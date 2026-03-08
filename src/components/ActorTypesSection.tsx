@@ -1,23 +1,23 @@
 import { motion } from "framer-motion";
-import {
-  Sprout, Users, UtensilsCrossed, GraduationCap, Store,
-  Building2, ShoppingCart, Truck, Factory, Heart,
-} from "lucide-react";
-
-const actors = [
-  { icon: Sprout, label: "Productores Agroecológicos", color: "from-primary to-leaf" },
-  { icon: Users, label: "Cooperativas y Asociaciones", color: "from-earth to-secondary" },
-  { icon: Heart, label: "Comedores Comunitarios", color: "from-secondary to-earth" },
-  { icon: GraduationCap, label: "Escuelas y Universidades", color: "from-wheat to-earth" },
-  { icon: ShoppingCart, label: "Consumidores Individuales", color: "from-leaf to-primary" },
-  { icon: UtensilsCrossed, label: "Restaurantes y Bares", color: "from-earth to-wheat" },
-  { icon: Store, label: "Comercios y Ferias", color: "from-primary to-forest" },
-  { icon: Building2, label: "Instituciones Públicas", color: "from-forest to-primary" },
-  { icon: Truck, label: "Proveedores Logísticos", color: "from-soil to-earth" },
-  { icon: Factory, label: "Plantas de Procesamiento", color: "from-wheat to-leaf" },
-];
+import { Sprout, Users, UtensilsCrossed, GraduationCap, Store, Building2, ShoppingCart, Truck, Factory, Heart } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const ActorTypesSection = () => {
+  const { t } = useLanguage();
+
+  const actors = [
+    { icon: Sprout, labelKey: "actors_section.producers", color: "from-primary to-leaf" },
+    { icon: Users, labelKey: "actors_section.cooperatives", color: "from-earth to-secondary" },
+    { icon: Heart, labelKey: "actors_section.kitchens", color: "from-secondary to-earth" },
+    { icon: GraduationCap, labelKey: "actors_section.schools", color: "from-wheat to-earth" },
+    { icon: ShoppingCart, labelKey: "actors_section.consumers", color: "from-leaf to-primary" },
+    { icon: UtensilsCrossed, labelKey: "actors_section.restaurants", color: "from-earth to-wheat" },
+    { icon: Store, labelKey: "actors_section.retail", color: "from-primary to-forest" },
+    { icon: Building2, labelKey: "actors_section.institutions", color: "from-forest to-primary" },
+    { icon: Truck, labelKey: "actors_section.logistics", color: "from-soil to-earth" },
+    { icon: Factory, labelKey: "actors_section.processing", color: "from-wheat to-leaf" },
+  ];
+
   return (
     <section className="py-24 bg-muted/50 relative overflow-hidden">
       <div className="absolute inset-0 opacity-30">
@@ -26,43 +26,24 @@ const ActorTypesSection = () => {
       </div>
 
       <div className="container relative">
-        <motion.div
-          className="text-center max-w-2xl mx-auto mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-        >
+        <motion.div className="text-center max-w-2xl mx-auto mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
           <span className="inline-block text-sm font-semibold text-earth uppercase tracking-wider px-4 py-1 rounded-full bg-earth/10">
-            Ecosistema multi-actor
+            {t("actors_section.badge")}
           </span>
-          <h2 className="text-3xl sm:text-4xl font-display text-foreground mt-4 mb-4">
-            Todos los eslabones de la cadena, conectados
-          </h2>
-          <p className="text-muted-foreground">
-            Desde el campo hasta la mesa, cada actor del sistema alimentario tiene su lugar en la red.
-          </p>
+          <h2 className="text-3xl sm:text-4xl font-display text-foreground mt-4 mb-4">{t("actors_section.title")}</h2>
+          <p className="text-muted-foreground">{t("actors_section.subtitle")}</p>
         </motion.div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           {actors.map((a, i) => (
-            <motion.div
-              key={a.label}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.06, type: "spring" }}
-              whileHover={{ y: -6, scale: 1.03 }}
-              className="group flex flex-col items-center gap-3 p-6 rounded-xl bg-card border border-border hover:border-primary/30 hover:shadow-elevated transition-all duration-300 text-center cursor-default"
-            >
-              <motion.div
-                className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${a.color} flex items-center justify-center shadow-lg`}
-                whileHover={{ rotate: 12, scale: 1.1 }}
-                transition={{ type: "spring", stiffness: 200 }}
-              >
+            <motion.div key={a.labelKey} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.06, type: "spring" }} whileHover={{ y: -6, scale: 1.03 }}
+              className="group flex flex-col items-center gap-3 p-6 rounded-xl bg-card border border-border hover:border-primary/30 hover:shadow-elevated transition-all duration-300 text-center cursor-default">
+              <motion.div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${a.color} flex items-center justify-center shadow-lg`}
+                whileHover={{ rotate: 12, scale: 1.1 }} transition={{ type: "spring", stiffness: 200 }}>
                 <a.icon className="h-6 w-6 text-primary-foreground" />
               </motion.div>
-              <span className="text-sm font-medium text-card-foreground group-hover:text-primary transition-colors">{a.label}</span>
+              <span className="text-sm font-medium text-card-foreground group-hover:text-primary transition-colors">{t(a.labelKey)}</span>
             </motion.div>
           ))}
         </div>

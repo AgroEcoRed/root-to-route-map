@@ -10,19 +10,21 @@ import {
 import {
   Search, MapPin, Sprout, Users, Heart, UtensilsCrossed,
   Store, Building2, Truck, Factory, ShieldCheck, Mail,
-  ClipboardCheck, Droplets, Leaf, FlaskConical, Eye, FileText, X
+  ClipboardCheck, Droplets, Leaf, FlaskConical, Eye, FileText
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type ActorType = "producer" | "cooperative" | "social_kitchen" | "restaurant" | "retail" | "institution" | "logistics" | "processing";
+type CertLevel = "red" | "yellow" | "green" | "none_spg";
 
 interface Actor {
   id: number;
   name: string;
   type: ActorType;
   location: string;
-  certification: "red" | "yellow" | "green";
+  certification: CertLevel;
   description: string;
   products: string[];
   capacity: string;
@@ -48,21 +50,15 @@ interface SPGEvaluation {
   evaluated_at: string | null;
 }
 
-const typeConfig: Record<ActorType, { label: string; icon: typeof Sprout }> = {
-  producer: { label: "Productor", icon: Sprout },
-  cooperative: { label: "Cooperativa", icon: Users },
-  social_kitchen: { label: "Comedor", icon: Heart },
-  restaurant: { label: "Restaurante", icon: UtensilsCrossed },
-  retail: { label: "Comercio", icon: Store },
-  institution: { label: "Institución", icon: Building2 },
-  logistics: { label: "Logística", icon: Truck },
-  processing: { label: "Procesamiento", icon: Factory },
-};
-
-const certConfig = {
-  red: { label: "Básico", classes: "bg-destructive/10 text-destructive", dot: "bg-destructive" },
-  yellow: { label: "En transición", classes: "bg-wheat/20 text-wheat-foreground", dot: "bg-wheat" },
-  green: { label: "Certificado", classes: "bg-primary/10 text-primary", dot: "bg-primary" },
+const typeIcons: Record<ActorType, typeof Sprout> = {
+  producer: Sprout,
+  cooperative: Users,
+  social_kitchen: Heart,
+  restaurant: UtensilsCrossed,
+  retail: Store,
+  institution: Building2,
+  logistics: Truck,
+  processing: Factory,
 };
 
 const evalTypeIcons: Record<string, typeof Droplets> = {
@@ -70,13 +66,6 @@ const evalTypeIcons: Record<string, typeof Droplets> = {
   agua: Droplets,
   biodiversidad: Leaf,
   condiciones_laborales: Users,
-};
-
-const evalTypeLabels: Record<string, string> = {
-  suelo: "Suelo",
-  agua: "Agua",
-  biodiversidad: "Biodiversidad",
-  condiciones_laborales: "Condiciones laborales",
 };
 
 const actors: Actor[] = [
@@ -90,15 +79,35 @@ const actors: Actor[] = [
   { id: 8, name: "Molino Agroeco", type: "processing", location: "Luján", certification: "green", description: "Molienda artesanal de cereales agroecológicos.", products: ["Harina de trigo", "Harina de maíz"], capacity: "2 ton/día" },
   { id: 9, name: "Granja El Retiro", type: "producer", location: "San Vicente", certification: "yellow", description: "Granja integral con animales a campo y huerta. En transición agroecológica.", products: ["Huevos", "Pollo", "Cerdos"], capacity: "500 docenas/mes", spgId: "b2222222-2222-2222-2222-222222222222" },
   { id: 10, name: "Coop. Tierra Viva", type: "cooperative", location: "Cañuelas", certification: "green", description: "Cooperativa de la agricultura familiar periurbana.", products: ["Verduras", "Plantines", "Semillas"], capacity: "8 ton/mes" },
+  { id: 11, name: "Huerta Orgánica Raíces", type: "producer", location: "Marcos Paz", certification: "none_spg", description: "Producción agroecológica sin participación en SPG. Aplica técnicas de permacultura.", products: ["Aromáticas", "Tomate", "Zapallito"], capacity: "1 ton/mes" },
 ];
 
 const ActorsPage = () => {
+  const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const [activeType, setActiveType] = useState<ActorType | "all">("all");
   const [selectedSpgId, setSelectedSpgId] = useState<string | null>(null);
   const [spgData, setSpgData] = useState<SPG | null>(null);
   const [spgEvals, setSpgEvals] = useState<SPGEvaluation[]>([]);
   const [loadingSpg, setLoadingSpg] = useState(false);
+
+  const typeConfig: Record<ActorType, { label: string; icon: typeof Sprout }> = {
+    producer: { label: t("actor.producer"), icon: Sprout },
+    cooperative: { label: t("actor.cooperative"), icon: Users },
+    social_kitchen: { label: t("actor.social_kitchen"), icon: Heart },
+    restaurant: { label: t("actor.restaurant"), icon: UtensilsCrossed },
+    retail: { label: t("actor.retail"), icon: Store },
+    institution: { label: t("actor.institution"), icon: Building2 },
+    logistics: { label: t("actor.logistics"), icon: Truck },
+    processing: { label: t("actor.processing"), icon: Factory },
+  };
+
+  const certConfig: Record<CertLevel, { label: string; classes: string }> = {
+    red: { label: t("cert.red"), classes: "bg-destructive/10 text-destructive" },
+    yellow: { label: t("cert.yellow"), classes: "bg-wheat/20 text-wheat-foreground" },
+    green: { label: t("cert.green"), classes: "bg-primary/10 text-primary" },
+    none_spg: { label: t("cert.none_spg"), classes: "bg-muted text-muted-foreground" },
+  };
 
   const filtered = useMemo(() => {
     return actors.filter((a) => {
@@ -133,10 +142,8 @@ const ActorsPage = () => {
       <main className="flex-1 pt-16">
         <div className="bg-gradient-earth py-12">
           <div className="container">
-            <h1 className="text-3xl sm:text-4xl font-display text-earth-foreground mb-2">Red de Actores</h1>
-            <p className="text-earth-foreground/70 max-w-xl">
-              Directorio de productores, compradores, logística e infraestructura del ecosistema agroecológico.
-            </p>
+            <h1 className="text-3xl sm:text-4xl font-display text-earth-foreground mb-2">{t("actors.title")}</h1>
+            <p className="text-earth-foreground/70 max-w-xl">{t("actors.subtitle")}</p>
           </div>
         </div>
 
@@ -144,29 +151,21 @@ const ActorsPage = () => {
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Buscar actor..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+              <Input placeholder={t("actors.search")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
             </div>
           </div>
 
           <div className="flex flex-wrap gap-2 mb-8">
-            <button
-              onClick={() => setActiveType("all")}
+            <button onClick={() => setActiveType("all")}
               className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
                 activeType === "all" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/40"
-              }`}
-            >
-              Todos
-            </button>
+              }`}>{t("actors.all")}</button>
             {(Object.entries(typeConfig) as [ActorType, typeof typeConfig.producer][]).map(([key, cfg]) => (
-              <button
-                key={key}
-                onClick={() => setActiveType(key)}
+              <button key={key} onClick={() => setActiveType(key)}
                 className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
                   activeType === key ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/40"
-                }`}
-              >
-                <cfg.icon className="h-3.5 w-3.5" />
-                {cfg.label}
+                }`}>
+                <cfg.icon className="h-3.5 w-3.5" />{cfg.label}
               </button>
             ))}
           </div>
@@ -177,13 +176,9 @@ const ActorsPage = () => {
               const cert = certConfig[a.certification];
               const isProducer = a.type === "producer";
               return (
-                <motion.div
-                  key={a.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                <motion.div key={a.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: i * 0.05 }}
-                  className="rounded-xl border border-border bg-card p-6 hover:shadow-elevated transition-all duration-300"
-                >
+                  className="rounded-xl border border-border bg-card p-6 hover:shadow-elevated transition-all duration-300">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <cfg.icon className="h-6 w-6 text-primary" />
@@ -194,8 +189,7 @@ const ActorsPage = () => {
                         <Badge variant="secondary" className="text-[10px]">{cfg.label}</Badge>
                         {isProducer && (
                           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${cert.classes}`}>
-                            <ShieldCheck className="h-3 w-3" />
-                            {cert.label}
+                            <ShieldCheck className="h-3 w-3" />{cert.label}
                           </span>
                         )}
                       </div>
@@ -203,21 +197,18 @@ const ActorsPage = () => {
                   </div>
 
                   <p className="text-sm text-muted-foreground mt-3">{a.description}</p>
-
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-3">
                     <MapPin className="h-3 w-3" /> {a.location}
                   </div>
 
                   {a.products.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-3">
-                      {a.products.map((p) => (
-                        <Badge key={p} variant="outline" className="text-[10px]">{p}</Badge>
-                      ))}
+                      {a.products.map((p) => (<Badge key={p} variant="outline" className="text-[10px]">{p}</Badge>))}
                     </div>
                   )}
 
                   <div className="flex items-center justify-between mt-4 pt-4 border-t border-border gap-2">
-                    <span className="text-xs text-muted-foreground">Cap: {a.capacity}</span>
+                    <span className="text-xs text-muted-foreground">{t("actors.cap")}: {a.capacity}</span>
                     <div className="flex items-center gap-2">
                       {isProducer && a.spgId && (
                         <Button size="sm" variant="outline" className="text-xs" onClick={() => setSelectedSpgId(a.spgId!)}>
@@ -225,7 +216,7 @@ const ActorsPage = () => {
                         </Button>
                       )}
                       <Button size="sm" variant="outline" className="text-xs">
-                        <Mail className="h-3 w-3 mr-1" /> Contactar
+                        <Mail className="h-3 w-3 mr-1" /> {t("actors.contact")}
                       </Button>
                     </div>
                   </div>
@@ -243,13 +234,12 @@ const ActorsPage = () => {
           <DialogHeader>
             <DialogTitle className="font-display text-xl flex items-center gap-2">
               <ClipboardCheck className="h-5 w-5 text-primary" />
-              {loadingSpg ? "Cargando..." : spgData?.name}
+              {loadingSpg ? t("spg.loading") : spgData?.name}
             </DialogTitle>
           </DialogHeader>
 
           {spgData && (
             <div className="space-y-6">
-              {/* Overview */}
               <div>
                 <p className="text-sm text-muted-foreground">{spgData.description}</p>
                 {spgData.region && (
@@ -259,60 +249,48 @@ const ActorsPage = () => {
                 )}
               </div>
 
-              {/* Stats */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="rounded-lg border border-border bg-muted/30 p-4 text-center">
                   <p className="text-2xl font-display text-primary">{spgData.peer_visit_count}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Visitas de pares realizadas</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t("spg.peer_visits")}</p>
                 </div>
                 <div className="rounded-lg border border-border bg-muted/30 p-4 text-center">
                   <p className="text-2xl font-display text-primary">{spgEvals.length}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Exámenes realizados</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t("spg.evaluations_done")}</p>
                 </div>
               </div>
 
-              {/* Methodology */}
               {spgData.methodology && (
                 <div>
                   <h4 className="font-medium text-sm text-card-foreground mb-2 flex items-center gap-1.5">
-                    <FileText className="h-4 w-4 text-primary" /> Metodología
+                    <FileText className="h-4 w-4 text-primary" /> {t("spg.methodology")}
                   </h4>
                   <p className="text-sm text-muted-foreground leading-relaxed">{spgData.methodology}</p>
                 </div>
               )}
 
-              {/* Evaluation form link */}
               {spgData.evaluation_form_url && (
                 <div>
-                  <h4 className="font-medium text-sm text-card-foreground mb-2">Formulario de evaluación</h4>
-                  <a
-                    href={spgData.evaluation_form_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-primary underline hover:text-primary/80 transition-colors"
-                  >
-                    Ver formulario utilizado →
+                  <h4 className="font-medium text-sm text-card-foreground mb-2">{t("spg.eval_form")}</h4>
+                  <a href={spgData.evaluation_form_url} target="_blank" rel="noopener noreferrer"
+                    className="text-sm text-primary underline hover:text-primary/80 transition-colors">
+                    {t("spg.view_form")}
                   </a>
                 </div>
               )}
 
-              {/* Evaluations */}
               {spgEvals.length > 0 && (
                 <div>
                   <h4 className="font-medium text-sm text-card-foreground mb-3 flex items-center gap-1.5">
-                    <FlaskConical className="h-4 w-4 text-primary" /> Exámenes realizados
+                    <FlaskConical className="h-4 w-4 text-primary" /> {t("spg.evaluations")}
                   </h4>
                   <div className="space-y-3">
                     {spgEvals.map((ev) => {
                       const EvalIcon = evalTypeIcons[ev.evaluation_type] || FlaskConical;
-                      const evalLabel = evalTypeLabels[ev.evaluation_type] || ev.evaluation_type;
+                      const evalLabel = t(`eval.${ev.evaluation_type}`) || ev.evaluation_type;
                       return (
-                        <motion.div
-                          key={ev.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          className="rounded-lg border border-border p-4 hover:bg-muted/20 transition-colors"
-                        >
+                        <motion.div key={ev.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+                          className="rounded-lg border border-border p-4 hover:bg-muted/20 transition-colors">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex items-center gap-2">
                               <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
@@ -323,13 +301,9 @@ const ActorsPage = () => {
                                 <p className="text-[10px] text-muted-foreground">{evalLabel}</p>
                               </div>
                             </div>
-                            {ev.result && (
-                              <Badge variant="secondary" className="text-[10px] flex-shrink-0">{ev.result}</Badge>
-                            )}
+                            {ev.result && (<Badge variant="secondary" className="text-[10px] flex-shrink-0">{ev.result}</Badge>)}
                           </div>
-                          {ev.notes && (
-                            <p className="text-xs text-muted-foreground mt-2 ml-10">{ev.notes}</p>
-                          )}
+                          {ev.notes && (<p className="text-xs text-muted-foreground mt-2 ml-10">{ev.notes}</p>)}
                           {ev.evaluated_at && (
                             <p className="text-[10px] text-muted-foreground mt-1 ml-10">
                               {new Date(ev.evaluated_at).toLocaleDateString("es-AR", { year: "numeric", month: "long", day: "numeric" })}

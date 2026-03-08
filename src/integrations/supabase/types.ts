@@ -183,7 +183,7 @@ export type Database = {
         | "institution"
         | "logistics"
         | "processing"
-      certification_level: "red" | "yellow" | "green"
+      certification_level: "red" | "yellow" | "green" | "none_spg"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -322,7 +322,7 @@ export const Constants = {
         "logistics",
         "processing",
       ],
-      certification_level: ["red", "yellow", "green"],
+      certification_level: ["red", "yellow", "green", "none_spg"],
     },
   },
 } as const
