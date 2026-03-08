@@ -258,8 +258,8 @@ const MapPage = () => {
   }, [filtered]);
 
   // Group actor types by role for filter display
-  const ofertaTypes: ActorType[] = ["producer", "cooperative", "processing"];
-  const demandaTypes: ActorType[] = ["restaurant", "social_kitchen", "institution", "retail"];
+  const ofertaTypes: ActorType[] = ["producer", "cooperative", "processing", "agroecological_node", "seed_bank", "composting_center", "research_center"];
+  const demandaTypes: ActorType[] = ["restaurant", "social_kitchen", "institution", "retail", "consumer_node", "individual_consumer", "food_bank", "consumer_cooperative", "community_org", "health_food_store"];
   const servicioTypes: ActorType[] = ["logistics"];
 
   return (
