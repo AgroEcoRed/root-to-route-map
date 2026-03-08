@@ -161,6 +161,15 @@ const Navbar = () => {
 
         {/* Mobile toggle */}
         <div className="flex items-center gap-2 md:hidden">
+          {/* Mobile cart */}
+          <button onClick={() => setCartOpen(true)} className="relative p-2">
+            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+            {totalItems > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[9px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
+          </button>
           {/* Mobile lang switcher */}
           <div className="relative">
             <button
