@@ -21,6 +21,7 @@ const Navbar = () => {
     { to: "/mapa", label: t("nav.map"), icon: MapPin },
     { to: "/mercado", label: t("nav.market"), icon: ShoppingBasket },
     { to: "/actores", label: t("nav.actors"), icon: Users },
+    { to: "/comunidad", label: t("nav.community"), icon: BookOpen },
   ];
 
   useEffect(() => {
