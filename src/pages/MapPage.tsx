@@ -122,9 +122,11 @@ const MapPage = () => {
         iconAnchor: [14, 14],
       });
 
-      const certColor = a.certification === "green" ? "#2d6a4f" : a.certification === "yellow" ? "#d4a017" : "#dc2626";
-      const productsHtml = a.products.length > 0
-        ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">${a.products.map((p) => `<span style="background:#e8f5e9;color:#2d6a4f;font-size:10px;padding:2px 6px;border-radius:4px">${p}</span>`).join("")}</div>`
+      const certHtml = a.type === "producer"
+        ? `<div style="display:flex;align-items:center;gap:4px;margin-top:8px">
+              <span style="width:10px;height:10px;border-radius:50%;background:${certColor};display:inline-block"></span>
+              <span style="font-size:11px">${certLabels[a.certification]}</span>
+            </div>`
         : "";
 
       const marker = L.marker([a.lat, a.lng], { icon })
@@ -135,10 +137,7 @@ const MapPage = () => {
             <p style="font-size:12px;color:#666;margin:2px 0">${actorTypeLabels[a.type]}</p>
             <p style="font-size:12px;margin:4px 0">${a.description}</p>
             ${productsHtml}
-            <div style="display:flex;align-items:center;gap:4px;margin-top:8px">
-              <span style="width:10px;height:10px;border-radius:50%;background:${certColor};display:inline-block"></span>
-              <span style="font-size:11px">${certLabels[a.certification]}</span>
-            </div>
+            ${certHtml}
           </div>
         `);
       markersRef.current.push(marker);
