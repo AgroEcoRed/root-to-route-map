@@ -14,7 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          actor_type: Database["public"]["Enums"]["actor_type"]
+          avatar_url: string | null
+          capacity: string | null
+          certification:
+            | Database["public"]["Enums"]["certification_level"]
+            | null
+          created_at: string
+          description: string | null
+          display_name: string | null
+          id: string
+          lat: number | null
+          lng: number | null
+          location: string | null
+          phone: string | null
+          production_methods: string | null
+          products: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          actor_type?: Database["public"]["Enums"]["actor_type"]
+          avatar_url?: string | null
+          capacity?: string | null
+          certification?:
+            | Database["public"]["Enums"]["certification_level"]
+            | null
+          created_at?: string
+          description?: string | null
+          display_name?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          location?: string | null
+          phone?: string | null
+          production_methods?: string | null
+          products?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          actor_type?: Database["public"]["Enums"]["actor_type"]
+          avatar_url?: string | null
+          capacity?: string | null
+          certification?:
+            | Database["public"]["Enums"]["certification_level"]
+            | null
+          created_at?: string
+          description?: string | null
+          display_name?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          location?: string | null
+          phone?: string | null
+          production_methods?: string | null
+          products?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +85,17 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      actor_type:
+        | "producer"
+        | "cooperative"
+        | "social_kitchen"
+        | "restaurant"
+        | "retail"
+        | "consumer"
+        | "institution"
+        | "logistics"
+        | "processing"
+      certification_level: "red" | "yellow" | "green"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +222,19 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      actor_type: [
+        "producer",
+        "cooperative",
+        "social_kitchen",
+        "restaurant",
+        "retail",
+        "consumer",
+        "institution",
+        "logistics",
+        "processing",
+      ],
+      certification_level: ["red", "yellow", "green"],
+    },
   },
 } as const
