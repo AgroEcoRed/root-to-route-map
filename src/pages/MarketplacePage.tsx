@@ -155,13 +155,31 @@ const MarketplacePage = () => {
             </Select>
           </div>
 
-          <div className="flex flex-wrap gap-2 mb-8">
+          <div className="flex flex-wrap gap-2 mb-4">
             {categoriesKeys.map((cat) => (
-              <button key={cat} onClick={() => setActiveCategory(cat)}
+              <button key={cat} onClick={() => { setActiveCategory(cat); if (cat !== "Huevos") setActiveEggSub("all_eggs"); }}
                 className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
                   activeCategory === cat ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/40"
                 }`}>{getCategoryLabel(cat)}</button>
             ))}
+          </div>
+
+          {/* Egg subcategory filter */}
+          <AnimatePresence>
+            {activeCategory === "Huevos" && (
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                className="flex flex-wrap gap-2 mb-4 overflow-hidden">
+                {eggSubcategories.map((sub) => (
+                  <button key={sub} onClick={() => setActiveEggSub(sub)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                      activeEggSub === sub ? "border-secondary bg-secondary text-secondary-foreground" : "border-border bg-card text-muted-foreground hover:border-secondary/40"
+                    }`}>{t(`egg.${sub}`)}</button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="mb-8" />
           </div>
 
           <div className="flex items-center justify-between mb-4">
