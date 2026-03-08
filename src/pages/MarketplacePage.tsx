@@ -179,8 +179,7 @@ const MarketplacePage = () => {
             )}
           </AnimatePresence>
 
-          <div className="mb-8" />
-          </div>
+          <div className="mb-4" />
 
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm text-muted-foreground">{filtered.length} {t("market.products_available")}</p>
