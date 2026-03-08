@@ -1,21 +1,11 @@
-import { useState, useMemo } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useState, useMemo, useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, Layers, X } from "lucide-react";
-
-// Fix Leaflet default icon issue
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-});
+import { Search, Filter, X } from "lucide-react";
 
 type ActorType =
   | "producer"
@@ -60,15 +50,8 @@ const actorTypeColors: Record<ActorType, string> = {
   processing: "#264653",
 };
 
-const certColors = {
-  red: "bg-destructive text-destructive-foreground",
-  yellow: "bg-wheat text-wheat-foreground",
-  green: "bg-primary text-primary-foreground",
-};
-
 const certLabels = { red: "Básico", yellow: "En proceso", green: "Certificado" };
 
-// Mock data - Argentina-centered
 const mockActors: MapActor[] = [
   { id: 1, name: "Finca La Esperanza", type: "producer", lat: -34.61, lng: -58.38, products: ["Tomate", "Lechuga", "Acelga"], certification: "green", description: "Producción agroecológica familiar, 5 hectáreas." },
   { id: 2, name: "Cooperativa Del Sol", type: "cooperative", lat: -34.65, lng: -58.50, products: ["Miel", "Frutas", "Hierbas"], certification: "green", description: "15 familias productoras asociadas." },
@@ -84,18 +67,13 @@ const mockActors: MapActor[] = [
   { id: 12, name: "Bar Cosecha", type: "restaurant", lat: -34.59, lng: -58.40, products: ["Frutas", "Verduras"], certification: "red", description: "Bar con carta de origen local." },
 ];
 
-const createIcon = (type: ActorType) =>
-  L.divIcon({
-    className: "custom-marker",
-    html: `<div style="background:${actorTypeColors[type]};width:28px;height:28px;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>`,
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
-  });
-
 const MapPage = () => {
   const [search, setSearch] = useState("");
   const [activeTypes, setActiveTypes] = useState<Set<ActorType>>(new Set(Object.keys(actorTypeLabels) as ActorType[]));
   const [showFilters, setShowFilters] = useState(true);
+  const mapRef = useRef<L.Map | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const markersRef = useRef<L.Marker[]>([]);
 
   const toggleType = (type: ActorType) => {
     setActiveTypes((prev) => {
@@ -113,6 +91,59 @@ const MapPage = () => {
       return true;
     });
   }, [activeTypes, search]);
+
+  // Initialize map
+  useEffect(() => {
+    if (!mapContainerRef.current || mapRef.current) return;
+    mapRef.current = L.map(mapContainerRef.current).setView([-34.61, -58.44], 12);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(mapRef.current);
+
+    return () => {
+      mapRef.current?.remove();
+      mapRef.current = null;
+    };
+  }, []);
+
+  // Update markers
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    // Clear existing markers
+    markersRef.current.forEach((m) => m.remove());
+    markersRef.current = [];
+
+    filtered.forEach((a) => {
+      const icon = L.divIcon({
+        className: "custom-marker",
+        html: `<div style="background:${actorTypeColors[a.type]};width:28px;height:28px;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
+      });
+
+      const certColor = a.certification === "green" ? "#2d6a4f" : a.certification === "yellow" ? "#d4a017" : "#dc2626";
+      const productsHtml = a.products.length > 0
+        ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">${a.products.map((p) => `<span style="background:#e8f5e9;color:#2d6a4f;font-size:10px;padding:2px 6px;border-radius:4px">${p}</span>`).join("")}</div>`
+        : "";
+
+      const marker = L.marker([a.lat, a.lng], { icon })
+        .addTo(mapRef.current!)
+        .bindPopup(`
+          <div style="min-width:200px;font-family:DM Sans,sans-serif">
+            <p style="font-weight:700;font-size:14px;margin:0">${a.name}</p>
+            <p style="font-size:12px;color:#666;margin:2px 0">${actorTypeLabels[a.type]}</p>
+            <p style="font-size:12px;margin:4px 0">${a.description}</p>
+            ${productsHtml}
+            <div style="display:flex;align-items:center;gap:4px;margin-top:8px">
+              <span style="width:10px;height:10px;border-radius:50%;background:${certColor};display:inline-block"></span>
+              <span style="font-size:11px">${certLabels[a.certification]}</span>
+            </div>
+          </div>
+        `);
+      markersRef.current.push(marker);
+    });
+  }, [filtered]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -162,7 +193,9 @@ const MapPage = () => {
               <p className="text-sm font-medium text-muted-foreground mb-2">Certificación</p>
               <div className="flex gap-2">
                 {(["green", "yellow", "red"] as const).map((c) => (
-                  <span key={c} className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${certColors[c]}`}>
+                  <span key={c} className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                    c === "green" ? "bg-primary text-primary-foreground" : c === "yellow" ? "bg-wheat text-wheat-foreground" : "bg-destructive text-destructive-foreground"
+                  }`}>
                     {certLabels[c]}
                   </span>
                 ))}
@@ -173,7 +206,9 @@ const MapPage = () => {
             <div className="space-y-2 max-h-[40vh] overflow-y-auto">
               <p className="text-sm font-medium text-muted-foreground">{filtered.length} resultados</p>
               {filtered.map((a) => (
-                <div key={a.id} className="p-3 rounded-lg border border-border hover:border-primary/30 transition-colors bg-background">
+                <div key={a.id} className="p-3 rounded-lg border border-border hover:border-primary/30 transition-colors bg-background cursor-pointer"
+                  onClick={() => mapRef.current?.setView([a.lat, a.lng], 15)}
+                >
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <p className="text-sm font-medium text-foreground">{a.name}</p>
@@ -209,41 +244,7 @@ const MapPage = () => {
               Filtros
             </Button>
           )}
-          <MapContainer
-            center={[-34.61, -58.44]}
-            zoom={12}
-            className="h-[calc(100vh-4rem)] w-full z-0"
-            scrollWheelZoom
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {filtered.map((a) => (
-              <Marker key={a.id} position={[a.lat, a.lng]} icon={createIcon(a.type)}>
-                <Popup>
-                  <div className="min-w-[200px]">
-                    <p className="font-bold text-sm">{a.name}</p>
-                    <p className="text-xs text-gray-500">{actorTypeLabels[a.type]}</p>
-                    <p className="text-xs mt-1">{a.description}</p>
-                    {a.products.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {a.products.map((p) => (
-                          <span key={p} className="bg-green-100 text-green-800 text-[10px] px-1.5 py-0.5 rounded">{p}</span>
-                        ))}
-                      </div>
-                    )}
-                    <div className="mt-2 flex items-center gap-1">
-                      <span className={`w-2.5 h-2.5 rounded-full ${
-                        a.certification === "green" ? "bg-green-500" : a.certification === "yellow" ? "bg-yellow-400" : "bg-red-500"
-                      }`} />
-                      <span className="text-[10px]">{certLabels[a.certification]}</span>
-                    </div>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
+          <div ref={mapContainerRef} className="h-[calc(100vh-4rem)] w-full z-0" />
         </div>
       </div>
     </div>
