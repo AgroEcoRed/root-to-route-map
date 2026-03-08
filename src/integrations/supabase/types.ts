@@ -32,6 +32,7 @@ export type Database = {
           phone: string | null
           production_methods: string | null
           products: string[] | null
+          spg_id: string | null
           updated_at: string
           user_id: string
         }
@@ -52,6 +53,7 @@ export type Database = {
           phone?: string | null
           production_methods?: string | null
           products?: string[] | null
+          spg_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -72,8 +74,94 @@ export type Database = {
           phone?: string | null
           production_methods?: string | null
           products?: string[] | null
+          spg_id?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_spg_id_fkey"
+            columns: ["spg_id"]
+            isOneToOne: false
+            referencedRelation: "spgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      spg_evaluations: {
+        Row: {
+          created_at: string
+          evaluated_at: string | null
+          evaluation_type: string
+          id: string
+          notes: string | null
+          result: string | null
+          spg_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          evaluated_at?: string | null
+          evaluation_type: string
+          id?: string
+          notes?: string | null
+          result?: string | null
+          spg_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          evaluated_at?: string | null
+          evaluation_type?: string
+          id?: string
+          notes?: string | null
+          result?: string | null
+          spg_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spg_evaluations_spg_id_fkey"
+            columns: ["spg_id"]
+            isOneToOne: false
+            referencedRelation: "spgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      spgs: {
+        Row: {
+          created_at: string
+          description: string | null
+          evaluation_form_url: string | null
+          id: string
+          methodology: string | null
+          name: string
+          peer_visit_count: number
+          region: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          evaluation_form_url?: string | null
+          id?: string
+          methodology?: string | null
+          name: string
+          peer_visit_count?: number
+          region?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          evaluation_form_url?: string | null
+          id?: string
+          methodology?: string | null
+          name?: string
+          peer_visit_count?: number
+          region?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
