@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/contexts/CartContext";
 import { Input } from "@/components/ui/input";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -74,6 +75,7 @@ const eggSubcategories = ["all_eggs", "gallina_pastoril", "pato", "codorniz"];
 
 const MarketplacePage = () => {
   const { t } = useLanguage();
+  const { addItem } = useCart();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [activeEggSub, setActiveEggSub] = useState("all_eggs");
@@ -243,8 +245,9 @@ const MarketplacePage = () => {
                       <span className="font-display text-lg text-foreground">
                         {p.priceDisplay}<span className="text-sm text-muted-foreground font-body">/{p.unit}</span>
                       </span>
-                      <Button size="sm" className="bg-gradient-hero text-primary-foreground text-xs">
-                        {t("market.contact")}
+                      <Button size="sm" className="bg-gradient-hero text-primary-foreground text-xs"
+                        onClick={() => addItem({ id: p.id, name: p.name, producer: p.producer, location: p.location, price: p.price, priceDisplay: p.priceDisplay, unit: p.unit, image: p.image })}>
+                        {t("market.add_cart")}
                       </Button>
                     </div>
                   </div>

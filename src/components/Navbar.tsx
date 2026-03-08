@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, MapPin, ShoppingBasket, Users, Leaf, LogOut, User, Globe, BookOpen } from "lucide-react";
+import { Menu, X, MapPin, ShoppingBasket, Users, Leaf, LogOut, User, Globe, BookOpen, ShoppingCart } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage, Lang } from "@/contexts/LanguageContext";
@@ -15,6 +16,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { t, lang, setLang, langs } = useLanguage();
+  const { totalItems, setIsOpen: setCartOpen } = useCart();
 
   const navItems = [
     { to: "/", label: t("nav.home"), icon: Leaf },
@@ -86,6 +88,18 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-2">
+          {/* Cart */}
+          <button
+            onClick={() => setCartOpen(true)}
+            className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+          >
+            <ShoppingCart className="h-4 w-4" />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
+          </button>
           {/* Language Switcher */}
           <div className="relative">
             <button
@@ -147,6 +161,15 @@ const Navbar = () => {
 
         {/* Mobile toggle */}
         <div className="flex items-center gap-2 md:hidden">
+          {/* Mobile cart */}
+          <button onClick={() => setCartOpen(true)} className="relative p-2">
+            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+            {totalItems > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[9px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
+          </button>
           {/* Mobile lang switcher */}
           <div className="relative">
             <button
