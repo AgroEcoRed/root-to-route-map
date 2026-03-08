@@ -16,6 +16,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { t, lang, setLang, langs } = useLanguage();
+  const { totalItems, setIsOpen: setCartOpen } = useCart();
 
   const navItems = [
     { to: "/", label: t("nav.home"), icon: Leaf },
