@@ -22,6 +22,7 @@ interface Product {
   producer: string;
   location: string;
   category: string;
+  subcategory?: string;
   price: number;
   priceDisplay: string;
   unit: string;
@@ -39,7 +40,7 @@ const mockProducts: Product[] = [
   { id: 1, name: "Tomate Platense", producer: "Finca La Esperanza", location: "La Plata", category: "Verduras", price: 1200, priceDisplay: "$1.200", unit: "kg", available: "500 kg", certification: "green", image: "🍅", seasonal: "Oct - Mar", soldCount: 340, distanceKm: 12 },
   { id: 2, name: "Lechuga Criolla", producer: "Finca La Esperanza", location: "La Plata", category: "Verduras", price: 800, priceDisplay: "$800", unit: "kg", available: "200 kg", certification: "green", image: "🥬", seasonal: "Todo el año", soldCount: 280, distanceKm: 12 },
   { id: 3, name: "Miel Multifloral", producer: "Cooperativa Del Sol", location: "Florencio Varela", category: "Miel", price: 4500, priceDisplay: "$4.500", unit: "kg", available: "150 kg", certification: "green", image: "🍯", seasonal: "Feb - May", soldCount: 150, distanceKm: 25 },
-  { id: 4, name: "Huevos de Campo", producer: "Granja El Retiro", location: "San Vicente", category: "Huevos", price: 3200, priceDisplay: "$3.200", unit: "docena", available: "80 doc/sem", certification: "green", image: "🥚", seasonal: "Todo el año", soldCount: 420, distanceKm: 45 },
+  { id: 4, name: "Huevos Pastoril Colorados", producer: "Granja El Retiro", location: "San Vicente", category: "Huevos", subcategory: "gallina_pastoril", price: 3200, priceDisplay: "$3.200", unit: "docena", available: "80 doc/sem", certification: "green", image: "🥚", seasonal: "Todo el año", soldCount: 420, distanceKm: 45 },
   { id: 5, name: "Zapallo Anco", producer: "Huerta Don Pedro", location: "Moreno", category: "Verduras", price: 900, priceDisplay: "$900", unit: "kg", available: "800 kg", certification: "yellow", image: "🎃", seasonal: "Mar - Jul", soldCount: 190, distanceKm: 35 },
   { id: 6, name: "Harina Integral", producer: "Molino Agroeco", location: "Luján", category: "Cereales", price: 2100, priceDisplay: "$2.100", unit: "kg", available: "1.000 kg", certification: "green", image: "🌾", seasonal: "Todo el año", soldCount: 310, distanceKm: 60 },
   { id: 7, name: "Dulce de Durazno", producer: "Cooperativa Del Sol", location: "Florencio Varela", category: "Conservas", price: 3800, priceDisplay: "$3.800", unit: "frasco 500g", available: "120 uds", certification: "green", image: "🍑", seasonal: "Ene - Mar", soldCount: 95, distanceKm: 25 },
@@ -48,6 +49,12 @@ const mockProducts: Product[] = [
   { id: 10, name: "Queso Criollo", producer: "Coop. Tierra Viva", location: "Cañuelas", category: "Lácteos", price: 6200, priceDisplay: "$6.200", unit: "kg", available: "40 kg/sem", certification: "green", image: "🧀", seasonal: "Todo el año", soldCount: 130, distanceKm: 55 },
   { id: 11, name: "Acelga de Hoja", producer: "Coop. Tierra Viva", location: "Cañuelas", category: "Verduras", price: 700, priceDisplay: "$700", unit: "atado", available: "300 atados", certification: "green", image: "🥗", seasonal: "Mar - Nov", soldCount: 260, distanceKm: 55 },
   { id: 12, name: "Choclo Fresco", producer: "Huerta Don Pedro", location: "Moreno", category: "Verduras", price: 600, priceDisplay: "$600", unit: "unidad", available: "1.000 uds", certification: "yellow", image: "🌽", seasonal: "Dic - Mar", soldCount: 380, distanceKm: 35 },
+  // Egg varieties
+  { id: 13, name: "Huevos Pastoril Blancos", producer: "Granja El Retiro", location: "San Vicente", category: "Huevos", subcategory: "gallina_pastoril", price: 3000, priceDisplay: "$3.000", unit: "docena", available: "60 doc/sem", certification: "green", image: "🥚", seasonal: "Todo el año", soldCount: 310, distanceKm: 45 },
+  { id: 14, name: "Huevos Araucanos (Verdes)", producer: "Finca La Esperanza", location: "La Plata", category: "Huevos", subcategory: "gallina_pastoril", price: 4200, priceDisplay: "$4.200", unit: "docena", available: "20 doc/sem", certification: "green", image: "🥚", seasonal: "Todo el año", soldCount: 85, distanceKm: 12 },
+  { id: 15, name: "Huevos Doble Yema", producer: "Granja El Retiro", location: "San Vicente", category: "Huevos", subcategory: "gallina_pastoril", price: 4500, priceDisplay: "$4.500", unit: "docena", available: "15 doc/sem", certification: "green", image: "🥚", seasonal: "Todo el año", soldCount: 60, distanceKm: 45 },
+  { id: 16, name: "Huevos de Pato", producer: "Coop. Tierra Viva", location: "Cañuelas", category: "Huevos", subcategory: "pato", price: 5800, priceDisplay: "$5.800", unit: "docena", available: "10 doc/sem", certification: "green", image: "🦆", seasonal: "Ago - Feb", soldCount: 40, distanceKm: 55 },
+  { id: 17, name: "Huevos de Codorniz", producer: "Huerta Don Pedro", location: "Moreno", category: "Huevos", subcategory: "codorniz", price: 2800, priceDisplay: "$2.800", unit: "30 uds", available: "25 packs/sem", certification: "yellow", image: "🐣", seasonal: "Todo el año", soldCount: 120, distanceKm: 35 },
 ];
 
 const isInSeason = (seasonal: string): boolean => {
