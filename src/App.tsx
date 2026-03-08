@@ -3,11 +3,14 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import MapPage from "./pages/MapPage";
 import MarketplacePage from "./pages/MarketplacePage";
 import ActorsPage from "./pages/ActorsPage";
 import RegistrationPage from "./pages/RegistrationPage";
+import LoginPage from "./pages/LoginPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -18,14 +21,18 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/mapa" element={<MapPage />} />
-          <Route path="/mercado" element={<MarketplacePage />} />
-          <Route path="/actores" element={<ActorsPage />} />
-          <Route path="/registro" element={<RegistrationPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/mapa" element={<MapPage />} />
+            <Route path="/mercado" element={<MarketplacePage />} />
+            <Route path="/actores" element={<ActorsPage />} />
+            <Route path="/registro" element={<RegistrationPage />} />
+            <Route path="/ingresar" element={<LoginPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
