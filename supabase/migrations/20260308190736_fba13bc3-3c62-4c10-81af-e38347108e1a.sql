@@ -1,0 +1,1 @@
+ALTER TYPE public.certification_level ADD VALUE 'none_spg';
