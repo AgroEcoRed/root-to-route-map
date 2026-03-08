@@ -1,14 +1,19 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Search, MapPin, Sprout, Users, Heart, UtensilsCrossed,
-  Store, Building2, Truck, Factory, ShieldCheck, Mail
+  Store, Building2, Truck, Factory, ShieldCheck, Mail,
+  ClipboardCheck, Droplets, Leaf, FlaskConical, Eye, FileText, X
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 
 type ActorType = "producer" | "cooperative" | "social_kitchen" | "restaurant" | "retail" | "institution" | "logistics" | "processing";
 
@@ -21,6 +26,26 @@ interface Actor {
   description: string;
   products: string[];
   capacity: string;
+  spgId?: string;
+}
+
+interface SPG {
+  id: string;
+  name: string;
+  description: string | null;
+  region: string | null;
+  peer_visit_count: number;
+  evaluation_form_url: string | null;
+  methodology: string | null;
+}
+
+interface SPGEvaluation {
+  id: string;
+  evaluation_type: string;
+  title: string;
+  result: string | null;
+  notes: string | null;
+  evaluated_at: string | null;
 }
 
 const typeConfig: Record<ActorType, { label: string; icon: typeof Sprout }> = {
@@ -35,13 +60,27 @@ const typeConfig: Record<ActorType, { label: string; icon: typeof Sprout }> = {
 };
 
 const certConfig = {
-  red: { label: "Básico", classes: "bg-destructive/10 text-destructive" },
-  yellow: { label: "En proceso", classes: "bg-wheat/20 text-wheat-foreground" },
-  green: { label: "Certificado", classes: "bg-primary/10 text-primary" },
+  red: { label: "Básico", classes: "bg-destructive/10 text-destructive", dot: "bg-destructive" },
+  yellow: { label: "En transición", classes: "bg-wheat/20 text-wheat-foreground", dot: "bg-wheat" },
+  green: { label: "Certificado", classes: "bg-primary/10 text-primary", dot: "bg-primary" },
+};
+
+const evalTypeIcons: Record<string, typeof Droplets> = {
+  suelo: FlaskConical,
+  agua: Droplets,
+  biodiversidad: Leaf,
+  condiciones_laborales: Users,
+};
+
+const evalTypeLabels: Record<string, string> = {
+  suelo: "Suelo",
+  agua: "Agua",
+  biodiversidad: "Biodiversidad",
+  condiciones_laborales: "Condiciones laborales",
 };
 
 const actors: Actor[] = [
-  { id: 1, name: "Finca La Esperanza", type: "producer", location: "La Plata, Buenos Aires", certification: "green", description: "Producción agroecológica familiar en 5 hectáreas con rotación de cultivos y manejo integrado.", products: ["Tomate", "Lechuga", "Acelga"], capacity: "2 ton/mes" },
+  { id: 1, name: "Finca La Esperanza", type: "producer", location: "La Plata, Buenos Aires", certification: "green", description: "Producción agroecológica familiar en 5 hectáreas con rotación de cultivos y manejo integrado.", products: ["Tomate", "Lechuga", "Acelga"], capacity: "2 ton/mes", spgId: "a1111111-1111-1111-1111-111111111111" },
   { id: 2, name: "Cooperativa Del Sol", type: "cooperative", location: "Florencio Varela", certification: "green", description: "15 familias productoras asociadas para comercialización conjunta.", products: ["Miel", "Frutas", "Conservas"], capacity: "5 ton/mes" },
   { id: 3, name: "Comedor Los Pibes", type: "social_kitchen", location: "La Matanza", certification: "yellow", description: "Comedor comunitario que sirve 200 raciones diarias.", products: ["Verduras", "Legumbres"], capacity: "200 raciones/día" },
   { id: 4, name: "Restaurante Raíz", type: "restaurant", location: "CABA, Palermo", certification: "yellow", description: "Restaurante de autor con menú 100% origen local.", products: ["Verduras de hoja", "Huevos"], capacity: "80 cubiertos/día" },
@@ -49,13 +88,17 @@ const actors: Actor[] = [
   { id: 6, name: "Escuela N°42", type: "institution", location: "Quilmes", certification: "red", description: "Comedor escolar para 350 alumnos.", products: ["Frutas", "Verduras"], capacity: "350 raciones/día" },
   { id: 7, name: "Transporte El Surco", type: "logistics", location: "Avellaneda", certification: "yellow", description: "Fletes refrigerados para alimentos frescos.", products: [], capacity: "3 camiones" },
   { id: 8, name: "Molino Agroeco", type: "processing", location: "Luján", certification: "green", description: "Molienda artesanal de cereales agroecológicos.", products: ["Harina de trigo", "Harina de maíz"], capacity: "2 ton/día" },
-  { id: 9, name: "Granja El Retiro", type: "producer", location: "San Vicente", certification: "green", description: "Granja integral con animales a campo y huerta.", products: ["Huevos", "Pollo", "Cerdos"], capacity: "500 docenas/mes" },
+  { id: 9, name: "Granja El Retiro", type: "producer", location: "San Vicente", certification: "yellow", description: "Granja integral con animales a campo y huerta. En transición agroecológica.", products: ["Huevos", "Pollo", "Cerdos"], capacity: "500 docenas/mes", spgId: "b2222222-2222-2222-2222-222222222222" },
   { id: 10, name: "Coop. Tierra Viva", type: "cooperative", location: "Cañuelas", certification: "green", description: "Cooperativa de la agricultura familiar periurbana.", products: ["Verduras", "Plantines", "Semillas"], capacity: "8 ton/mes" },
 ];
 
 const ActorsPage = () => {
   const [search, setSearch] = useState("");
   const [activeType, setActiveType] = useState<ActorType | "all">("all");
+  const [selectedSpgId, setSelectedSpgId] = useState<string | null>(null);
+  const [spgData, setSpgData] = useState<SPG | null>(null);
+  const [spgEvals, setSpgEvals] = useState<SPGEvaluation[]>([]);
+  const [loadingSpg, setLoadingSpg] = useState(false);
 
   const filtered = useMemo(() => {
     return actors.filter((a) => {
@@ -64,6 +107,25 @@ const ActorsPage = () => {
       return true;
     });
   }, [search, activeType]);
+
+  useEffect(() => {
+    if (!selectedSpgId) return;
+    setLoadingSpg(true);
+    Promise.all([
+      supabase.from("spgs").select("*").eq("id", selectedSpgId).single(),
+      supabase.from("spg_evaluations").select("*").eq("spg_id", selectedSpgId).order("evaluated_at", { ascending: false }),
+    ]).then(([spgRes, evalsRes]) => {
+      if (spgRes.data) setSpgData(spgRes.data as SPG);
+      if (evalsRes.data) setSpgEvals(evalsRes.data as SPGEvaluation[]);
+      setLoadingSpg(false);
+    });
+  }, [selectedSpgId]);
+
+  const closeSpgModal = () => {
+    setSelectedSpgId(null);
+    setSpgData(null);
+    setSpgEvals([]);
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -113,6 +175,7 @@ const ActorsPage = () => {
             {filtered.map((a, i) => {
               const cfg = typeConfig[a.type];
               const cert = certConfig[a.certification];
+              const isProducer = a.type === "producer";
               return (
                 <motion.div
                   key={a.id}
@@ -127,12 +190,14 @@ const ActorsPage = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-display text-lg text-card-foreground">{a.name}</h3>
-                      <div className="flex items-center gap-2 mt-1">
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
                         <Badge variant="secondary" className="text-[10px]">{cfg.label}</Badge>
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${cert.classes}`}>
-                          <ShieldCheck className="h-3 w-3" />
-                          {cert.label}
-                        </span>
+                        {isProducer && (
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${cert.classes}`}>
+                            <ShieldCheck className="h-3 w-3" />
+                            {cert.label}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -151,11 +216,18 @@ const ActorsPage = () => {
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-border gap-2">
                     <span className="text-xs text-muted-foreground">Cap: {a.capacity}</span>
-                    <Button size="sm" variant="outline" className="text-xs">
-                      <Mail className="h-3 w-3 mr-1" /> Contactar
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      {isProducer && a.spgId && (
+                        <Button size="sm" variant="outline" className="text-xs" onClick={() => setSelectedSpgId(a.spgId!)}>
+                          <Eye className="h-3 w-3 mr-1" /> SPG
+                        </Button>
+                      )}
+                      <Button size="sm" variant="outline" className="text-xs">
+                        <Mail className="h-3 w-3 mr-1" /> Contactar
+                      </Button>
+                    </div>
                   </div>
                 </motion.div>
               );
@@ -164,6 +236,115 @@ const ActorsPage = () => {
         </div>
       </main>
       <Footer />
+
+      {/* SPG Detail Modal */}
+      <Dialog open={!!selectedSpgId} onOpenChange={(open) => !open && closeSpgModal()}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl flex items-center gap-2">
+              <ClipboardCheck className="h-5 w-5 text-primary" />
+              {loadingSpg ? "Cargando..." : spgData?.name}
+            </DialogTitle>
+          </DialogHeader>
+
+          {spgData && (
+            <div className="space-y-6">
+              {/* Overview */}
+              <div>
+                <p className="text-sm text-muted-foreground">{spgData.description}</p>
+                {spgData.region && (
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-2">
+                    <MapPin className="h-3 w-3" /> {spgData.region}
+                  </div>
+                )}
+              </div>
+
+              {/* Stats */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-lg border border-border bg-muted/30 p-4 text-center">
+                  <p className="text-2xl font-display text-primary">{spgData.peer_visit_count}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Visitas de pares realizadas</p>
+                </div>
+                <div className="rounded-lg border border-border bg-muted/30 p-4 text-center">
+                  <p className="text-2xl font-display text-primary">{spgEvals.length}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Exámenes realizados</p>
+                </div>
+              </div>
+
+              {/* Methodology */}
+              {spgData.methodology && (
+                <div>
+                  <h4 className="font-medium text-sm text-card-foreground mb-2 flex items-center gap-1.5">
+                    <FileText className="h-4 w-4 text-primary" /> Metodología
+                  </h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{spgData.methodology}</p>
+                </div>
+              )}
+
+              {/* Evaluation form link */}
+              {spgData.evaluation_form_url && (
+                <div>
+                  <h4 className="font-medium text-sm text-card-foreground mb-2">Formulario de evaluación</h4>
+                  <a
+                    href={spgData.evaluation_form_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-primary underline hover:text-primary/80 transition-colors"
+                  >
+                    Ver formulario utilizado →
+                  </a>
+                </div>
+              )}
+
+              {/* Evaluations */}
+              {spgEvals.length > 0 && (
+                <div>
+                  <h4 className="font-medium text-sm text-card-foreground mb-3 flex items-center gap-1.5">
+                    <FlaskConical className="h-4 w-4 text-primary" /> Exámenes realizados
+                  </h4>
+                  <div className="space-y-3">
+                    {spgEvals.map((ev) => {
+                      const EvalIcon = evalTypeIcons[ev.evaluation_type] || FlaskConical;
+                      const evalLabel = evalTypeLabels[ev.evaluation_type] || ev.evaluation_type;
+                      return (
+                        <motion.div
+                          key={ev.id}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="rounded-lg border border-border p-4 hover:bg-muted/20 transition-colors"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
+                                <EvalIcon className="h-4 w-4 text-primary" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-card-foreground">{ev.title}</p>
+                                <p className="text-[10px] text-muted-foreground">{evalLabel}</p>
+                              </div>
+                            </div>
+                            {ev.result && (
+                              <Badge variant="secondary" className="text-[10px] flex-shrink-0">{ev.result}</Badge>
+                            )}
+                          </div>
+                          {ev.notes && (
+                            <p className="text-xs text-muted-foreground mt-2 ml-10">{ev.notes}</p>
+                          )}
+                          {ev.evaluated_at && (
+                            <p className="text-[10px] text-muted-foreground mt-1 ml-10">
+                              {new Date(ev.evaluated_at).toLocaleDateString("es-AR", { year: "numeric", month: "long", day: "numeric" })}
+                            </p>
+                          )}
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

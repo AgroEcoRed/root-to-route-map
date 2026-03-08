@@ -50,7 +50,7 @@ const actorTypeColors: Record<ActorType, string> = {
   processing: "#264653",
 };
 
-const certLabels = { red: "Básico", yellow: "En proceso", green: "Certificado" };
+const certLabels = { red: "Básico", yellow: "En transición", green: "Certificado" };
 
 const mockActors: MapActor[] = [
   { id: 1, name: "Finca La Esperanza", type: "producer", lat: -34.61, lng: -58.38, products: ["Tomate", "Lechuga", "Acelga"], certification: "green", description: "Producción agroecológica familiar, 5 hectáreas." },
@@ -127,6 +127,13 @@ const MapPage = () => {
         ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">${a.products.map((p) => `<span style="background:#e8f5e9;color:#2d6a4f;font-size:10px;padding:2px 6px;border-radius:4px">${p}</span>`).join("")}</div>`
         : "";
 
+      const certHtml = a.type === "producer"
+        ? `<div style="display:flex;align-items:center;gap:4px;margin-top:8px">
+              <span style="width:10px;height:10px;border-radius:50%;background:${certColor};display:inline-block"></span>
+              <span style="font-size:11px">${certLabels[a.certification]}</span>
+            </div>`
+        : "";
+
       const marker = L.marker([a.lat, a.lng], { icon })
         .addTo(mapRef.current!)
         .bindPopup(`
@@ -135,10 +142,7 @@ const MapPage = () => {
             <p style="font-size:12px;color:#666;margin:2px 0">${actorTypeLabels[a.type]}</p>
             <p style="font-size:12px;margin:4px 0">${a.description}</p>
             ${productsHtml}
-            <div style="display:flex;align-items:center;gap:4px;margin-top:8px">
-              <span style="width:10px;height:10px;border-radius:50%;background:${certColor};display:inline-block"></span>
-              <span style="font-size:11px">${certLabels[a.certification]}</span>
-            </div>
+            ${certHtml}
           </div>
         `);
       markersRef.current.push(marker);
@@ -214,9 +218,11 @@ const MapPage = () => {
                       <p className="text-sm font-medium text-foreground">{a.name}</p>
                       <p className="text-xs text-muted-foreground">{actorTypeLabels[a.type]}</p>
                     </div>
-                    <span className={`inline-flex w-3 h-3 rounded-full flex-shrink-0 mt-1 ${
-                      a.certification === "green" ? "bg-primary" : a.certification === "yellow" ? "bg-wheat" : "bg-destructive"
-                    }`} />
+                    {a.type === "producer" && (
+                      <span className={`inline-flex w-3 h-3 rounded-full flex-shrink-0 mt-1 ${
+                        a.certification === "green" ? "bg-primary" : a.certification === "yellow" ? "bg-wheat" : "bg-destructive"
+                      }`} />
+                    )}
                   </div>
                   {a.products.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">
