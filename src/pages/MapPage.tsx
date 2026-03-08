@@ -213,9 +213,11 @@ const MapPage = () => {
                       <p className="text-sm font-medium text-foreground">{a.name}</p>
                       <p className="text-xs text-muted-foreground">{actorTypeLabels[a.type]}</p>
                     </div>
-                    <span className={`inline-flex w-3 h-3 rounded-full flex-shrink-0 mt-1 ${
-                      a.certification === "green" ? "bg-primary" : a.certification === "yellow" ? "bg-wheat" : "bg-destructive"
-                    }`} />
+                    {a.type === "producer" && (
+                      <span className={`inline-flex w-3 h-3 rounded-full flex-shrink-0 mt-1 ${
+                        a.certification === "green" ? "bg-primary" : a.certification === "yellow" ? "bg-wheat" : "bg-destructive"
+                      }`} />
+                    )}
                   </div>
                   {a.products.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">
