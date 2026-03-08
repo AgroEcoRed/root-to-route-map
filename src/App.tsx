@@ -12,6 +12,7 @@ import ActorsPage from "./pages/ActorsPage";
 import RegistrationPage from "./pages/RegistrationPage";
 import LoginPage from "./pages/LoginPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import CommunityPage from "./pages/CommunityPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
