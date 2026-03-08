@@ -4,8 +4,16 @@ import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin, Calendar, ShoppingBasket, ArrowUpDown } from "lucide-react";
-import { motion } from "framer-motion";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
+  Search, MapPin, Calendar, ShoppingBasket, ArrowUpDown,
+  TrendingUp, DollarSign, Navigation, ShieldCheck, Star, SlidersHorizontal
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+type SortOption = "relevance" | "price_asc" | "price_desc" | "proximity" | "best_seller" | "cert_green" | "seasonal";
 
 interface Product {
   id: number;
@@ -13,44 +21,103 @@ interface Product {
   producer: string;
   location: string;
   category: string;
-  price: string;
+  price: number;
+  priceDisplay: string;
   unit: string;
   available: string;
   certification: "red" | "yellow" | "green";
   image: string;
   seasonal: string;
+  soldCount: number;
+  distanceKm: number;
 }
 
 const categories = ["Todos", "Verduras", "Frutas", "Lácteos", "Huevos", "Cereales", "Conservas", "Miel", "Carnes"];
 
-const certLabels = { red: "Básico", yellow: "En proceso", green: "Certificado" };
+const certLabels = { red: "Básico", yellow: "En transición", green: "Certificado" };
+
+const sortOptions: { value: SortOption; label: string; icon: typeof Star }[] = [
+  { value: "relevance", label: "Relevancia", icon: Star },
+  { value: "price_asc", label: "Menor precio", icon: DollarSign },
+  { value: "price_desc", label: "Mayor precio", icon: DollarSign },
+  { value: "proximity", label: "Más cercano", icon: Navigation },
+  { value: "best_seller", label: "Más vendido", icon: TrendingUp },
+  { value: "cert_green", label: "Certificado SPG", icon: ShieldCheck },
+  { value: "seasonal", label: "De temporada", icon: Calendar },
+];
 
 const mockProducts: Product[] = [
-  { id: 1, name: "Tomate Platense", producer: "Finca La Esperanza", location: "La Plata, Buenos Aires", category: "Verduras", price: "$1.200", unit: "kg", available: "500 kg", certification: "green", image: "🍅", seasonal: "Oct - Mar" },
-  { id: 2, name: "Lechuga Criolla", producer: "Finca La Esperanza", location: "La Plata, Buenos Aires", category: "Verduras", price: "$800", unit: "kg", available: "200 kg", certification: "green", image: "🥬", seasonal: "Todo el año" },
-  { id: 3, name: "Miel Multifloral", producer: "Cooperativa Del Sol", location: "Florencio Varela", category: "Miel", price: "$4.500", unit: "kg", available: "150 kg", certification: "green", image: "🍯", seasonal: "Feb - May" },
-  { id: 4, name: "Huevos de Campo", producer: "Granja El Retiro", location: "San Vicente", category: "Huevos", price: "$3.200", unit: "docena", available: "80 docenas/sem", certification: "green", image: "🥚", seasonal: "Todo el año" },
-  { id: 5, name: "Zapallo Anco", producer: "Huerta Don Pedro", location: "Moreno", category: "Verduras", price: "$900", unit: "kg", available: "800 kg", certification: "yellow", image: "🎃", seasonal: "Mar - Jul" },
-  { id: 6, name: "Harina de Trigo Integral", producer: "Molino Agroeco", location: "Luján", category: "Cereales", price: "$2.100", unit: "kg", available: "1.000 kg", certification: "green", image: "🌾", seasonal: "Todo el año" },
-  { id: 7, name: "Dulce de Durazno", producer: "Cooperativa Del Sol", location: "Florencio Varela", category: "Conservas", price: "$3.800", unit: "frasco 500g", available: "120 unidades", certification: "green", image: "🍑", seasonal: "Ene - Mar" },
-  { id: 8, name: "Pollo Entero Pastoril", producer: "Granja El Retiro", location: "San Vicente", category: "Carnes", price: "$5.500", unit: "kg", available: "50 unidades/sem", certification: "green", image: "🍗", seasonal: "Todo el año" },
-  { id: 9, name: "Naranjas de Quinta", producer: "Huerta Don Pedro", location: "Moreno", category: "Frutas", price: "$1.500", unit: "kg", available: "300 kg", certification: "yellow", image: "🍊", seasonal: "Jun - Oct" },
-  { id: 10, name: "Queso Criollo Artesanal", producer: "Coop. Tierra Viva", location: "Cañuelas", category: "Lácteos", price: "$6.200", unit: "kg", available: "40 kg/sem", certification: "green", image: "🧀", seasonal: "Todo el año" },
-  { id: 11, name: "Acelga de Hoja", producer: "Coop. Tierra Viva", location: "Cañuelas", category: "Verduras", price: "$700", unit: "atado", available: "300 atados", certification: "green", image: "🥗", seasonal: "Mar - Nov" },
-  { id: 12, name: "Choclo Fresco", producer: "Huerta Don Pedro", location: "Moreno", category: "Verduras", price: "$600", unit: "unidad", available: "1.000 unidades", certification: "yellow", image: "🌽", seasonal: "Dic - Mar" },
+  { id: 1, name: "Tomate Platense", producer: "Finca La Esperanza", location: "La Plata", category: "Verduras", price: 1200, priceDisplay: "$1.200", unit: "kg", available: "500 kg", certification: "green", image: "🍅", seasonal: "Oct - Mar", soldCount: 340, distanceKm: 12 },
+  { id: 2, name: "Lechuga Criolla", producer: "Finca La Esperanza", location: "La Plata", category: "Verduras", price: 800, priceDisplay: "$800", unit: "kg", available: "200 kg", certification: "green", image: "🥬", seasonal: "Todo el año", soldCount: 280, distanceKm: 12 },
+  { id: 3, name: "Miel Multifloral", producer: "Cooperativa Del Sol", location: "Florencio Varela", category: "Miel", price: 4500, priceDisplay: "$4.500", unit: "kg", available: "150 kg", certification: "green", image: "🍯", seasonal: "Feb - May", soldCount: 150, distanceKm: 25 },
+  { id: 4, name: "Huevos de Campo", producer: "Granja El Retiro", location: "San Vicente", category: "Huevos", price: 3200, priceDisplay: "$3.200", unit: "docena", available: "80 doc/sem", certification: "green", image: "🥚", seasonal: "Todo el año", soldCount: 420, distanceKm: 45 },
+  { id: 5, name: "Zapallo Anco", producer: "Huerta Don Pedro", location: "Moreno", category: "Verduras", price: 900, priceDisplay: "$900", unit: "kg", available: "800 kg", certification: "yellow", image: "🎃", seasonal: "Mar - Jul", soldCount: 190, distanceKm: 35 },
+  { id: 6, name: "Harina Integral", producer: "Molino Agroeco", location: "Luján", category: "Cereales", price: 2100, priceDisplay: "$2.100", unit: "kg", available: "1.000 kg", certification: "green", image: "🌾", seasonal: "Todo el año", soldCount: 310, distanceKm: 60 },
+  { id: 7, name: "Dulce de Durazno", producer: "Cooperativa Del Sol", location: "Florencio Varela", category: "Conservas", price: 3800, priceDisplay: "$3.800", unit: "frasco 500g", available: "120 uds", certification: "green", image: "🍑", seasonal: "Ene - Mar", soldCount: 95, distanceKm: 25 },
+  { id: 8, name: "Pollo Pastoril", producer: "Granja El Retiro", location: "San Vicente", category: "Carnes", price: 5500, priceDisplay: "$5.500", unit: "kg", available: "50 uds/sem", certification: "green", image: "🍗", seasonal: "Todo el año", soldCount: 220, distanceKm: 45 },
+  { id: 9, name: "Naranjas de Quinta", producer: "Huerta Don Pedro", location: "Moreno", category: "Frutas", price: 1500, priceDisplay: "$1.500", unit: "kg", available: "300 kg", certification: "yellow", image: "🍊", seasonal: "Jun - Oct", soldCount: 175, distanceKm: 35 },
+  { id: 10, name: "Queso Criollo", producer: "Coop. Tierra Viva", location: "Cañuelas", category: "Lácteos", price: 6200, priceDisplay: "$6.200", unit: "kg", available: "40 kg/sem", certification: "green", image: "🧀", seasonal: "Todo el año", soldCount: 130, distanceKm: 55 },
+  { id: 11, name: "Acelga de Hoja", producer: "Coop. Tierra Viva", location: "Cañuelas", category: "Verduras", price: 700, priceDisplay: "$700", unit: "atado", available: "300 atados", certification: "green", image: "🥗", seasonal: "Mar - Nov", soldCount: 260, distanceKm: 55 },
+  { id: 12, name: "Choclo Fresco", producer: "Huerta Don Pedro", location: "Moreno", category: "Verduras", price: 600, priceDisplay: "$600", unit: "unidad", available: "1.000 uds", certification: "yellow", image: "🌽", seasonal: "Dic - Mar", soldCount: 380, distanceKm: 35 },
 ];
+
+const isInSeason = (seasonal: string): boolean => {
+  if (seasonal === "Todo el año") return true;
+  const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+  const currentMonth = new Date().getMonth(); // 0-indexed
+  const parts = seasonal.split(" - ");
+  if (parts.length !== 2) return false;
+  const start = months.indexOf(parts[0]);
+  const end = months.indexOf(parts[1]);
+  if (start === -1 || end === -1) return false;
+  if (start <= end) return currentMonth >= start && currentMonth <= end;
+  return currentMonth >= start || currentMonth <= end;
+};
 
 const MarketplacePage = () => {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
+  const [sortBy, setSortBy] = useState<SortOption>("relevance");
 
   const filtered = useMemo(() => {
-    return mockProducts.filter((p) => {
+    let results = mockProducts.filter((p) => {
       if (activeCategory !== "Todos" && p.category !== activeCategory) return false;
       if (search && !p.name.toLowerCase().includes(search.toLowerCase()) && !p.producer.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
-  }, [search, activeCategory]);
+
+    const sorted = [...results];
+    switch (sortBy) {
+      case "price_asc":
+        sorted.sort((a, b) => a.price - b.price);
+        break;
+      case "price_desc":
+        sorted.sort((a, b) => b.price - a.price);
+        break;
+      case "proximity":
+        sorted.sort((a, b) => a.distanceKm - b.distanceKm);
+        break;
+      case "best_seller":
+        sorted.sort((a, b) => b.soldCount - a.soldCount);
+        break;
+      case "cert_green":
+        const certOrder = { green: 0, yellow: 1, red: 2 };
+        sorted.sort((a, b) => certOrder[a.certification] - certOrder[b.certification]);
+        break;
+      case "seasonal":
+        sorted.sort((a, b) => {
+          const aInSeason = isInSeason(a.seasonal) ? 0 : 1;
+          const bInSeason = isInSeason(b.seasonal) ? 0 : 1;
+          return aInSeason - bInSeason;
+        });
+        break;
+      default:
+        break;
+    }
+    return sorted;
+  }, [search, activeCategory, sortBy]);
+
+  const activeSortLabel = sortOptions.find((s) => s.value === sortBy)?.label || "Relevancia";
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -69,8 +136,8 @@ const MarketplacePage = () => {
         </div>
 
         <div className="container py-8">
-          {/* Search & Filters */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-8">
+          {/* Search & Sort */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -80,6 +147,24 @@ const MarketplacePage = () => {
                 className="pl-9"
               />
             </div>
+            <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
+              <SelectTrigger className="w-full sm:w-56">
+                <div className="flex items-center gap-2">
+                  <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+                  <SelectValue placeholder="Ordenar por..." />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                {sortOptions.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    <span className="flex items-center gap-2">
+                      <opt.icon className="h-3.5 w-3.5 text-muted-foreground" />
+                      {opt.label}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Category pills */}
@@ -99,53 +184,81 @@ const MarketplacePage = () => {
             ))}
           </div>
 
-          <p className="text-sm text-muted-foreground mb-4">{filtered.length} productos disponibles</p>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm text-muted-foreground">{filtered.length} productos disponibles</p>
+            {sortBy !== "relevance" && (
+              <button
+                onClick={() => setSortBy("relevance")}
+                className="text-xs text-primary hover:text-primary/80 transition-colors underline"
+              >
+                Limpiar orden
+              </button>
+            )}
+          </div>
 
           {/* Product grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filtered.map((p, i) => (
-              <motion.div
-                key={p.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: i * 0.05 }}
-                className="rounded-xl border border-border bg-card overflow-hidden hover:shadow-elevated transition-all duration-300 group"
-              >
-                <div className="h-36 bg-muted flex items-center justify-center text-5xl group-hover:scale-105 transition-transform duration-300">
-                  {p.image}
-                </div>
-                <div className="p-4">
-                  <div className="flex items-start justify-between gap-2 mb-1">
-                    <h3 className="font-display text-base text-card-foreground">{p.name}</h3>
-                    <span className={`inline-flex w-3 h-3 rounded-full flex-shrink-0 mt-1.5 ${
-                      p.certification === "green" ? "bg-primary" : p.certification === "yellow" ? "bg-wheat" : "bg-destructive"
-                    }`} title={certLabels[p.certification]} />
+            <AnimatePresence mode="popLayout">
+              {filtered.map((p, i) => (
+                <motion.div
+                  key={p.id}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.3, delay: i * 0.03 }}
+                  className="rounded-xl border border-border bg-card overflow-hidden hover:shadow-elevated transition-all duration-300 group"
+                >
+                  <div className="h-36 bg-muted flex items-center justify-center text-5xl group-hover:scale-105 transition-transform duration-300 relative">
+                    {p.image}
+                    {isInSeason(p.seasonal) && (
+                      <span className="absolute top-2 right-2 bg-primary text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
+                        De temporada
+                      </span>
+                    )}
+                    {p.soldCount >= 300 && (
+                      <span className="absolute top-2 left-2 bg-accent text-accent-foreground text-[10px] font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <TrendingUp className="h-3 w-3" /> Popular
+                      </span>
+                    )}
                   </div>
-                  <p className="text-sm text-muted-foreground mb-3">{p.producer}</p>
+                  <div className="p-4">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <h3 className="font-display text-base text-card-foreground">{p.name}</h3>
+                      <span className={`inline-flex w-3 h-3 rounded-full flex-shrink-0 mt-1.5 ${
+                        p.certification === "green" ? "bg-primary" : p.certification === "yellow" ? "bg-wheat" : "bg-destructive"
+                      }`} title={certLabels[p.certification]} />
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">{p.producer}</p>
 
-                  <div className="space-y-1.5 text-xs text-muted-foreground mb-4">
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="h-3 w-3" /> {p.location}
+                    <div className="space-y-1.5 text-xs text-muted-foreground mb-4">
+                      <div className="flex items-center gap-1.5">
+                        <MapPin className="h-3 w-3" /> {p.location}
+                        <span className="text-muted-foreground/60">· {p.distanceKm} km</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <ShoppingBasket className="h-3 w-3" /> {p.available}
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="h-3 w-3" /> {p.seasonal}
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <TrendingUp className="h-3 w-3" /> {p.soldCount} vendidos
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <ShoppingBasket className="h-3 w-3" /> {p.available}
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <Calendar className="h-3 w-3" /> {p.seasonal}
-                    </div>
-                  </div>
 
-                  <div className="flex items-center justify-between">
-                    <span className="font-display text-lg text-foreground">
-                      {p.price}<span className="text-sm text-muted-foreground font-body">/{p.unit}</span>
-                    </span>
-                    <Button size="sm" className="bg-gradient-hero text-primary-foreground text-xs">
-                      Contactar
-                    </Button>
+                    <div className="flex items-center justify-between">
+                      <span className="font-display text-lg text-foreground">
+                        {p.priceDisplay}<span className="text-sm text-muted-foreground font-body">/{p.unit}</span>
+                      </span>
+                      <Button size="sm" className="bg-gradient-hero text-primary-foreground text-xs">
+                        Contactar
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
         </div>
       </main>
