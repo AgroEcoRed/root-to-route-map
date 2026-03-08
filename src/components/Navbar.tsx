@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, MapPin, ShoppingBasket, Users, Leaf, LogOut, User, Globe } from "lucide-react";
+import { Menu, X, MapPin, ShoppingBasket, Users, Leaf, LogOut, User, Globe, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage, Lang } from "@/contexts/LanguageContext";
