@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, X } from "lucide-react";
+import { Search, Filter, X, ArrowUp, ArrowDown, Minus } from "lucide-react";
 
 type ActorType =
   | "producer"
@@ -16,6 +16,8 @@ type ActorType =
   | "institution"
   | "logistics"
   | "processing";
+
+type ActorRole = "oferta" | "demanda" | "servicio";
 
 interface MapActor {
   id: number;
@@ -39,15 +41,40 @@ const actorTypeLabels: Record<ActorType, string> = {
   processing: "Procesamiento",
 };
 
-const actorTypeColors: Record<ActorType, string> = {
-  producer: "#2d6a4f",
-  cooperative: "#40916c",
-  social_kitchen: "#e07a5f",
-  restaurant: "#f2cc8f",
-  retail: "#81b29a",
-  institution: "#3d405b",
-  logistics: "#f4a261",
-  processing: "#264653",
+// Classify actors by role
+const actorRole: Record<ActorType, ActorRole> = {
+  producer: "oferta",
+  cooperative: "oferta",
+  processing: "oferta",
+  restaurant: "demanda",
+  social_kitchen: "demanda",
+  institution: "demanda",
+  retail: "demanda",
+  logistics: "servicio",
+};
+
+const roleLabels: Record<ActorRole, string> = {
+  oferta: "Ofrece",
+  demanda: "Demanda",
+  servicio: "Servicio",
+};
+
+const roleColors: Record<ActorRole, string> = {
+  oferta: "#2d6a4f",
+  demanda: "#c0392b",
+  servicio: "#f4a261",
+};
+
+const roleBgClasses: Record<ActorRole, string> = {
+  oferta: "bg-primary",
+  demanda: "bg-destructive",
+  servicio: "bg-wheat",
+};
+
+const roleBorderClasses: Record<ActorRole, string> = {
+  oferta: "border-primary",
+  demanda: "border-destructive",
+  servicio: "border-wheat",
 };
 
 const certLabels = { red: "Básico", yellow: "En transición", green: "Certificado" };
@@ -110,36 +137,58 @@ const MapPage = () => {
   useEffect(() => {
     if (!mapRef.current) return;
 
-    // Clear existing markers
     markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
 
     filtered.forEach((a) => {
+      const role = actorRole[a.type];
+      const color = roleColors[role];
+      const arrowIcon = role === "oferta" ? "▲" : role === "demanda" ? "▼" : "●";
+      const shape = role === "oferta"
+        ? `border-radius:4px 4px 50% 50%;`
+        : role === "demanda"
+        ? `border-radius:50% 50% 4px 4px;`
+        : `border-radius:50%;`;
+
       const icon = L.divIcon({
         className: "custom-marker",
-        html: `<div style="background:${actorTypeColors[a.type]};width:28px;height:28px;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);"></div>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 14],
+        html: `<div style="background:${color};width:30px;height:30px;${shape}border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">
+          <span style="color:white;font-size:12px;font-weight:bold;line-height:1">${arrowIcon}</span>
+        </div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
       });
 
       const certColor = a.certification === "green" ? "#2d6a4f" : a.certification === "yellow" ? "#d4a017" : "#dc2626";
+      const productLabel = role === "oferta" ? "🟢 Ofrece" : role === "demanda" ? "🔴 Demanda" : "Servicio";
+      const productBg = role === "oferta" ? "#e8f5e9" : "#fce4ec";
+      const productColor = role === "oferta" ? "#2d6a4f" : "#c0392b";
+
       const productsHtml = a.products.length > 0
-        ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">${a.products.map((p) => `<span style="background:#e8f5e9;color:#2d6a4f;font-size:10px;padding:2px 6px;border-radius:4px">${p}</span>`).join("")}</div>`
+        ? `<div style="margin-top:6px">
+            <p style="font-size:11px;font-weight:600;color:${productColor};margin:0 0 4px">${productLabel}:</p>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">${a.products.map((p) => `<span style="background:${productBg};color:${productColor};font-size:10px;padding:2px 6px;border-radius:4px">${p}</span>`).join("")}</div>
+          </div>`
         : "";
 
-      const certHtml = a.type === "producer"
+      const certHtml = (role === "oferta")
         ? `<div style="display:flex;align-items:center;gap:4px;margin-top:8px">
               <span style="width:10px;height:10px;border-radius:50%;background:${certColor};display:inline-block"></span>
               <span style="font-size:11px">${certLabels[a.certification]}</span>
             </div>`
         : "";
 
+      const roleBadgeColor = role === "oferta" ? "#2d6a4f" : role === "demanda" ? "#c0392b" : "#e67e22";
+
       const marker = L.marker([a.lat, a.lng], { icon })
         .addTo(mapRef.current!)
         .bindPopup(`
-          <div style="min-width:200px;font-family:DM Sans,sans-serif">
-            <p style="font-weight:700;font-size:14px;margin:0">${a.name}</p>
-            <p style="font-size:12px;color:#666;margin:2px 0">${actorTypeLabels[a.type]}</p>
+          <div style="min-width:220px;font-family:DM Sans,sans-serif">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+              <p style="font-weight:700;font-size:14px;margin:0">${a.name}</p>
+              <span style="background:${roleBadgeColor};color:white;font-size:9px;padding:1px 6px;border-radius:8px;font-weight:600;white-space:nowrap">${roleLabels[role]}</span>
+            </div>
+            <p style="font-size:12px;color:#666;margin:0">${actorTypeLabels[a.type]}</p>
             <p style="font-size:12px;margin:4px 0">${a.description}</p>
             ${productsHtml}
             ${certHtml}
@@ -148,6 +197,11 @@ const MapPage = () => {
       markersRef.current.push(marker);
     });
   }, [filtered]);
+
+  // Group actor types by role for filter display
+  const ofertaTypes: ActorType[] = ["producer", "cooperative", "processing"];
+  const demandaTypes: ActorType[] = ["restaurant", "social_kitchen", "institution", "retail"];
+  const servicioTypes: ActorType[] = ["logistics"];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -173,21 +227,78 @@ const MapPage = () => {
               />
             </div>
 
+            {/* Legend */}
+            <div className="p-3 rounded-lg border border-border bg-muted/30 space-y-2">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Leyenda</p>
+              <div className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded-sm bg-primary flex items-center justify-center text-[10px] text-primary-foreground font-bold">▲</span>
+                <span className="text-xs text-foreground font-medium">Oferta</span>
+                <span className="text-xs text-muted-foreground">— Vende productos</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded-sm bg-destructive flex items-center justify-center text-[10px] text-destructive-foreground font-bold">▼</span>
+                <span className="text-xs text-foreground font-medium">Demanda</span>
+                <span className="text-xs text-muted-foreground">— Compra productos</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded-full bg-wheat flex items-center justify-center text-[10px] text-wheat-foreground font-bold">●</span>
+                <span className="text-xs text-foreground font-medium">Servicio</span>
+                <span className="text-xs text-muted-foreground">— Logística</span>
+              </div>
+            </div>
+
+            {/* Oferta types */}
             <div>
-              <p className="text-sm font-medium text-muted-foreground mb-2">Tipo de actor</p>
+              <p className="text-sm font-medium text-primary mb-2 flex items-center gap-1">
+                <ArrowUp className="h-3.5 w-3.5" /> Oferta
+              </p>
               <div className="flex flex-wrap gap-2">
-                {(Object.entries(actorTypeLabels) as [ActorType, string][]).map(([key, label]) => (
-                  <button
-                    key={key}
-                    onClick={() => toggleType(key)}
+                {ofertaTypes.map((key) => (
+                  <button key={key} onClick={() => toggleType(key)}
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                       activeTypes.has(key)
                         ? "border-primary bg-primary text-primary-foreground"
                         : "border-border bg-background text-muted-foreground hover:border-primary/40"
-                    }`}
-                  >
-                    <span style={{ background: actorTypeColors[key] }} className="w-2.5 h-2.5 rounded-full inline-block" />
-                    {label}
+                    }`}>
+                    {actorTypeLabels[key]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Demanda types */}
+            <div>
+              <p className="text-sm font-medium text-destructive mb-2 flex items-center gap-1">
+                <ArrowDown className="h-3.5 w-3.5" /> Demanda
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {demandaTypes.map((key) => (
+                  <button key={key} onClick={() => toggleType(key)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                      activeTypes.has(key)
+                        ? "border-destructive bg-destructive text-destructive-foreground"
+                        : "border-border bg-background text-muted-foreground hover:border-destructive/40"
+                    }`}>
+                    {actorTypeLabels[key]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Servicio types */}
+            <div>
+              <p className="text-sm font-medium text-wheat mb-2 flex items-center gap-1">
+                <Minus className="h-3.5 w-3.5" /> Servicio
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {servicioTypes.map((key) => (
+                  <button key={key} onClick={() => toggleType(key)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                      activeTypes.has(key)
+                        ? "border-wheat bg-wheat text-wheat-foreground"
+                        : "border-border bg-background text-muted-foreground hover:border-wheat/40"
+                    }`}>
+                    {actorTypeLabels[key]}
                   </button>
                 ))}
               </div>
@@ -209,30 +320,46 @@ const MapPage = () => {
             {/* Actor list */}
             <div className="space-y-2 max-h-[40vh] overflow-y-auto">
               <p className="text-sm font-medium text-muted-foreground">{filtered.length} resultados</p>
-              {filtered.map((a) => (
-                <div key={a.id} className="p-3 rounded-lg border border-border hover:border-primary/30 transition-colors bg-background cursor-pointer"
-                  onClick={() => mapRef.current?.setView([a.lat, a.lng], 15)}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{a.name}</p>
-                      <p className="text-xs text-muted-foreground">{actorTypeLabels[a.type]}</p>
+              {filtered.map((a) => {
+                const role = actorRole[a.type];
+                return (
+                  <div key={a.id}
+                    className={`p-3 rounded-lg border-l-4 border border-border hover:border-primary/30 transition-colors bg-background cursor-pointer ${
+                      role === "oferta" ? "border-l-primary" : role === "demanda" ? "border-l-destructive" : "border-l-wheat"
+                    }`}
+                    onClick={() => mapRef.current?.setView([a.lat, a.lng], 15)}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{a.name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs text-muted-foreground">{actorTypeLabels[a.type]}</p>
+                          <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${
+                            role === "oferta" ? "bg-primary/10 text-primary" : role === "demanda" ? "bg-destructive/10 text-destructive" : "bg-wheat/10 text-wheat"
+                          }`}>
+                            {roleLabels[role]}
+                          </span>
+                        </div>
+                      </div>
+                      {(role === "oferta") && (
+                        <span className={`inline-flex w-3 h-3 rounded-full flex-shrink-0 mt-1 ${
+                          a.certification === "green" ? "bg-primary" : a.certification === "yellow" ? "bg-wheat" : "bg-destructive"
+                        }`} />
+                      )}
                     </div>
-                    {a.type === "producer" && (
-                      <span className={`inline-flex w-3 h-3 rounded-full flex-shrink-0 mt-1 ${
-                        a.certification === "green" ? "bg-primary" : a.certification === "yellow" ? "bg-wheat" : "bg-destructive"
-                      }`} />
+                    {a.products.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        <span className={`text-[9px] font-medium mr-1 ${role === "oferta" ? "text-primary" : "text-destructive"}`}>
+                          {role === "oferta" ? "Ofrece:" : "Demanda:"}
+                        </span>
+                        {a.products.slice(0, 3).map((p) => (
+                          <Badge key={p} variant={role === "oferta" ? "default" : "destructive"} className="text-[10px]">{p}</Badge>
+                        ))}
+                      </div>
                     )}
                   </div>
-                  {a.products.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {a.products.slice(0, 3).map((p) => (
-                        <Badge key={p} variant="secondary" className="text-[10px]">{p}</Badge>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </aside>
