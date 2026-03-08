@@ -70,10 +70,13 @@ const isInSeason = (seasonal: string): boolean => {
   return currentMonth >= start || currentMonth <= end;
 };
 
+const eggSubcategories = ["all_eggs", "gallina_pastoril", "pato", "codorniz"];
+
 const MarketplacePage = () => {
   const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
+  const [activeEggSub, setActiveEggSub] = useState("all_eggs");
   const [sortBy, setSortBy] = useState<SortOption>("relevance");
 
   const certLabels = { red: t("cert.red"), yellow: t("cert.yellow"), green: t("cert.green") };
@@ -91,6 +94,7 @@ const MarketplacePage = () => {
   const filtered = useMemo(() => {
     let results = mockProducts.filter((p) => {
       if (activeCategory !== "Todos" && p.category !== activeCategory) return false;
+      if (activeCategory === "Huevos" && activeEggSub !== "all_eggs" && p.subcategory !== activeEggSub) return false;
       if (search && !p.name.toLowerCase().includes(search.toLowerCase()) && !p.producer.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
