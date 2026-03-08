@@ -216,7 +216,12 @@ const MarketplacePage = () => {
                         p.certification === "green" ? "bg-primary" : p.certification === "yellow" ? "bg-wheat" : "bg-destructive"
                       }`} title={certLabels[p.certification]} />
                     </div>
-                    <p className="text-sm text-muted-foreground mb-3">{p.producer}</p>
+                    <div className="flex items-center gap-2 mb-3">
+                      <p className="text-sm text-muted-foreground">{p.producer}</p>
+                      {p.subcategory && (
+                        <Badge variant="outline" className="text-[10px]">{t(`egg.${p.subcategory}`)}</Badge>
+                      )}
+                    </div>
 
                     <div className="space-y-1.5 text-xs text-muted-foreground mb-4">
                       <div className="flex items-center gap-1.5">
