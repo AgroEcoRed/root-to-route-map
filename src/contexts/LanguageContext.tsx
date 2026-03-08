@@ -168,6 +168,15 @@ const translations: Record<Lang, Record<string, string>> = {
     "community.event_type.field_day": "Jornada de campo",
     "community.event_type.course": "Curso",
     "community.event_type.meeting": "Encuentro",
+    // Cart
+    "market.add_cart": "Agregar",
+    "cart.title": "Mi Pedido",
+    "cart.empty": "Tu carrito está vacío",
+    "cart.send_order": "Enviar pedido",
+    "cart.order_sent": "¡Pedido enviado!",
+    "cart.order_to": "Pedido enviado a",
+    "cart.total": "Total estimado",
+    "cart.grouped_note": "Los pedidos se agrupan por productor. Cada productor recibirá su pedido por separado.",
   },
   en: {
     "nav.home": "Home",
