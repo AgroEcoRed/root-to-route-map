@@ -12,6 +12,7 @@ import ActorsPage from "./pages/ActorsPage";
 import RegistrationPage from "./pages/RegistrationPage";
 import LoginPage from "./pages/LoginPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import CommunityPage from "./pages/CommunityPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
               <Route path="/mapa" element={<MapPage />} />
               <Route path="/mercado" element={<MarketplacePage />} />
               <Route path="/actores" element={<ActorsPage />} />
+              <Route path="/comunidad" element={<CommunityPage />} />
               <Route path="/registro" element={<RegistrationPage />} />
               <Route path="/ingresar" element={<LoginPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
