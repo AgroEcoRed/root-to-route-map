@@ -88,6 +88,18 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-2">
+          {/* Cart */}
+          <button
+            onClick={() => setCartOpen(true)}
+            className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+          >
+            <ShoppingCart className="h-4 w-4" />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
+          </button>
           {/* Language Switcher */}
           <div className="relative">
             <button
