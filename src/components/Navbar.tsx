@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, MapPin, ShoppingBasket, Users, Leaf, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { motion, AnimatePresence } from "framer-motion";
 import logo from "@/assets/logo.png";
 
 const navItems = [
@@ -14,9 +15,16 @@ const navItems = [
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -24,10 +32,19 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
+    <motion.nav
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "bg-background/90 backdrop-blur-xl shadow-sm border-b border-border"
+          : "bg-transparent border-b border-transparent"
+      }`}
+    >
       <div className="container flex items-center justify-between h-16">
-        <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="AgroRed" className="h-9 w-9" />
+        <Link to="/" className="flex items-center gap-2 group">
+          <img src={logo} alt="AgroRed" className="h-9 w-9 transition-transform group-hover:scale-110" />
           <span className="font-display text-xl text-foreground">AgroRed</span>
         </Link>
 
@@ -37,14 +54,21 @@ const Navbar = () => {
             <Link
               key={item.to}
               to={item.to}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`relative flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 location.pathname === item.to
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  ? "text-primary"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <item.icon className="h-4 w-4" />
               {item.label}
+              {location.pathname === item.to && (
+                <motion.div
+                  layoutId="nav-indicator"
+                  className="absolute inset-0 rounded-lg bg-primary/10 -z-10"
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
             </Link>
           ))}
         </div>
@@ -52,18 +76,18 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-2">
           {user ? (
             <>
-              <span className="text-sm text-muted-foreground flex items-center gap-1.5">
+              <span className="text-sm text-muted-foreground flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50">
                 <User className="h-4 w-4" />
                 {user.email?.split("@")[0]}
               </span>
-              <Button variant="outline" size="sm" onClick={handleSignOut}>
-                <LogOut className="h-4 w-4 mr-1" />
+              <Button variant="outline" size="sm" onClick={handleSignOut} className="group">
+                <LogOut className="h-4 w-4 mr-1 transition-transform group-hover:-translate-x-0.5" />
                 Salir
               </Button>
             </>
           ) : (
             <>
-              <Button variant="outline" size="sm" asChild>
+              <Button variant="ghost" size="sm" asChild>
                 <Link to="/registro">Registrarse</Link>
               </Button>
               <Button size="sm" className="bg-gradient-hero text-primary-foreground" asChild>
@@ -80,42 +104,58 @@ const Navbar = () => {
       </div>
 
       {/* Mobile menu */}
-      {open && (
-        <div className="md:hidden border-t border-border bg-background p-4 space-y-2 animate-fade-in">
-          {navItems.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                location.pathname === item.to
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              <item.icon className="h-4 w-4" />
-              {item.label}
-            </Link>
-          ))}
-          <div className="flex gap-2 pt-2">
-            {user ? (
-              <Button variant="outline" size="sm" className="flex-1" onClick={() => { handleSignOut(); setOpen(false); }}>
-                <LogOut className="h-4 w-4 mr-1" /> Salir
-              </Button>
-            ) : (
-              <>
-                <Button variant="outline" size="sm" className="flex-1" asChild>
-                  <Link to="/registro" onClick={() => setOpen(false)}>Registrarse</Link>
-                </Button>
-                <Button size="sm" className="flex-1 bg-gradient-hero text-primary-foreground" asChild>
-                  <Link to="/ingresar" onClick={() => setOpen(false)}>Ingresar</Link>
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-    </nav>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="md:hidden border-t border-border bg-background/95 backdrop-blur-xl overflow-hidden"
+          >
+            <div className="p-4 space-y-2">
+              {navItems.map((item, i) => (
+                <motion.div
+                  key={item.to}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                >
+                  <Link
+                    to={item.to}
+                    onClick={() => setOpen(false)}
+                    className={`flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                      location.pathname === item.to
+                        ? "bg-primary/10 text-primary"
+                        : "text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {item.label}
+                  </Link>
+                </motion.div>
+              ))}
+              <div className="flex gap-2 pt-2">
+                {user ? (
+                  <Button variant="outline" size="sm" className="flex-1" onClick={() => { handleSignOut(); setOpen(false); }}>
+                    <LogOut className="h-4 w-4 mr-1" /> Salir
+                  </Button>
+                ) : (
+                  <>
+                    <Button variant="outline" size="sm" className="flex-1" asChild>
+                      <Link to="/registro" onClick={() => setOpen(false)}>Registrarse</Link>
+                    </Button>
+                    <Button size="sm" className="flex-1 bg-gradient-hero text-primary-foreground" asChild>
+                      <Link to="/ingresar" onClick={() => setOpen(false)}>Ingresar</Link>
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.nav>
   );
 };
 
