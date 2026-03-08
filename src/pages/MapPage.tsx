@@ -50,7 +50,7 @@ const actorTypeColors: Record<ActorType, string> = {
   processing: "#264653",
 };
 
-const certLabels = { red: "Básico", yellow: "En proceso", green: "Certificado" };
+const certLabels = { red: "Básico", yellow: "En transición", green: "Certificado" };
 
 const mockActors: MapActor[] = [
   { id: 1, name: "Finca La Esperanza", type: "producer", lat: -34.61, lng: -58.38, products: ["Tomate", "Lechuga", "Acelga"], certification: "green", description: "Producción agroecológica familiar, 5 hectáreas." },
