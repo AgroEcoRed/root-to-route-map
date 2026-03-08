@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X, MapPin, ShoppingBasket, Users, Leaf } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, X, MapPin, ShoppingBasket, Users, Leaf, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
 
 const navItems = [
@@ -14,6 +15,13 @@ const navItems = [
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -42,12 +50,27 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-2">
-          <Button variant="outline" size="sm" asChild>
-            <Link to="/registro">Registrarse</Link>
-          </Button>
-          <Button size="sm" className="bg-gradient-hero text-primary-foreground" asChild>
-            <Link to="/registro">Ingresar</Link>
-          </Button>
+          {user ? (
+            <>
+              <span className="text-sm text-muted-foreground flex items-center gap-1.5">
+                <User className="h-4 w-4" />
+                {user.email?.split("@")[0]}
+              </span>
+              <Button variant="outline" size="sm" onClick={handleSignOut}>
+                <LogOut className="h-4 w-4 mr-1" />
+                Salir
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/registro">Registrarse</Link>
+              </Button>
+              <Button size="sm" className="bg-gradient-hero text-primary-foreground" asChild>
+                <Link to="/ingresar">Ingresar</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile toggle */}
@@ -75,12 +98,20 @@ const Navbar = () => {
             </Link>
           ))}
           <div className="flex gap-2 pt-2">
-            <Button variant="outline" size="sm" className="flex-1" asChild>
-              <Link to="/registro">Registrarse</Link>
-            </Button>
-            <Button size="sm" className="flex-1 bg-gradient-hero text-primary-foreground" asChild>
-              <Link to="/registro">Ingresar</Link>
-            </Button>
+            {user ? (
+              <Button variant="outline" size="sm" className="flex-1" onClick={() => { handleSignOut(); setOpen(false); }}>
+                <LogOut className="h-4 w-4 mr-1" /> Salir
+              </Button>
+            ) : (
+              <>
+                <Button variant="outline" size="sm" className="flex-1" asChild>
+                  <Link to="/registro" onClick={() => setOpen(false)}>Registrarse</Link>
+                </Button>
+                <Button size="sm" className="flex-1 bg-gradient-hero text-primary-foreground" asChild>
+                  <Link to="/ingresar" onClick={() => setOpen(false)}>Ingresar</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       )}
