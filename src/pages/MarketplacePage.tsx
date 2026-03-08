@@ -8,10 +8,11 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Search, MapPin, Calendar, ShoppingBasket, ArrowUpDown,
+  Search, MapPin, Calendar, ShoppingBasket,
   TrendingUp, DollarSign, Navigation, ShieldCheck, Star, SlidersHorizontal
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type SortOption = "relevance" | "price_asc" | "price_desc" | "proximity" | "best_seller" | "cert_green" | "seasonal";
 
@@ -32,19 +33,7 @@ interface Product {
   distanceKm: number;
 }
 
-const categories = ["Todos", "Verduras", "Frutas", "Lácteos", "Huevos", "Cereales", "Conservas", "Miel", "Carnes"];
-
-const certLabels = { red: "Básico", yellow: "En transición", green: "Certificado" };
-
-const sortOptions: { value: SortOption; label: string; icon: typeof Star }[] = [
-  { value: "relevance", label: "Relevancia", icon: Star },
-  { value: "price_asc", label: "Menor precio", icon: DollarSign },
-  { value: "price_desc", label: "Mayor precio", icon: DollarSign },
-  { value: "proximity", label: "Más cercano", icon: Navigation },
-  { value: "best_seller", label: "Más vendido", icon: TrendingUp },
-  { value: "cert_green", label: "Certificado SPG", icon: ShieldCheck },
-  { value: "seasonal", label: "De temporada", icon: Calendar },
-];
+const categoriesKeys = ["Todos", "Verduras", "Frutas", "Lácteos", "Huevos", "Cereales", "Conservas", "Miel", "Carnes"];
 
 const mockProducts: Product[] = [
   { id: 1, name: "Tomate Platense", producer: "Finca La Esperanza", location: "La Plata", category: "Verduras", price: 1200, priceDisplay: "$1.200", unit: "kg", available: "500 kg", certification: "green", image: "🍅", seasonal: "Oct - Mar", soldCount: 340, distanceKm: 12 },
@@ -64,7 +53,7 @@ const mockProducts: Product[] = [
 const isInSeason = (seasonal: string): boolean => {
   if (seasonal === "Todo el año") return true;
   const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-  const currentMonth = new Date().getMonth(); // 0-indexed
+  const currentMonth = new Date().getMonth();
   const parts = seasonal.split(" - ");
   if (parts.length !== 2) return false;
   const start = months.indexOf(parts[0]);
@@ -75,9 +64,22 @@ const isInSeason = (seasonal: string): boolean => {
 };
 
 const MarketplacePage = () => {
+  const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [sortBy, setSortBy] = useState<SortOption>("relevance");
+
+  const certLabels = { red: t("cert.red"), yellow: t("cert.yellow"), green: t("cert.green") };
+
+  const sortOptions: { value: SortOption; label: string; icon: typeof Star }[] = [
+    { value: "relevance", label: t("market.sort.relevance"), icon: Star },
+    { value: "price_asc", label: t("market.sort.price_asc"), icon: DollarSign },
+    { value: "price_desc", label: t("market.sort.price_desc"), icon: DollarSign },
+    { value: "proximity", label: t("market.sort.proximity"), icon: Navigation },
+    { value: "best_seller", label: t("market.sort.best_seller"), icon: TrendingUp },
+    { value: "cert_green", label: t("market.sort.cert_green"), icon: ShieldCheck },
+    { value: "seasonal", label: t("market.sort.seasonal"), icon: Calendar },
+  ];
 
   const filtered = useMemo(() => {
     let results = mockProducts.filter((p) => {
@@ -88,78 +90,53 @@ const MarketplacePage = () => {
 
     const sorted = [...results];
     switch (sortBy) {
-      case "price_asc":
-        sorted.sort((a, b) => a.price - b.price);
-        break;
-      case "price_desc":
-        sorted.sort((a, b) => b.price - a.price);
-        break;
-      case "proximity":
-        sorted.sort((a, b) => a.distanceKm - b.distanceKm);
-        break;
-      case "best_seller":
-        sorted.sort((a, b) => b.soldCount - a.soldCount);
-        break;
+      case "price_asc": sorted.sort((a, b) => a.price - b.price); break;
+      case "price_desc": sorted.sort((a, b) => b.price - a.price); break;
+      case "proximity": sorted.sort((a, b) => a.distanceKm - b.distanceKm); break;
+      case "best_seller": sorted.sort((a, b) => b.soldCount - a.soldCount); break;
       case "cert_green":
         const certOrder = { green: 0, yellow: 1, red: 2 };
-        sorted.sort((a, b) => certOrder[a.certification] - certOrder[b.certification]);
-        break;
+        sorted.sort((a, b) => certOrder[a.certification] - certOrder[b.certification]); break;
       case "seasonal":
-        sorted.sort((a, b) => {
-          const aInSeason = isInSeason(a.seasonal) ? 0 : 1;
-          const bInSeason = isInSeason(b.seasonal) ? 0 : 1;
-          return aInSeason - bInSeason;
-        });
-        break;
-      default:
-        break;
+        sorted.sort((a, b) => (isInSeason(a.seasonal) ? 0 : 1) - (isInSeason(b.seasonal) ? 0 : 1)); break;
     }
     return sorted;
   }, [search, activeCategory, sortBy]);
 
-  const activeSortLabel = sortOptions.find((s) => s.value === sortBy)?.label || "Relevancia";
+  const getCategoryLabel = (cat: string) => {
+    if (cat === "Todos") return t("market.all");
+    return t(`cat.${cat}`) || cat;
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <main className="flex-1 pt-16">
-        {/* Header */}
         <div className="bg-gradient-hero py-12">
           <div className="container">
-            <h1 className="text-3xl sm:text-4xl font-display text-primary-foreground mb-2">
-              Mercado Agroecológico
-            </h1>
-            <p className="text-primary-foreground/70 max-w-xl">
-              Productos frescos directamente de productores agroecológicos certificados. Sin intermediarios, con trazabilidad completa.
-            </p>
+            <h1 className="text-3xl sm:text-4xl font-display text-primary-foreground mb-2">{t("market.title")}</h1>
+            <p className="text-primary-foreground/70 max-w-xl">{t("market.subtitle")}</p>
           </div>
         </div>
 
         <div className="container py-8">
-          {/* Search & Sort */}
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar producto o productor..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-9"
-              />
+              <Input placeholder={t("market.search")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
             </div>
             <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
               <SelectTrigger className="w-full sm:w-56">
                 <div className="flex items-center gap-2">
                   <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-                  <SelectValue placeholder="Ordenar por..." />
+                  <SelectValue />
                 </div>
               </SelectTrigger>
               <SelectContent>
                 {sortOptions.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
                     <span className="flex items-center gap-2">
-                      <opt.icon className="h-3.5 w-3.5 text-muted-foreground" />
-                      {opt.label}
+                      <opt.icon className="h-3.5 w-3.5 text-muted-foreground" />{opt.label}
                     </span>
                   </SelectItem>
                 ))}
@@ -167,58 +144,40 @@ const MarketplacePage = () => {
             </Select>
           </div>
 
-          {/* Category pills */}
           <div className="flex flex-wrap gap-2 mb-8">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
+            {categoriesKeys.map((cat) => (
+              <button key={cat} onClick={() => setActiveCategory(cat)}
                 className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
-                  activeCategory === cat
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-card text-muted-foreground hover:border-primary/40"
-                }`}
-              >
-                {cat}
-              </button>
+                  activeCategory === cat ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/40"
+                }`}>{getCategoryLabel(cat)}</button>
             ))}
           </div>
 
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-muted-foreground">{filtered.length} productos disponibles</p>
+            <p className="text-sm text-muted-foreground">{filtered.length} {t("market.products_available")}</p>
             {sortBy !== "relevance" && (
-              <button
-                onClick={() => setSortBy("relevance")}
-                className="text-xs text-primary hover:text-primary/80 transition-colors underline"
-              >
-                Limpiar orden
+              <button onClick={() => setSortBy("relevance")} className="text-xs text-primary hover:text-primary/80 transition-colors underline">
+                {t("market.clear_sort")}
               </button>
             )}
           </div>
 
-          {/* Product grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <AnimatePresence mode="popLayout">
               {filtered.map((p, i) => (
-                <motion.div
-                  key={p.id}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
+                <motion.div key={p.id} layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3, delay: i * 0.03 }}
-                  className="rounded-xl border border-border bg-card overflow-hidden hover:shadow-elevated transition-all duration-300 group"
-                >
+                  className="rounded-xl border border-border bg-card overflow-hidden hover:shadow-elevated transition-all duration-300 group">
                   <div className="h-36 bg-muted flex items-center justify-center text-5xl group-hover:scale-105 transition-transform duration-300 relative">
                     {p.image}
                     {isInSeason(p.seasonal) && (
                       <span className="absolute top-2 right-2 bg-primary text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
-                        De temporada
+                        {t("market.in_season")}
                       </span>
                     )}
                     {p.soldCount >= 300 && (
                       <span className="absolute top-2 left-2 bg-accent text-accent-foreground text-[10px] font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <TrendingUp className="h-3 w-3" /> Popular
+                        <TrendingUp className="h-3 w-3" /> {t("market.popular")}
                       </span>
                     )}
                   </div>
@@ -243,7 +202,7 @@ const MarketplacePage = () => {
                         <Calendar className="h-3 w-3" /> {p.seasonal}
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <TrendingUp className="h-3 w-3" /> {p.soldCount} vendidos
+                        <TrendingUp className="h-3 w-3" /> {p.soldCount} {t("market.sold")}
                       </div>
                     </div>
 
@@ -252,7 +211,7 @@ const MarketplacePage = () => {
                         {p.priceDisplay}<span className="text-sm text-muted-foreground font-body">/{p.unit}</span>
                       </span>
                       <Button size="sm" className="bg-gradient-hero text-primary-foreground text-xs">
-                        Contactar
+                        {t("market.contact")}
                       </Button>
                     </div>
                   </div>
