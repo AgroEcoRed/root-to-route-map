@@ -12,7 +12,7 @@ const floatingVariants = {
     transition: {
       duration: 4 + i,
       repeat: Infinity,
-      ease: "easeInOut",
+      ease: "easeInOut" as const,
     },
   }),
 };
@@ -22,7 +22,7 @@ const counterVariants = {
   visible: (i: number) => ({
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.6, delay: 0.6 + i * 0.15, type: "spring", stiffness: 100 },
+    transition: { duration: 0.6, delay: 0.6 + i * 0.15, type: "spring" as const, stiffness: 100 },
   }),
 };
 
