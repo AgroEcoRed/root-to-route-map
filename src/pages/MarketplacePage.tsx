@@ -75,6 +75,7 @@ const eggSubcategories = ["all_eggs", "gallina_pastoril", "pato", "codorniz"];
 
 const MarketplacePage = () => {
   const { t } = useLanguage();
+  const { addItem } = useCart();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [activeEggSub, setActiveEggSub] = useState("all_eggs");
