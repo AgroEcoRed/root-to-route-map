@@ -269,9 +269,9 @@ const MapPage = () => {
       const productColor = role === "oferta" ? "#2d6a4f" : "#c0392b";
 
       const productsHtml = a.products.length > 0
-        ? `<div style="margin-top:6px">
-            <p style="font-size:11px;font-weight:600;color:${productColor};margin:0 0 4px">${productLabel}:</p>
-            <div style="display:flex;flex-wrap:wrap;gap:4px">${a.products.map((p) => `<a href="#" class="map-product-link" data-producer="${encodeURIComponent(a.name)}" data-product="${encodeURIComponent(p)}" style="background:${productBg};color:${productColor};font-size:10px;padding:2px 6px;border-radius:4px;text-decoration:none;cursor:pointer;border:1px solid transparent;transition:border 0.2s" onmouseover="this.style.borderColor='${productColor}'" onmouseout="this.style.borderColor='transparent'">${p}</a>`).join("")}</div>
+        ? `<div style="margin-top:8px">
+            <p style="font-size:11px;font-weight:600;color:${productColor};margin:0 0 6px">${productLabel}:</p>
+            <div style="display:flex;flex-wrap:wrap;gap:5px">${a.products.map((p) => `<a href="#" class="map-product-link" data-producer="${encodeURIComponent(a.name)}" data-product="${encodeURIComponent(p)}" style="display:inline-block;background:${productBg};color:${productColor};font-size:11px;padding:4px 10px;border-radius:12px;text-decoration:none;cursor:pointer;border:1.5px solid ${productColor}40;font-weight:600;transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.08)" onmouseover="this.style.background='${productColor}';this.style.color='white';this.style.transform='scale(1.05)'" onmouseout="this.style.background='${productBg}';this.style.color='${productColor}';this.style.transform='scale(1)'">${p}</a>`).join("")}</div>
           </div>`
         : "";
 
