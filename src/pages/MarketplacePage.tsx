@@ -49,7 +49,7 @@ interface Product {
 const mainCategories = [
   "Todos", "Verduras", "Frutas", "Lácteos", "Huevos", "Carnes",
   "Almacén", "Panificados", "Bebidas", "Cosmética Natural",
-  "Plantines y Semillas", "Salud Natural"
+  "Plantines y Semillas", "Salud Natural", "Mercado Híbrido"
 ];
 
 // Almacén subcategories
