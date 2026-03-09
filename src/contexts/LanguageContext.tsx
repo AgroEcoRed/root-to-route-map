@@ -383,6 +383,8 @@ const translations: Record<Lang, Record<string, string>> = {
     "cart.order_to": "Order sent to",
     "cart.total": "Estimated total",
     "cart.grouped_note": "Orders are grouped by producer. Each producer will receive their order separately.",
+    "cart.keep_shopping": "Keep shopping",
+    "cart.send_all": "Send entire order",
   },
   fr: {
     "nav.home": "Accueil",
