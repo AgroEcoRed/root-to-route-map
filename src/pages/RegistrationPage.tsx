@@ -206,15 +206,11 @@ const RegistrationPage = () => {
                       <Label htmlFor="password">Contraseña</Label>
                       <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres" className="mt-1" minLength={6} required />
                     </motion.div>
-                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-                      <Label htmlFor="phone">Teléfono</Label>
-                      <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+54 11 1234-5678" className="mt-1" />
-                    </motion.div>
 
                     {/* Cascading location selects */}
-                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="space-y-3">
+                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="space-y-3">
                       <Label>Ubicación</Label>
-                      <Select value={country} onValueChange={(v) => { setCountry(v); setRegion(""); setCity(""); }}>
+                      <Select value={country} onValueChange={(v) => { setCountry(v); setRegion(""); setCity(""); setPhone(locationData.countries.find(c => c.code === v)?.phoneCode + " " || ""); }}>
                         <SelectTrigger>
                           <SelectValue placeholder="País" />
                         </SelectTrigger>
@@ -241,7 +237,7 @@ const RegistrationPage = () => {
                       {region && (
                         <Select value={city} onValueChange={setCity}>
                           <SelectTrigger>
-                            <SelectValue placeholder="Ciudad" />
+                            <SelectValue placeholder="Ciudad / Localidad" />
                           </SelectTrigger>
                           <SelectContent position="popper" className="max-h-[200px] overflow-y-auto">
                             {selectedRegion?.cities.map((c) => (
@@ -250,6 +246,11 @@ const RegistrationPage = () => {
                           </SelectContent>
                         </Select>
                       )}
+                    </motion.div>
+
+                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+                      <Label htmlFor="phone">Teléfono</Label>
+                      <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={selectedCountry ? `${selectedCountry.phoneCode} ej: 11 1234-5678` : "Seleccioná un país primero"} className="mt-1" />
                     </motion.div>
 
                     <div className="flex gap-3 pt-4">

@@ -1,5 +1,5 @@
 export interface LocationData {
-  countries: { code: string; name: string; regions: { code: string; name: string; cities: string[] }[] }[];
+  countries: { code: string; name: string; phoneCode: string; regions: { code: string; name: string; cities: string[] }[] }[];
 }
 
 export const locationData: LocationData = {
@@ -7,6 +7,7 @@ export const locationData: LocationData = {
     {
       code: "AR",
       name: "Argentina",
+      phoneCode: "+54",
       regions: [
         { code: "BA", name: "Buenos Aires", cities: ["CABA", "La Plata", "Mar del Plata", "Bahía Blanca", "Quilmes", "Moreno", "Florencio Varela", "San Vicente", "Cañuelas", "Luján", "Marcos Paz", "Pilar", "Tigre", "San Isidro", "Avellaneda", "Lanús", "Lomas de Zamora", "Berazategui", "Almirante Brown", "Esteban Echeverría"] },
         { code: "SF", name: "Santa Fe", cities: ["Rosario", "Santa Fe", "Rafaela", "Reconquista", "Venado Tuerto"] },
@@ -36,6 +37,7 @@ export const locationData: LocationData = {
     {
       code: "UY",
       name: "Uruguay",
+      phoneCode: "+598",
       regions: [
         { code: "MO", name: "Montevideo", cities: ["Montevideo"] },
         { code: "CA", name: "Canelones", cities: ["Las Piedras", "Ciudad de la Costa", "Pando", "Canelones"] },
@@ -47,6 +49,7 @@ export const locationData: LocationData = {
     {
       code: "BR",
       name: "Brasil",
+      phoneCode: "+55",
       regions: [
         { code: "SP", name: "São Paulo", cities: ["São Paulo", "Campinas", "Santos", "Ribeirão Preto"] },
         { code: "RJ", name: "Rio de Janeiro", cities: ["Rio de Janeiro", "Niterói", "Petrópolis"] },
@@ -59,6 +62,7 @@ export const locationData: LocationData = {
     {
       code: "CL",
       name: "Chile",
+      phoneCode: "+56",
       regions: [
         { code: "RM", name: "Región Metropolitana", cities: ["Santiago", "Puente Alto", "Maipú"] },
         { code: "VA", name: "Valparaíso", cities: ["Valparaíso", "Viña del Mar", "Quilpué"] },
@@ -68,6 +72,7 @@ export const locationData: LocationData = {
     {
       code: "PY",
       name: "Paraguay",
+      phoneCode: "+595",
       regions: [
         { code: "AS", name: "Asunción", cities: ["Asunción"] },
         { code: "CE", name: "Central", cities: ["San Lorenzo", "Luque", "Fernando de la Mora", "Lambaré"] },
@@ -77,6 +82,7 @@ export const locationData: LocationData = {
     {
       code: "BO",
       name: "Bolivia",
+      phoneCode: "+591",
       regions: [
         { code: "LP", name: "La Paz", cities: ["La Paz", "El Alto"] },
         { code: "CB", name: "Cochabamba", cities: ["Cochabamba", "Sacaba", "Quillacollo"] },
