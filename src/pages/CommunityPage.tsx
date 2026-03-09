@@ -1,5 +1,6 @@
 import { useState } from "react";
-import Navbar from "@/components/Navbar";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
