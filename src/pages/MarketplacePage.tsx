@@ -461,6 +461,26 @@ const MarketplacePage = () => {
                         </Badge>
                       )}
                     </div>
+                    {/* Seller rating */}
+                    {(() => {
+                      const { avg, count } = getSellerRating(p.producer);
+                      return (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setReviewSeller(p.producer); }}
+                          className="flex items-center gap-1 mb-1 group/stars"
+                        >
+                          <div className="flex">
+                            {[1, 2, 3, 4, 5].map((s) => (
+                              <Star key={s} className={`h-3 w-3 ${count > 0 && s <= Math.round(avg) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/25"}`} />
+                            ))}
+                          </div>
+                          <span className="text-[10px] text-muted-foreground group-hover/stars:text-primary transition-colors">
+                            {count > 0 ? `${avg} (${count})` : t("market.no_reviews")}
+                          </span>
+                          <MessageSquare className="h-2.5 w-2.5 text-muted-foreground/40 group-hover/stars:text-primary transition-colors" />
+                        </button>
+                      );
+                    })()}
                     {/* More from this seller / nearby sellers */}
                     {(() => {
                       const sellerOtherCount = mockProducts.filter(pp => pp.producer === p.producer && pp.id !== p.id).length;
