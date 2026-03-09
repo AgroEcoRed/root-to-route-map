@@ -70,7 +70,7 @@ const HeroSection = () => {
           </motion.h1>
 
           <motion.p initial={{ opacity: 0, y: 40, filter: "blur(10px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-lg text-primary-foreground/80 mb-8 max-w-xl leading-relaxed">
+            className="text-lg text-white/80 mb-8 max-w-xl leading-relaxed">
             {t("hero.subtitle")}
           </motion.p>
 
