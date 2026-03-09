@@ -103,6 +103,8 @@ const RegistrationPage = () => {
           display_name: name,
           phone,
           location: locationString,
+          lat,
+          lng,
           products: activities.length > 0 ? activities.map(a => `${a.type === "ofrece" ? "🟢" : "🔴"} ${a.product}`) : null,
           capacity,
           production_methods: methods,
