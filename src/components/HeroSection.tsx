@@ -78,7 +78,7 @@ const HeroSection = () => {
             <Button size="lg" className="bg-wheat text-wheat-foreground hover:bg-wheat/90 font-semibold text-base group" asChild>
               <Link to="/mapa"><MapPin className="h-5 w-5 mr-2 group-hover:animate-bounce" />{t("hero.cta_map")}</Link>
             </Button>
-            <Button size="lg" variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 backdrop-blur-sm group" asChild>
+            <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10 backdrop-blur-sm group" asChild>
               <Link to="/mercado">{t("hero.cta_market")}<ArrowRight className="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" /></Link>
             </Button>
           </motion.div>
