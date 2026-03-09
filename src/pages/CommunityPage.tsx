@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -87,6 +90,8 @@ const eventTypeColors: Record<string, string> = {
 
 const CommunityPage = () => {
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [forumSearch, setForumSearch] = useState("");
   const [wikiSearch, setWikiSearch] = useState("");
 
@@ -217,7 +222,13 @@ const CommunityPage = () => {
                         </div>
                       </div>
                       <div className="flex items-center">
-                        <Button size="sm" variant="outline" className="text-xs">{t("community.register_event")}</Button>
+                        <Button size="sm" variant="outline" className="text-xs" onClick={() => {
+                          if (!user) {
+                            toast("Necesitás ingresar para inscribirte", { action: { label: "Ingresar", onClick: () => navigate("/ingresar") } });
+                          } else {
+                            toast.success(`¡Te inscribiste a "${event.title}"!`);
+                          }
+                        }}>{t("community.register_event")}</Button>
                       </div>
                     </div>
                   </motion.div>
