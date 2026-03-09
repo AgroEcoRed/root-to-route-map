@@ -150,6 +150,10 @@ const translations: Record<Lang, Record<string, string>> = {
     "cat.Conservas": "Conservas",
     "cat.Miel": "Miel",
     "cat.Carnes": "Carnes",
+    "cat.Hierbas Medicinales": "Hierbas Medicinales",
+    "cat.Tinturas": "Tinturas Madre",
+    "cat.Yerba Mate": "Yerba Mate",
+    "cat.Almacén": "Almacén",
     // Egg subcategories
     "egg.all_eggs": "Todos los huevos",
     "egg.gallina_pastoril": "Gallina pastoril",
