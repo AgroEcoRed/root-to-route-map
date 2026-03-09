@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import {
   Search, MapPin, Calendar, ShoppingBasket,
-  TrendingUp, DollarSign, Navigation, ShieldCheck, Star, SlidersHorizontal, Store, Users
+  TrendingUp, DollarSign, Navigation, ShieldCheck, Star, SlidersHorizontal, Store, Users, Info
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -37,17 +37,30 @@ interface Product {
   listingType: ListingType;
 }
 
-const categoriesKeys = ["Todos", "Verduras", "Frutas", "Lácteos", "Huevos", "Cereales", "Conservas", "Miel", "Carnes", "Hierbas Medicinales", "Tinturas", "Yerba Mate", "Almacén"];
+// Main categories (intermediate approach)
+const mainCategories = [
+  "Todos", "Verduras", "Frutas", "Lácteos", "Huevos", "Carnes",
+  "Almacén", "Panificados", "Bebidas", "Cosmética Natural",
+  "Plantines y Semillas", "Salud Natural"
+];
+
+// Almacén subcategories
+const almacenSubcategories = [
+  "all_almacen", "yerba_mate", "cereales", "conservas", "miel",
+  "mermeladas", "productos_secos", "aceites", "azucar"
+];
+
+const eggSubcategories = ["all_eggs", "gallina_pastoril", "pato", "codorniz"];
 
 const mockProducts: Product[] = [
-  // ── OFERTA (productores, cooperativas, nodos agroecológicos venden) ──
+  // ── OFERTA ──
   { id: 1, name: "Tomate Platense", producer: "Finca La Esperanza", location: "La Plata", category: "Verduras", price: 1200, priceDisplay: "$1.200", unit: "kg", available: "500 kg", certification: "green", image: "🍅", seasonal: "Oct - Mar", soldCount: 340, distanceKm: 12, listingType: "oferta" },
   { id: 2, name: "Lechuga Criolla", producer: "Finca La Esperanza", location: "La Plata", category: "Verduras", price: 800, priceDisplay: "$800", unit: "kg", available: "200 kg", certification: "green", image: "🥬", seasonal: "Todo el año", soldCount: 280, distanceKm: 12, listingType: "oferta" },
-  { id: 3, name: "Miel Multifloral", producer: "Cooperativa Del Sol", location: "Florencio Varela", category: "Miel", price: 4500, priceDisplay: "$4.500", unit: "kg", available: "150 kg", certification: "green", image: "🍯", seasonal: "Feb - May", soldCount: 150, distanceKm: 25, listingType: "oferta" },
+  { id: 3, name: "Miel Multifloral", producer: "Cooperativa Del Sol", location: "Florencio Varela", category: "Almacén", subcategory: "miel", price: 4500, priceDisplay: "$4.500", unit: "kg", available: "150 kg", certification: "green", image: "🍯", seasonal: "Feb - May", soldCount: 150, distanceKm: 25, listingType: "oferta" },
   { id: 4, name: "Huevos Pastoril Colorados", producer: "Granja El Retiro", location: "San Vicente", category: "Huevos", subcategory: "gallina_pastoril", price: 3200, priceDisplay: "$3.200", unit: "docena", available: "80 doc/sem", certification: "green", image: "🥚", seasonal: "Todo el año", soldCount: 420, distanceKm: 45, listingType: "oferta" },
   { id: 5, name: "Zapallo Anco", producer: "Huerta Don Pedro", location: "Moreno", category: "Verduras", price: 900, priceDisplay: "$900", unit: "kg", available: "800 kg", certification: "yellow", image: "🎃", seasonal: "Mar - Jul", soldCount: 190, distanceKm: 35, listingType: "oferta" },
-  { id: 6, name: "Harina Integral", producer: "Molino Agroeco", location: "Luján", category: "Cereales", price: 2100, priceDisplay: "$2.100", unit: "kg", available: "1.000 kg", certification: "green", image: "🌾", seasonal: "Todo el año", soldCount: 310, distanceKm: 60, listingType: "oferta" },
-  { id: 7, name: "Dulce de Durazno", producer: "Cooperativa Del Sol", location: "Florencio Varela", category: "Conservas", price: 3800, priceDisplay: "$3.800", unit: "frasco 500g", available: "120 uds", certification: "green", image: "🍑", seasonal: "Ene - Mar", soldCount: 95, distanceKm: 25, listingType: "oferta" },
+  { id: 6, name: "Harina Integral", producer: "Molino Agroeco", location: "Luján", category: "Almacén", subcategory: "cereales", price: 2100, priceDisplay: "$2.100", unit: "kg", available: "1.000 kg", certification: "green", image: "🌾", seasonal: "Todo el año", soldCount: 310, distanceKm: 60, listingType: "oferta" },
+  { id: 7, name: "Dulce de Durazno", producer: "Cooperativa Del Sol", location: "Florencio Varela", category: "Almacén", subcategory: "mermeladas", price: 3800, priceDisplay: "$3.800", unit: "frasco 500g", available: "120 uds", certification: "green", image: "🍑", seasonal: "Ene - Mar", soldCount: 95, distanceKm: 25, listingType: "oferta" },
   { id: 8, name: "Pollo Pastoril", producer: "Granja El Retiro", location: "San Vicente", category: "Carnes", price: 5500, priceDisplay: "$5.500", unit: "kg", available: "50 uds/sem", certification: "green", image: "🍗", seasonal: "Todo el año", soldCount: 220, distanceKm: 45, listingType: "oferta" },
   { id: 9, name: "Naranjas de Quinta", producer: "Huerta Don Pedro", location: "Moreno", category: "Frutas", price: 1500, priceDisplay: "$1.500", unit: "kg", available: "300 kg", certification: "yellow", image: "🍊", seasonal: "Jun - Oct", soldCount: 175, distanceKm: 35, listingType: "oferta" },
   { id: 10, name: "Queso Criollo", producer: "Coop. Tierra Viva", location: "Cañuelas", category: "Lácteos", price: 6200, priceDisplay: "$6.200", unit: "kg", available: "40 kg/sem", certification: "green", image: "🧀", seasonal: "Todo el año", soldCount: 130, distanceKm: 55, listingType: "oferta" },
@@ -59,28 +72,45 @@ const mockProducts: Product[] = [
   { id: 16, name: "Huevos de Pato", producer: "Coop. Tierra Viva", location: "Cañuelas", category: "Huevos", subcategory: "pato", price: 5800, priceDisplay: "$5.800", unit: "docena", available: "10 doc/sem", certification: "green", image: "🦆", seasonal: "Ago - Feb", soldCount: 40, distanceKm: 55, listingType: "oferta" },
   { id: 17, name: "Huevos de Codorniz", producer: "Huerta Don Pedro", location: "Moreno", category: "Huevos", subcategory: "codorniz", price: 2800, priceDisplay: "$2.800", unit: "30 uds", available: "25 packs/sem", certification: "yellow", image: "🐣", seasonal: "Todo el año", soldCount: 120, distanceKm: 35, listingType: "oferta" },
   { id: 18, name: "Nodo La Plata - Bolsón Mixto", producer: "Nodo Agroeco La Plata", location: "La Plata", category: "Verduras", price: 5000, priceDisplay: "$5.000", unit: "bolsón", available: "100 bolsones/sem", certification: "green", image: "🧺", seasonal: "Todo el año", soldCount: 500, distanceKm: 10, listingType: "oferta" },
-  // ── Nuevas categorías ──
-  { id: 19, name: "Manzanilla Orgánica", producer: "Herbario Del Monte", location: "Marcos Paz", category: "Hierbas Medicinales", price: 2800, priceDisplay: "$2.800", unit: "100g", available: "50 packs", certification: "green", image: "🌼", seasonal: "Oct - Feb", soldCount: 90, distanceKm: 40, listingType: "oferta" },
-  { id: 20, name: "Menta Piperita Seca", producer: "Herbario Del Monte", location: "Marcos Paz", category: "Hierbas Medicinales", price: 2500, priceDisplay: "$2.500", unit: "100g", available: "80 packs", certification: "green", image: "🌿", seasonal: "Todo el año", soldCount: 120, distanceKm: 40, listingType: "oferta" },
-  { id: 21, name: "Tintura Madre de Valeriana", producer: "Lab. Natural Raíz", location: "La Plata", category: "Tinturas", price: 5500, priceDisplay: "$5.500", unit: "60ml", available: "30 uds", certification: "green", image: "💧", seasonal: "Todo el año", soldCount: 45, distanceKm: 15, listingType: "oferta" },
-  { id: 22, name: "Tintura Madre de Equinácea", producer: "Lab. Natural Raíz", location: "La Plata", category: "Tinturas", price: 6000, priceDisplay: "$6.000", unit: "60ml", available: "25 uds", certification: "green", image: "💧", seasonal: "Todo el año", soldCount: 55, distanceKm: 15, listingType: "oferta" },
-  { id: 23, name: "Yerba Mate Agroecológica", producer: "Coop. Tierra Roja", location: "Misiones", category: "Yerba Mate", price: 4200, priceDisplay: "$4.200", unit: "kg", available: "500 kg", certification: "green", image: "🧉", seasonal: "Todo el año", soldCount: 680, distanceKm: 1000, listingType: "oferta" },
-  { id: 24, name: "Yerba Mate con Hierbas Serranas", producer: "Coop. Tierra Roja", location: "Misiones", category: "Yerba Mate", price: 4800, priceDisplay: "$4.800", unit: "kg", available: "200 kg", certification: "green", image: "🧉", seasonal: "Todo el año", soldCount: 320, distanceKm: 1000, listingType: "oferta" },
-  { id: 25, name: "Arroz Integral Agroecológico", producer: "Coop. Arroceros del Litoral", location: "Entre Ríos", category: "Almacén", price: 2200, priceDisplay: "$2.200", unit: "kg", available: "1.000 kg", certification: "green", image: "🍚", seasonal: "Todo el año", soldCount: 250, distanceKm: 300, listingType: "oferta" },
-  { id: 26, name: "Fideos Artesanales Integrales", producer: "Molino Agroeco", location: "Luján", category: "Almacén", price: 1800, priceDisplay: "$1.800", unit: "500g", available: "200 packs", certification: "green", image: "🍝", seasonal: "Todo el año", soldCount: 180, distanceKm: 60, listingType: "oferta" },
-  { id: 27, name: "Aceite de Oliva Extra Virgen", producer: "Finca Del Olivo", location: "Mendoza", category: "Almacén", price: 8500, priceDisplay: "$8.500", unit: "500ml", available: "100 botellas", certification: "green", image: "🫒", seasonal: "Mar - Jun", soldCount: 95, distanceKm: 1100, listingType: "oferta" },
-  { id: 28, name: "Azúcar Mascabo Orgánica", producer: "Ingenio Agroeco", location: "Tucumán", category: "Almacén", price: 3200, priceDisplay: "$3.200", unit: "kg", available: "300 kg", certification: "green", image: "🍬", seasonal: "Todo el año", soldCount: 210, distanceKm: 1200, listingType: "oferta" },
-  { id: 29, name: "Burrito / Poleo Seco", producer: "Herbario Del Monte", location: "Marcos Paz", category: "Hierbas Medicinales", price: 2200, priceDisplay: "$2.200", unit: "100g", available: "60 packs", certification: "green", image: "🌾", seasonal: "Todo el año", soldCount: 75, distanceKm: 40, listingType: "oferta" },
+  // Salud Natural (ex Hierbas + Tinturas)
+  { id: 19, name: "Manzanilla Orgánica", producer: "Herbario Del Monte", location: "Marcos Paz", category: "Salud Natural", price: 2800, priceDisplay: "$2.800", unit: "100g", available: "50 packs", certification: "green", image: "🌼", seasonal: "Oct - Feb", soldCount: 90, distanceKm: 40, listingType: "oferta" },
+  { id: 20, name: "Menta Piperita Seca", producer: "Herbario Del Monte", location: "Marcos Paz", category: "Salud Natural", price: 2500, priceDisplay: "$2.500", unit: "100g", available: "80 packs", certification: "green", image: "🌿", seasonal: "Todo el año", soldCount: 120, distanceKm: 40, listingType: "oferta" },
+  { id: 21, name: "Tintura Madre de Valeriana", producer: "Lab. Natural Raíz", location: "La Plata", category: "Salud Natural", price: 5500, priceDisplay: "$5.500", unit: "60ml", available: "30 uds", certification: "green", image: "💧", seasonal: "Todo el año", soldCount: 45, distanceKm: 15, listingType: "oferta" },
+  { id: 22, name: "Tintura Madre de Equinácea", producer: "Lab. Natural Raíz", location: "La Plata", category: "Salud Natural", price: 6000, priceDisplay: "$6.000", unit: "60ml", available: "25 uds", certification: "green", image: "💧", seasonal: "Todo el año", soldCount: 55, distanceKm: 15, listingType: "oferta" },
+  // Almacén: Yerba Mate
+  { id: 23, name: "Yerba Mate Agroecológica", producer: "Coop. Tierra Roja", location: "Misiones", category: "Almacén", subcategory: "yerba_mate", price: 4200, priceDisplay: "$4.200", unit: "kg", available: "500 kg", certification: "green", image: "🧉", seasonal: "Todo el año", soldCount: 680, distanceKm: 1000, listingType: "oferta" },
+  { id: 24, name: "Yerba Mate con Hierbas Serranas", producer: "Coop. Tierra Roja", location: "Misiones", category: "Almacén", subcategory: "yerba_mate", price: 4800, priceDisplay: "$4.800", unit: "kg", available: "200 kg", certification: "green", image: "🧉", seasonal: "Todo el año", soldCount: 320, distanceKm: 1000, listingType: "oferta" },
+  // Almacén: Productos secos, aceites, etc.
+  { id: 25, name: "Arroz Integral Agroecológico", producer: "Coop. Arroceros del Litoral", location: "Entre Ríos", category: "Almacén", subcategory: "cereales", price: 2200, priceDisplay: "$2.200", unit: "kg", available: "1.000 kg", certification: "green", image: "🍚", seasonal: "Todo el año", soldCount: 250, distanceKm: 300, listingType: "oferta" },
+  { id: 26, name: "Fideos Artesanales Integrales", producer: "Molino Agroeco", location: "Luján", category: "Almacén", subcategory: "productos_secos", price: 1800, priceDisplay: "$1.800", unit: "500g", available: "200 packs", certification: "green", image: "🍝", seasonal: "Todo el año", soldCount: 180, distanceKm: 60, listingType: "oferta" },
+  { id: 27, name: "Aceite de Oliva Extra Virgen", producer: "Finca Del Olivo", location: "Mendoza", category: "Almacén", subcategory: "aceites", price: 8500, priceDisplay: "$8.500", unit: "500ml", available: "100 botellas", certification: "green", image: "🫒", seasonal: "Mar - Jun", soldCount: 95, distanceKm: 1100, listingType: "oferta" },
+  { id: 28, name: "Azúcar Mascabo Orgánica", producer: "Ingenio Agroeco", location: "Tucumán", category: "Almacén", subcategory: "azucar", price: 3200, priceDisplay: "$3.200", unit: "kg", available: "300 kg", certification: "green", image: "🍬", seasonal: "Todo el año", soldCount: 210, distanceKm: 1200, listingType: "oferta" },
+  { id: 29, name: "Burrito / Poleo Seco", producer: "Herbario Del Monte", location: "Marcos Paz", category: "Salud Natural", price: 2200, priceDisplay: "$2.200", unit: "100g", available: "60 packs", certification: "green", image: "🌾", seasonal: "Todo el año", soldCount: 75, distanceKm: 40, listingType: "oferta" },
+  // Almacén: Conservas
+  { id: 30, name: "Salsa de Tomate Casera", producer: "Cooperativa Del Sol", location: "Florencio Varela", category: "Almacén", subcategory: "conservas", price: 2800, priceDisplay: "$2.800", unit: "frasco 500g", available: "80 uds", certification: "green", image: "🍅", seasonal: "Ene - Abr", soldCount: 110, distanceKm: 25, listingType: "oferta" },
+  // Almacén: Mermeladas
+  { id: 31, name: "Mermelada de Naranja Amarga", producer: "Cooperativa Del Sol", location: "Florencio Varela", category: "Almacén", subcategory: "mermeladas", price: 3500, priceDisplay: "$3.500", unit: "frasco 450g", available: "60 uds", certification: "green", image: "🍊", seasonal: "Jun - Ago", soldCount: 70, distanceKm: 25, listingType: "oferta" },
+  // Panificados
+  { id: 32, name: "Pan Integral de Masa Madre", producer: "Panadería La Miga", location: "La Plata", category: "Panificados", price: 3500, priceDisplay: "$3.500", unit: "kg", available: "30 kg/día", certification: "green", image: "🍞", seasonal: "Todo el año", soldCount: 400, distanceKm: 12, listingType: "oferta" },
+  { id: 33, name: "Galletitas de Avena y Miel", producer: "Panadería La Miga", location: "La Plata", category: "Panificados", price: 2800, priceDisplay: "$2.800", unit: "300g", available: "50 packs/sem", certification: "green", image: "🍪", seasonal: "Todo el año", soldCount: 230, distanceKm: 12, listingType: "oferta" },
+  // Bebidas
+  { id: 34, name: "Jugo de Manzana Natural", producer: "Finca Del Olivo", location: "Mendoza", category: "Bebidas", price: 3200, priceDisplay: "$3.200", unit: "litro", available: "200 litros", certification: "green", image: "🧃", seasonal: "Mar - Jun", soldCount: 140, distanceKm: 1100, listingType: "oferta" },
+  // Cosmética Natural
+  { id: 35, name: "Jabón Agroecológico de Lavanda", producer: "Herbario Del Monte", location: "Marcos Paz", category: "Cosmética Natural", price: 2500, priceDisplay: "$2.500", unit: "unidad", available: "100 uds", certification: "green", image: "🧼", seasonal: "Todo el año", soldCount: 85, distanceKm: 40, listingType: "oferta" },
+  { id: 36, name: "Crema de Caléndula", producer: "Lab. Natural Raíz", location: "La Plata", category: "Cosmética Natural", price: 4500, priceDisplay: "$4.500", unit: "100g", available: "40 uds", certification: "green", image: "🌻", seasonal: "Todo el año", soldCount: 60, distanceKm: 15, listingType: "oferta" },
+  // Plantines y Semillas
+  { id: 37, name: "Plantines de Tomate (bandeja x12)", producer: "Vivero Raíces", location: "La Plata", category: "Plantines y Semillas", price: 3000, priceDisplay: "$3.000", unit: "bandeja", available: "50 bandejas", certification: "green", image: "🌱", seasonal: "Ago - Nov", soldCount: 150, distanceKm: 12, listingType: "oferta" },
+  { id: 38, name: "Semillas de Lechuga Criolla", producer: "Vivero Raíces", location: "La Plata", category: "Plantines y Semillas", price: 1200, priceDisplay: "$1.200", unit: "sobre 5g", available: "200 sobres", certification: "green", image: "🌿", seasonal: "Todo el año", soldCount: 200, distanceKm: 12, listingType: "oferta" },
 
-  // ── DEMANDA (restaurantes, comedores, dietéticas, nodos de consumo buscan) ──
+  // ── DEMANDA ──
   { id: 101, name: "Verduras de Hoja (variadas)", producer: "Restaurante Raíz", location: "CABA", category: "Verduras", price: 1000, priceDisplay: "$1.000", unit: "kg", available: "Necesita 50 kg/sem", certification: "green", image: "🥬", seasonal: "Todo el año", soldCount: 0, distanceKm: 20, listingType: "demanda" },
   { id: 102, name: "Huevos Pastoriles", producer: "Comedor Comunitario Sol", location: "Quilmes", category: "Huevos", subcategory: "gallina_pastoril", price: 3000, priceDisplay: "$3.000", unit: "docena", available: "Necesita 30 doc/sem", certification: "green", image: "🥚", seasonal: "Todo el año", soldCount: 0, distanceKm: 18, listingType: "demanda" },
   { id: 103, name: "Frutas de Estación", producer: "Dietética Vida Sana", location: "CABA", category: "Frutas", price: 1800, priceDisplay: "$1.800", unit: "kg", available: "Necesita 40 kg/sem", certification: "yellow", image: "🍎", seasonal: "Todo el año", soldCount: 0, distanceKm: 22, listingType: "demanda" },
-  { id: 104, name: "Harina Integral a Granel", producer: "Nodo Consumo Almagro", location: "CABA", category: "Cereales", price: 2000, priceDisplay: "$2.000", unit: "kg", available: "Necesita 100 kg/mes", certification: "green", image: "🌾", seasonal: "Todo el año", soldCount: 0, distanceKm: 15, listingType: "demanda" },
+  { id: 104, name: "Harina Integral a Granel", producer: "Nodo Consumo Almagro", location: "CABA", category: "Almacén", subcategory: "cereales", price: 2000, priceDisplay: "$2.000", unit: "kg", available: "Necesita 100 kg/mes", certification: "green", image: "🌾", seasonal: "Todo el año", soldCount: 0, distanceKm: 15, listingType: "demanda" },
   { id: 105, name: "Lácteos Artesanales", producer: "Escuela Rural N°5", location: "San Vicente", category: "Lácteos", price: 5000, priceDisplay: "$5.000", unit: "kg", available: "Necesita 20 kg/sem", certification: "green", image: "🧀", seasonal: "Todo el año", soldCount: 0, distanceKm: 48, listingType: "demanda" },
-  { id: 106, name: "Conservas y Dulces", producer: "Banco de Alimentos BA", location: "CABA", category: "Conservas", price: 3500, priceDisplay: "$3.500", unit: "frasco", available: "Necesita 200 uds/mes", certification: "green", image: "🍯", seasonal: "Todo el año", soldCount: 0, distanceKm: 25, listingType: "demanda" },
-  { id: 107, name: "Yerba Mate y Hierbas", producer: "Dietética Raíces", location: "CABA", category: "Yerba Mate", price: 4000, priceDisplay: "$4.000", unit: "kg", available: "Necesita 50 kg/mes", certification: "green", image: "🧉", seasonal: "Todo el año", soldCount: 0, distanceKm: 20, listingType: "demanda" },
-  { id: 108, name: "Tinturas Madre variadas", producer: "Dietética Vida Sana", location: "CABA", category: "Tinturas", price: 5000, priceDisplay: "$5.000", unit: "60ml", available: "Necesita 20 uds/mes", certification: "green", image: "💧", seasonal: "Todo el año", soldCount: 0, distanceKm: 22, listingType: "demanda" },
+  { id: 106, name: "Conservas y Dulces", producer: "Banco de Alimentos BA", location: "CABA", category: "Almacén", subcategory: "conservas", price: 3500, priceDisplay: "$3.500", unit: "frasco", available: "Necesita 200 uds/mes", certification: "green", image: "🍯", seasonal: "Todo el año", soldCount: 0, distanceKm: 25, listingType: "demanda" },
+  { id: 107, name: "Yerba Mate y Hierbas", producer: "Dietética Raíces", location: "CABA", category: "Almacén", subcategory: "yerba_mate", price: 4000, priceDisplay: "$4.000", unit: "kg", available: "Necesita 50 kg/mes", certification: "green", image: "🧉", seasonal: "Todo el año", soldCount: 0, distanceKm: 20, listingType: "demanda" },
+  { id: 108, name: "Tinturas y Hierbas Medicinales", producer: "Dietética Vida Sana", location: "CABA", category: "Salud Natural", price: 5000, priceDisplay: "$5.000", unit: "60ml", available: "Necesita 20 uds/mes", certification: "green", image: "💧", seasonal: "Todo el año", soldCount: 0, distanceKm: 22, listingType: "demanda" },
 ];
 
 const isInSeason = (seasonal: string): boolean => {
@@ -96,13 +126,12 @@ const isInSeason = (seasonal: string): boolean => {
   return currentMonth >= start || currentMonth <= end;
 };
 
-const eggSubcategories = ["all_eggs", "gallina_pastoril", "pato", "codorniz"];
-
 const MarketplacePage = () => {
   const { t } = useLanguage();
   const { addItem } = useCart();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
+  const [activeAlmacenSub, setActiveAlmacenSub] = useState("all_almacen");
   const [activeEggSub, setActiveEggSub] = useState("all_eggs");
   const [sortBy, setSortBy] = useState<SortOption>("relevance");
   const [filterProducer, setFilterProducer] = useState("all");
@@ -111,7 +140,6 @@ const MarketplacePage = () => {
 
   const certLabels = { red: t("cert.red"), yellow: t("cert.yellow"), green: t("cert.green") };
 
-  // Derive unique producers and zones from data
   const producers = useMemo(() => [...new Set(mockProducts.map(p => p.producer))].sort(), []);
   const zones = useMemo(() => [...new Set(mockProducts.map(p => p.location))].sort(), []);
 
@@ -129,6 +157,7 @@ const MarketplacePage = () => {
     let results = mockProducts.filter((p) => {
       if (activeCategory !== "Todos" && p.category !== activeCategory) return false;
       if (activeCategory === "Huevos" && activeEggSub !== "all_eggs" && p.subcategory !== activeEggSub) return false;
+      if (activeCategory === "Almacén" && activeAlmacenSub !== "all_almacen" && p.subcategory !== activeAlmacenSub) return false;
       if (filterProducer !== "all" && p.producer !== filterProducer) return false;
       if (filterZone !== "all" && p.location !== filterZone) return false;
       if (filterType !== "all" && p.listingType !== filterType) return false;
@@ -149,7 +178,7 @@ const MarketplacePage = () => {
         sorted.sort((a, b) => (isInSeason(a.seasonal) ? 0 : 1) - (isInSeason(b.seasonal) ? 0 : 1)); break;
     }
     return sorted;
-  }, [search, activeCategory, activeEggSub, sortBy, filterProducer, filterZone, filterType]);
+  }, [search, activeCategory, activeEggSub, activeAlmacenSub, sortBy, filterProducer, filterZone, filterType]);
 
   const hasActiveFilters = filterProducer !== "all" || filterZone !== "all" || filterType !== "all" || sortBy !== "relevance";
 
@@ -166,6 +195,7 @@ const MarketplacePage = () => {
     setSearch("");
     setActiveCategory("Todos");
     setActiveEggSub("all_eggs");
+    setActiveAlmacenSub("all_almacen");
   };
 
   return (
@@ -207,7 +237,6 @@ const MarketplacePage = () => {
 
           {/* Filter row: Type, Producer, Zone */}
           <div className="flex flex-col sm:flex-row gap-3 mb-4">
-            {/* Oferta / Demanda */}
             <Select value={filterType} onValueChange={(v) => setFilterType(v as "all" | ListingType)}>
               <SelectTrigger className="w-full sm:w-52">
                 <div className="flex items-center gap-2">
@@ -226,7 +255,6 @@ const MarketplacePage = () => {
               </SelectContent>
             </Select>
 
-            {/* Producer */}
             <Select value={filterProducer} onValueChange={setFilterProducer}>
               <SelectTrigger className="w-full sm:w-52">
                 <div className="flex items-center gap-2">
@@ -242,7 +270,6 @@ const MarketplacePage = () => {
               </SelectContent>
             </Select>
 
-            {/* Zone */}
             <Select value={filterZone} onValueChange={setFilterZone}>
               <SelectTrigger className="w-full sm:w-48">
                 <div className="flex items-center gap-2">
@@ -261,13 +288,32 @@ const MarketplacePage = () => {
 
           {/* Category pills */}
           <div className="flex flex-wrap gap-2 mb-4">
-            {categoriesKeys.map((cat) => (
-              <button key={cat} onClick={() => { setActiveCategory(cat); if (cat !== "Huevos") setActiveEggSub("all_eggs"); }}
+            {mainCategories.map((cat) => (
+              <button key={cat} onClick={() => {
+                setActiveCategory(cat);
+                if (cat !== "Huevos") setActiveEggSub("all_eggs");
+                if (cat !== "Almacén") setActiveAlmacenSub("all_almacen");
+              }}
                 className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
                   activeCategory === cat ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/40"
                 }`}>{getCategoryLabel(cat)}</button>
             ))}
           </div>
+
+          {/* Almacén subcategory filter */}
+          <AnimatePresence>
+            {activeCategory === "Almacén" && (
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                className="flex flex-wrap gap-2 mb-4 overflow-hidden">
+                {almacenSubcategories.map((sub) => (
+                  <button key={sub} onClick={() => setActiveAlmacenSub(sub)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                      activeAlmacenSub === sub ? "border-secondary bg-secondary text-secondary-foreground" : "border-border bg-card text-muted-foreground hover:border-secondary/40"
+                    }`}>{t(`almacen.${sub}`)}</button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Egg subcategory filter */}
           <AnimatePresence>
@@ -305,7 +351,6 @@ const MarketplacePage = () => {
                   }`}>
                   <div className="h-36 bg-muted flex items-center justify-center text-5xl group-hover:scale-105 transition-transform duration-300 relative">
                     {p.image}
-                    {/* Oferta / Demanda badge */}
                     <span className={`absolute bottom-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full ${
                       p.listingType === "oferta"
                         ? "bg-primary text-primary-foreground"
@@ -334,7 +379,9 @@ const MarketplacePage = () => {
                     <div className="flex items-center gap-2 mb-3">
                       <p className="text-sm text-muted-foreground">{p.producer}</p>
                       {p.subcategory && (
-                        <Badge variant="outline" className="text-[10px]">{t(`egg.${p.subcategory}`)}</Badge>
+                        <Badge variant="outline" className="text-[10px]">
+                          {activeCategory === "Almacén" ? t(`almacen.${p.subcategory}`) : t(`egg.${p.subcategory}`)}
+                        </Badge>
                       )}
                     </div>
 
@@ -373,6 +420,18 @@ const MarketplacePage = () => {
                 </motion.div>
               ))}
             </AnimatePresence>
+          </div>
+
+          {/* Disclaimer */}
+          <div className="mt-12 mb-4 border border-border rounded-xl bg-card p-6">
+            <div className="flex items-start gap-3">
+              <Info className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+              <div className="space-y-2">
+                <h4 className="font-display text-sm text-card-foreground">{t("market.disclaimer_title")}</h4>
+                <p className="text-xs text-muted-foreground leading-relaxed">{t("market.disclaimer_text")}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{t("market.disclaimer_categories")}</p>
+              </div>
+            </div>
           </div>
         </div>
       </main>
