@@ -134,9 +134,18 @@ const isInSeason = (seasonal: string): boolean => {
   return currentMonth >= start || currentMonth <= end;
 };
 
+interface SellerReview {
+  id: string;
+  seller_name: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+}
+
 const MarketplacePage = () => {
   const [searchParams] = useSearchParams();
   const { t } = useLanguage();
+  const { user } = useAuth();
   const { addItem } = useCart();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
@@ -146,6 +155,52 @@ const MarketplacePage = () => {
   const [filterProducer, setFilterProducer] = useState("all");
   const [filterZone, setFilterZone] = useState("all");
   const [filterType, setFilterType] = useState<"all" | ListingType>("all");
+
+  // Reviews state
+  const [reviews, setReviews] = useState<SellerReview[]>([]);
+  const [reviewSeller, setReviewSeller] = useState<string | null>(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+
+  // Fetch reviews
+  useEffect(() => {
+    const fetchReviews = async () => {
+      const { data } = await supabase.from("seller_reviews").select("*").order("created_at", { ascending: false });
+      if (data) setReviews(data as SellerReview[]);
+    };
+    fetchReviews();
+  }, []);
+
+  const getSellerRating = (sellerName: string) => {
+    const sellerReviews = reviews.filter(r => r.seller_name === sellerName);
+    if (sellerReviews.length === 0) return { avg: 0, count: 0 };
+    const avg = sellerReviews.reduce((sum, r) => sum + r.rating, 0) / sellerReviews.length;
+    return { avg: Math.round(avg * 10) / 10, count: sellerReviews.length };
+  };
+
+  const handleSubmitReview = async () => {
+    if (!user || !reviewSeller) return;
+    setReviewSubmitting(true);
+    const { error } = await supabase.from("seller_reviews").insert({
+      reviewer_id: user.id,
+      seller_name: reviewSeller,
+      rating: reviewRating,
+      comment: reviewComment || null,
+    } as any);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success(t("market.review_thanks"));
+      // Refresh reviews
+      const { data } = await supabase.from("seller_reviews").select("*").order("created_at", { ascending: false });
+      if (data) setReviews(data as SellerReview[]);
+      setReviewSeller(null);
+      setReviewRating(5);
+      setReviewComment("");
+    }
+    setReviewSubmitting(false);
+  };
 
   // Read URL params from map links
   useEffect(() => {
