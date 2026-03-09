@@ -104,7 +104,7 @@ const Navbar = () => {
           <div className="relative">
             <button
               onClick={(e) => { e.stopPropagation(); setLangOpen(!langOpen); }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${scrolled ? "text-muted-foreground hover:text-foreground hover:bg-muted/50" : "text-white/70 hover:text-white"}`}
             >
               <Globe className="h-4 w-4" />
               {lang.toUpperCase()}
