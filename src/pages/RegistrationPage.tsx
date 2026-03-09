@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -22,12 +23,33 @@ import type { Database } from "@/integrations/supabase/types";
 import { locationData } from "@/data/locations";
 
 type ActorType = Database["public"]["Enums"]["actor_type"];
+type CertLevel = Database["public"]["Enums"]["certification_level"];
 
-interface ActivityItem {
-  id: string;
-  product: string;
-  type: "ofrece" | "necesita";
-}
+// Categories matching marketplace filters
+const ofertaCategories = [
+  "Verduras", "Frutas", "Lácteos", "Huevos", "Carnes",
+  "Almacén", "Panificados", "Bebidas", "Cosmética Natural",
+  "Plantines y Semillas", "Salud Natural",
+];
+
+const demandaCategories = [
+  "Verduras", "Frutas", "Lácteos", "Huevos", "Carnes",
+  "Almacén", "Panificados", "Bebidas", "Cosmética Natural",
+  "Plantines y Semillas", "Salud Natural",
+  "Mercado Híbrido (convencional/agroecológico)",
+];
+
+const servicioCategories = [
+  "Transporte", "Distribución", "Almacenamiento", "Procesamiento",
+  "Capacitación", "Certificación", "Asesoramiento técnico",
+];
+
+const certOptions: { value: CertLevel; label: string; color: string; desc: string }[] = [
+  { value: "green", label: "Certificado SPG", color: "bg-primary", desc: "Certificación participativa vigente" },
+  { value: "yellow", label: "En transición", color: "bg-wheat", desc: "En proceso de transición agroecológica" },
+  { value: "red", label: "Básico / Inicio", color: "bg-destructive", desc: "Inicio del camino agroecológico" },
+  { value: "none_spg", label: "Agroecológico sin SPG", color: "bg-muted-foreground", desc: "Producción agroecológica sin certificación formal" },
+];
 
 const actorTypes: { key: ActorType; label: string; icon: typeof Sprout; desc: string; color: string }[] = [
   { key: "producer", label: "Productor Agroecológico", icon: Sprout, desc: "Cultivo, cría o producción de alimentos agroecológicos", color: "from-primary to-leaf" },
@@ -40,6 +62,8 @@ const actorTypes: { key: ActorType; label: string; icon: typeof Sprout; desc: st
   { key: "logistics", label: "Proveedor Logístico", icon: Truck, desc: "Transporte, distribución o almacenamiento", color: "from-soil to-earth" },
   { key: "processing", label: "Planta de Procesamiento", icon: Factory, desc: "Molino, frigorífico, acopio o biofábrica", color: "from-wheat to-leaf" },
 ];
+
+const isProducerType = (type: ActorType | null) => type === "producer" || type === "cooperative" || type === "processing";
 
 const RegistrationPage = () => {
   const navigate = useNavigate();
@@ -57,34 +81,61 @@ const RegistrationPage = () => {
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
 
-  const [activities, setActivities] = useState<ActivityItem[]>([]);
-  const [newProduct, setNewProduct] = useState("");
-  const [newType, setNewType] = useState<"ofrece" | "necesita">("ofrece");
+  // Step 3: Categories
+  const [selectedOferta, setSelectedOferta] = useState<string[]>([]);
+  const [selectedDemanda, setSelectedDemanda] = useState<string[]>([]);
+  const [selectedServicios, setSelectedServicios] = useState<string[]>([]);
+  const [customCategory, setCustomCategory] = useState("");
+  const [customCategoryType, setCustomCategoryType] = useState<"oferta" | "demanda" | "servicio">("oferta");
+  const [certification, setCertification] = useState<CertLevel>("red");
+  const [description, setDescription] = useState("");
   const [capacity, setCapacity] = useState("");
   const [methods, setMethods] = useState("");
-  const [description, setDescription] = useState("");
 
   const selectedCountry = locationData.countries.find(c => c.code === country);
-  const selectedRegion = selectedCountry?.regions.find(r => r.code === region);
-  const locationString = [city, selectedRegion?.name, selectedCountry?.name].filter(Boolean).join(", ");
+  const selectedRegion2 = selectedCountry?.regions.find(r => r.code === region);
+  const locationString = [city, selectedRegion2?.name, selectedCountry?.name].filter(Boolean).join(", ");
 
-  const addActivity = () => {
-    if (!newProduct.trim()) return;
-    setActivities(prev => [...prev, { id: crypto.randomUUID(), product: newProduct.trim(), type: newType }]);
-    setNewProduct("");
+  const toggleCategory = (cat: string, list: string[], setList: (v: string[]) => void) => {
+    setList(list.includes(cat) ? list.filter(c => c !== cat) : [...list, cat]);
   };
 
-  const removeActivity = (id: string) => {
-    setActivities(prev => prev.filter(a => a.id !== id));
+  const addCustomCategory = async () => {
+    const trimmed = customCategory.trim();
+    if (!trimmed) return;
+    
+    // Add to local selection
+    if (customCategoryType === "oferta") {
+      setSelectedOferta(prev => [...prev, trimmed]);
+    } else if (customCategoryType === "demanda") {
+      setSelectedDemanda(prev => [...prev, trimmed]);
+    } else {
+      setSelectedServicios(prev => [...prev, trimmed]);
+    }
+    
+    setCustomCategory("");
   };
 
-  const toggleActivityType = (id: string) => {
-    setActivities(prev => prev.map(a => a.id === id ? { ...a, type: a.type === "ofrece" ? "necesita" : "ofrece" } : a));
+  // Build products array from selections
+  const buildProducts = () => {
+    const products: string[] = [];
+    selectedOferta.forEach(p => products.push(`🟢 ${p}`));
+    selectedDemanda.forEach(p => products.push(`🔴 ${p}`));
+    selectedServicios.forEach(p => products.push(`🔵 ${p}`));
+    return products.length > 0 ? products : null;
   };
+
+  const descriptionWordCount = description.trim().split(/\s+/).filter(Boolean).length;
+  const minWords = 15;
+  const descriptionValid = descriptionWordCount >= minWords;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedType) return;
+    if (!descriptionValid) {
+      toast.error(`La descripción debe tener al menos ${minWords} palabras.`);
+      return;
+    }
     setLoading(true);
 
     try {
@@ -96,6 +147,24 @@ const RegistrationPage = () => {
       if (authError) throw authError;
       if (!authData.user) throw new Error("No se pudo crear el usuario");
 
+      // Save custom categories globally
+      const allCustomOferta = selectedOferta.filter(c => !ofertaCategories.includes(c));
+      const allCustomDemanda = selectedDemanda.filter(c => !demandaCategories.includes(c));
+      const allCustomServicios = selectedServicios.filter(c => !servicioCategories.includes(c));
+
+      const customCats = [
+        ...allCustomOferta.map(name => ({ name, type: "oferta" as const, created_by: authData.user!.id })),
+        ...allCustomDemanda.map(name => ({ name, type: "demanda" as const, created_by: authData.user!.id })),
+        ...allCustomServicios.map(name => ({ name, type: "servicio" as const, created_by: authData.user!.id })),
+      ];
+
+      if (customCats.length > 0) {
+        // Insert ignoring duplicates
+        for (const cat of customCats) {
+          await supabase.from("custom_categories").insert(cat as any).select();
+        }
+      }
+
       const { error: profileError } = await supabase
         .from("profiles")
         .update({
@@ -105,10 +174,11 @@ const RegistrationPage = () => {
           location: locationString,
           lat,
           lng,
-          products: activities.length > 0 ? activities.map(a => `${a.type === "ofrece" ? "🟢" : "🔴"} ${a.product}`) : null,
+          products: buildProducts(),
           capacity,
           production_methods: methods,
           description,
+          certification: isProducerType(selectedType) ? certification : null,
         })
         .eq("user_id", authData.user.id);
 
@@ -245,7 +315,7 @@ const RegistrationPage = () => {
                             <SelectValue placeholder="Ciudad / Localidad" />
                           </SelectTrigger>
                           <SelectContent position="popper" className="max-h-[200px] overflow-y-auto">
-                            {selectedRegion?.cities.map((c) => (
+                            {selectedRegion2?.cities.map((c) => (
                               <SelectItem key={c} value={c}>{c}</SelectItem>
                             ))}
                           </SelectContent>
@@ -284,78 +354,161 @@ const RegistrationPage = () => {
                 <div className="text-center mb-8">
                   <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-3">Paso 3 de 3</span>
                   <h1 className="text-3xl sm:text-4xl font-display text-foreground mb-2">Tu actividad</h1>
-                  <p className="text-muted-foreground">Agregá los productos o servicios que ofrecés y/o necesitás.</p>
+                  <p className="text-muted-foreground">Seleccioná las categorías de lo que ofrecés y/o necesitás.</p>
                 </div>
                 <form onSubmit={handleSubmit} className="max-w-lg mx-auto rounded-2xl border border-border bg-card p-6 shadow-card">
-                  <div className="space-y-4">
-                    {/* Add new activity */}
-                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0 }}>
-                      <Label>Agregar producto o servicio</Label>
-                      <div className="flex gap-2 mt-1">
-                        <div className="flex-1">
-                          <Input value={newProduct} onChange={(e) => setNewProduct(e.target.value)} placeholder="Ej: Tomate, Lechuga, Transporte..."
-                            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addActivity(); } }} />
+                  <div className="space-y-5">
+                    {/* Oferta categories */}
+                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
+                      <Label className="text-sm font-medium">🟢 ¿Qué ofrecés?</Label>
+                      <p className="text-[11px] text-muted-foreground mb-2">Seleccioná las categorías de productos o servicios que ofrecés.</p>
+                      <div className="flex flex-wrap gap-2">
+                        {ofertaCategories.map((cat) => (
+                          <button key={cat} type="button" onClick={() => toggleCategory(cat, selectedOferta, setSelectedOferta)}
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                              selectedOferta.includes(cat) ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/40"
+                            }`}>
+                            {cat}
+                          </button>
+                        ))}
+                        {/* Show custom oferta categories */}
+                        {selectedOferta.filter(c => !ofertaCategories.includes(c)).map((cat) => (
+                          <span key={cat} className="px-3 py-1.5 rounded-full text-xs font-medium border border-primary bg-primary/10 text-primary flex items-center gap-1">
+                            {cat}
+                            <button type="button" onClick={() => setSelectedOferta(prev => prev.filter(c => c !== cat))}>
+                              <X className="h-3 w-3" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    </motion.div>
+
+                    {/* Demanda categories */}
+                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+                      <Label className="text-sm font-medium">🔴 ¿Qué necesitás?</Label>
+                      <p className="text-[11px] text-muted-foreground mb-2">Seleccioná las categorías de productos que buscás comprar.</p>
+                      <div className="flex flex-wrap gap-2">
+                        {demandaCategories.map((cat) => (
+                          <button key={cat} type="button" onClick={() => toggleCategory(cat, selectedDemanda, setSelectedDemanda)}
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                              selectedDemanda.includes(cat) ? "border-destructive bg-destructive/10 text-destructive" : "border-border bg-card text-muted-foreground hover:border-destructive/40"
+                            }`}>
+                            {cat}
+                          </button>
+                        ))}
+                        {selectedDemanda.filter(c => !demandaCategories.includes(c)).map((cat) => (
+                          <span key={cat} className="px-3 py-1.5 rounded-full text-xs font-medium border border-destructive bg-destructive/10 text-destructive flex items-center gap-1">
+                            {cat}
+                            <button type="button" onClick={() => setSelectedDemanda(prev => prev.filter(c => c !== cat))}>
+                              <X className="h-3 w-3" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    </motion.div>
+
+                    {/* Servicios categories (for logistics/processing types) */}
+                    {(selectedType === "logistics" || selectedType === "processing" || selectedType === "cooperative") && (
+                      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+                        <Label className="text-sm font-medium">🔵 Servicios que ofrecés</Label>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {servicioCategories.map((cat) => (
+                            <button key={cat} type="button" onClick={() => toggleCategory(cat, selectedServicios, setSelectedServicios)}
+                              className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                                selectedServicios.includes(cat) ? "border-accent bg-accent/10 text-accent-foreground" : "border-border bg-card text-muted-foreground hover:border-accent/40"
+                              }`}>
+                              {cat}
+                            </button>
+                          ))}
+                          {selectedServicios.filter(c => !servicioCategories.includes(c)).map((cat) => (
+                            <span key={cat} className="px-3 py-1.5 rounded-full text-xs font-medium border border-accent bg-accent/10 text-accent-foreground flex items-center gap-1">
+                              {cat}
+                              <button type="button" onClick={() => setSelectedServicios(prev => prev.filter(c => c !== cat))}>
+                                <X className="h-3 w-3" />
+                              </button>
+                            </span>
+                          ))}
                         </div>
-                        <Select value={newType} onValueChange={(v: "ofrece" | "necesita") => setNewType(v)}>
-                          <SelectTrigger className="w-[130px]">
+                      </motion.div>
+                    )}
+
+                    {/* Custom category "Otra" */}
+                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+                      <Label className="text-sm font-medium">➕ Agregar otra categoría</Label>
+                      <p className="text-[11px] text-muted-foreground mb-2">Si no encontrás tu categoría, escribila acá. Quedará disponible para otros usuarios.</p>
+                      <div className="flex gap-2">
+                        <Input value={customCategory} onChange={(e) => setCustomCategory(e.target.value)} placeholder="Ej: Fibras naturales, Apicultura..."
+                          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCustomCategory(); } }}
+                          className="flex-1" />
+                        <Select value={customCategoryType} onValueChange={(v: "oferta" | "demanda" | "servicio") => setCustomCategoryType(v)}>
+                          <SelectTrigger className="w-[120px]">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="ofrece">🟢 Ofrezco</SelectItem>
-                            <SelectItem value="necesita">🔴 Necesito</SelectItem>
+                            <SelectItem value="oferta">🟢 Oferta</SelectItem>
+                            <SelectItem value="demanda">🔴 Demanda</SelectItem>
+                            <SelectItem value="servicio">🔵 Servicio</SelectItem>
                           </SelectContent>
                         </Select>
-                        <Button type="button" size="icon" variant="outline" onClick={addActivity} disabled={!newProduct.trim()}>
+                        <Button type="button" size="icon" variant="outline" onClick={addCustomCategory} disabled={!customCategory.trim()}>
                           <Plus className="h-4 w-4" />
                         </Button>
                       </div>
                     </motion.div>
 
-                    {/* Activity list */}
-                    {activities.length > 0 && (
-                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
-                        <Label>Tu oferta y demanda</Label>
-                        <div className="flex flex-wrap gap-2">
-                          <AnimatePresence>
-                            {activities.map((a) => (
-                              <motion.div key={a.id} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }}
-                                className="group flex items-center gap-1">
-                                <Badge
-                                  variant={a.type === "ofrece" ? "default" : "destructive"}
-                                  className="cursor-pointer select-none px-3 py-1.5 text-sm flex items-center gap-1.5"
-                                  onClick={() => toggleActivityType(a.id)}
-                                >
-                                  <span className="text-xs">{a.type === "ofrece" ? "🟢" : "🔴"}</span>
-                                  {a.product}
-                                  <button type="button" onClick={(e) => { e.stopPropagation(); removeActivity(a.id); }}
-                                    className="ml-1 opacity-60 hover:opacity-100 transition-opacity">
-                                    <X className="h-3 w-3" />
-                                  </button>
-                                </Badge>
-                              </motion.div>
-                            ))}
-                          </AnimatePresence>
+                    {/* Certification level - only for producers */}
+                    {isProducerType(selectedType) && (
+                      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+                        <Label className="text-sm font-medium">🌱 Nivel de transición / certificación</Label>
+                        <p className="text-[11px] text-muted-foreground mb-2">Indicá tu nivel actual en el camino agroecológico.</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {certOptions.map((opt) => (
+                            <button key={opt.value} type="button" onClick={() => setCertification(opt.value)}
+                              className={`flex items-center gap-3 p-3 rounded-lg border transition-all text-left ${
+                                certification === opt.value ? "border-primary bg-primary/5 shadow-sm" : "border-border bg-card hover:border-primary/30"
+                              }`}>
+                              <span className={`w-3 h-3 rounded-full ${opt.color} flex-shrink-0`} />
+                              <div>
+                                <p className="text-xs font-medium text-card-foreground">{opt.label}</p>
+                                <p className="text-[10px] text-muted-foreground">{opt.desc}</p>
+                              </div>
+                            </button>
+                          ))}
                         </div>
-                        <p className="text-[11px] text-muted-foreground">Tocá un badge para cambiar entre ofrezco/necesito. Usá la ✕ para eliminarlo.</p>
                       </motion.div>
                     )}
-                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+
+                    {/* Description - mandatory */}
+                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
+                      <Label htmlFor="description">Descripción <span className="text-destructive">*</span></Label>
+                      <p className="text-[11px] text-muted-foreground mb-1">
+                        Contanos quiénes son y qué hacen. Esta descripción aparecerá en el mapa y en tu perfil. Mínimo {minWords} palabras.
+                      </p>
+                      <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Ej: Somos una familia productora de hortalizas agroecológicas en La Plata, Buenos Aires. Cultivamos tomates, lechugas, acelgas y morrones sin uso de agroquímicos desde 2018. Participamos del SPG local y entregamos en nodos de consumo semanales..."
+                        rows={4} className="mt-1" required />
+                      <p className={`text-[11px] mt-1 ${descriptionValid ? "text-primary" : "text-destructive"}`}>
+                        {descriptionWordCount}/{minWords} palabras {descriptionValid ? "✓" : "(mínimo requerido)"}
+                      </p>
+                    </motion.div>
+
+                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
                       <Label htmlFor="capacity">Capacidad / Volumen</Label>
                       <Input id="capacity" value={capacity} onChange={(e) => setCapacity(e.target.value)} placeholder="Ej: 500 kg/mes" className="mt-1" />
                     </motion.div>
-                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-                      <Label htmlFor="methods">Métodos de producción</Label>
-                      <Input id="methods" value={methods} onChange={(e) => setMethods(e.target.value)} placeholder="Ej: Agroecológico, en transición" className="mt-1" />
-                    </motion.div>
-                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-                      <Label htmlFor="description">Descripción</Label>
-                      <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Contanos más sobre tu actividad..." rows={3} className="mt-1" />
-                    </motion.div>
+
+                    {isProducerType(selectedType) && (
+                      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+                        <Label htmlFor="methods">Métodos de producción</Label>
+                        <Input id="methods" value={methods} onChange={(e) => setMethods(e.target.value)} placeholder="Ej: Agroecológico, biodinámico, en transición" className="mt-1" />
+                      </motion.div>
+                    )}
+
                     <div className="flex gap-3 pt-4">
                       <Button variant="outline" type="button" onClick={() => setStep(2)} className="flex-1">
                         <ArrowLeft className="h-4 w-4 mr-1" /> Volver
                       </Button>
-                      <Button type="submit" className="flex-1 bg-gradient-hero text-primary-foreground group" disabled={loading}>
+                      <Button type="submit" className="flex-1 bg-gradient-hero text-primary-foreground group" disabled={loading || !descriptionValid}>
                         {loading ? "Registrando..." : <><Check className="h-4 w-4 mr-1" /> Registrarme</>}
                       </Button>
                     </div>
