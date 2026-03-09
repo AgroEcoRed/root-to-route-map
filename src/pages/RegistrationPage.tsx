@@ -15,6 +15,7 @@ import {
   Sprout, Users, Heart, UtensilsCrossed, Store,
   Building2, Truck, Factory, ShoppingCart, ArrowRight, ArrowLeft, Check, Sparkles, Plus, X
 } from "lucide-react";
+import LocationPicker from "@/components/LocationPicker";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
