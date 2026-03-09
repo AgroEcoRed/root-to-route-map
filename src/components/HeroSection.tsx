@@ -61,7 +61,7 @@ const HeroSection = () => {
           </motion.div>
 
           <motion.h1 initial={{ opacity: 0, y: 40, filter: "blur(10px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.8, delay: 0.15 }}
-            className="text-4xl sm:text-5xl lg:text-6xl font-display leading-tight text-primary-foreground mb-6">
+            className="text-4xl sm:text-5xl lg:text-6xl font-display leading-tight text-white mb-6">
             {t("hero.title_1")}
             <span className="relative inline-block">
               {t("hero.title_highlight")}
