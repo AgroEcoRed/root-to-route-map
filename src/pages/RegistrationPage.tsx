@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
   Sprout, Users, Heart, UtensilsCrossed, Store,
-  Building2, Truck, Factory, ShoppingCart, ArrowRight, ArrowLeft, Check, Sparkles
+  Building2, Truck, Factory, ShoppingCart, ArrowRight, ArrowLeft, Check, Sparkles, Plus, X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -20,6 +21,12 @@ import type { Database } from "@/integrations/supabase/types";
 import { locationData } from "@/data/locations";
 
 type ActorType = Database["public"]["Enums"]["actor_type"];
+
+interface ActivityItem {
+  id: string;
+  product: string;
+  type: "ofrece" | "necesita";
+}
 
 const actorTypes: { key: ActorType; label: string; icon: typeof Sprout; desc: string; color: string }[] = [
   { key: "producer", label: "Productor Agroecológico", icon: Sprout, desc: "Cultivo, cría o producción de alimentos agroecológicos", color: "from-primary to-leaf" },
@@ -39,27 +46,38 @@ const RegistrationPage = () => {
   const [selectedType, setSelectedType] = useState<ActorType | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Step 2 fields
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
-  
-  // Location fields
   const [country, setCountry] = useState("");
   const [region, setRegion] = useState("");
   const [city, setCity] = useState("");
 
-  // Step 3 fields
-  const [products, setProducts] = useState("");
+  const [activities, setActivities] = useState<ActivityItem[]>([]);
+  const [newProduct, setNewProduct] = useState("");
+  const [newType, setNewType] = useState<"ofrece" | "necesita">("ofrece");
   const [capacity, setCapacity] = useState("");
   const [methods, setMethods] = useState("");
   const [description, setDescription] = useState("");
 
   const selectedCountry = locationData.countries.find(c => c.code === country);
   const selectedRegion = selectedCountry?.regions.find(r => r.code === region);
-
   const locationString = [city, selectedRegion?.name, selectedCountry?.name].filter(Boolean).join(", ");
+
+  const addActivity = () => {
+    if (!newProduct.trim()) return;
+    setActivities(prev => [...prev, { id: crypto.randomUUID(), product: newProduct.trim(), type: newType }]);
+    setNewProduct("");
+  };
+
+  const removeActivity = (id: string) => {
+    setActivities(prev => prev.filter(a => a.id !== id));
+  };
+
+  const toggleActivityType = (id: string) => {
+    setActivities(prev => prev.map(a => a.id === id ? { ...a, type: a.type === "ofrece" ? "necesita" : "ofrece" } : a));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
