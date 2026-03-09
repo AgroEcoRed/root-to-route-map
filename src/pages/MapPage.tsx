@@ -166,11 +166,29 @@ const mockActors: MapActor[] = [
   { id: 24, name: "Dietética Vida Sana", type: "health_food_store", lat: -34.60, lng: -58.43, products: ["Orgánicos", "Sin TACC", "Suplementos"], certification: "green", description: "Dietética especializada en productos agroecológicos." },
   // SERVICIO — Logística
   { id: 7, name: "Transporte El Surco", type: "logistics", lat: -34.70, lng: -58.30, products: [], certification: "yellow", description: "Fletes refrigerados para alimentos frescos." },
+  // OFERTA — Intermediario Solidario
+  { id: 25, name: "Nodo Sin Intermediarios", type: "solidarity_intermediary", lat: -34.59, lng: -58.50, products: ["Bolsones", "Verduras", "Frutas"], certification: "green", description: "Articulación directa campo-barrio sin intermediarios." },
+  { id: 26, name: "Red Más Cerca Más Justo", type: "solidarity_intermediary", lat: -34.63, lng: -58.43, products: ["Alimentos agroecológicos", "Almacén"], certification: "green", description: "Intermediación solidaria entre productores y consumidores." },
+  // OFERTA — Huerta Comunitaria
+  { id: 27, name: "Huerta El Retoño", type: "community_garden", lat: -34.66, lng: -58.44, products: ["Verduras", "Aromáticas", "Plantines"], certification: "yellow", description: "Huerta comunitaria barrial, producción colectiva." },
+  { id: 28, name: "Huerta INTA Pro-Huerta", type: "community_garden", lat: -34.54, lng: -58.51, products: ["Hortalizas", "Semillas"], certification: "green", description: "Huerta demostrativa del programa Pro-Huerta." },
+  // DEMANDA — Almacén Agroecológico
+  { id: 29, name: "Pochamama Almacén", type: "agroecological_store", lat: -34.64, lng: -58.41, products: ["Orgánicos", "Granos", "Yerba mate"], certification: "green", description: "Almacén autogestivo de alimentos agroecológicos." },
+  { id: 30, name: "Almacén de Ramos Generales Eco", type: "agroecological_store", lat: -34.67, lng: -58.38, products: ["Harinas", "Conservas", "Tinturas"], certification: "green", description: "Almacén agroecológico con productos de la economía popular." },
+  // DEMANDA — Feria Agroecológica
+  { id: 31, name: "Feria Agroecológica de Productores", type: "agroecological_fair", lat: -34.61, lng: -58.46, products: ["Verduras", "Frutas", "Conservas", "Plantines"], certification: "green", description: "Feria semanal de productores agroecológicos." },
+  { id: 32, name: "Feria Soberana", type: "agroecological_fair", lat: -34.69, lng: -58.35, products: ["Alimentos", "Artesanías", "Semillas"], certification: "yellow", description: "Feria mensual de soberanía alimentaria." },
+  // DEMANDA — Mercado Agroecológico
+  { id: 33, name: "Mercado Territorial Autogestivo", type: "agroecological_market", lat: -34.62, lng: -58.53, products: ["Verduras", "Lácteos", "Panificados"], certification: "green", description: "Mercado cooperativo de alimentos locales." },
+  { id: 34, name: "Mercado de Economía Social", type: "agroecological_market", lat: -34.58, lng: -58.39, products: ["Productos de la economía popular"], certification: "yellow", description: "Mercado de la economía social y solidaria." },
 ];
+
+type CertFilter = "green" | "yellow" | "red";
 
 const MapPage = () => {
   const [search, setSearch] = useState("");
   const [activeTypes, setActiveTypes] = useState<Set<ActorType>>(new Set(Object.keys(actorTypeLabels) as ActorType[]));
+  const [activeCerts, setActiveCerts] = useState<Set<CertFilter>>(new Set(["green", "yellow", "red"]));
   const [showFilters, setShowFilters] = useState(true);
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
