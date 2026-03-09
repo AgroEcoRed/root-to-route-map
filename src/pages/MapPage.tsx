@@ -20,12 +20,17 @@ type ActorType =
   | "seed_bank"
   | "composting_center"
   | "research_center"
+  | "solidarity_intermediary"
+  | "community_garden"
   | "consumer_node"
   | "individual_consumer"
   | "food_bank"
   | "consumer_cooperative"
   | "community_org"
-  | "health_food_store";
+  | "health_food_store"
+  | "agroecological_store"
+  | "agroecological_fair"
+  | "agroecological_market";
 
 type ActorRole = "oferta" | "demanda" | "servicio";
 
