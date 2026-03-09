@@ -134,7 +134,7 @@ const LoginPage = () => {
                 <Leaf className="h-7 w-7 text-primary-foreground" />
               </div>
               <h1 className="text-2xl font-display text-foreground">
-                {showForgot ? "Restablecer contraseña" : isSignUp ? "Crear cuenta" : "Ingresar a AgroRed"}
+                {showForgot ? "Restablecer contraseña" : isSignUp ? "Crear cuenta" : "Ingresar a MercadoAgroecológico"}
               </h1>
             </div>
 
