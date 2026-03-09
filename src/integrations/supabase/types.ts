@@ -88,6 +88,33 @@ export type Database = {
           },
         ]
       }
+      seller_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          rating: number
+          reviewer_id: string
+          seller_name: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          reviewer_id: string
+          seller_name: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          reviewer_id?: string
+          seller_name?: string
+        }
+        Relationships: []
+      }
       spg_evaluations: {
         Row: {
           created_at: string

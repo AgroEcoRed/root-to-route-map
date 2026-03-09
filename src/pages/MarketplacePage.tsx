@@ -1,20 +1,27 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   Search, MapPin, Calendar, ShoppingBasket,
-  TrendingUp, DollarSign, Navigation, ShieldCheck, Star, SlidersHorizontal, Store, Users, Info
+  TrendingUp, DollarSign, Navigation, ShieldCheck, Star, SlidersHorizontal, Store, Users, AlertTriangle, MessageSquare
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 type SortOption = "relevance" | "price_asc" | "price_desc" | "proximity" | "best_seller" | "cert_green" | "seasonal";
 type ListingType = "oferta" | "demanda";
@@ -127,9 +134,18 @@ const isInSeason = (seasonal: string): boolean => {
   return currentMonth >= start || currentMonth <= end;
 };
 
+interface SellerReview {
+  id: string;
+  seller_name: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+}
+
 const MarketplacePage = () => {
   const [searchParams] = useSearchParams();
   const { t } = useLanguage();
+  const { user } = useAuth();
   const { addItem } = useCart();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
@@ -139,6 +155,52 @@ const MarketplacePage = () => {
   const [filterProducer, setFilterProducer] = useState("all");
   const [filterZone, setFilterZone] = useState("all");
   const [filterType, setFilterType] = useState<"all" | ListingType>("all");
+
+  // Reviews state
+  const [reviews, setReviews] = useState<SellerReview[]>([]);
+  const [reviewSeller, setReviewSeller] = useState<string | null>(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+
+  // Fetch reviews
+  useEffect(() => {
+    const fetchReviews = async () => {
+      const { data } = await supabase.from("seller_reviews").select("*").order("created_at", { ascending: false });
+      if (data) setReviews(data as SellerReview[]);
+    };
+    fetchReviews();
+  }, []);
+
+  const getSellerRating = (sellerName: string) => {
+    const sellerReviews = reviews.filter(r => r.seller_name === sellerName);
+    if (sellerReviews.length === 0) return { avg: 0, count: 0 };
+    const avg = sellerReviews.reduce((sum, r) => sum + r.rating, 0) / sellerReviews.length;
+    return { avg: Math.round(avg * 10) / 10, count: sellerReviews.length };
+  };
+
+  const handleSubmitReview = async () => {
+    if (!user || !reviewSeller) return;
+    setReviewSubmitting(true);
+    const { error } = await supabase.from("seller_reviews").insert({
+      reviewer_id: user.id,
+      seller_name: reviewSeller,
+      rating: reviewRating,
+      comment: reviewComment || null,
+    } as any);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success(t("market.review_thanks"));
+      // Refresh reviews
+      const { data } = await supabase.from("seller_reviews").select("*").order("created_at", { ascending: false });
+      if (data) setReviews(data as SellerReview[]);
+      setReviewSeller(null);
+      setReviewRating(5);
+      setReviewComment("");
+    }
+    setReviewSubmitting(false);
+  };
 
   // Read URL params from map links
   useEffect(() => {
@@ -220,6 +282,13 @@ const MarketplacePage = () => {
         </div>
 
         <div className="container py-8">
+          {/* Trust warning banner */}
+          <div className="mb-6 flex items-center gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3">
+            <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              <strong className="text-foreground">{t("market.disclaimer_title")}</strong> — {t("market.disclaimer_text")}
+            </p>
+          </div>
           {/* Search + Sort row */}
           <div className="flex flex-col sm:flex-row gap-4 mb-4">
             <div className="relative flex-1">
@@ -399,6 +468,26 @@ const MarketplacePage = () => {
                         </Badge>
                       )}
                     </div>
+                    {/* Seller rating */}
+                    {(() => {
+                      const { avg, count } = getSellerRating(p.producer);
+                      return (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setReviewSeller(p.producer); }}
+                          className="flex items-center gap-1 mb-1 group/stars"
+                        >
+                          <div className="flex">
+                            {[1, 2, 3, 4, 5].map((s) => (
+                              <Star key={s} className={`h-3 w-3 ${count > 0 && s <= Math.round(avg) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/25"}`} />
+                            ))}
+                          </div>
+                          <span className="text-[10px] text-muted-foreground group-hover/stars:text-primary transition-colors">
+                            {count > 0 ? `${avg} (${count})` : t("market.no_reviews")}
+                          </span>
+                          <MessageSquare className="h-2.5 w-2.5 text-muted-foreground/40 group-hover/stars:text-primary transition-colors" />
+                        </button>
+                      );
+                    })()}
                     {/* More from this seller / nearby sellers */}
                     {(() => {
                       const sellerOtherCount = mockProducts.filter(pp => pp.producer === p.producer && pp.id !== p.id).length;
@@ -464,17 +553,73 @@ const MarketplacePage = () => {
             </AnimatePresence>
           </div>
 
-          {/* Disclaimer */}
-          <div className="mt-12 mb-4 border border-border rounded-xl bg-card p-6">
+           {/* Disclaimer - prominent warning */}
+          <div className="mt-12 mb-4 border-2 border-destructive/30 rounded-xl bg-destructive/5 p-6">
             <div className="flex items-start gap-3">
-              <Info className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+              <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
               <div className="space-y-2">
-                <h4 className="font-display text-sm text-card-foreground">{t("market.disclaimer_title")}</h4>
+                <h4 className="font-display text-sm text-foreground">{t("market.disclaimer_title")}</h4>
                 <p className="text-xs text-muted-foreground leading-relaxed">{t("market.disclaimer_text")}</p>
                 <p className="text-xs text-muted-foreground leading-relaxed">{t("market.disclaimer_categories")}</p>
               </div>
             </div>
           </div>
+
+          {/* Review dialog */}
+          <Dialog open={!!reviewSeller} onOpenChange={(open) => { if (!open) setReviewSeller(null); }}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5" />
+                  {t("market.write_review")}: {reviewSeller}
+                </DialogTitle>
+              </DialogHeader>
+              {user ? (
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Calificación</p>
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <button key={s} onClick={() => setReviewRating(s)} className="transition-transform hover:scale-110">
+                          <Star className={`h-7 w-7 ${s <= reviewRating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"}`} />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <Textarea
+                    value={reviewComment}
+                    onChange={(e) => setReviewComment(e.target.value)}
+                    placeholder={t("market.review_placeholder")}
+                    rows={3}
+                  />
+                  <Button onClick={handleSubmitReview} disabled={reviewSubmitting} className="w-full bg-gradient-hero text-primary-foreground">
+                    {reviewSubmitting ? "Enviando..." : t("market.review_submit")}
+                  </Button>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground py-4 text-center">{t("market.review_login")}</p>
+              )}
+
+              {/* Existing reviews for this seller */}
+              {reviews.filter(r => r.seller_name === reviewSeller).length > 0 && (
+                <div className="border-t border-border pt-4 mt-2 space-y-3 max-h-60 overflow-y-auto">
+                  {reviews.filter(r => r.seller_name === reviewSeller).map((r) => (
+                    <div key={r.id} className="text-sm space-y-1">
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <Star key={s} className={`h-3.5 w-3.5 ${s <= r.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20"}`} />
+                        ))}
+                        <span className="text-xs text-muted-foreground ml-2">
+                          {new Date(r.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                      {r.comment && <p className="text-xs text-muted-foreground">{r.comment}</p>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
         </div>
       </main>
       <Footer />
