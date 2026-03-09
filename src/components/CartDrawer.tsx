@@ -1,15 +1,17 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Minus, Plus, Trash2, ShoppingBasket, Send, MapPin, ShoppingCart } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBasket, Send, MapPin, ShoppingCart, CheckCircle2, MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
 
 const CartDrawer = () => {
   const { items, isOpen, setIsOpen, updateQuantity, removeItem, clearProducer } = useCart();
   const { t } = useLanguage();
+  const [orderSent, setOrderSent] = useState(false);
+  const [sentProducers, setSentProducers] = useState<string[]>([]);
 
   const grouped = useMemo(() => {
     const map = new Map<string, typeof items>();
@@ -23,27 +25,56 @@ const CartDrawer = () => {
 
   const totalPrice = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
-  const handleOrder = (producer: string) => {
-    clearProducer(producer);
-    toast({
-      title: t("cart.order_sent"),
-      description: `${t("cart.order_to")} ${producer}`,
-    });
+  const buildWhatsAppMessage = (producer: string, producerItems: typeof items) => {
+    const lines = producerItems.map(
+      (i) => `• ${i.name} x${i.quantity} (${i.priceDisplay}/${i.unit})`
+    );
+    const subtotal = producerItems.reduce((s, i) => s + i.price * i.quantity, 0);
+    const msg = `Hola ${producer}! 🌱\n\nTe escribo desde MercadoAgroecológico. Quisiera hacer el siguiente pedido:\n\n${lines.join("\n")}\n\nTotal estimado: $${subtotal.toLocaleString("es-AR")}\n\n¿Tienen disponibilidad? ¿Cómo coordinamos la entrega?`;
+    return encodeURIComponent(msg);
+  };
+
+  const openWhatsApp = (producer: string, producerItems: typeof items) => {
+    const message = buildWhatsAppMessage(producer, producerItems);
+    // Opens WhatsApp with pre-filled message (no phone number = user picks contact)
+    window.open(`https://wa.me/?text=${message}`, "_blank");
   };
 
   const handleSendAll = () => {
-    const producerNames = grouped.map(([p]) => p).join(", ");
-    const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
-    items.length > 0 && toast({
-      title: t("cart.order_sent"),
-      description: `${totalItems} ${t("market.products_available")} → ${producerNames}`,
+    if (items.length === 0) return;
+    const producers = grouped.map(([p]) => p);
+    
+    // Open WhatsApp for each producer
+    grouped.forEach(([producer, producerItems]) => {
+      openWhatsApp(producer, producerItems);
     });
-    // Clear all
+
+    setSentProducers(producers);
+    setOrderSent(true);
+
+    // Clear cart
     grouped.forEach(([producer]) => clearProducer(producer));
+
+    toast({
+      title: t("cart.order_sent"),
+      description: `${producers.join(", ")}`,
+    });
+  };
+
+  const handleCloseConfirmation = () => {
+    setOrderSent(false);
+    setSentProducers([]);
+    setIsOpen(false);
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet open={isOpen} onOpenChange={(open) => {
+      if (!open) {
+        setOrderSent(false);
+        setSentProducers([]);
+      }
+      setIsOpen(open);
+    }}>
       <SheetContent className="w-full sm:max-w-md flex flex-col">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2 font-display">
@@ -52,7 +83,31 @@ const CartDrawer = () => {
           </SheetTitle>
         </SheetHeader>
 
-        {items.length === 0 ? (
+        {/* Order sent confirmation */}
+        {orderSent ? (
+          <div className="flex-1 flex flex-col items-center justify-center text-center gap-4 px-4">
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200 }}>
+              <CheckCircle2 className="h-16 w-16 text-primary" />
+            </motion.div>
+            <h3 className="font-display text-xl text-foreground">{t("cart.order_sent")}</h3>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p className="flex items-center gap-2 justify-center">
+                <MessageCircle className="h-4 w-4 text-primary" />
+                {t("cart.order_whatsapp")}
+              </p>
+              <p>{t("cart.order_email_sent")}</p>
+              <p className="text-xs mt-4 bg-muted/50 rounded-lg p-3">{t("cart.order_next_steps")}</p>
+            </div>
+            {sentProducers.length > 0 && (
+              <div className="text-xs text-muted-foreground">
+                {t("cart.order_to")}: <span className="font-medium text-foreground">{sentProducers.join(", ")}</span>
+              </div>
+            )}
+            <Button onClick={handleCloseConfirmation} className="mt-4 bg-gradient-hero text-primary-foreground">
+              <ShoppingCart className="h-4 w-4 mr-1" /> {t("cart.keep_shopping")}
+            </Button>
+          </div>
+        ) : items.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground gap-3">
             <ShoppingBasket className="h-12 w-12 opacity-30" />
             <p className="text-sm">{t("cart.empty")}</p>
@@ -127,7 +182,7 @@ const CartDrawer = () => {
           </div>
         )}
 
-        {items.length > 0 && (
+        {items.length > 0 && !orderSent && (
           <div className="border-t border-border pt-4 mt-4 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-muted-foreground">{t("cart.total")}</span>
@@ -136,6 +191,10 @@ const CartDrawer = () => {
               </span>
             </div>
             <p className="text-xs text-muted-foreground">{t("cart.grouped_note")}</p>
+            <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+              <MessageCircle className="h-3.5 w-3.5 text-primary" />
+              {t("cart.order_whatsapp")}
+            </p>
             <div className="flex gap-2">
               <Button variant="outline" className="flex-1 text-xs" onClick={() => setIsOpen(false)}>
                 <ShoppingCart className="h-3.5 w-3.5 mr-1" />
