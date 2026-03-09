@@ -70,8 +70,8 @@ const Navbar = () => {
               to={item.to}
               className={`relative flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 location.pathname === item.to
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? scrolled ? "text-primary" : "text-white font-semibold"
+                  : scrolled ? "text-muted-foreground hover:text-foreground" : "text-white/70 hover:text-white"
               }`}
             >
               <item.icon className="h-4 w-4" />
