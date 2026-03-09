@@ -53,13 +53,13 @@ const Navbar = () => {
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
           ? "bg-background/90 backdrop-blur-xl shadow-sm border-b border-border"
-          : "bg-transparent border-b border-transparent"
+          : "bg-transparent border-b border-transparent text-white"
       }`}
     >
       <div className="container flex items-center justify-between h-16">
         <Link to="/" className="flex items-center gap-2 group">
           <img src={logo} alt="AgroRed" className="h-9 w-9 transition-transform group-hover:scale-110" />
-          <span className="font-display text-xl text-foreground">AgroRed</span>
+          <span className={`font-display text-xl ${scrolled ? "text-foreground" : "text-white"}`}>AgroRed</span>
         </Link>
 
         {/* Desktop */}
@@ -70,8 +70,8 @@ const Navbar = () => {
               to={item.to}
               className={`relative flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 location.pathname === item.to
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? scrolled ? "text-primary" : "text-white font-semibold"
+                  : scrolled ? "text-muted-foreground hover:text-foreground" : "text-white/70 hover:text-white"
               }`}
             >
               <item.icon className="h-4 w-4" />
@@ -91,7 +91,7 @@ const Navbar = () => {
           {/* Cart */}
           <button
             onClick={() => setCartOpen(true)}
-            className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+            className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${scrolled ? "text-muted-foreground hover:text-foreground hover:bg-muted/50" : "text-white/70 hover:text-white"}`}
           >
             <ShoppingCart className="h-4 w-4" />
             {totalItems > 0 && (
@@ -104,7 +104,7 @@ const Navbar = () => {
           <div className="relative">
             <button
               onClick={(e) => { e.stopPropagation(); setLangOpen(!langOpen); }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${scrolled ? "text-muted-foreground hover:text-foreground hover:bg-muted/50" : "text-white/70 hover:text-white"}`}
             >
               <Globe className="h-4 w-4" />
               {lang.toUpperCase()}
@@ -138,7 +138,7 @@ const Navbar = () => {
 
           {user ? (
             <>
-              <span className="text-sm text-muted-foreground flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50">
+              <span className={`text-sm flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${scrolled ? "text-muted-foreground bg-muted/50" : "text-white/80 bg-white/10"}`}>
                 <User className="h-4 w-4" />
                 {user.email?.split("@")[0]}
               </span>
