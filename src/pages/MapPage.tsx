@@ -203,9 +203,19 @@ const MapPage = () => {
     });
   };
 
+  const toggleCert = (cert: CertFilter) => {
+    setActiveCerts((prev) => {
+      const next = new Set(prev);
+      if (next.has(cert)) next.delete(cert);
+      else next.add(cert);
+      return next;
+    });
+  };
+
   const filtered = useMemo(() => {
     return mockActors.filter((a) => {
       if (!activeTypes.has(a.type)) return false;
+      if (!activeCerts.has(a.certification)) return false;
       if (search && !a.name.toLowerCase().includes(search.toLowerCase()) && !a.products.some((p) => p.toLowerCase().includes(search.toLowerCase()))) return false;
       return true;
     });
