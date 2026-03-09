@@ -88,7 +88,10 @@ const eventTypeColors: Record<string, string> = {
 
 const CommunityPage = () => {
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [forumSearch, setForumSearch] = useState("");
+  const [wikiSearch, setWikiSearch] = useState("");
   const [wikiSearch, setWikiSearch] = useState("");
 
   const filteredPosts = forumPosts.filter((p) =>
