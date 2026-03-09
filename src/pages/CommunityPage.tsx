@@ -11,8 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
   MessageSquare, BookOpen, CalendarDays, Search, ThumbsUp,
-  Clock, User, Tag, ChevronRight, Sprout, Droplets, Bug, Leaf,
-  MapPin, Users
+  Clock, User, Tag, ChevronRight, ChevronLeft, Sprout, Droplets, Bug, Leaf,
+  MapPin, Users, Send
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -26,6 +26,7 @@ interface ForumPost {
   replies: number;
   likes: number;
   excerpt: string;
+  mockReplies?: { author: string; text: string; date: string; likes: number }[];
 }
 
 interface WikiArticle {
@@ -48,9 +49,24 @@ interface Event {
 }
 
 const forumPosts: ForumPost[] = [
-  { id: 1, title: "Control biológico de pulgones en tomate", author: "María G.", date: "2026-03-05", category: "plagas", replies: 12, likes: 34, excerpt: "Compartí mi experiencia con mariquitas y crisopas para el control del pulgón verde en cultivo de tomate bajo invernadero." },
-  { id: 2, title: "Rotación de cultivos en huerta familiar", author: "Pedro L.", date: "2026-03-04", category: "técnicas", replies: 8, likes: 21, excerpt: "¿Cómo organizan la rotación en parcelas pequeñas? Tengo 2000m² y me cuesta no repetir familias botánicas." },
-  { id: 3, title: "Experiencia con bokashi para mejorar suelos arcillosos", author: "Ana R.", date: "2026-03-03", category: "suelo", replies: 15, likes: 45, excerpt: "Después de 6 meses aplicando bokashi, los resultados en estructura y retención de agua son impresionantes." },
+  { id: 1, title: "Control biológico de pulgones en tomate", author: "María G.", date: "2026-03-05", category: "plagas", replies: 12, likes: 34, excerpt: "Compartí mi experiencia con mariquitas y crisopas para el control del pulgón verde en cultivo de tomate bajo invernadero.",
+    mockReplies: [
+      { author: "Pedro L.", text: "¡Excelente experiencia María! Yo también probé con crisopas y funciona muy bien. ¿Cuántas liberaste por metro cuadrado?", date: "2026-03-05", likes: 8 },
+      { author: "Ana R.", text: "En mi caso usé purín de ortiga como complemento y el resultado fue muy bueno. Les comparto la receta si les interesa.", date: "2026-03-06", likes: 12 },
+      { author: "Jorge M.", text: "¿Funcionará también para pulgón negro en habas? Tengo el mismo problema pero no encuentro mariquitas en mi zona.", date: "2026-03-06", likes: 3 },
+    ]
+  },
+  { id: 2, title: "Rotación de cultivos en huerta familiar", author: "Pedro L.", date: "2026-03-04", category: "técnicas", replies: 8, likes: 21, excerpt: "¿Cómo organizan la rotación en parcelas pequeñas? Tengo 2000m² y me cuesta no repetir familias botánicas.",
+    mockReplies: [
+      { author: "María G.", text: "Te recomiendo dividir en 4 sectores y rotar por familias: solanáceas → leguminosas → cucurbitáceas → brassicáceas.", date: "2026-03-04", likes: 15 },
+      { author: "Lucía S.", text: "Yo uso una planilla simple en papel. La clave es no repetir familia en el mismo cantero por 3 temporadas.", date: "2026-03-05", likes: 6 },
+    ]
+  },
+  { id: 3, title: "Experiencia con bokashi para mejorar suelos arcillosos", author: "Ana R.", date: "2026-03-03", category: "suelo", replies: 15, likes: 45, excerpt: "Después de 6 meses aplicando bokashi, los resultados en estructura y retención de agua son impresionantes.",
+    mockReplies: [
+      { author: "Carlos D.", text: "¿Qué proporción de materiales usás para tu bokashi? Yo tengo mucha arcilla roja y no logro que drene bien.", date: "2026-03-03", likes: 7 },
+    ]
+  },
   { id: 4, title: "Semillas criollas de zapallo: variedades y conservación", author: "Jorge M.", date: "2026-03-02", category: "semillas", replies: 6, likes: 18, excerpt: "Estoy armando un banco de semillas de zapallos criollos. Tengo 8 variedades, busco intercambiar." },
   { id: 5, title: "Problemas con mosca blanca en invernadero", author: "Lucía S.", date: "2026-03-01", category: "plagas", replies: 20, likes: 28, excerpt: "Probé con trampas amarillas y encarsia formosa pero sigo teniendo problemas. ¿Sugerencias?" },
   { id: 6, title: "Certificación participativa: ¿cómo empezar?", author: "Carlos D.", date: "2026-02-28", category: "certificación", replies: 9, likes: 32, excerpt: "Quiero iniciar el proceso de SPG en mi zona. ¿Quiénes han pasado por el proceso? ¿Qué necesito saber?" },
@@ -94,6 +110,11 @@ const CommunityPage = () => {
   const navigate = useNavigate();
   const [forumSearch, setForumSearch] = useState("");
   const [wikiSearch, setWikiSearch] = useState("");
+  const [selectedPost, setSelectedPost] = useState<ForumPost | null>(null);
+  const [showNewPost, setShowNewPost] = useState(false);
+  const [newPostTitle, setNewPostTitle] = useState("");
+  const [newPostContent, setNewPostContent] = useState("");
+  const [replyText, setReplyText] = useState("");
 
   const filteredPosts = forumPosts.filter((p) =>
     !forumSearch || p.title.toLowerCase().includes(forumSearch.toLowerCase()) || p.excerpt.toLowerCase().includes(forumSearch.toLowerCase())
@@ -102,6 +123,32 @@ const CommunityPage = () => {
   const filteredArticles = wikiArticles.filter((a) =>
     !wikiSearch || a.title.toLowerCase().includes(wikiSearch.toLowerCase())
   );
+
+  const handleNewPost = () => {
+    if (!user) {
+      toast("Necesitás ingresar para crear un tema", { action: { label: "Ingresar", onClick: () => navigate("/ingresar") } });
+      return;
+    }
+    setShowNewPost(true);
+  };
+
+  const submitNewPost = () => {
+    if (!newPostTitle.trim()) return;
+    toast.success("¡Tema creado! Aparecerá cuando sea aprobado por la comunidad.");
+    setShowNewPost(false);
+    setNewPostTitle("");
+    setNewPostContent("");
+  };
+
+  const submitReply = () => {
+    if (!user) {
+      toast("Necesitás ingresar para responder", { action: { label: "Ingresar", onClick: () => navigate("/ingresar") } });
+      return;
+    }
+    if (!replyText.trim()) return;
+    toast.success("¡Respuesta enviada!");
+    setReplyText("");
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -130,42 +177,149 @@ const CommunityPage = () => {
 
             {/* FORUM */}
             <TabsContent value="forum">
-              <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder={t("community.search_forum")} value={forumSearch} onChange={(e) => setForumSearch(e.target.value)} className="pl-9" />
-                </div>
-                <Button className="bg-gradient-hero text-primary-foreground">{t("community.new_post")}</Button>
-              </div>
+              <AnimatePresence mode="wait">
+                {selectedPost ? (
+                  /* Thread detail view */
+                  <motion.div key="thread" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                    <button onClick={() => setSelectedPost(null)}
+                      className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 mb-6 transition-colors">
+                      <ChevronLeft className="h-4 w-4" /> Volver al foro
+                    </button>
 
-              <div className="space-y-4">
-                {filteredPosts.map((post, i) => {
-                  const CatIcon = forumCategoryIcons[post.category] || MessageSquare;
-                  return (
-                    <motion.div key={post.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: i * 0.05 }}
-                      className="rounded-xl border border-border bg-card p-5 hover:shadow-elevated hover:border-primary/20 transition-all duration-300 cursor-pointer group">
-                      <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                          <CatIcon className="h-5 w-5 text-primary" />
+                    {/* Original post */}
+                    <div className="rounded-xl border border-border bg-card p-6 mb-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <User className="h-5 w-5 text-primary" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-display text-base text-card-foreground group-hover:text-primary transition-colors">{post.title}</h3>
-                          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{post.excerpt}</p>
-                          <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1"><User className="h-3 w-3" />{post.author}</span>
-                            <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{new Date(post.date).toLocaleDateString()}</span>
-                            <span className="flex items-center gap-1"><MessageSquare className="h-3 w-3" />{post.replies}</span>
-                            <span className="flex items-center gap-1"><ThumbsUp className="h-3 w-3" />{post.likes}</span>
-                            <Badge variant="secondary" className="text-[10px]">{t(`community.cat.${post.category}`)}</Badge>
-                          </div>
+                        <div>
+                          <p className="font-medium text-card-foreground text-sm">{selectedPost.author}</p>
+                          <p className="text-xs text-muted-foreground">{new Date(selectedPost.date).toLocaleDateString()}</p>
                         </div>
-                        <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0 mt-2" />
+                        <Badge variant="secondary" className="text-[10px] ml-auto">{t(`community.cat.${selectedPost.category}`)}</Badge>
                       </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
+                      <h2 className="font-display text-xl text-card-foreground mb-3">{selectedPost.title}</h2>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{selectedPost.excerpt}</p>
+                      <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1"><ThumbsUp className="h-3 w-3" />{selectedPost.likes}</span>
+                        <span className="flex items-center gap-1"><MessageSquare className="h-3 w-3" />{selectedPost.replies} respuestas</span>
+                      </div>
+                    </div>
+
+                    {/* Replies */}
+                    <div className="space-y-4 mb-6">
+                      {(selectedPost.mockReplies || []).map((reply, i) => (
+                        <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
+                          className="rounded-xl border border-border bg-card p-5 ml-6">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                              <User className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-card-foreground text-sm">{reply.author}</p>
+                              <p className="text-xs text-muted-foreground">{new Date(reply.date).toLocaleDateString()}</p>
+                            </div>
+                            <span className="flex items-center gap-1 text-xs text-muted-foreground ml-auto">
+                              <ThumbsUp className="h-3 w-3" />{reply.likes}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground leading-relaxed">{reply.text}</p>
+                        </motion.div>
+                      ))}
+                      {(!selectedPost.mockReplies || selectedPost.mockReplies.length === 0) && (
+                        <div className="text-center py-8 text-muted-foreground text-sm">
+                          Aún no hay respuestas. ¡Sé el primero en responder!
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Reply input */}
+                    <div className="rounded-xl border border-border bg-card p-5">
+                      <Textarea
+                        placeholder={user ? "Escribí tu respuesta..." : "Ingresá para responder"}
+                        value={replyText}
+                        onChange={(e) => setReplyText(e.target.value)}
+                        rows={3}
+                        disabled={!user}
+                        className="mb-3"
+                      />
+                      <div className="flex justify-end">
+                        <Button size="sm" className="bg-gradient-hero text-primary-foreground gap-2" onClick={submitReply} disabled={!replyText.trim()}>
+                          <Send className="h-3.5 w-3.5" /> Responder
+                        </Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ) : showNewPost ? (
+                  /* New post form */
+                  <motion.div key="newpost" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                    <button onClick={() => setShowNewPost(false)}
+                      className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 mb-6 transition-colors">
+                      <ChevronLeft className="h-4 w-4" /> Volver al foro
+                    </button>
+                    <div className="max-w-2xl mx-auto rounded-xl border border-border bg-card p-6">
+                      <h2 className="font-display text-xl text-card-foreground mb-4">Nuevo tema</h2>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="text-sm font-medium text-card-foreground">Título</label>
+                          <Input value={newPostTitle} onChange={(e) => setNewPostTitle(e.target.value)} placeholder="Ej: Experiencia con cobertura vegetal" className="mt-1" />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-card-foreground">Contenido</label>
+                          <Textarea value={newPostContent} onChange={(e) => setNewPostContent(e.target.value)} placeholder="Compartí tu experiencia, pregunta o reflexión..." rows={6} className="mt-1" />
+                        </div>
+                        <div className="flex gap-3 justify-end">
+                          <Button variant="outline" onClick={() => setShowNewPost(false)}>Cancelar</Button>
+                          <Button className="bg-gradient-hero text-primary-foreground" onClick={submitNewPost} disabled={!newPostTitle.trim()}>
+                            Publicar tema
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ) : (
+                  /* Forum list */
+                  <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                    <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                      <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input placeholder={t("community.search_forum")} value={forumSearch} onChange={(e) => setForumSearch(e.target.value)} className="pl-9" />
+                      </div>
+                      <Button className="bg-gradient-hero text-primary-foreground" onClick={handleNewPost}>{t("community.new_post")}</Button>
+                    </div>
+
+                    <div className="space-y-4">
+                      {filteredPosts.map((post, i) => {
+                        const CatIcon = forumCategoryIcons[post.category] || MessageSquare;
+                        return (
+                          <motion.div key={post.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: i * 0.05 }}
+                            onClick={() => setSelectedPost(post)}
+                            className="rounded-xl border border-border bg-card p-5 hover:shadow-elevated hover:border-primary/20 transition-all duration-300 cursor-pointer group">
+                            <div className="flex items-start gap-4">
+                              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                <CatIcon className="h-5 w-5 text-primary" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-display text-base text-card-foreground group-hover:text-primary transition-colors">{post.title}</h3>
+                                <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{post.excerpt}</p>
+                                <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
+                                  <span className="flex items-center gap-1"><User className="h-3 w-3" />{post.author}</span>
+                                  <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{new Date(post.date).toLocaleDateString()}</span>
+                                  <span className="flex items-center gap-1"><MessageSquare className="h-3 w-3" />{post.replies}</span>
+                                  <span className="flex items-center gap-1"><ThumbsUp className="h-3 w-3" />{post.likes}</span>
+                                  <Badge variant="secondary" className="text-[10px]">{t(`community.cat.${post.category}`)}</Badge>
+                                </div>
+                              </div>
+                              <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0 mt-2" />
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </TabsContent>
 
             {/* WIKI */}
