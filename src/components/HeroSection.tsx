@@ -83,11 +83,11 @@ const HeroSection = () => {
             </Button>
           </motion.div>
 
-          <div className="flex gap-8 mt-12 pt-8 border-t border-primary-foreground/20">
+          <div className="flex gap-8 mt-12 pt-8 border-t border-white/20">
             {stats.map((s, i) => (
               <motion.div key={s.label} custom={i} variants={counterVariants} initial="hidden" animate="visible">
                 <div className="text-2xl sm:text-3xl font-display text-wheat">{s.num}</div>
-                <div className="text-sm text-primary-foreground/60">{s.label}</div>
+                <div className="text-sm text-white/60">{s.label}</div>
               </motion.div>
             ))}
           </div>
