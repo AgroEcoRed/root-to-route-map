@@ -743,6 +743,8 @@ const translations: Record<Lang, Record<string, string>> = {
     "cart.order_to": "Pedido enviado para",
     "cart.total": "Total estimado",
     "cart.grouped_note": "Os pedidos são agrupados por produtor. Cada produtor receberá seu pedido separadamente.",
+    "cart.keep_shopping": "Continuar comprando",
+    "cart.send_all": "Enviar todo o pedido",
   },
 };
 
