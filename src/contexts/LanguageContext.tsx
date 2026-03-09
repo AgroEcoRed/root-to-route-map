@@ -402,6 +402,9 @@ const translations: Record<Lang, Record<string, string>> = {
     "cart.grouped_note": "Orders are grouped by producer. Each producer will receive their order separately.",
     "cart.keep_shopping": "Keep shopping",
     "cart.send_all": "Send entire order",
+    "cart.order_whatsapp": "📲 WhatsApp will open to coordinate delivery with each producer.",
+    "cart.order_email_sent": "An email with the order details will also be sent to the producer.",
+    "cart.order_next_steps": "Next steps: the producer will confirm availability, and you'll agree on payment and delivery.",
   },
   fr: {
     "nav.home": "Accueil",
