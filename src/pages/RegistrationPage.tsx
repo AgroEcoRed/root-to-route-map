@@ -251,6 +251,14 @@ const RegistrationPage = () => {
                       )}
                     </motion.div>
 
+                    {/* Geolocation picker */}
+                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+                      <Label>Georreferenciación</Label>
+                      <div className="mt-1">
+                        <LocationPicker lat={lat} lng={lng} onChange={(newLat, newLng) => { setLat(newLat); setLng(newLng); }} />
+                      </div>
+                    </motion.div>
+
                     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
                       <Label htmlFor="phone">Teléfono</Label>
                       <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={selectedCountry ? `${selectedCountry.phoneCode} ej: 11 1234-5678` : "Seleccioná un país primero"} className="mt-1" />
