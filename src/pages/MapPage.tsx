@@ -20,12 +20,17 @@ type ActorType =
   | "seed_bank"
   | "composting_center"
   | "research_center"
+  | "solidarity_intermediary"
+  | "community_garden"
   | "consumer_node"
   | "individual_consumer"
   | "food_bank"
   | "consumer_cooperative"
   | "community_org"
-  | "health_food_store";
+  | "health_food_store"
+  | "agroecological_store"
+  | "agroecological_fair"
+  | "agroecological_market";
 
 type ActorRole = "oferta" | "demanda" | "servicio";
 
@@ -53,12 +58,17 @@ const actorTypeLabels: Record<ActorType, string> = {
   seed_bank: "Banco de Semillas",
   composting_center: "Centro de Compostaje",
   research_center: "Centro de Investigación",
+  solidarity_intermediary: "Intermediario Solidario",
+  community_garden: "Huerta Comunitaria",
   consumer_node: "Nodo de Consumidores",
   individual_consumer: "Consumidor Individual",
   food_bank: "Banco de Alimentos",
   consumer_cooperative: "Cooperativa de Consumo",
   community_org: "Org. Comunitaria",
   health_food_store: "Dietética",
+  agroecological_store: "Almacén Agroecológico",
+  agroecological_fair: "Feria Agroecológica",
+  agroecological_market: "Mercado Agroecológico",
 };
 
 const actorRole: Record<ActorType, ActorRole> = {
@@ -69,6 +79,8 @@ const actorRole: Record<ActorType, ActorRole> = {
   seed_bank: "oferta",
   composting_center: "oferta",
   research_center: "oferta",
+  solidarity_intermediary: "oferta",
+  community_garden: "oferta",
   restaurant: "demanda",
   social_kitchen: "demanda",
   institution: "demanda",
@@ -79,6 +91,9 @@ const actorRole: Record<ActorType, ActorRole> = {
   consumer_cooperative: "demanda",
   community_org: "demanda",
   health_food_store: "demanda",
+  agroecological_store: "demanda",
+  agroecological_fair: "demanda",
+  agroecological_market: "demanda",
   logistics: "servicio",
 };
 
@@ -151,11 +166,29 @@ const mockActors: MapActor[] = [
   { id: 24, name: "Dietética Vida Sana", type: "health_food_store", lat: -34.60, lng: -58.43, products: ["Orgánicos", "Sin TACC", "Suplementos"], certification: "green", description: "Dietética especializada en productos agroecológicos." },
   // SERVICIO — Logística
   { id: 7, name: "Transporte El Surco", type: "logistics", lat: -34.70, lng: -58.30, products: [], certification: "yellow", description: "Fletes refrigerados para alimentos frescos." },
+  // OFERTA — Intermediario Solidario
+  { id: 25, name: "Nodo Sin Intermediarios", type: "solidarity_intermediary", lat: -34.59, lng: -58.50, products: ["Bolsones", "Verduras", "Frutas"], certification: "green", description: "Articulación directa campo-barrio sin intermediarios." },
+  { id: 26, name: "Red Más Cerca Más Justo", type: "solidarity_intermediary", lat: -34.63, lng: -58.43, products: ["Alimentos agroecológicos", "Almacén"], certification: "green", description: "Intermediación solidaria entre productores y consumidores." },
+  // OFERTA — Huerta Comunitaria
+  { id: 27, name: "Huerta El Retoño", type: "community_garden", lat: -34.66, lng: -58.44, products: ["Verduras", "Aromáticas", "Plantines"], certification: "yellow", description: "Huerta comunitaria barrial, producción colectiva." },
+  { id: 28, name: "Huerta INTA Pro-Huerta", type: "community_garden", lat: -34.54, lng: -58.51, products: ["Hortalizas", "Semillas"], certification: "green", description: "Huerta demostrativa del programa Pro-Huerta." },
+  // DEMANDA — Almacén Agroecológico
+  { id: 29, name: "Pochamama Almacén", type: "agroecological_store", lat: -34.64, lng: -58.41, products: ["Orgánicos", "Granos", "Yerba mate"], certification: "green", description: "Almacén autogestivo de alimentos agroecológicos." },
+  { id: 30, name: "Almacén de Ramos Generales Eco", type: "agroecological_store", lat: -34.67, lng: -58.38, products: ["Harinas", "Conservas", "Tinturas"], certification: "green", description: "Almacén agroecológico con productos de la economía popular." },
+  // DEMANDA — Feria Agroecológica
+  { id: 31, name: "Feria Agroecológica de Productores", type: "agroecological_fair", lat: -34.61, lng: -58.46, products: ["Verduras", "Frutas", "Conservas", "Plantines"], certification: "green", description: "Feria semanal de productores agroecológicos." },
+  { id: 32, name: "Feria Soberana", type: "agroecological_fair", lat: -34.69, lng: -58.35, products: ["Alimentos", "Artesanías", "Semillas"], certification: "yellow", description: "Feria mensual de soberanía alimentaria." },
+  // DEMANDA — Mercado Agroecológico
+  { id: 33, name: "Mercado Territorial Autogestivo", type: "agroecological_market", lat: -34.62, lng: -58.53, products: ["Verduras", "Lácteos", "Panificados"], certification: "green", description: "Mercado cooperativo de alimentos locales." },
+  { id: 34, name: "Mercado de Economía Social", type: "agroecological_market", lat: -34.58, lng: -58.39, products: ["Productos de la economía popular"], certification: "yellow", description: "Mercado de la economía social y solidaria." },
 ];
+
+type CertFilter = "green" | "yellow" | "red";
 
 const MapPage = () => {
   const [search, setSearch] = useState("");
   const [activeTypes, setActiveTypes] = useState<Set<ActorType>>(new Set(Object.keys(actorTypeLabels) as ActorType[]));
+  const [activeCerts, setActiveCerts] = useState<Set<CertFilter>>(new Set(["green", "yellow", "red"]));
   const [showFilters, setShowFilters] = useState(true);
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -170,9 +203,19 @@ const MapPage = () => {
     });
   };
 
+  const toggleCert = (cert: CertFilter) => {
+    setActiveCerts((prev) => {
+      const next = new Set(prev);
+      if (next.has(cert)) next.delete(cert);
+      else next.add(cert);
+      return next;
+    });
+  };
+
   const filtered = useMemo(() => {
     return mockActors.filter((a) => {
       if (!activeTypes.has(a.type)) return false;
+      if (!activeCerts.has(a.certification)) return false;
       if (search && !a.name.toLowerCase().includes(search.toLowerCase()) && !a.products.some((p) => p.toLowerCase().includes(search.toLowerCase()))) return false;
       return true;
     });
@@ -258,8 +301,8 @@ const MapPage = () => {
   }, [filtered]);
 
   // Group actor types by role for filter display
-  const ofertaTypes: ActorType[] = ["producer", "cooperative", "processing", "agroecological_node", "seed_bank", "composting_center", "research_center"];
-  const demandaTypes: ActorType[] = ["restaurant", "social_kitchen", "institution", "retail", "consumer_node", "individual_consumer", "food_bank", "consumer_cooperative", "community_org", "health_food_store"];
+  const ofertaTypes: ActorType[] = ["producer", "cooperative", "processing", "agroecological_node", "seed_bank", "composting_center", "research_center", "solidarity_intermediary", "community_garden"];
+  const demandaTypes: ActorType[] = ["restaurant", "social_kitchen", "institution", "retail", "consumer_node", "individual_consumer", "food_bank", "consumer_cooperative", "community_org", "health_food_store", "agroecological_store", "agroecological_fair", "agroecological_market"];
   const servicioTypes: ActorType[] = ["logistics"];
 
   return (
@@ -367,11 +410,14 @@ const MapPage = () => {
               <p className="text-sm font-medium text-muted-foreground mb-2">Certificación</p>
               <div className="flex gap-2">
                 {(["green", "yellow", "red"] as const).map((c) => (
-                  <span key={c} className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                    c === "green" ? "bg-primary text-primary-foreground" : c === "yellow" ? "bg-wheat text-wheat-foreground" : "bg-destructive text-destructive-foreground"
-                  }`}>
+                  <button key={c} onClick={() => toggleCert(c)}
+                    className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
+                      activeCerts.has(c)
+                        ? c === "green" ? "bg-primary text-primary-foreground border-primary" : c === "yellow" ? "bg-wheat text-wheat-foreground border-wheat" : "bg-destructive text-destructive-foreground border-destructive"
+                        : "border-border bg-background text-muted-foreground opacity-50"
+                    }`}>
                     {certLabels[c]}
-                  </span>
+                  </button>
                 ))}
               </div>
             </div>
