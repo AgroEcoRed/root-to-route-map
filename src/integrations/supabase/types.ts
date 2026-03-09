@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      custom_categories: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          name: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+          type?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           actor_type: Database["public"]["Enums"]["actor_type"]

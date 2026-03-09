@@ -49,7 +49,7 @@ interface Product {
 const mainCategories = [
   "Todos", "Verduras", "Frutas", "Lácteos", "Huevos", "Carnes",
   "Almacén", "Panificados", "Bebidas", "Cosmética Natural",
-  "Plantines y Semillas", "Salud Natural"
+  "Plantines y Semillas", "Salud Natural", "Mercado Híbrido"
 ];
 
 // Almacén subcategories
@@ -119,6 +119,7 @@ const mockProducts: Product[] = [
   { id: 106, name: "Conservas y Dulces", producer: "Banco de Alimentos BA", location: "CABA", category: "Almacén", subcategory: "conservas", price: 3500, priceDisplay: "$3.500", unit: "frasco", available: "Necesita 200 uds/mes", certification: "green", image: "🍯", seasonal: "Todo el año", soldCount: 0, distanceKm: 25, listingType: "demanda" },
   { id: 107, name: "Yerba Mate y Hierbas", producer: "Dietética Raíces", location: "CABA", category: "Almacén", subcategory: "yerba_mate", price: 4000, priceDisplay: "$4.000", unit: "kg", available: "Necesita 50 kg/mes", certification: "green", image: "🧉", seasonal: "Todo el año", soldCount: 0, distanceKm: 20, listingType: "demanda" },
   { id: 108, name: "Tinturas y Hierbas Medicinales", producer: "Dietética Vida Sana", location: "CABA", category: "Salud Natural", price: 5000, priceDisplay: "$5.000", unit: "60ml", available: "Necesita 20 uds/mes", certification: "green", image: "💧", seasonal: "Todo el año", soldCount: 0, distanceKm: 22, listingType: "demanda" },
+  { id: 109, name: "Alimentos Mixtos (conv./agroeco.)", producer: "Almacén Natural y Más", location: "CABA", category: "Mercado Híbrido", price: 2000, priceDisplay: "$2.000", unit: "kg", available: "Necesita variado/mes", certification: "yellow", image: "🔄", seasonal: "Todo el año", soldCount: 0, distanceKm: 18, listingType: "demanda" },
 ];
 
 const isInSeason = (seasonal: string): boolean => {
@@ -282,13 +283,7 @@ const MarketplacePage = () => {
         </div>
 
         <div className="container py-8">
-          {/* Trust warning banner */}
-          <div className="mb-6 flex items-center gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3">
-            <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              <strong className="text-foreground">{t("market.disclaimer_title")}</strong> — {t("market.disclaimer_text")}
-            </p>
-          </div>
+          {/* Trust warning - moved to bottom */}
           {/* Search + Sort row */}
           <div className="flex flex-col sm:flex-row gap-4 mb-4">
             <div className="relative flex-1">
