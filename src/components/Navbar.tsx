@@ -59,7 +59,7 @@ const Navbar = () => {
       <div className="container flex items-center justify-between h-16">
         <Link to="/" className="flex items-center gap-2 group">
           <img src={logo} alt="AgroRed" className="h-9 w-9 transition-transform group-hover:scale-110" />
-          <span className="font-display text-xl text-foreground">AgroRed</span>
+          <span className={`font-display text-xl ${scrolled ? "text-foreground" : "text-white"}`}>AgroRed</span>
         </Link>
 
         {/* Desktop */}
