@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { MapPin, ShoppingBasket, ShieldCheck, Truck, MessageCircle, BarChart3, Leaf } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useNavigate } from "react-router-dom";
 
 const cardVariants = {
   hidden: { opacity: 0, y: 40, rotateX: 10 },
@@ -12,15 +13,16 @@ const cardVariants = {
 
 const FeaturesSection = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
 
   const features = [
-    { icon: MapPin, titleKey: "features.map", descKey: "features.map_desc", color: "bg-primary text-primary-foreground" },
-    { icon: ShoppingBasket, titleKey: "features.marketplace", descKey: "features.marketplace_desc", color: "bg-secondary text-secondary-foreground" },
-    { icon: ShieldCheck, titleKey: "features.cert", descKey: "features.cert_desc", color: "bg-wheat text-wheat-foreground" },
-    { icon: Truck, titleKey: "features.logistics", descKey: "features.logistics_desc", color: "bg-earth text-earth-foreground" },
-    { icon: MessageCircle, titleKey: "features.comm", descKey: "features.comm_desc", color: "bg-soil text-soil-foreground" },
-    { icon: BarChart3, titleKey: "features.dashboard", descKey: "features.dashboard_desc", color: "bg-forest text-forest-foreground" },
-    { icon: Leaf, titleKey: "features.scalable", descKey: "features.scalable_desc", color: "bg-primary text-primary-foreground" },
+    { icon: MapPin, titleKey: "features.map", descKey: "features.map_desc", color: "bg-primary text-primary-foreground", link: "/mapa" },
+    { icon: ShoppingBasket, titleKey: "features.marketplace", descKey: "features.marketplace_desc", color: "bg-secondary text-secondary-foreground", link: "/mercado" },
+    { icon: ShieldCheck, titleKey: "features.cert", descKey: "features.cert_desc", color: "bg-wheat text-wheat-foreground", link: "/actores" },
+    { icon: Truck, titleKey: "features.logistics", descKey: "features.logistics_desc", color: "bg-earth text-earth-foreground", link: "/mapa" },
+    { icon: MessageCircle, titleKey: "features.comm", descKey: "features.comm_desc", color: "bg-soil text-soil-foreground", link: "/comunidad" },
+    { icon: BarChart3, titleKey: "features.dashboard", descKey: "features.dashboard_desc", color: "bg-forest text-forest-foreground", link: null },
+    { icon: Leaf, titleKey: "features.scalable", descKey: "features.scalable_desc", color: "bg-primary text-primary-foreground", link: null },
   ];
 
   return (
@@ -42,7 +44,8 @@ const FeaturesSection = () => {
           {features.map((f, i) => (
             <motion.div key={f.titleKey} custom={i} variants={cardVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}
               whileHover={{ y: -8, transition: { duration: 0.3 } }}
-              className="group rounded-xl border border-border bg-card p-6 hover:shadow-elevated hover:border-primary/20 transition-all duration-300 cursor-default">
+              onClick={() => f.link && navigate(f.link)}
+              className={`group rounded-xl border border-border bg-card p-6 hover:shadow-elevated hover:border-primary/20 transition-all duration-300 ${f.link ? "cursor-pointer" : "cursor-default"}`}>
               <motion.div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${f.color} mb-4`}
                 whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }} transition={{ duration: 0.5 }}>
                 <f.icon className="h-5 w-5" />
