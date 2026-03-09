@@ -62,7 +62,7 @@ const translations: Record<Lang, Record<string, string>> = {
     // CTA
     "cta.badge": "Más de 1,200 actores ya forman parte",
     "cta.title": "Sumate a la red agroecológica",
-    "cta.subtitle": "Ofrecé tus productos, encontrá lo que necesitás cerca tuyo tuyo y formá parte de una economía alimentaria más justa y sustentable.",
+    "cta.subtitle": "Ofrecé tus productos, encontrá lo que necesitás cerca tuyo tuyo tuyo y formá parte de una economía alimentaria más justa y sustentable.",
     "cta.register": "Registrarme ahora",
     "cta.explore": "Explorar el mapa",
     // Footer
@@ -256,7 +256,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "actors_section.processing": "Processing Plants",
     "cta.badge": "Over 1,200 actors are already part of it",
     "cta.title": "Join the agroecological network",
-    "cta.subtitlOffer your products, find what you need nearby,uyers and be part of a fairer, more sustainable food economy.",
+    "cta.suOffer your products, find what you need nearby, nearby,uyers and be part of a fairer, more sustainable food economy.",
     "cta.register": "Register now",
     "cta.explore": "Explore the map",
     "footer.description": "Digital platform for mapping, connecting and marketing agroecological food. Short chains, sustainable production, fair trade.",
@@ -436,7 +436,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "actors_section.processing": "Usines de Transformation",
     "cta.badge": "Plus de 1 200 acteurs en font déjà partie",
     "cta.title": "Rejoignez le réseau agroécologique",
-    "cta.subtitle": "Enregistrez votre production, trouvez des acheteurs proches et participez à une économie alimentaire plus juste et durable.",
+    "cta.subtProposez vos produits, trouvez ce dont vous avez besoin à proximité proches et participez à une économie alimentaire plus juste et durable.",
     "cta.register": "S'inscrire maintenant",
     "cta.explore": "Explorer la carte",
     "footer.description": "Plateforme numérique pour la cartographie, la connexion et la commercialisation d'aliments agroécologiques. Circuits courts, production durable, commerce équitable.",
