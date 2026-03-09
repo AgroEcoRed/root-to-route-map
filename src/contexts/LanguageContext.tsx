@@ -169,9 +169,17 @@ const translations: Record<Lang, Record<string, string>> = {
     "egg.pato": "Pato",
     "egg.codorniz": "Codorniz",
     // Disclaimer
-    "market.disclaimer_title": "Sobre los productos de este mercado",
-    "market.disclaimer_text": "Todos los productos ofrecidos en este marketplace son autodeclarados agroecológicos por sus productores. Muchos de ellos cuentan además con certificaciones participativas (SPG) que avalan sus prácticas mediante visitas de pares y evaluación comunitaria.",
-    "market.disclaimer_categories": "Las categorías y subcategorías del mercado se generan dinámicamente a medida que nuevos productores se registran y ofrecen sus productos. Si ofrecés un producto que no encaja en ninguna categoría existente, se creará una nueva automáticamente.",
+    "market.disclaimer_title": "⚠️ Aviso importante sobre vendedores",
+    "market.disclaimer_text": "Los usuarios registrados en esta plataforma son autodeclarados. AgroRed no verifica la identidad ni la veracidad de los emprendimientos. Recomendamos tomar precauciones antes de realizar transferencias de dinero: verificá la existencia del emprendimiento, pedí referencias y, de ser posible, coordiná entregas en persona o contra entrega.",
+    "market.disclaimer_categories": "Las calificaciones con estrellas y comentarios de otros usuarios pueden ayudarte a evaluar la confiabilidad de un vendedor, pero no reemplazan la verificación personal. Ante cualquier duda, contactá al vendedor antes de comprar.",
+    // Reviews
+    "market.reviews": "reseñas",
+    "market.no_reviews": "Sin reseñas aún",
+    "market.write_review": "Escribir reseña",
+    "market.review_placeholder": "Contá tu experiencia con este vendedor...",
+    "market.review_submit": "Enviar reseña",
+    "market.review_login": "Ingresá para dejar una reseña",
+    "market.review_thanks": "¡Gracias por tu reseña!",
     // Community nav
     "nav.community": "Comunidad",
     // Community page
