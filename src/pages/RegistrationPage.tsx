@@ -8,12 +8,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
   Sprout, Users, Heart, UtensilsCrossed, Store,
   Building2, Truck, Factory, ShoppingCart, ArrowRight, ArrowLeft, Check, Sparkles
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
+import { locationData } from "@/data/locations";
 
 type ActorType = Database["public"]["Enums"]["actor_type"];
 
@@ -40,7 +44,11 @@ const RegistrationPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
-  const [location, setLocation] = useState("");
+  
+  // Location fields
+  const [country, setCountry] = useState("");
+  const [region, setRegion] = useState("");
+  const [city, setCity] = useState("");
 
   // Step 3 fields
   const [products, setProducts] = useState("");
@@ -48,13 +56,17 @@ const RegistrationPage = () => {
   const [methods, setMethods] = useState("");
   const [description, setDescription] = useState("");
 
+  const selectedCountry = locationData.countries.find(c => c.code === country);
+  const selectedRegion = selectedCountry?.regions.find(r => r.code === region);
+
+  const locationString = [city, selectedRegion?.name, selectedCountry?.name].filter(Boolean).join(", ");
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedType) return;
     setLoading(true);
 
     try {
-      // 1. Create auth user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
@@ -63,14 +75,13 @@ const RegistrationPage = () => {
       if (authError) throw authError;
       if (!authData.user) throw new Error("No se pudo crear el usuario");
 
-      // 2. Update the auto-created profile with registration data
       const { error: profileError } = await supabase
         .from("profiles")
         .update({
           actor_type: selectedType,
           display_name: name,
           phone,
-          location,
+          location: locationString,
           products: products ? products.split(",").map((p) => p.trim()) : null,
           capacity,
           production_methods: methods,
@@ -80,7 +91,7 @@ const RegistrationPage = () => {
 
       if (profileError) throw profileError;
 
-      toast.success("¡Registro exitoso! Ya podés usar la plataforma.");
+      toast.success("¡Registro exitoso! Revisá tu email para confirmar tu cuenta.");
       navigate("/");
     } catch (error: any) {
       toast.error(error.message || "Error al registrar");
@@ -181,10 +192,48 @@ const RegistrationPage = () => {
                       <Label htmlFor="phone">Teléfono</Label>
                       <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+54 11 1234-5678" className="mt-1" />
                     </motion.div>
-                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-                      <Label htmlFor="location">Ubicación</Label>
-                      <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Ciudad, Provincia" className="mt-1" />
+
+                    {/* Cascading location selects */}
+                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="space-y-3">
+                      <Label>Ubicación</Label>
+                      <Select value={country} onValueChange={(v) => { setCountry(v); setRegion(""); setCity(""); }}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="País" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {locationData.countries.map((c) => (
+                            <SelectItem key={c.code} value={c.code}>{c.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      {country && (
+                        <Select value={region} onValueChange={(v) => { setRegion(v); setCity(""); }}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Provincia / Estado" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {selectedCountry?.regions.map((r) => (
+                              <SelectItem key={r.code} value={r.code}>{r.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+
+                      {region && (
+                        <Select value={city} onValueChange={setCity}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Ciudad" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {selectedRegion?.cities.map((c) => (
+                              <SelectItem key={c} value={c}>{c}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
                     </motion.div>
+
                     <div className="flex gap-3 pt-4">
                       <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
                         <ArrowLeft className="h-4 w-4 mr-1" /> Volver

@@ -3,7 +3,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Minus, Plus, Trash2, ShoppingBasket, Send, MapPin } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBasket, Send, MapPin, ShoppingCart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
 
@@ -31,6 +31,17 @@ const CartDrawer = () => {
     });
   };
 
+  const handleSendAll = () => {
+    const producerNames = grouped.map(([p]) => p).join(", ");
+    const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
+    items.length > 0 && toast({
+      title: t("cart.order_sent"),
+      description: `${totalItems} ${t("market.products_available")} → ${producerNames}`,
+    });
+    // Clear all
+    grouped.forEach(([producer]) => clearProducer(producer));
+  };
+
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetContent className="w-full sm:max-w-md flex flex-col">
@@ -45,6 +56,9 @@ const CartDrawer = () => {
           <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground gap-3">
             <ShoppingBasket className="h-12 w-12 opacity-30" />
             <p className="text-sm">{t("cart.empty")}</p>
+            <Button variant="outline" size="sm" onClick={() => setIsOpen(false)} className="mt-2">
+              <ShoppingCart className="h-4 w-4 mr-1" /> {t("cart.keep_shopping")}
+            </Button>
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto space-y-6 pr-1 mt-4">
@@ -106,16 +120,6 @@ const CartDrawer = () => {
                         </div>
                       ))}
                     </div>
-                    <div className="px-4 py-3 bg-muted/30">
-                      <Button
-                        size="sm"
-                        className="w-full bg-gradient-hero text-primary-foreground gap-2"
-                        onClick={() => handleOrder(producer)}
-                      >
-                        <Send className="h-3.5 w-3.5" />
-                        {t("cart.send_order")}
-                      </Button>
-                    </div>
                   </motion.div>
                 );
               })}
@@ -132,6 +136,16 @@ const CartDrawer = () => {
               </span>
             </div>
             <p className="text-xs text-muted-foreground">{t("cart.grouped_note")}</p>
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1 text-xs" onClick={() => setIsOpen(false)}>
+                <ShoppingCart className="h-3.5 w-3.5 mr-1" />
+                {t("cart.keep_shopping")}
+              </Button>
+              <Button className="flex-1 bg-gradient-hero text-primary-foreground gap-2 text-xs" onClick={handleSendAll}>
+                <Send className="h-3.5 w-3.5" />
+                {t("cart.send_all")}
+              </Button>
+            </div>
           </div>
         )}
       </SheetContent>

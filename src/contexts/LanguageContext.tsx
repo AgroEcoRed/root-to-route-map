@@ -203,6 +203,8 @@ const translations: Record<Lang, Record<string, string>> = {
     "cart.order_to": "Pedido enviado a",
     "cart.total": "Total estimado",
     "cart.grouped_note": "Los pedidos se agrupan por productor. Cada productor recibirá su pedido por separado.",
+    "cart.keep_shopping": "Seguir comprando",
+    "cart.send_all": "Enviar todo el pedido",
   },
   en: {
     "nav.home": "Home",
@@ -381,6 +383,8 @@ const translations: Record<Lang, Record<string, string>> = {
     "cart.order_to": "Order sent to",
     "cart.total": "Estimated total",
     "cart.grouped_note": "Orders are grouped by producer. Each producer will receive their order separately.",
+    "cart.keep_shopping": "Keep shopping",
+    "cart.send_all": "Send entire order",
   },
   fr: {
     "nav.home": "Accueil",
@@ -559,6 +563,8 @@ const translations: Record<Lang, Record<string, string>> = {
     "cart.order_to": "Commande envoyée à",
     "cart.total": "Total estimé",
     "cart.grouped_note": "Les commandes sont regroupées par producteur. Chaque producteur recevra sa commande séparément.",
+    "cart.keep_shopping": "Continuer les achats",
+    "cart.send_all": "Envoyer toute la commande",
   },
   pt: {
     "nav.home": "Início",
@@ -737,6 +743,8 @@ const translations: Record<Lang, Record<string, string>> = {
     "cart.order_to": "Pedido enviado para",
     "cart.total": "Total estimado",
     "cart.grouped_note": "Os pedidos são agrupados por produtor. Cada produtor receberá seu pedido separadamente.",
+    "cart.keep_shopping": "Continuar comprando",
+    "cart.send_all": "Enviar todo o pedido",
   },
 };
 
