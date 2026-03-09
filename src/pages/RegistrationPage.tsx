@@ -100,7 +100,7 @@ const RegistrationPage = () => {
           display_name: name,
           phone,
           location: locationString,
-          products: products ? products.split(",").map((p) => p.trim()) : null,
+          products: activities.length > 0 ? activities.map(a => `${a.type === "ofrece" ? "🟢" : "🔴"} ${a.product}`) : null,
           capacity,
           production_methods: methods,
           description,
