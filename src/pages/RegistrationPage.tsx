@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
   Sprout, Users, Heart, UtensilsCrossed, Store,
-  Building2, Truck, Factory, ShoppingCart, ArrowRight, ArrowLeft, Check, Sparkles
+  Building2, Truck, Factory, ShoppingCart, ArrowRight, ArrowLeft, Check, Sparkles, Plus, X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -20,6 +21,12 @@ import type { Database } from "@/integrations/supabase/types";
 import { locationData } from "@/data/locations";
 
 type ActorType = Database["public"]["Enums"]["actor_type"];
+
+interface ActivityItem {
+  id: string;
+  product: string;
+  type: "ofrece" | "necesita";
+}
 
 const actorTypes: { key: ActorType; label: string; icon: typeof Sprout; desc: string; color: string }[] = [
   { key: "producer", label: "Productor Agroecológico", icon: Sprout, desc: "Cultivo, cría o producción de alimentos agroecológicos", color: "from-primary to-leaf" },
@@ -39,27 +46,38 @@ const RegistrationPage = () => {
   const [selectedType, setSelectedType] = useState<ActorType | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Step 2 fields
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
-  
-  // Location fields
   const [country, setCountry] = useState("");
   const [region, setRegion] = useState("");
   const [city, setCity] = useState("");
 
-  // Step 3 fields
-  const [products, setProducts] = useState("");
+  const [activities, setActivities] = useState<ActivityItem[]>([]);
+  const [newProduct, setNewProduct] = useState("");
+  const [newType, setNewType] = useState<"ofrece" | "necesita">("ofrece");
   const [capacity, setCapacity] = useState("");
   const [methods, setMethods] = useState("");
   const [description, setDescription] = useState("");
 
   const selectedCountry = locationData.countries.find(c => c.code === country);
   const selectedRegion = selectedCountry?.regions.find(r => r.code === region);
-
   const locationString = [city, selectedRegion?.name, selectedCountry?.name].filter(Boolean).join(", ");
+
+  const addActivity = () => {
+    if (!newProduct.trim()) return;
+    setActivities(prev => [...prev, { id: crypto.randomUUID(), product: newProduct.trim(), type: newType }]);
+    setNewProduct("");
+  };
+
+  const removeActivity = (id: string) => {
+    setActivities(prev => prev.filter(a => a.id !== id));
+  };
+
+  const toggleActivityType = (id: string) => {
+    setActivities(prev => prev.map(a => a.id === id ? { ...a, type: a.type === "ofrece" ? "necesita" : "ofrece" } : a));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,7 +100,7 @@ const RegistrationPage = () => {
           display_name: name,
           phone,
           location: locationString,
-          products: products ? products.split(",").map((p) => p.trim()) : null,
+          products: activities.length > 0 ? activities.map(a => `${a.type === "ofrece" ? "🟢" : "🔴"} ${a.product}`) : null,
           capacity,
           production_methods: methods,
           description,
@@ -252,14 +270,61 @@ const RegistrationPage = () => {
                 <div className="text-center mb-8">
                   <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-3">Paso 3 de 3</span>
                   <h1 className="text-3xl sm:text-4xl font-display text-foreground mb-2">Tu actividad</h1>
-                  <p className="text-muted-foreground">Contanos sobre tu producción o necesidades de compra.</p>
+                  <p className="text-muted-foreground">Agregá los productos o servicios que ofrecés y/o necesitás.</p>
                 </div>
-                <form onSubmit={handleSubmit} className="max-w-md mx-auto rounded-2xl border border-border bg-card p-6 shadow-card">
+                <form onSubmit={handleSubmit} className="max-w-lg mx-auto rounded-2xl border border-border bg-card p-6 shadow-card">
                   <div className="space-y-4">
+                    {/* Add new activity */}
                     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0 }}>
-                      <Label htmlFor="products">Productos que ofrecés o necesitás</Label>
-                      <Input id="products" value={products} onChange={(e) => setProducts(e.target.value)} placeholder="Ej: Tomate, Lechuga, Miel" className="mt-1" />
+                      <Label>Agregar producto o servicio</Label>
+                      <div className="flex gap-2 mt-1">
+                        <div className="flex-1">
+                          <Input value={newProduct} onChange={(e) => setNewProduct(e.target.value)} placeholder="Ej: Tomate, Lechuga, Transporte..."
+                            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addActivity(); } }} />
+                        </div>
+                        <Select value={newType} onValueChange={(v: "ofrece" | "necesita") => setNewType(v)}>
+                          <SelectTrigger className="w-[130px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="ofrece">🟢 Ofrezco</SelectItem>
+                            <SelectItem value="necesita">🔴 Necesito</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button type="button" size="icon" variant="outline" onClick={addActivity} disabled={!newProduct.trim()}>
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </motion.div>
+
+                    {/* Activity list */}
+                    {activities.length > 0 && (
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
+                        <Label>Tu oferta y demanda</Label>
+                        <div className="flex flex-wrap gap-2">
+                          <AnimatePresence>
+                            {activities.map((a) => (
+                              <motion.div key={a.id} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }}
+                                className="group flex items-center gap-1">
+                                <Badge
+                                  variant={a.type === "ofrece" ? "default" : "destructive"}
+                                  className="cursor-pointer select-none px-3 py-1.5 text-sm flex items-center gap-1.5"
+                                  onClick={() => toggleActivityType(a.id)}
+                                >
+                                  <span className="text-xs">{a.type === "ofrece" ? "🟢" : "🔴"}</span>
+                                  {a.product}
+                                  <button type="button" onClick={(e) => { e.stopPropagation(); removeActivity(a.id); }}
+                                    className="ml-1 opacity-60 hover:opacity-100 transition-opacity">
+                                    <X className="h-3 w-3" />
+                                  </button>
+                                </Badge>
+                              </motion.div>
+                            ))}
+                          </AnimatePresence>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground">Tocá un badge para cambiar entre ofrezco/necesito. Usá la ✕ para eliminarlo.</p>
+                      </motion.div>
+                    )}
                     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
                       <Label htmlFor="capacity">Capacidad / Volumen</Label>
                       <Input id="capacity" value={capacity} onChange={(e) => setCapacity(e.target.value)} placeholder="Ej: 500 kg/mes" className="mt-1" />
