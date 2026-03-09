@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { MapPin, ShoppingBasket, QrCode, ShieldCheck, Truck, MessageCircle, BarChart3, Leaf } from "lucide-react";
+import { MapPin, ShoppingBasket, ShieldCheck, Truck, MessageCircle, BarChart3, Leaf } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const cardVariants = {
