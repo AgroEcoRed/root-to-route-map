@@ -386,14 +386,46 @@ const MarketplacePage = () => {
                         p.certification === "green" ? "bg-primary" : p.certification === "yellow" ? "bg-wheat" : "bg-destructive"
                       }`} title={certLabels[p.certification]} />
                     </div>
-                    <div className="flex items-center gap-2 mb-3">
-                      <p className="text-sm text-muted-foreground">{p.producer}</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setFilterProducer(p.producer); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                        className="text-sm text-primary hover:text-primary/80 hover:underline transition-colors text-left font-medium"
+                      >
+                        {p.producer}
+                      </button>
                       {p.subcategory && (
                         <Badge variant="outline" className="text-[10px]">
                           {activeCategory === "Almacén" ? t(`almacen.${p.subcategory}`) : t(`egg.${p.subcategory}`)}
                         </Badge>
                       )}
                     </div>
+                    {/* More from this seller / nearby sellers */}
+                    {(() => {
+                      const sellerOtherCount = mockProducts.filter(pp => pp.producer === p.producer && pp.id !== p.id).length;
+                      const nearbyCount = mockProducts.filter(pp => pp.producer !== p.producer && pp.location === p.location).length;
+                      return (sellerOtherCount > 0 || nearbyCount > 0) ? (
+                        <div className="flex flex-wrap gap-1.5 mb-2">
+                          {sellerOtherCount > 0 && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setFilterProducer(p.producer); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                              className="text-[10px] text-muted-foreground hover:text-primary transition-colors bg-muted/50 hover:bg-primary/10 px-2 py-0.5 rounded-full flex items-center gap-1"
+                            >
+                              <Store className="h-2.5 w-2.5" />
+                              {sellerOtherCount} más de este vendedor
+                            </button>
+                          )}
+                          {nearbyCount > 0 && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setFilterZone(p.location); setFilterProducer("all"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                              className="text-[10px] text-muted-foreground hover:text-primary transition-colors bg-muted/50 hover:bg-primary/10 px-2 py-0.5 rounded-full flex items-center gap-1"
+                            >
+                              <MapPin className="h-2.5 w-2.5" />
+                              {nearbyCount} en {p.location}
+                            </button>
+                          )}
+                        </div>
+                      ) : null;
+                    })()}
 
                     <div className="space-y-1.5 text-xs text-muted-foreground mb-4">
                       <div className="flex items-center gap-1.5">
