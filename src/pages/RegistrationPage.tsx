@@ -243,7 +243,7 @@ const RegistrationPage = () => {
                           <SelectTrigger>
                             <SelectValue placeholder="Ciudad" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent position="popper" className="max-h-[200px] overflow-y-auto">
                             {selectedRegion?.cities.map((c) => (
                               <SelectItem key={c} value={c}>{c}</SelectItem>
                             ))}
