@@ -79,6 +79,8 @@ const actorRole: Record<ActorType, ActorRole> = {
   seed_bank: "oferta",
   composting_center: "oferta",
   research_center: "oferta",
+  solidarity_intermediary: "oferta",
+  community_garden: "oferta",
   restaurant: "demanda",
   social_kitchen: "demanda",
   institution: "demanda",
@@ -89,6 +91,9 @@ const actorRole: Record<ActorType, ActorRole> = {
   consumer_cooperative: "demanda",
   community_org: "demanda",
   health_food_store: "demanda",
+  agroecological_store: "demanda",
+  agroecological_fair: "demanda",
+  agroecological_market: "demanda",
   logistics: "servicio",
 };
 
