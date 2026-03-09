@@ -62,7 +62,7 @@ const translations: Record<Lang, Record<string, string>> = {
     // CTA
     "cta.badge": "Más de 1,200 actores ya forman parte",
     "cta.title": "Sumate a la red agroecológica",
-    "cta.subtitle": "Registrá tu producción, encontrá compradores cercanos y formá parte de una economía alimentaria más justa y sustentable.",
+    "cta.subtitle": "Ofrecé tus productos, encontrá lo que necesitás cerca tuyo y formá parte de una economía alimentaria más justa y sustentable.",
     "cta.register": "Registrarme ahora",
     "cta.explore": "Explorar el mapa",
     // Footer
