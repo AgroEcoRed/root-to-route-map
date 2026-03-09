@@ -526,17 +526,73 @@ const MarketplacePage = () => {
             </AnimatePresence>
           </div>
 
-          {/* Disclaimer */}
-          <div className="mt-12 mb-4 border border-border rounded-xl bg-card p-6">
+           {/* Disclaimer - prominent warning */}
+          <div className="mt-12 mb-4 border-2 border-destructive/30 rounded-xl bg-destructive/5 p-6">
             <div className="flex items-start gap-3">
-              <Info className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+              <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
               <div className="space-y-2">
-                <h4 className="font-display text-sm text-card-foreground">{t("market.disclaimer_title")}</h4>
+                <h4 className="font-display text-sm text-foreground">{t("market.disclaimer_title")}</h4>
                 <p className="text-xs text-muted-foreground leading-relaxed">{t("market.disclaimer_text")}</p>
                 <p className="text-xs text-muted-foreground leading-relaxed">{t("market.disclaimer_categories")}</p>
               </div>
             </div>
           </div>
+
+          {/* Review dialog */}
+          <Dialog open={!!reviewSeller} onOpenChange={(open) => { if (!open) setReviewSeller(null); }}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5" />
+                  {t("market.write_review")}: {reviewSeller}
+                </DialogTitle>
+              </DialogHeader>
+              {user ? (
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Calificación</p>
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <button key={s} onClick={() => setReviewRating(s)} className="transition-transform hover:scale-110">
+                          <Star className={`h-7 w-7 ${s <= reviewRating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"}`} />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <Textarea
+                    value={reviewComment}
+                    onChange={(e) => setReviewComment(e.target.value)}
+                    placeholder={t("market.review_placeholder")}
+                    rows={3}
+                  />
+                  <Button onClick={handleSubmitReview} disabled={reviewSubmitting} className="w-full bg-gradient-hero text-primary-foreground">
+                    {reviewSubmitting ? "Enviando..." : t("market.review_submit")}
+                  </Button>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground py-4 text-center">{t("market.review_login")}</p>
+              )}
+
+              {/* Existing reviews for this seller */}
+              {reviews.filter(r => r.seller_name === reviewSeller).length > 0 && (
+                <div className="border-t border-border pt-4 mt-2 space-y-3 max-h-60 overflow-y-auto">
+                  {reviews.filter(r => r.seller_name === reviewSeller).map((r) => (
+                    <div key={r.id} className="text-sm space-y-1">
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <Star key={s} className={`h-3.5 w-3.5 ${s <= r.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20"}`} />
+                        ))}
+                        <span className="text-xs text-muted-foreground ml-2">
+                          {new Date(r.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                      {r.comment && <p className="text-xs text-muted-foreground">{r.comment}</p>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
         </div>
       </main>
       <Footer />
