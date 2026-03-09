@@ -212,6 +212,9 @@ const translations: Record<Lang, Record<string, string>> = {
     "cart.grouped_note": "Los pedidos se agrupan por productor. Cada productor recibirá su pedido por separado.",
     "cart.keep_shopping": "Seguir comprando",
     "cart.send_all": "Enviar todo el pedido",
+    "cart.order_whatsapp": "📲 Se abrirá WhatsApp para coordinar la entrega con cada productor.",
+    "cart.order_email_sent": "También se enviará un email con el detalle del pedido al productor.",
+    "cart.order_next_steps": "Próximos pasos: el productor confirmará disponibilidad, acordarán forma de pago y entrega.",
   },
   en: {
     "nav.home": "Home",
