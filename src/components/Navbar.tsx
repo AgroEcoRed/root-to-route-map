@@ -140,27 +140,27 @@ const Navbar = () => {
             </AnimatePresence>
           </div>
 
-          {user ? (
-            <>
-              <span className={`text-sm flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${scrolled ? "text-muted-foreground bg-muted/50" : "text-white/80 bg-white/10"}`}>
-                <User className="h-4 w-4" />
-                {user.email?.split("@")[0]}
-              </span>
-              <Button variant="outline" size="sm" onClick={handleSignOut} className="group">
-                <LogOut className="h-4 w-4 mr-1 transition-transform group-hover:-translate-x-0.5" />
-                {t("nav.logout")}
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/registro">{t("nav.register")}</Link>
-              </Button>
-              <Button size="sm" className="bg-gradient-hero text-primary-foreground" asChild>
-                <Link to="/ingresar">{t("nav.login")}</Link>
-              </Button>
-            </>
-          )}
+           {user ? (
+             <>
+               <span className={`text-sm flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${navbarScrolled ? "text-muted-foreground bg-muted/50" : "text-white/80 bg-white/10"}`}>
+                 <User className="h-4 w-4" />
+                 {user.email?.split("@")[0]}
+               </span>
+               <Button variant="outline" size="sm" onClick={handleSignOut} className="group">
+                 <LogOut className="h-4 w-4 mr-1 transition-transform group-hover:-translate-x-0.5" />
+                 {t("nav.logout")}
+               </Button>
+             </>
+           ) : (
+             <>
+               <Button variant="ghost" size="sm" asChild>
+                 <Link to="/registro">{t("nav.register")}</Link>
+               </Button>
+               <Button size="sm" className="bg-gradient-hero text-primary-foreground" asChild>
+                 <Link to="/ingresar">{t("nav.login")}</Link>
+               </Button>
+             </>
+           )}
         </div>
 
         {/* Mobile toggle */}
