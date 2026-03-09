@@ -37,7 +37,7 @@ interface Product {
   listingType: ListingType;
 }
 
-const categoriesKeys = ["Todos", "Verduras", "Frutas", "Lácteos", "Huevos", "Cereales", "Conservas", "Miel", "Carnes"];
+const categoriesKeys = ["Todos", "Verduras", "Frutas", "Lácteos", "Huevos", "Cereales", "Conservas", "Miel", "Carnes", "Hierbas Medicinales", "Tinturas", "Yerba Mate", "Almacén"];
 
 const mockProducts: Product[] = [
   // ── OFERTA (productores, cooperativas, nodos agroecológicos venden) ──
