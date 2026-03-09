@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Leaf, Github, Twitter, Mail } from "lucide-react";
+import { Leaf, Github, Twitter, Mail, Phone } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 
