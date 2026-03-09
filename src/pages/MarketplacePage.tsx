@@ -282,13 +282,7 @@ const MarketplacePage = () => {
         </div>
 
         <div className="container py-8">
-          {/* Trust warning banner */}
-          <div className="mb-6 flex items-center gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3">
-            <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              <strong className="text-foreground">{t("market.disclaimer_title")}</strong> — {t("market.disclaimer_text")}
-            </p>
-          </div>
+          {/* Trust warning - moved to bottom */}
           {/* Search + Sort row */}
           <div className="flex flex-col sm:flex-row gap-4 mb-4">
             <div className="relative flex-1">
