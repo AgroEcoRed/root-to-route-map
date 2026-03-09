@@ -287,11 +287,11 @@ const MapPage = () => {
       const marker = L.marker([a.lat, a.lng], { icon })
         .addTo(mapRef.current!)
         .bindPopup(`
-          <div style="min-width:220px;font-family:DM Sans,sans-serif">
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-              <a href="#" class="map-actor-link" data-producer="${encodeURIComponent(a.name)}" style="font-weight:700;font-size:14px;margin:0;color:inherit;text-decoration:none;cursor:pointer;border-bottom:1px dashed #999" onmouseover="this.style.color='${roleBadgeColor}'" onmouseout="this.style.color='inherit'">${a.name}</a>
-              <span style="background:${roleBadgeColor};color:white;font-size:9px;padding:1px 6px;border-radius:8px;font-weight:600;white-space:nowrap">${roleLabels[role]}</span>
-            </div>
+          <div style="min-width:240px;font-family:DM Sans,sans-serif;padding:4px">
+            <a href="#" class="map-actor-link" data-producer="${encodeURIComponent(a.name)}" style="display:block;background:${roleBadgeColor};color:white;font-weight:700;font-size:14px;margin:0 0 8px;padding:8px 12px;border-radius:8px;text-decoration:none;cursor:pointer;text-align:center;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+              ${a.name}
+              <span style="display:block;font-size:10px;font-weight:400;opacity:0.85;margin-top:2px">Ver todos sus productos →</span>
+            </a>
             <p style="font-size:12px;color:#666;margin:0">${actorTypeLabels[a.type]}</p>
             <p style="font-size:12px;margin:4px 0">${a.description}</p>
             ${productsHtml}
