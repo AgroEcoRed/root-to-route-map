@@ -128,6 +128,7 @@ const isInSeason = (seasonal: string): boolean => {
 };
 
 const MarketplacePage = () => {
+  const [searchParams] = useSearchParams();
   const { t } = useLanguage();
   const { addItem } = useCart();
   const [search, setSearch] = useState("");
@@ -138,6 +139,14 @@ const MarketplacePage = () => {
   const [filterProducer, setFilterProducer] = useState("all");
   const [filterZone, setFilterZone] = useState("all");
   const [filterType, setFilterType] = useState<"all" | ListingType>("all");
+
+  // Read URL params from map links
+  useEffect(() => {
+    const producerParam = searchParams.get("producer");
+    const searchParam = searchParams.get("search");
+    if (producerParam) setFilterProducer(producerParam);
+    if (searchParam) setSearch(searchParam);
+  }, [searchParams]);
 
   const certLabels = { red: t("cert.red"), yellow: t("cert.yellow"), green: t("cert.green") };
 
