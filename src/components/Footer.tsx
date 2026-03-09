@@ -55,9 +55,25 @@ const Footer = () => {
             </ul>
           </div>
         </div>
-        <div className="mt-12 pt-8 border-t border-forest-foreground/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-forest-foreground/40">
-          <span>{t("footer.copyright")}</span>
-          <span>{t("footer.tagline")}</span>
+        <div className="mt-12 pt-8 border-t border-forest-foreground/10 flex flex-col items-center gap-4 text-xs text-forest-foreground/40">
+          <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-4">
+            <span>{t("footer.copyright")}</span>
+            <span>{t("footer.tagline")}</span>
+          </div>
+          <div className="pt-4 border-t border-forest-foreground/10 w-full text-center">
+            <span className="text-forest-foreground/50 text-xs">
+              Página creada y gestionada por{" "}
+              <a
+                href="https://agenciaequinoxia.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold tracking-wide hover:opacity-80 transition-opacity"
+                style={{ color: "#00e5a0", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.05em" }}
+              >
+                equinoxia
+              </a>
+            </span>
+          </div>
         </div>
       </div>
     </footer>
