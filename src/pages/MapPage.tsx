@@ -187,6 +187,7 @@ const mockActors: MapActor[] = [
 type CertFilter = "green" | "yellow" | "red";
 
 const MapPage = () => {
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const [activeTypes, setActiveTypes] = useState<Set<ActorType>>(new Set(Object.keys(actorTypeLabels) as ActorType[]));
   const [activeCerts, setActiveCerts] = useState<Set<CertFilter>>(new Set(["green", "yellow", "red"]));
