@@ -410,11 +410,14 @@ const MapPage = () => {
               <p className="text-sm font-medium text-muted-foreground mb-2">Certificación</p>
               <div className="flex gap-2">
                 {(["green", "yellow", "red"] as const).map((c) => (
-                  <span key={c} className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                    c === "green" ? "bg-primary text-primary-foreground" : c === "yellow" ? "bg-wheat text-wheat-foreground" : "bg-destructive text-destructive-foreground"
-                  }`}>
+                  <button key={c} onClick={() => toggleCert(c)}
+                    className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
+                      activeCerts.has(c)
+                        ? c === "green" ? "bg-primary text-primary-foreground border-primary" : c === "yellow" ? "bg-wheat text-wheat-foreground border-wheat" : "bg-destructive text-destructive-foreground border-destructive"
+                        : "border-border bg-background text-muted-foreground opacity-50"
+                    }`}>
                     {certLabels[c]}
-                  </span>
+                  </button>
                 ))}
               </div>
             </div>
