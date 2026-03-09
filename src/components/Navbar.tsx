@@ -138,7 +138,7 @@ const Navbar = () => {
 
           {user ? (
             <>
-              <span className="text-sm text-muted-foreground flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/50">
+              <span className={`text-sm flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${scrolled ? "text-muted-foreground bg-muted/50" : "text-white/80 bg-white/10"}`}>
                 <User className="h-4 w-4" />
                 {user.email?.split("@")[0]}
               </span>
