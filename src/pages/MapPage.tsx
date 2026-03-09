@@ -58,12 +58,17 @@ const actorTypeLabels: Record<ActorType, string> = {
   seed_bank: "Banco de Semillas",
   composting_center: "Centro de Compostaje",
   research_center: "Centro de Investigación",
+  solidarity_intermediary: "Intermediario Solidario",
+  community_garden: "Huerta Comunitaria",
   consumer_node: "Nodo de Consumidores",
   individual_consumer: "Consumidor Individual",
   food_bank: "Banco de Alimentos",
   consumer_cooperative: "Cooperativa de Consumo",
   community_org: "Org. Comunitaria",
   health_food_store: "Dietética",
+  agroecological_store: "Almacén Agroecológico",
+  agroecological_fair: "Feria Agroecológica",
+  agroecological_market: "Mercado Agroecológico",
 };
 
 const actorRole: Record<ActorType, ActorRole> = {
