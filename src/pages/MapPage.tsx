@@ -270,7 +270,7 @@ const MapPage = () => {
       const productsHtml = a.products.length > 0
         ? `<div style="margin-top:6px">
             <p style="font-size:11px;font-weight:600;color:${productColor};margin:0 0 4px">${productLabel}:</p>
-            <div style="display:flex;flex-wrap:wrap;gap:4px">${a.products.map((p) => `<span style="background:${productBg};color:${productColor};font-size:10px;padding:2px 6px;border-radius:4px">${p}</span>`).join("")}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">${a.products.map((p) => `<a href="#" class="map-product-link" data-producer="${encodeURIComponent(a.name)}" data-product="${encodeURIComponent(p)}" style="background:${productBg};color:${productColor};font-size:10px;padding:2px 6px;border-radius:4px;text-decoration:none;cursor:pointer;border:1px solid transparent;transition:border 0.2s" onmouseover="this.style.borderColor='${productColor}'" onmouseout="this.style.borderColor='transparent'">${p}</a>`).join("")}</div>
           </div>`
         : "";
 
@@ -288,7 +288,7 @@ const MapPage = () => {
         .bindPopup(`
           <div style="min-width:220px;font-family:DM Sans,sans-serif">
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-              <p style="font-weight:700;font-size:14px;margin:0">${a.name}</p>
+              <a href="#" class="map-actor-link" data-producer="${encodeURIComponent(a.name)}" style="font-weight:700;font-size:14px;margin:0;color:inherit;text-decoration:none;cursor:pointer;border-bottom:1px dashed #999" onmouseover="this.style.color='${roleBadgeColor}'" onmouseout="this.style.color='inherit'">${a.name}</a>
               <span style="background:${roleBadgeColor};color:white;font-size:9px;padding:1px 6px;border-radius:8px;font-weight:600;white-space:nowrap">${roleLabels[role]}</span>
             </div>
             <p style="font-size:12px;color:#666;margin:0">${actorTypeLabels[a.type]}</p>
@@ -297,9 +297,33 @@ const MapPage = () => {
             ${certHtml}
           </div>
         `);
+
+      // Handle clicks on popup links
+      marker.on("popupopen", () => {
+        setTimeout(() => {
+          // Actor name click → marketplace filtered by producer
+          document.querySelectorAll(".map-actor-link").forEach((el) => {
+            el.addEventListener("click", (e) => {
+              e.preventDefault();
+              const producer = decodeURIComponent((el as HTMLElement).dataset.producer || "");
+              navigate(`/mercado?producer=${encodeURIComponent(producer)}`);
+            });
+          });
+          // Product click → marketplace filtered by producer + search for product
+          document.querySelectorAll(".map-product-link").forEach((el) => {
+            el.addEventListener("click", (e) => {
+              e.preventDefault();
+              const producer = decodeURIComponent((el as HTMLElement).dataset.producer || "");
+              const product = decodeURIComponent((el as HTMLElement).dataset.product || "");
+              navigate(`/mercado?producer=${encodeURIComponent(producer)}&search=${encodeURIComponent(product)}`);
+            });
+          });
+        }, 50);
+      });
+
       markersRef.current.push(marker);
     });
-  }, [filtered]);
+  }, [filtered, navigate]);
 
   // Group actor types by role for filter display
   const ofertaTypes: ActorType[] = ["producer", "cooperative", "processing", "agroecological_node", "seed_bank", "composting_center", "research_center", "solidarity_intermediary", "community_garden"];
