@@ -15,6 +15,7 @@ import {
   Sprout, Users, Heart, UtensilsCrossed, Store,
   Building2, Truck, Factory, ShoppingCart, ArrowRight, ArrowLeft, Check, Sparkles, Plus, X
 } from "lucide-react";
+import LocationPicker from "@/components/LocationPicker";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
@@ -53,6 +54,8 @@ const RegistrationPage = () => {
   const [country, setCountry] = useState("");
   const [region, setRegion] = useState("");
   const [city, setCity] = useState("");
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
 
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [newProduct, setNewProduct] = useState("");
@@ -100,6 +103,8 @@ const RegistrationPage = () => {
           display_name: name,
           phone,
           location: locationString,
+          lat,
+          lng,
           products: activities.length > 0 ? activities.map(a => `${a.type === "ofrece" ? "🟢" : "🔴"} ${a.product}`) : null,
           capacity,
           production_methods: methods,
@@ -246,6 +251,14 @@ const RegistrationPage = () => {
                           </SelectContent>
                         </Select>
                       )}
+                    </motion.div>
+
+                    {/* Geolocation picker */}
+                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+                      <Label>Georreferenciación</Label>
+                      <div className="mt-1">
+                        <LocationPicker lat={lat} lng={lng} onChange={(newLat, newLng) => { setLat(newLat); setLng(newLng); }} />
+                      </div>
                     </motion.div>
 
                     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>

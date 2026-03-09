@@ -1,5 +1,6 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import Navbar from "@/components/Navbar";
@@ -195,6 +196,37 @@ const MapPage = () => {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const markersRef = useRef<L.Marker[]>([]);
+  const [dbActors, setDbActors] = useState<MapActor[]>([]);
+
+  // Fetch real profiles from database
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .not("lat", "is", null)
+        .not("lng", "is", null);
+      
+      if (error || !data) return;
+      
+      const realActors: MapActor[] = data
+        .filter(p => p.lat && p.lng)
+        .map((p, i) => ({
+          id: 10000 + i,
+          name: p.display_name || "Sin nombre",
+          type: (p.actor_type as ActorType) || "producer",
+          lat: p.lat!,
+          lng: p.lng!,
+          products: (p.products || []).map(pr => pr.replace(/^[🟢🔴]\s*/, "")),
+          certification: (p.certification as "red" | "yellow" | "green") || "red",
+          description: p.description || p.location || "",
+        }));
+      setDbActors(realActors);
+    };
+    fetchProfiles();
+  }, []);
+
+  const allActors = useMemo(() => [...mockActors, ...dbActors], [dbActors]);
 
   const toggleType = (type: ActorType) => {
     setActiveTypes((prev) => {
@@ -215,13 +247,13 @@ const MapPage = () => {
   };
 
   const filtered = useMemo(() => {
-    return mockActors.filter((a) => {
+    return allActors.filter((a) => {
       if (!activeTypes.has(a.type)) return false;
       if (!activeCerts.has(a.certification)) return false;
       if (search && !a.name.toLowerCase().includes(search.toLowerCase()) && !a.products.some((p) => p.toLowerCase().includes(search.toLowerCase()))) return false;
       return true;
     });
-  }, [activeTypes, search]);
+  }, [activeTypes, activeCerts, search, allActors]);
 
   // Initialize map
   useEffect(() => {
