@@ -16,7 +16,6 @@ const FeaturesSection = () => {
   const features = [
     { icon: MapPin, titleKey: "features.map", descKey: "features.map_desc", color: "bg-primary text-primary-foreground" },
     { icon: ShoppingBasket, titleKey: "features.marketplace", descKey: "features.marketplace_desc", color: "bg-secondary text-secondary-foreground" },
-    { icon: QrCode, titleKey: "features.qr", descKey: "features.qr_desc", color: "bg-leaf text-leaf-foreground" },
     { icon: ShieldCheck, titleKey: "features.cert", descKey: "features.cert_desc", color: "bg-wheat text-wheat-foreground" },
     { icon: Truck, titleKey: "features.logistics", descKey: "features.logistics_desc", color: "bg-earth text-earth-foreground" },
     { icon: MessageCircle, titleKey: "features.comm", descKey: "features.comm_desc", color: "bg-soil text-soil-foreground" },
