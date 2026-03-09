@@ -94,7 +94,6 @@ const CommunityPage = () => {
   const navigate = useNavigate();
   const [forumSearch, setForumSearch] = useState("");
   const [wikiSearch, setWikiSearch] = useState("");
-  const [wikiSearch, setWikiSearch] = useState("");
 
   const filteredPosts = forumPosts.filter((p) =>
     !forumSearch || p.title.toLowerCase().includes(forumSearch.toLowerCase()) || p.excerpt.toLowerCase().includes(forumSearch.toLowerCase())
