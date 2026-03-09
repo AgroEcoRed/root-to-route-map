@@ -54,6 +54,8 @@ const RegistrationPage = () => {
   const [country, setCountry] = useState("");
   const [region, setRegion] = useState("");
   const [city, setCity] = useState("");
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
 
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [newProduct, setNewProduct] = useState("");
