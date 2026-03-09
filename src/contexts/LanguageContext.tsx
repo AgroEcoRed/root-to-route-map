@@ -256,7 +256,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "actors_section.processing": "Processing Plants",
     "cta.badge": "Over 1,200 actors are already part of it",
     "cta.title": "Join the agroecological network",
-    "cOffer your products, find what you need nearby, nearby, nearby,uyers and be part of a fairer, more sustainable food economy.",
+    "cta.subtitle": "Offer your products, find what you need nearby, and be part of a fairer, more sustainable food economy.",
     "cta.register": "Register now",
     "cta.explore": "Explore the map",
     "footer.description": "Digital platform for mapping, connecting and marketing agroecological food. Short chains, sustainable production, fair trade.",
