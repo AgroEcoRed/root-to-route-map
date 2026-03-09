@@ -45,13 +45,17 @@ const Navbar = () => {
     navigate("/");
   };
 
+  // Detectar si estamos en páginas de autenticación para mantener navbar oscuro
+  const isAuthPage = ["/ingresar", "/registro", "/reset-password"].includes(location.pathname);
+  const navbarScrolled = scrolled || isAuthPage;
+
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
+        navbarScrolled
           ? "bg-background/90 backdrop-blur-xl shadow-sm border-b border-border"
           : "bg-transparent border-b border-transparent text-white"
       }`}
