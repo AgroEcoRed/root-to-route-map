@@ -142,8 +142,8 @@ const ActorsPage = () => {
       <main className="flex-1 pt-16">
         <div className="bg-gradient-earth py-12">
           <div className="container">
-            <h1 className="text-3xl sm:text-4xl font-display text-earth-foreground mb-2">{t("actors.title")}</h1>
-            <p className="text-earth-foreground/70 max-w-xl">{t("actors.subtitle")}</p>
+            <h1 className="text-3xl sm:text-4xl font-display text-white mb-2">{t("actors.title")}</h1>
+            <p className="text-white/70 max-w-xl">{t("actors.subtitle")}</p>
           </div>
         </div>
 

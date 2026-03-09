@@ -61,7 +61,7 @@ const HeroSection = () => {
           </motion.div>
 
           <motion.h1 initial={{ opacity: 0, y: 40, filter: "blur(10px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.8, delay: 0.15 }}
-            className="text-4xl sm:text-5xl lg:text-6xl font-display leading-tight text-primary-foreground mb-6">
+            className="text-4xl sm:text-5xl lg:text-6xl font-display leading-tight text-white mb-6">
             {t("hero.title_1")}
             <span className="relative inline-block">
               {t("hero.title_highlight")}
@@ -70,7 +70,7 @@ const HeroSection = () => {
           </motion.h1>
 
           <motion.p initial={{ opacity: 0, y: 40, filter: "blur(10px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-lg text-primary-foreground/80 mb-8 max-w-xl leading-relaxed">
+            className="text-lg text-white/80 mb-8 max-w-xl leading-relaxed">
             {t("hero.subtitle")}
           </motion.p>
 
@@ -78,16 +78,16 @@ const HeroSection = () => {
             <Button size="lg" className="bg-wheat text-wheat-foreground hover:bg-wheat/90 font-semibold text-base group" asChild>
               <Link to="/mapa"><MapPin className="h-5 w-5 mr-2 group-hover:animate-bounce" />{t("hero.cta_map")}</Link>
             </Button>
-            <Button size="lg" variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 backdrop-blur-sm group" asChild>
+            <Button size="lg" className="bg-white/20 border border-white/40 text-white hover:bg-white/30 backdrop-blur-sm font-semibold group" asChild>
               <Link to="/mercado">{t("hero.cta_market")}<ArrowRight className="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" /></Link>
             </Button>
           </motion.div>
 
-          <div className="flex gap-8 mt-12 pt-8 border-t border-primary-foreground/20">
+          <div className="flex gap-8 mt-12 pt-8 border-t border-white/20">
             {stats.map((s, i) => (
               <motion.div key={s.label} custom={i} variants={counterVariants} initial="hidden" animate="visible">
                 <div className="text-2xl sm:text-3xl font-display text-wheat">{s.num}</div>
-                <div className="text-sm text-primary-foreground/60">{s.label}</div>
+                <div className="text-sm text-white/60">{s.label}</div>
               </motion.div>
             ))}
           </div>
@@ -95,7 +95,7 @@ const HeroSection = () => {
       </motion.div>
 
       <motion.div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10" animate={{ y: [0, 8, 0] }} transition={{ duration: 2, repeat: Infinity }}>
-        <div className="w-6 h-10 rounded-full border-2 border-primary-foreground/30 flex justify-center pt-2">
+        <div className="w-6 h-10 rounded-full border-2 border-white/30 flex justify-center pt-2">
           <motion.div className="w-1.5 h-1.5 rounded-full bg-wheat" animate={{ y: [0, 12, 0], opacity: [1, 0.3, 1] }} transition={{ duration: 2, repeat: Infinity }} />
         </div>
       </motion.div>

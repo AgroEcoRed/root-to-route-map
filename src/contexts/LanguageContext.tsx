@@ -12,7 +12,8 @@ const translations: Record<Lang, Record<string, string>> = {
     "nav.home": "Inicio",
     "nav.map": "Mapa",
     "nav.market": "Mercado",
-    "nav.actors": "Redse",
+    "nav.actors": "Red",
+    "nav.register": "Registrarse",
     "nav.login": "Ingresar",
     "nav.logout": "Salir",
     // Hero

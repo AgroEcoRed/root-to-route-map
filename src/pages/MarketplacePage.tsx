@@ -277,8 +277,8 @@ const MarketplacePage = () => {
       <main className="flex-1 pt-16">
         <div className="bg-gradient-hero py-12">
           <div className="container">
-            <h1 className="text-3xl sm:text-4xl font-display text-primary-foreground mb-2">{t("market.title")}</h1>
-            <p className="text-primary-foreground/70 max-w-xl">{t("market.subtitle")}</p>
+            <h1 className="text-3xl sm:text-4xl font-display text-white mb-2">{t("market.title")}</h1>
+            <p className="text-white/70 max-w-xl">{t("market.subtitle")}</p>
           </div>
         </div>
 
