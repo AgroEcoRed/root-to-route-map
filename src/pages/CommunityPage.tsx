@@ -221,7 +221,13 @@ const CommunityPage = () => {
                         </div>
                       </div>
                       <div className="flex items-center">
-                        <Button size="sm" variant="outline" className="text-xs">{t("community.register_event")}</Button>
+                        <Button size="sm" variant="outline" className="text-xs" onClick={() => {
+                          if (!user) {
+                            toast("Necesitás ingresar para inscribirte", { action: { label: "Ingresar", onClick: () => navigate("/ingresar") } });
+                          } else {
+                            toast.success(`¡Te inscribiste a "${event.title}"!`);
+                          }
+                        }}>{t("community.register_event")}</Button>
                       </div>
                     </div>
                   </motion.div>
