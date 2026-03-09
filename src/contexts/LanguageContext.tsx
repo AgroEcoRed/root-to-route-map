@@ -541,6 +541,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "cat.Cosmética Natural": "Cosmétique Naturelle",
     "cat.Plantines y Semillas": "Plants et Graines",
     "cat.Salud Natural": "Santé Naturelle",
+    "cat.Mercado Híbrido": "Marché Hybride (conv./agroéco.)",
     "almacen.all_almacen": "Toute l'Épicerie",
     "almacen.yerba_mate": "Yerba Maté",
     "almacen.cereales": "Céréales et Farines",
