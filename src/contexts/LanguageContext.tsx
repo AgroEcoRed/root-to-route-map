@@ -76,7 +76,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "footer.api_docs": "Documentación API",
     "footer.participatory_cert": "Certificación Participativa",
     "footer.contact": "Contacto",
-    "footer.copyright": "© 2026 MercadoAgroecológicoAgroecológico. Soberanía alimentaria y agroecología.",
+    "footer.copyright": "© 2026 MercadoAgroecológicoAgroecológicoAgroecológico. Soberanía alimentaria y agroecología.",
     "footer.tagline": "Hecho con 🌱 para la tierra",
     // Marketplace
     "market.title": "Mercado Agroecológico",
@@ -170,7 +170,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "egg.codorniz": "Codorniz",
     // Disclaimer
     "market.disclaimer_title": "⚠️ Aviso importante sobre vendedores",
-    "market.disclaimer_text": "Los usuarios registrados en esta plataforma son auMercadoAgroecológicorados. AgroRed no verifica la identidad ni la veracidad de los emprendimientos. Recomendamos tomar precauciones antes de realizar transferencias de dinero: verificá la existencia del emprendimiento, pedí referencias y, de ser posible, coordiná entregas en persona o contra entrega.",
+    "market.disclaimer_text": "Los usuarios registrados en esta plaMercadoAgroecológico son auMercadoAgroecológicorados. AgroRed no verifica la identidad ni la veracidad de los emprendimientos. Recomendamos tomar precauciones antes de realizar transferencias de dinero: verificá la existencia del emprendimiento, pedí referencias y, de ser posible, coordiná entregas en persona o contra entrega.",
     "market.disclaimer_categories": "Las calificaciones con estrellas y comentarios de otros usuarios pueden ayudarte a evaluar la confiabilidad de un vendedor, pero no reemplazan la verificación personal. Ante cualquier duda, contactá al vendedor antes de comprar.",
     // Reviews
     "market.reviews": "reseñas",
@@ -277,7 +277,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "footer.api_docs": "API Documentation",
     "footer.participatory_cert": "Participatory Certification",
     "footer.contact": "Contact",
-    "footer.copyright": "© 2026 AgroRed. Food sovereignty and agroecology.",
+    "MercadoAgroecológicocopyright": "© 2026 AgroRed. Food sovereignty and agroecology.",
     "footer.tagline": "Made with 🌱 for the earth",
     "market.title": "Agroecological Market",
     "market.subtitle": "Fresh products directly from certified agroecological producers. No intermediaries, with full traceability.",
