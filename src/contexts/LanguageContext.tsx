@@ -29,7 +29,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "hero.stat_regions": "Regiones",
     // Features
     "features.badge": "Módulos de la plataforma",
-    "features.title": "Infraestructura digital para cadenas agroecológicas",
+    "features.title": "Infraestructura digital para sistemas alimentarios agroecológicos",
     "features.subtitle": "Cada módulo está diseñado para conectar actores, reducir intermediarios y fortalecer la soberanía alimentaria.",
     "features.map": "Mapa Agroecológico",
     "features.map_desc": "Visualiza productores, cooperativas, comedores y puntos de venta geolocalizados con filtros por producto y certificación.",
