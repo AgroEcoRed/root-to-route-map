@@ -47,7 +47,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "features.scalable_desc": "Nuevas regiones e instituciones pueden incorporarse fácilmente al ecosistema de la plataforma.",
     // Actors section
     "actors_section.badge": "Ecosistema multi-actor",
-    "actors_section.title": "Todos los eslabones de la cadena, conectados",
+    "actors_section.title": "Todos los actores del sistema alimentario, conectados",
     "actors_section.subtitle": "Desde el campo hasta la mesa, cada actor del sistema alimentario tiene su lugar en la red.",
     "actors_section.producers": "Productores Agroecológicos",
     "actors_section.cooperatives": "Cooperativas y Asociaciones",
