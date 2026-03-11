@@ -66,7 +66,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "cta.register": "Registrarme ahora",
     "cta.explore": "Explorar el mapa",
     // Footer
-    "footer.description": "Plataforma digital para el mapeo, conexión y comercialización de alimentos agroecológicos. Cadenas cortas, producción sustentable, comercio justo.",
+    "footer.description": "Plataforma digital para el mapeo, conexión y comercialización de alimentos agroecológicos. Sistemas alimentarios sustentables, producción agroecológica, comercio justo.",
     "footer.platform": "Plataforma",
     "footer.interactive_map": "Mapa Interactivo",
     "footer.marketplace": "Marketplace",
