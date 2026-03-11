@@ -76,7 +76,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "footer.api_docs": "Documentación API",
     "footer.participatory_cert": "Certificación Participativa",
     "footer.contact": "Contacto",
-    "footer.copyright": "© 2026 MercadoAgroecológico. Soberanía alimentaria y agroecología.",
+    "footer.copyright": "© 2026 RedAgroEco (RAE). Soberanía alimentaria y agroecología.",
     "footer.tagline": "Hecho con 🌱 para la tierra",
     // Marketplace
     "market.title": "Mercado Agroecológico",

@@ -63,7 +63,7 @@ const Navbar = () => {
       <div className="container flex items-center justify-between h-16">
         <Link to="/" className="flex items-center gap-2 group">
           <img src={logo} alt="MercadoAgroecológico" className="h-9 w-9 transition-transform group-hover:scale-110" />
-          <span className={`font-display text-xl ${navbarScrolled ? "text-foreground" : "text-white"}`}>Mercado<span className="text-wheat">Agroecológico</span></span>
+          <span className={`font-display text-xl ${navbarScrolled ? "text-foreground" : "text-white"}`}>Red<span className="text-wheat">AgroEco</span> <span className="text-xs opacity-60">(RAE)</span></span>
         </Link>
 
         {/* Desktop */}

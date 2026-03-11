@@ -17,7 +17,7 @@ const Footer = () => {
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-wheat to-earth flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Leaf className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="font-display text-xl">Mercado<span className="text-wheat">Agroecológico</span></span>
+              <span className="font-display text-xl">Red<span className="text-wheat">AgroEco</span> <span className="text-xs opacity-60">(RAE)</span></span>
             </Link>
             <p className="text-forest-foreground/70 text-sm max-w-sm leading-relaxed mb-6">{t("footer.description")}</p>
             <div className="flex gap-3">
