@@ -33,7 +33,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "features.subtitle": "Cada módulo está diseñado para conectar actores, reducir intermediarios y fortalecer la soberanía alimentaria.",
     "features.map": "Mapa Agroecológico",
     "features.map_desc": "Visualiza productores, cooperativas, comedores y puntos de venta geolocalizados con filtros por producto y certificación.",
-    "features.marketplace": "Marketplace",
+    "features.marketplace": "Mercado Agroecológico",
     "features.marketplace_desc": "Oferta y demanda de alimentos agroecológicos con matching automático por proximidad geográfica.",
     "features.cert": "Certificación Participativa (SPG)",
     "features.cert_desc": "Accedé a cómo funciona cada SPG, cuestionarios de evaluación, visitas de pares, niveles de certificación y validación comunitaria. Toda la información transparente.",
