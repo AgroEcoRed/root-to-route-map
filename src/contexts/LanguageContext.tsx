@@ -22,7 +22,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "hero.title_highlight": "tu mesa",
     "hero.subtitle": "Mapa interactivo, marketplace y trazabilidad para productores, cooperativas, comedores, restaurantes y consumidores.",
     "hero.cta_map": "Explorar el Mapa",
-    "hero.cta_market": "Marketplace",
+    "hero.cta_market": "Accedé al Mercado Agroecológico",
     "hero.stat_producers": "Productores",
     "hero.stat_points": "Puntos de venta",
     "hero.stat_kitchens": "Comedores",
