@@ -17,7 +17,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "nav.login": "Ingresar",
     "nav.logout": "Salir",
     // Hero
-    "hero.badge": "Trazabilidad · Certificación Participativa · Cadenas Cortas",
+    "hero.badge": "Trazabilidad · Certificación Participativa · Sistemas Alimentarios",
     "hero.title_1": "La red que conecta el campo agroecológico con ",
     "hero.title_highlight": "tu mesa",
     "hero.subtitle": "Mapa interactivo, marketplace y trazabilidad para productores, cooperativas, comedores, restaurantes y consumidores.",
