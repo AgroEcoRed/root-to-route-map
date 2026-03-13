@@ -1,0 +1,37 @@
+# MercadoAgroecológico → RedAgroEco (RAE) - Design System & Architecture
+
+## Branding
+- Name: RedAgroEco (RAE) — previously MercadoAgroecológico
+- Use "sistema alimentario" instead of "cadena"
+- "Marketplace" → "Mercado Agroecológico" / "Accedé al Mercado Agroecológico"
+
+## Colors (HSL)
+- Primary: 152 45% 28% (deep green)
+- Secondary: 18 55% 55% (terracotta)
+- Accent: 45 80% 55% (wheat/gold)
+- Custom: earth, leaf, wheat, soil, forest
+
+## Fonts
+- Display: Playfair Display
+- Body: DM Sans
+
+## Pages
+- / (landing), /mapa (Leaflet native API), /mercado (marketplace), /actores (directory + SPG tab), /registro (multi-step form), /ingresar (login), /reset-password, /comunidad
+
+## Architecture decisions
+- Leaflet native API (NOT react-leaflet - incompatible with React 18)
+- Lovable Cloud for backend (Supabase under the hood)
+- Auth: email/password + Google OAuth (Lovable managed)
+- Profiles table with actor_type enum, certification_level enum
+- Auto-create profile on signup via trigger
+- custom_categories table for user-created global categories
+- Products: both producers AND admin can upload (TBD implementation)
+- Order flow: WhatsApp + email to producer
+
+## Nav labels
+- "Red" (not "Red de Actores") in all languages
+
+## Auth
+- AuthProvider context wraps routes
+- Login page at /ingresar with email + Google
+- Password reset flow with /reset-password page

@@ -32,7 +32,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "features.title": "Infraestructura digital para sistemas alimentarios agroecológicos",
     "features.subtitle": "Cada módulo está diseñado para conectar actores, reducir intermediarios y fortalecer la soberanía alimentaria.",
     "features.map": "Mapa Agroecológico",
-    "features.map_desc": "Visualiza productores, cooperativas, comedores y puntos de venta geolocalizados con filtros por producto y certificación.",
+    "features.map_desc": "Mapa interactivo con productores, cooperativas, comedores y puntos de venta geolocalizados. Filtrá por tipo de actor, producto o certificación. Hacé clic en un marcador para ver datos y acceder al mercado.",
     "features.marketplace": "Mercado Agroecológico",
     "features.marketplace_desc": "Oferta y demanda de alimentos agroecológicos con matching automático por proximidad geográfica.",
     "features.cert": "Certificación Participativa (SPG)",
