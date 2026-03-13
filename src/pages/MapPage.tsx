@@ -377,6 +377,17 @@ const MapPage = () => {
               </Button>
             </div>
 
+            {/* How-to guide */}
+            <div className="p-3 rounded-lg border border-primary/20 bg-primary/5 space-y-2">
+              <p className="text-xs font-semibold text-primary uppercase tracking-wider">¿Cómo funciona?</p>
+              <ul className="text-xs text-muted-foreground space-y-1.5 list-none">
+                <li className="flex items-start gap-1.5"><span className="text-primary font-bold">1.</span> Usá los filtros de abajo para mostrar u ocultar tipos de actores.</li>
+                <li className="flex items-start gap-1.5"><span className="text-primary font-bold">2.</span> Hacé clic en un marcador del mapa para ver sus datos y productos.</li>
+                <li className="flex items-start gap-1.5"><span className="text-primary font-bold">3.</span> Desde el popup, podés ir directamente al mercado para contactar al actor.</li>
+                <li className="flex items-start gap-1.5"><span className="text-primary font-bold">4.</span> Los colores indican: <span className="text-primary font-medium">verde = oferta</span>, <span className="text-destructive font-medium">rojo = demanda</span>, <span className="text-wheat font-medium">amarillo = servicio</span>.</li>
+              </ul>
+            </div>
+
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
