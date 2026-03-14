@@ -52,14 +52,14 @@ const certOptions: { value: CertLevel; label: string; color: string; desc: strin
 ];
 
 const actorTypes: { key: ActorType; label: string; icon: typeof Sprout; desc: string; color: string }[] = [
-  { key: "producer", label: "Productor Agroecológico", icon: Sprout, desc: "Cultivo, cría o producción de alimentos agroecológicos", color: "from-primary to-leaf" },
-  { key: "cooperative", label: "Cooperativa / Asociación", icon: Users, desc: "Organización de productores para comercialización conjunta", color: "from-earth to-secondary" },
+  { key: "producer", label: "Productor/a Agroecológico/a", icon: Sprout, desc: "Cultivo, cría o producción de alimentos agroecológicos", color: "from-primary to-leaf" },
+  { key: "cooperative", label: "Cooperativa / Asociación", icon: Users, desc: "Organización de productores/as para comercialización conjunta", color: "from-earth to-secondary" },
   { key: "social_kitchen", label: "Comedor Comunitario", icon: Heart, desc: "Comedor social, merendero o espacio comunitario", color: "from-secondary to-earth" },
   { key: "restaurant", label: "Restaurante / Bar", icon: UtensilsCrossed, desc: "Gastronomía que busca insumos agroecológicos", color: "from-wheat to-earth" },
   { key: "retail", label: "Comercio / Feria", icon: Store, desc: "Punto de venta de alimentos", color: "from-leaf to-primary" },
-  { key: "consumer", label: "Consumidor Individual", icon: ShoppingCart, desc: "Persona que busca comprar directo a productores", color: "from-primary to-forest" },
+  { key: "consumer", label: "Consumidor/a Individual", icon: ShoppingCart, desc: "Persona que busca comprar directo a productores/as", color: "from-primary to-forest" },
   { key: "institution", label: "Institución Pública", icon: Building2, desc: "Escuela, hospital, municipio u oficina pública", color: "from-forest to-primary" },
-  { key: "logistics", label: "Proveedor Logístico", icon: Truck, desc: "Transporte, distribución o almacenamiento", color: "from-soil to-earth" },
+  { key: "logistics", label: "Proveedor/a Logístico/a", icon: Truck, desc: "Transporte, distribución o almacenamiento", color: "from-soil to-earth" },
   { key: "processing", label: "Planta de Procesamiento", icon: Factory, desc: "Molino, frigorífico, acopio o biofábrica", color: "from-wheat to-leaf" },
 ];
 
