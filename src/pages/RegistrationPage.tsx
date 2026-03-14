@@ -238,8 +238,8 @@ const RegistrationPage = () => {
                     className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-3">
                     <Sparkles className="h-4 w-4" />Paso 1 de 3
                   </motion.div>
-                  <h1 className="text-3xl sm:text-4xl font-display text-foreground mb-2">¿Qué tipo de actor sos?</h1>
-                  <p className="text-muted-foreground">Seleccioná el perfil que mejor te represente en la red agroecológica.</p>
+                  <h1 className="text-3xl sm:text-4xl font-display text-foreground mb-2">¿Cómo participás de la red?</h1>
+                  <p className="text-muted-foreground">Elegí el rol que mejor te represente para conectarte con la comunidad agroecológica.</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {actorTypes.map((a, i) => (
