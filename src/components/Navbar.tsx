@@ -23,6 +23,7 @@ const Navbar = () => {
     { to: "/mapa", label: t("nav.map"), icon: MapPin },
     { to: "/mercado", label: t("nav.market"), icon: ShoppingBasket },
     { to: "/actores", label: t("nav.actors"), icon: Users },
+    { to: "/servicios", label: t("nav.services"), icon: Sprout },
     { to: "/comunidad", label: t("nav.community"), icon: BookOpen },
   ];
 
