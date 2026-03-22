@@ -15,6 +15,7 @@ import RegistrationPage from "./pages/RegistrationPage";
 import LoginPage from "./pages/LoginPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import CommunityPage from "./pages/CommunityPage";
+import ServicesPage from "./pages/ServicesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/mercado" element={<MarketplacePage />} />
               <Route path="/actores" element={<ActorsPage />} />
               <Route path="/comunidad" element={<CommunityPage />} />
+              <Route path="/servicios" element={<ServicesPage />} />
               <Route path="/registro" element={<RegistrationPage />} />
               <Route path="/ingresar" element={<LoginPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
