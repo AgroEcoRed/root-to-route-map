@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, MapPin, ShoppingBasket, Users, Leaf, LogOut, User, Globe, BookOpen, ShoppingCart } from "lucide-react";
+import { Menu, X, MapPin, ShoppingBasket, Users, Leaf, LogOut, User, Globe, BookOpen, ShoppingCart, Sprout } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
