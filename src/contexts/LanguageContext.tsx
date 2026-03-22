@@ -299,6 +299,8 @@ const translations: Record<Lang, Record<string, string>> = {
     "features.dashboard_desc": "Impact metrics, production planning, demand forecasting and environmental indicators.",
     "features.scalable": "Modular & Scalable",
     "features.scalable_desc": "New regions and institutions can easily join the platform ecosystem.",
+    "features.services": "Holistic Services",
+    "features.services_desc": "Bio-inputs, seeds, technical assistance, financing, storage and logistics. Everything for your agroecological transition.",
     "actors_section.badge": "Multi-actor ecosystem",
     "actors_section.title": "All links in the chain, connected",
     "actors_section.subtitle": "From farm to table, every actor in the food system has a place in the network.",
