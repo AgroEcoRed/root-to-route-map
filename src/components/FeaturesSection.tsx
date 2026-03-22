@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { MapPin, ShoppingBasket, ShieldCheck, Truck, MessageCircle, BarChart3, Leaf } from "lucide-react";
+import { MapPin, ShoppingBasket, ShieldCheck, Truck, MessageCircle, BarChart3, Leaf, Sprout } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
 
