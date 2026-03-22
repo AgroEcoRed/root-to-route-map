@@ -19,10 +19,11 @@ const FeaturesSection = () => {
     { icon: MapPin, titleKey: "features.map", descKey: "features.map_desc", color: "bg-primary text-primary-foreground", link: "/mapa" },
     { icon: ShoppingBasket, titleKey: "features.marketplace", descKey: "features.marketplace_desc", color: "bg-secondary text-secondary-foreground", link: "/mercado" },
     { icon: ShieldCheck, titleKey: "features.cert", descKey: "features.cert_desc", color: "bg-wheat text-wheat-foreground", link: "/actores" },
-    { icon: Truck, titleKey: "features.logistics", descKey: "features.logistics_desc", color: "bg-earth text-earth-foreground", link: "/mapa" },
-    { icon: MessageCircle, titleKey: "features.comm", descKey: "features.comm_desc", color: "bg-soil text-soil-foreground", link: "/comunidad" },
-    { icon: BarChart3, titleKey: "features.dashboard", descKey: "features.dashboard_desc", color: "bg-forest text-forest-foreground", link: null },
-    { icon: Leaf, titleKey: "features.scalable", descKey: "features.scalable_desc", color: "bg-primary text-primary-foreground", link: null },
+    { icon: Sprout, titleKey: "features.services", descKey: "features.services_desc", color: "bg-earth text-earth-foreground", link: "/servicios" },
+    { icon: Truck, titleKey: "features.logistics", descKey: "features.logistics_desc", color: "bg-soil text-soil-foreground", link: "/mapa" },
+    { icon: MessageCircle, titleKey: "features.comm", descKey: "features.comm_desc", color: "bg-forest text-forest-foreground", link: "/comunidad" },
+    { icon: BarChart3, titleKey: "features.dashboard", descKey: "features.dashboard_desc", color: "bg-primary text-primary-foreground", link: null },
+    { icon: Leaf, titleKey: "features.scalable", descKey: "features.scalable_desc", color: "bg-secondary text-secondary-foreground", link: null },
   ];
 
   return (
