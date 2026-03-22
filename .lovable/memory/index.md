@@ -1,4 +1,4 @@
-# MercadoAgroecológico → RedAgroEco (RAE) - Design System & Architecture
+# RedAgroEco (RAE) - Design System & Architecture
 
 ## Branding
 - Name: RedAgroEco (RAE) — previously MercadoAgroecológico
@@ -16,7 +16,7 @@
 - Body: DM Sans
 
 ## Pages
-- / (landing), /mapa (Leaflet native API), /mercado (marketplace), /actores (directory + SPG tab), /registro (multi-step form), /ingresar (login), /reset-password, /comunidad
+- / (landing), /mapa (Leaflet native API), /mercado (marketplace), /actores (directory + SPG tab), /registro (multi-step form), /ingresar (login), /reset-password, /comunidad, /servicios (holistic services hub)
 
 ## Architecture decisions
 - Leaflet native API (NOT react-leaflet - incompatible with React 18)
@@ -27,6 +27,7 @@
 - custom_categories table for user-created global categories
 - Products: both producers AND admin can upload (TBD implementation)
 - Order flow: WhatsApp + email to producer
+- Services page: bio-inputs, seeds, weather (Open-Meteo), gov programs, storage, logistics
 
 ## Nav labels
 - "Red" (not "Red de Actores") in all languages
