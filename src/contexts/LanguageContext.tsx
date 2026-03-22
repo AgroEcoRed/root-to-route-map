@@ -535,6 +535,8 @@ const translations: Record<Lang, Record<string, string>> = {
     "features.dashboard_desc": "Métriques d'impact, planification de production, prévision de demande et indicateurs environnementaux.",
     "features.scalable": "Modulaire et Évolutif",
     "features.scalable_desc": "De nouvelles régions et institutions peuvent facilement rejoindre l'écosystème de la plateforme.",
+    "features.services": "Services Intégraux",
+    "features.services_desc": "Bio-intrants, semences, assistance technique, financement, stockage et logistique pour votre transition.",
     "actors_section.badge": "Écosystème multi-acteurs",
     "actors_section.title": "Tous les maillons de la chaîne, connectés",
     "actors_section.subtitle": "Du champ à la table, chaque acteur du système alimentaire a sa place dans le réseau.",
