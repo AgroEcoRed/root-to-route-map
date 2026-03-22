@@ -15,6 +15,7 @@ import RegistrationPage from "./pages/RegistrationPage";
 import LoginPage from "./pages/LoginPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import CommunityPage from "./pages/CommunityPage";
+import ServicesPage from "./pages/ServicesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
