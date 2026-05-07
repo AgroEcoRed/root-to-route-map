@@ -58,7 +58,7 @@ const Navbar = () => {
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         navbarScrolled
           ? "bg-background/90 backdrop-blur-xl shadow-sm border-b border-border"
-          : "bg-transparent border-b border-transparent text-white"
+          : "bg-gradient-to-b from-black/55 via-black/30 to-transparent border-b border-transparent text-white"
       }`}
     >
       <div className="container flex items-center justify-between h-16">
