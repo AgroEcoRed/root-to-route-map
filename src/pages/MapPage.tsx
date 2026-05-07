@@ -224,6 +224,12 @@ const MapPage = () => {
     [filtered, page]
   );
 
+  // Recalculate map size when surrounding layout changes
+  useEffect(() => {
+    const t = setTimeout(() => mapRef.current?.invalidateSize(), 100);
+    return () => clearTimeout(t);
+  }, [pagedActors, showFilters]);
+
   // Initialize map
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
