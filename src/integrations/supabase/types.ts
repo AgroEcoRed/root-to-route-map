@@ -234,6 +234,22 @@ export type Database = {
         | "institution"
         | "logistics"
         | "processing"
+        | "agroecological_node"
+        | "seed_bank"
+        | "composting_center"
+        | "research_center"
+        | "solidarity_intermediary"
+        | "community_garden"
+        | "consumer_node"
+        | "individual_consumer"
+        | "food_bank"
+        | "consumer_cooperative"
+        | "community_org"
+        | "health_food_store"
+        | "agroecological_store"
+        | "agroecological_fair"
+        | "agroecological_market"
+        | "bio_input_supplier"
       certification_level: "red" | "yellow" | "green" | "none_spg"
     }
     CompositeTypes: {
@@ -372,6 +388,22 @@ export const Constants = {
         "institution",
         "logistics",
         "processing",
+        "agroecological_node",
+        "seed_bank",
+        "composting_center",
+        "research_center",
+        "solidarity_intermediary",
+        "community_garden",
+        "consumer_node",
+        "individual_consumer",
+        "food_bank",
+        "consumer_cooperative",
+        "community_org",
+        "health_food_store",
+        "agroecological_store",
+        "agroecological_fair",
+        "agroecological_market",
+        "bio_input_supplier",
       ],
       certification_level: ["red", "yellow", "green", "none_spg"],
     },
