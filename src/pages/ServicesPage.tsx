@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { getWeather, type WeatherData } from "@/lib/weather/officialWeather";
 
 const cardVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -21,17 +22,13 @@ const cardVariants = {
 // Weather widget using Open-Meteo (free, no API key)
 const WeatherWidget = () => {
   const { t } = useLanguage();
-  const [weather, setWeather] = useState<any>(null);
+  const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Default: Buenos Aires area. In production, use user's profile location
     const lat = -34.6;
     const lng = -58.4;
-    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code&timezone=America/Argentina/Buenos_Aires&forecast_days=5`)
-      .then(r => r.json())
-      .then(data => { setWeather(data); setLoading(false); })
-      .catch(() => setLoading(false));
+    getWeather(lat, lng).then((data) => { setWeather(data); setLoading(false); });
   }, []);
 
   const weatherIcon = (code: number) => {
@@ -79,7 +76,11 @@ const WeatherWidget = () => {
           </div>
         ))}
       </div>
-      <p className="text-xs text-muted-foreground mt-3 italic">{t("services.weather_note")}</p>
+      {weather.source && (
+        <p className="text-xs text-muted-foreground mt-3 italic">
+          Fuente: <a href={weather.source.url} target="_blank" rel="noopener noreferrer" className="hover:text-primary underline">{weather.source.name}</a>
+        </p>
+      )}
     </div>
   );
 };
@@ -230,7 +231,16 @@ const ServicesPage = () => {
                         </a>
                       ))}
                     </div>
+                    <Link to="/programas" className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+                      Ver todos los programas <ArrowRight className="h-4 w-4" />
+                    </Link>
                   </div>
+                )}
+
+                {cat.id === "knowledge" && (
+                  <Link to="/biblioteca" className="mt-4 flex items-center gap-2 text-sm font-medium text-primary hover:underline">
+                    Ir a la biblioteca <ArrowRight className="h-4 w-4" />
+                  </Link>
                 )}
 
                 {/* Link to map for postharvest */}
