@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+import "leaflet.markercluster";
+import rutasSanas from "@/data/rutasSanas.json";
 import Navbar from "@/components/Navbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -125,65 +129,17 @@ const roleBorderClasses: Record<ActorRole, string> = {
 
 const certLabels = { red: "Básico", yellow: "En transición", green: "Certificado" };
 
-const mockActors: MapActor[] = [
-  // OFERTA — Productores
-  { id: 1, name: "Finca La Esperanza", type: "producer", lat: -34.61, lng: -58.38, products: ["Tomate", "Lechuga", "Acelga"], certification: "green", description: "Producción agroecológica familiar, 5 hectáreas." },
-  { id: 9, name: "Huerta Don Pedro", type: "producer", lat: -34.68, lng: -58.55, products: ["Zapallo", "Choclo", "Papa"], certification: "yellow", description: "Producción en transición agroecológica." },
-  { id: 10, name: "Granja El Retiro", type: "producer", lat: -34.50, lng: -58.60, products: ["Huevos", "Pollo", "Cerdos"], certification: "green", description: "Granja integral, animales a campo." },
-  // OFERTA — Cooperativas
-  { id: 2, name: "Cooperativa Del Sol", type: "cooperative", lat: -34.65, lng: -58.50, products: ["Miel", "Frutas", "Hierbas"], certification: "green", description: "15 familias productoras asociadas." },
-  { id: 11, name: "Coop. Tierra Viva", type: "cooperative", lat: -34.72, lng: -58.35, products: ["Verduras", "Plantines", "Semillas"], certification: "green", description: "Cooperativa de la agricultura familiar." },
-  // OFERTA — Procesamiento
-  { id: 8, name: "Molino Agroeco", type: "processing", lat: -34.55, lng: -58.52, products: ["Harina de trigo", "Harina de maíz"], certification: "green", description: "Molienda artesanal, 2 ton/día." },
-  // OFERTA — Nodos Agroecológicos
-  { id: 13, name: "Nodo Sur Agroecológico", type: "agroecological_node", lat: -34.73, lng: -58.42, products: ["Verduras", "Aromáticas", "Frutas"], certification: "green", description: "Red de 8 huertas comunitarias del sur." },
-  { id: 14, name: "Nodo Oeste Productivo", type: "agroecological_node", lat: -34.63, lng: -58.62, products: ["Hortalizas", "Plantines"], certification: "yellow", description: "Articulación de productores periurbanos." },
-  // OFERTA — Banco de Semillas
-  { id: 15, name: "Semillero Nativo", type: "seed_bank", lat: -34.56, lng: -58.48, products: ["Semillas criollas", "Plantines nativos"], certification: "green", description: "Conservación de 200+ variedades criollas." },
-  // OFERTA — Centro de Compostaje
-  { id: 16, name: "Compostar BA", type: "composting_center", lat: -34.64, lng: -58.39, products: ["Compost", "Humus de lombriz"], certification: "yellow", description: "Procesamiento de residuos orgánicos urbanos." },
-  // OFERTA — Centro de Investigación
-  { id: 17, name: "INTA Agroecología", type: "research_center", lat: -34.52, lng: -58.45, products: ["Capacitación", "Asistencia técnica"], certification: "green", description: "Investigación en sistemas agroecológicos." },
-  // DEMANDA — Restaurantes
-  { id: 4, name: "Restaurante Raíz", type: "restaurant", lat: -34.60, lng: -58.37, products: ["Verduras de hoja", "Huevos"], certification: "yellow", description: "Restaurante orgánico de autor." },
-  { id: 12, name: "Bar Cosecha", type: "restaurant", lat: -34.59, lng: -58.40, products: ["Frutas", "Verduras"], certification: "red", description: "Bar con carta de origen local." },
-  // DEMANDA — Comedores
-  { id: 3, name: "Comedor Los Pibes", type: "social_kitchen", lat: -34.58, lng: -58.42, products: ["Verduras", "Legumbres"], certification: "yellow", description: "Comedor comunitario, 200 raciones diarias." },
-  // DEMANDA — Comercio
-  { id: 5, name: "Almacén Natural", type: "retail", lat: -34.62, lng: -58.44, products: ["Harinas", "Conservas", "Lácteos"], certification: "green", description: "Dietética y productos naturales." },
-  // DEMANDA — Instituciones
-  { id: 6, name: "Escuela N°42", type: "institution", lat: -34.57, lng: -58.46, products: ["Frutas", "Verduras"], certification: "red", description: "Comedor escolar, 350 alumnos." },
-  // DEMANDA — Nodos de Consumidores
-  { id: 18, name: "Nodo Almagro Consume", type: "consumer_node", lat: -34.61, lng: -58.42, products: ["Bolsones", "Verduras", "Frutas"], certification: "green", description: "Grupo de 45 familias que compran juntas." },
-  { id: 19, name: "Nodo Villa Crespo", type: "consumer_node", lat: -34.60, lng: -58.44, products: ["Verduras", "Lácteos", "Panificados"], certification: "yellow", description: "Nodo de consumo responsable, 30 familias." },
-  // DEMANDA — Consumidores Individuales
-  { id: 20, name: "María González", type: "individual_consumer", lat: -34.62, lng: -58.41, products: ["Verduras", "Huevos"], certification: "red", description: "Consumidora habitual de bolsones agroecológicos." },
-  // DEMANDA — Banco de Alimentos
-  { id: 21, name: "Banco de Alimentos BA", type: "food_bank", lat: -34.66, lng: -58.37, products: ["Verduras", "Frutas", "Secos"], certification: "yellow", description: "Redistribución a 150 comedores." },
-  // DEMANDA — Cooperativa de Consumo
-  { id: 22, name: "Coop. El Galpón", type: "consumer_cooperative", lat: -34.58, lng: -58.45, products: ["Verduras", "Lácteos", "Conservas"], certification: "green", description: "Cooperativa de consumo con 200 socios." },
-  // DEMANDA — Org. Comunitaria
-  { id: 23, name: "Centro Cultural Raíces", type: "community_org", lat: -34.67, lng: -58.48, products: ["Meriendas", "Viandas"], certification: "red", description: "Espacio cultural con merendero comunitario." },
-  // DEMANDA — Dietética
-  { id: 24, name: "Dietética Vida Sana", type: "health_food_store", lat: -34.60, lng: -58.43, products: ["Orgánicos", "Sin TACC", "Suplementos"], certification: "green", description: "Dietética especializada en productos agroecológicos." },
-  // SERVICIO — Logística
-  { id: 7, name: "Transporte El Surco", type: "logistics", lat: -34.70, lng: -58.30, products: [], certification: "yellow", description: "Fletes refrigerados para alimentos frescos." },
-  // OFERTA — Intermediario Solidario
-  { id: 25, name: "Nodo Sin Intermediarios", type: "solidarity_intermediary", lat: -34.59, lng: -58.50, products: ["Bolsones", "Verduras", "Frutas"], certification: "green", description: "Articulación directa campo-barrio sin intermediarios." },
-  { id: 26, name: "Red Más Cerca Más Justo", type: "solidarity_intermediary", lat: -34.63, lng: -58.43, products: ["Alimentos agroecológicos", "Almacén"], certification: "green", description: "Intermediación solidaria entre productores y consumidores." },
-  // OFERTA — Huerta Comunitaria
-  { id: 27, name: "Huerta El Retoño", type: "community_garden", lat: -34.66, lng: -58.44, products: ["Verduras", "Aromáticas", "Plantines"], certification: "yellow", description: "Huerta comunitaria barrial, producción colectiva." },
-  { id: 28, name: "Huerta INTA Pro-Huerta", type: "community_garden", lat: -34.54, lng: -58.51, products: ["Hortalizas", "Semillas"], certification: "green", description: "Huerta demostrativa del programa Pro-Huerta." },
-  // DEMANDA — Almacén Agroecológico
-  { id: 29, name: "Pochamama Almacén", type: "agroecological_store", lat: -34.64, lng: -58.41, products: ["Orgánicos", "Granos", "Yerba mate"], certification: "green", description: "Almacén autogestivo de alimentos agroecológicos." },
-  { id: 30, name: "Almacén de Ramos Generales Eco", type: "agroecological_store", lat: -34.67, lng: -58.38, products: ["Harinas", "Conservas", "Tinturas"], certification: "green", description: "Almacén agroecológico con productos de la economía popular." },
-  // DEMANDA — Feria Agroecológica
-  { id: 31, name: "Feria Agroecológica de Productores", type: "agroecological_fair", lat: -34.61, lng: -58.46, products: ["Verduras", "Frutas", "Conservas", "Plantines"], certification: "green", description: "Feria semanal de productores agroecológicos." },
-  { id: 32, name: "Feria Soberana", type: "agroecological_fair", lat: -34.69, lng: -58.35, products: ["Alimentos", "Artesanías", "Semillas"], certification: "yellow", description: "Feria mensual de soberanía alimentaria." },
-  // DEMANDA — Mercado Agroecológico
-  { id: 33, name: "Mercado Territorial Autogestivo", type: "agroecological_market", lat: -34.62, lng: -58.53, products: ["Verduras", "Lácteos", "Panificados"], certification: "green", description: "Mercado cooperativo de alimentos locales." },
-  { id: 34, name: "Mercado de Economía Social", type: "agroecological_market", lat: -34.58, lng: -58.39, products: ["Productos de la economía popular"], certification: "yellow", description: "Mercado de la economía social y solidaria." },
-];
+// Real points imported from "Mapa de las Rutas Sanas del Alimento" (Red Interregional de Nodos Agroecológicos)
+const mockActors: MapActor[] = (rutasSanas as Array<{n:string;lat:number;lng:number;t:string;f:string;d:string}>).map((p, i) => ({
+  id: i + 1,
+  name: p.n,
+  type: p.t as ActorType,
+  lat: p.lat,
+  lng: p.lng,
+  products: [],
+  certification: "yellow",
+  description: p.d || p.f,
+}));
 
 type CertFilter = "green" | "yellow" | "red";
 
@@ -195,7 +151,7 @@ const MapPage = () => {
   const [showFilters, setShowFilters] = useState(true);
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const markersRef = useRef<L.Marker[]>([]);
+  const clusterRef = useRef<L.MarkerClusterGroup | null>(null);
   const [dbActors, setDbActors] = useState<MapActor[]>([]);
 
   // Fetch real profiles from database
@@ -258,23 +214,28 @@ const MapPage = () => {
   // Initialize map
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
-    mapRef.current = L.map(mapContainerRef.current).setView([-34.61, -58.44], 12);
+    mapRef.current = L.map(mapContainerRef.current).setView([-34.61, -58.44], 9);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(mapRef.current);
+    clusterRef.current = L.markerClusterGroup({
+      chunkedLoading: true,
+      maxClusterRadius: 50,
+      showCoverageOnHover: false,
+    });
+    mapRef.current.addLayer(clusterRef.current);
 
     return () => {
       mapRef.current?.remove();
       mapRef.current = null;
+      clusterRef.current = null;
     };
   }, []);
 
   // Update markers
   useEffect(() => {
-    if (!mapRef.current) return;
-
-    markersRef.current.forEach((m) => m.remove());
-    markersRef.current = [];
+    if (!mapRef.current || !clusterRef.current) return;
+    clusterRef.current.clearLayers();
 
     filtered.forEach((a) => {
       const role = actorRole[a.type];
@@ -317,7 +278,6 @@ const MapPage = () => {
       const roleBadgeColor = role === "oferta" ? "#2d6a4f" : role === "demanda" ? "#c0392b" : "#e67e22";
 
       const marker = L.marker([a.lat, a.lng], { icon })
-        .addTo(mapRef.current!)
         .bindPopup(`
           <div style="min-width:240px;font-family:DM Sans,sans-serif;padding:4px">
             <a href="#" class="map-actor-link" data-producer="${encodeURIComponent(a.name)}" style="display:block;background:${roleBadgeColor};color:white;font-weight:700;font-size:14px;margin:0 0 8px;padding:8px 12px;border-radius:8px;text-decoration:none;cursor:pointer;text-align:center;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
@@ -354,7 +314,7 @@ const MapPage = () => {
         }, 50);
       });
 
-      markersRef.current.push(marker);
+      clusterRef.current!.addLayer(marker);
     });
   }, [filtered, navigate]);
 
