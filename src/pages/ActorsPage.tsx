@@ -212,7 +212,7 @@ const ActorsPage = () => {
               }`}
             >
               <Users className="h-4 w-4 inline mr-1.5" />
-              Red de Actores
+              Miembros de la Red
             </button>
             <button
               onClick={() => setActiveTab("spg")}
