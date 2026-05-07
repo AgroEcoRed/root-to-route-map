@@ -271,8 +271,8 @@ const MapPage = () => {
 
       const certColor = a.certification === "green" ? "#2d6a4f" : a.certification === "yellow" ? "#d4a017" : "#dc2626";
       const productLabel = role === "oferta" ? "🟢 Ofrece" : role === "demanda" ? "🔴 Demanda" : "Servicio";
-      const productBg = role === "oferta" ? "#e8f5e9" : "#fce4ec";
-      const productColor = role === "oferta" ? "#2d6a4f" : "#c0392b";
+      const productBg = role === "oferta" ? "#dbeafe" : "#f3e8ff";
+      const productColor = role === "oferta" ? "#2563eb" : "#9333ea";
 
       const productsHtml = a.products.length > 0
         ? `<div style="margin-top:8px">
@@ -288,7 +288,7 @@ const MapPage = () => {
             </div>`
         : "";
 
-      const roleBadgeColor = role === "oferta" ? "#2d6a4f" : role === "demanda" ? "#c0392b" : "#e67e22";
+      const roleBadgeColor = role === "oferta" ? "#2563eb" : role === "demanda" ? "#9333ea" : "#ea580c";
 
       const marker = L.marker([a.lat, a.lng], { icon })
         .bindPopup(`
