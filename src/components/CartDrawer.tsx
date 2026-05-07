@@ -30,7 +30,7 @@ const CartDrawer = () => {
       (i) => `• ${i.name} x${i.quantity} (${i.priceDisplay}/${i.unit})`
     );
     const subtotal = producerItems.reduce((s, i) => s + i.price * i.quantity, 0);
-    const msg = `Hola ${producer}! 🌱\n\nTe escribo desde MercadoAgroecológico. Quisiera hacer el siguiente pedido:\n\n${lines.join("\n")}\n\nTotal estimado: $${subtotal.toLocaleString("es-AR")}\n\n¿Tienen disponibilidad? ¿Cómo coordinamos la entrega?`;
+    const msg = `Hola ${producer}! 🌱\n\nTe escribo desde AgroEco.Red. Quisiera hacer el siguiente pedido:\n\n${lines.join("\n")}\n\nTotal estimado: $${subtotal.toLocaleString("es-AR")}\n\n¿Tienen disponibilidad? ¿Cómo coordinamos la entrega?`;
     return encodeURIComponent(msg);
   };
 
