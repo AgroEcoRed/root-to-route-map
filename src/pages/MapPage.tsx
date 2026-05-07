@@ -216,6 +216,14 @@ const MapPage = () => {
     });
   }, [activeTypes, activeCerts, search, allActors]);
 
+  // Reset pagination when filters/search change
+  useEffect(() => { setPage(1); }, [search, activeTypes, activeCerts]);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pagedActors = useMemo(
+    () => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [filtered, page]
+  );
+
   // Initialize map
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
