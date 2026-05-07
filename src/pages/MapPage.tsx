@@ -12,6 +12,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Filter, X, ArrowUp, ArrowDown, Minus } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 type ActorType =
   | "producer"
@@ -152,8 +161,6 @@ const MapPage = () => {
   const [activeTypes, setActiveTypes] = useState<Set<ActorType>>(new Set(Object.keys(actorTypeLabels) as ActorType[]));
   const [activeCerts, setActiveCerts] = useState<Set<CertFilter>>(new Set(["green", "yellow", "red"]));
   const [showFilters, setShowFilters] = useState(true);
-  const [page, setPage] = useState(1);
-  const PAGE_SIZE = 8;
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null);
@@ -216,19 +223,11 @@ const MapPage = () => {
     });
   }, [activeTypes, activeCerts, search, allActors]);
 
-  // Reset pagination when filters/search change
-  useEffect(() => { setPage(1); }, [search, activeTypes, activeCerts]);
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const pagedActors = useMemo(
-    () => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
-    [filtered, page]
-  );
-
   // Recalculate map size when surrounding layout changes
   useEffect(() => {
     const t = setTimeout(() => mapRef.current?.invalidateSize(), 100);
     return () => clearTimeout(t);
-  }, [pagedActors, showFilters]);
+  }, [showFilters]);
 
   // Initialize map
   useEffect(() => {
