@@ -10,13 +10,23 @@ import {
 import {
   Search, MapPin, Sprout, Users, Heart, UtensilsCrossed,
   Store, Building2, Truck, Factory, ShieldCheck, Mail,
-  ClipboardCheck, Droplets, Leaf, FlaskConical, Eye, FileText, ExternalLink
+  ClipboardCheck, Droplets, Leaf, FlaskConical, Eye, FileText, ExternalLink,
+  Recycle, Microscope, Handshake, Trees, ShoppingBasket, User, HeartHandshake,
+  Network, Apple, Carrot, ChevronLeft, ChevronRight
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import rutasSanas from "@/data/rutasSanas.json";
 
-type ActorType = "producer" | "cooperative" | "social_kitchen" | "restaurant" | "retail" | "institution" | "logistics" | "processing";
+type ActorType =
+  | "producer" | "cooperative" | "social_kitchen" | "restaurant" | "retail"
+  | "institution" | "logistics" | "processing"
+  | "agroecological_node" | "seed_bank" | "composting_center" | "research_center"
+  | "solidarity_intermediary" | "community_garden" | "consumer_node"
+  | "individual_consumer" | "food_bank" | "consumer_cooperative" | "community_org"
+  | "health_food_store" | "agroecological_store" | "agroecological_fair"
+  | "agroecological_market" | "bio_input_supplier";
 type CertLevel = "red" | "yellow" | "green" | "none_spg";
 
 interface Actor {
@@ -24,11 +34,7 @@ interface Actor {
   name: string;
   type: ActorType;
   location: string;
-  certification: CertLevel;
   description: string;
-  products: string[];
-  capacity: string;
-  spgId?: string;
 }
 
 interface SPG {
@@ -57,19 +63,18 @@ const evalTypeIcons: Record<string, typeof Droplets> = {
   condiciones_laborales: Users,
 };
 
-const actors: Actor[] = [
-  { id: 1, name: "Finca La Esperanza", type: "producer", location: "La Plata, Buenos Aires", certification: "green", description: "Producción agroecológica familiar en 5 hectáreas con rotación de cultivos y manejo integrado.", products: ["Tomate", "Lechuga", "Acelga"], capacity: "2 ton/mes", spgId: "a1111111-1111-1111-1111-111111111111" },
-  { id: 2, name: "Cooperativa Del Sol", type: "cooperative", location: "Florencio Varela", certification: "green", description: "15 familias productoras asociadas para comercialización conjunta.", products: ["Miel", "Frutas", "Conservas"], capacity: "5 ton/mes" },
-  { id: 3, name: "Comedor Los Pibes", type: "social_kitchen", location: "La Matanza", certification: "yellow", description: "Comedor comunitario que sirve 200 raciones diarias.", products: ["Verduras", "Legumbres"], capacity: "200 raciones/día" },
-  { id: 4, name: "Restaurante Raíz", type: "restaurant", location: "CABA, Palermo", certification: "yellow", description: "Restaurante de autor con menú 100% origen local.", products: ["Verduras de hoja", "Huevos"], capacity: "80 cubiertos/día" },
-  { id: 5, name: "Almacén Natural", type: "retail", location: "CABA, Caballito", certification: "green", description: "Dietética y almacén de productos agroecológicos.", products: ["Harinas", "Conservas", "Lácteos"], capacity: "Retail" },
-  { id: 6, name: "Escuela N°42", type: "institution", location: "Quilmes", certification: "red", description: "Comedor escolar para 350 alumnos.", products: ["Frutas", "Verduras"], capacity: "350 raciones/día" },
-  { id: 7, name: "Transporte El Surco", type: "logistics", location: "Avellaneda", certification: "yellow", description: "Fletes refrigerados para alimentos frescos.", products: [], capacity: "3 camiones" },
-  { id: 8, name: "Molino Agroeco", type: "processing", location: "Luján", certification: "green", description: "Molienda artesanal de cereales agroecológicos.", products: ["Harina de trigo", "Harina de maíz"], capacity: "2 ton/día" },
-  { id: 9, name: "Granja El Retiro", type: "producer", location: "San Vicente", certification: "yellow", description: "Granja integral con animales a campo y huerta. En transición agroecológica.", products: ["Huevos", "Pollo", "Cerdos"], capacity: "500 docenas/mes", spgId: "b2222222-2222-2222-2222-222222222222" },
-  { id: 10, name: "Coop. Tierra Viva", type: "cooperative", location: "Cañuelas", certification: "green", description: "Cooperativa de la agricultura familiar periurbana.", products: ["Verduras", "Plantines", "Semillas"], capacity: "8 ton/mes" },
-  { id: 11, name: "Huerta Orgánica Raíces", type: "producer", location: "Marcos Paz", certification: "none_spg", description: "Producción agroecológica sin participación en SPG. Aplica técnicas de permacultura.", products: ["Aromáticas", "Tomate", "Zapallito"], capacity: "1 ton/mes" },
-];
+// Real members imported from "Mapa de las Rutas Sanas del Alimento"
+const realActors: Actor[] = (rutasSanas as Array<{n:string;lat:number;lng:number;t:string;f:string;d:string}>).map((p, i) => {
+  // Extract a short location heuristically (first comma-separated chunk of d, fallback to f)
+  const locGuess = (p.d || "").split(/[-–|]/)[0].trim().split(",").slice(0, 2).join(",").slice(0, 60);
+  return {
+    id: i + 1,
+    name: p.n,
+    type: p.t as ActorType,
+    location: locGuess || p.f || "—",
+    description: p.d || p.f || "",
+  };
+});
 
 const knownSpgs = [
   { name: "SPG FCAL-UNER", region: "Entre Ríos", description: "Sistema Participativo de Garantía de la Facultad de Ciencias de la Alimentación de la Universidad Nacional de Entre Ríos.", url: "https://www.fcal.uner.edu.ar/spg/" },
@@ -87,6 +92,8 @@ const ActorsPage = () => {
   const [spgEvals, setSpgEvals] = useState<SPGEvaluation[]>([]);
   const [loadingSpg, setLoadingSpg] = useState(false);
   const [dbSpgs, setDbSpgs] = useState<SPG[]>([]);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 12;
 
   const typeConfig: Record<ActorType, { label: string; icon: typeof Sprout }> = {
     producer: { label: t("actor.producer"), icon: Sprout },
@@ -97,6 +104,22 @@ const ActorsPage = () => {
     institution: { label: t("actor.institution"), icon: Building2 },
     logistics: { label: t("actor.logistics"), icon: Truck },
     processing: { label: t("actor.processing"), icon: Factory },
+    agroecological_node: { label: "Nodo Agroecológico", icon: Network },
+    seed_bank: { label: "Banco de Semillas", icon: Sprout },
+    composting_center: { label: "Centro de Compostaje", icon: Recycle },
+    research_center: { label: "Centro de Investigación", icon: Microscope },
+    solidarity_intermediary: { label: "Intermediario Solidario", icon: Handshake },
+    community_garden: { label: "Huerta Comunitaria", icon: Trees },
+    consumer_node: { label: "Nodo de Consumo", icon: ShoppingBasket },
+    individual_consumer: { label: "Consumidor/a", icon: User },
+    food_bank: { label: "Banco de Alimentos", icon: Apple },
+    consumer_cooperative: { label: "Coop. de Consumo", icon: HeartHandshake },
+    community_org: { label: "Org. Comunitaria", icon: Users },
+    health_food_store: { label: "Dietética", icon: Store },
+    agroecological_store: { label: "Almacén Agroecológico", icon: Store },
+    agroecological_fair: { label: "Feria Agroecológica", icon: ShoppingBasket },
+    agroecological_market: { label: "Mercado Agroecológico", icon: ShoppingBasket },
+    bio_input_supplier: { label: "Bio-insumos", icon: Carrot },
   };
 
   const certConfig: Record<CertLevel, { label: string; classes: string }> = {
@@ -107,12 +130,39 @@ const ActorsPage = () => {
   };
 
   const filtered = useMemo(() => {
-    return actors.filter((a) => {
+    return realActors.filter((a) => {
       if (activeType !== "all" && a.type !== activeType) return false;
-      if (search && !a.name.toLowerCase().includes(search.toLowerCase())) return false;
+      if (search) {
+        const q = search.toLowerCase();
+        if (!a.name.toLowerCase().includes(q) && !a.description.toLowerCase().includes(q) && !a.location.toLowerCase().includes(q)) return false;
+      }
       return true;
     });
   }, [search, activeType]);
+
+  useEffect(() => { setPage(1); }, [search, activeType]);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pageActors = useMemo(
+    () => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [filtered, page]
+  );
+
+  // Active types ordered by count, for nicer filter chips
+  const typeCounts = useMemo(() => {
+    const counts: Partial<Record<ActorType, number>> = {};
+    realActors.forEach(a => { counts[a.type] = (counts[a.type] || 0) + 1; });
+    return counts;
+  }, []);
+  const orderedTypes = useMemo(
+    () => (Object.keys(typeConfig) as ActorType[])
+      .filter(k => (typeCounts[k] || 0) > 0)
+      .sort((a, b) => (typeCounts[b] || 0) - (typeCounts[a] || 0)),
+    [typeCounts, typeConfig]
+  );
+
+  // Helpers to extract contact info from description text
+  const extractEmail = (s: string) => s.match(/[\w.+-]+@[\w-]+\.[\w.-]+/)?.[0];
+  const extractUrl = (s: string) => s.match(/https?:\/\/[^\s)<]+/)?.[0];
 
   useEffect(() => {
     supabase.from("spgs").select("*").then(({ data }) => {
@@ -162,7 +212,7 @@ const ActorsPage = () => {
               }`}
             >
               <Users className="h-4 w-4 inline mr-1.5" />
-              Red de Actores
+              Miembros de la Red
             </button>
             <button
               onClick={() => setActiveTab("spg")}
@@ -179,82 +229,112 @@ const ActorsPage = () => {
 
           {activeTab === "actors" && (
             <>
-              <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder={t("actors.search")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+              {/* Big search */}
+              <div className="max-w-3xl mx-auto mb-6">
+                <div className="relative group">
+                  <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-6 w-6 text-primary/70 group-focus-within:text-primary transition-colors" />
+                  <Input
+                    placeholder="Buscar por nombre, lugar o descripción..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="pl-14 h-14 text-base rounded-2xl border-2 border-border bg-card shadow-md focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary placeholder:text-muted-foreground/70"
+                  />
                 </div>
+                <p className="text-xs text-muted-foreground mt-2 text-center">
+                  <span className="font-semibold text-foreground">{filtered.length}</span> miembros{search && <> para "<span className="italic">{search}</span>"</>}
+                </p>
               </div>
 
-              <div className="flex flex-wrap gap-2 mb-8">
+              {/* Type filter chips */}
+              <div className="flex flex-wrap gap-2 justify-center mb-8">
                 <button onClick={() => setActiveType("all")}
-                  className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
-                    activeType === "all" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/40"
-                  }`}>{t("actors.all")}</button>
-                {(Object.entries(typeConfig) as [ActorType, typeof typeConfig.producer][]).map(([key, cfg]) => (
-                  <button key={key} onClick={() => setActiveType(key)}
-                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
-                      activeType === key ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/40"
-                    }`}>
-                    <cfg.icon className="h-3.5 w-3.5" />{cfg.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filtered.map((a, i) => {
-                  const cfg = typeConfig[a.type];
-                  const cert = certConfig[a.certification];
-                  const isProducer = a.type === "producer";
+                  className={`px-4 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                    activeType === "all" ? "border-primary bg-primary text-primary-foreground shadow-sm" : "border-border bg-card text-muted-foreground hover:border-primary/40"
+                  }`}>
+                  Todos <span className="opacity-70">· {realActors.length}</span>
+                </button>
+                {orderedTypes.map((key) => {
+                  const cfg = typeConfig[key];
                   return (
-                    <motion.div key={a.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: i * 0.05 }}
-                      className="rounded-xl border border-border bg-card p-6 hover:shadow-elevated transition-all duration-300">
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                          <cfg.icon className="h-6 w-6 text-primary" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-display text-lg text-card-foreground">{a.name}</h3>
-                          <div className="flex items-center gap-2 mt-1 flex-wrap">
-                            <Badge variant="secondary" className="text-[10px]">{cfg.label}</Badge>
-                            {isProducer && (
-                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${cert.classes}`}>
-                                <ShieldCheck className="h-3 w-3" />{cert.label}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      <p className="text-sm text-muted-foreground mt-3">{a.description}</p>
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-3">
-                        <MapPin className="h-3 w-3" /> {a.location}
-                      </div>
-
-                      {a.products.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-3">
-                          {a.products.map((p) => (<Badge key={p} variant="outline" className="text-[10px]">{p}</Badge>))}
-                        </div>
-                      )}
-
-                      <div className="flex items-center justify-between mt-4 pt-4 border-t border-border gap-2">
-                        <span className="text-xs text-muted-foreground">{t("actors.cap")}: {a.capacity}</span>
-                        <div className="flex items-center gap-2">
-                          {isProducer && a.spgId && (
-                            <Button size="sm" variant="outline" className="text-xs" onClick={() => setSelectedSpgId(a.spgId!)}>
-                              <Eye className="h-3 w-3 mr-1" /> SPG
-                            </Button>
-                          )}
-                          <Button size="sm" variant="outline" className="text-xs">
-                            <Mail className="h-3 w-3 mr-1" /> {t("actors.contact")}
-                          </Button>
-                        </div>
-                      </div>
-                    </motion.div>
+                    <button key={key} onClick={() => setActiveType(key)}
+                      className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                        activeType === key ? "border-primary bg-primary text-primary-foreground shadow-sm" : "border-border bg-card text-muted-foreground hover:border-primary/40"
+                      }`}>
+                      <cfg.icon className="h-3.5 w-3.5" />{cfg.label}
+                      <span className="opacity-70">· {typeCounts[key]}</span>
+                    </button>
                   );
                 })}
               </div>
+
+              {/* Cards grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                {pageActors.map((a, i) => {
+                  const cfg = typeConfig[a.type];
+                  const email = extractEmail(a.description);
+                  const url = extractUrl(a.description);
+                  return (
+                    <motion.article key={a.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: Math.min(i, 8) * 0.03 }}
+                      className="group relative rounded-2xl border border-border bg-card overflow-hidden hover:shadow-elevated hover:-translate-y-0.5 transition-all duration-300">
+                      <div className="h-1.5 bg-gradient-to-r from-primary via-leaf to-wheat" />
+                      <div className="p-5">
+                        <div className="flex items-start gap-3 mb-3">
+                          <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 ring-1 ring-primary/20">
+                            <cfg.icon className="h-5 w-5 text-primary" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-display text-base leading-tight text-card-foreground line-clamp-2">{a.name}</h3>
+                            <Badge variant="secondary" className="text-[10px] mt-1.5">{cfg.label}</Badge>
+                          </div>
+                        </div>
+
+                        {a.location && (
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
+                            <MapPin className="h-3 w-3 flex-shrink-0 text-primary/60" />
+                            <span className="truncate">{a.location}</span>
+                          </div>
+                        )}
+
+                        <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">{a.description}</p>
+
+                        {(email || url) && (
+                          <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-border">
+                            {email && (
+                              <a href={`mailto:${email}`} className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline font-medium">
+                                <Mail className="h-3 w-3" /> {email}
+                              </a>
+                            )}
+                            {url && (
+                              <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline font-medium">
+                                <ExternalLink className="h-3 w-3" /> Sitio
+                              </a>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </motion.article>
+                  );
+                })}
+                {pageActors.length === 0 && (
+                  <p className="col-span-full text-center text-sm text-muted-foreground py-12">Sin miembros que coincidan con la búsqueda.</p>
+                )}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-8">
+                  <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>
+                    <ChevronLeft className="h-4 w-4" /> Anterior
+                  </Button>
+                  <span className="text-xs text-muted-foreground px-3">
+                    Página <span className="font-semibold text-foreground">{page}</span> de {totalPages}
+                  </span>
+                  <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))}>
+                    Siguiente <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
             </>
           )}
 
