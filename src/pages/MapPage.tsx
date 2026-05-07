@@ -470,7 +470,7 @@ const MapPage = () => {
               Filtros
             </Button>
           )}
-          <div className="flex flex-col h-[calc(100vh-4rem)]">
+          <div className="flex flex-col min-h-[calc(100vh-4rem)]">
             {/* Big search bar */}
             <div className="px-4 sm:px-6 pt-4 pb-3 bg-gradient-to-b from-card/80 to-background border-b border-border">
               <div className="max-w-3xl mx-auto">
@@ -543,7 +543,7 @@ const MapPage = () => {
               )}
             </div>
 
-            <div ref={mapContainerRef} className="flex-1 w-full z-0" />
+            <div ref={mapContainerRef} className="flex-1 w-full z-0 min-h-[600px]" />
           </div>
         </div>
       </div>
