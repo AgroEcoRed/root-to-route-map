@@ -10,13 +10,23 @@ import {
 import {
   Search, MapPin, Sprout, Users, Heart, UtensilsCrossed,
   Store, Building2, Truck, Factory, ShieldCheck, Mail,
-  ClipboardCheck, Droplets, Leaf, FlaskConical, Eye, FileText, ExternalLink
+  ClipboardCheck, Droplets, Leaf, FlaskConical, Eye, FileText, ExternalLink,
+  Recycle, Microscope, Handshake, Trees, ShoppingBasket, User, HeartHandshake,
+  Network, Apple, Carrot, ChevronLeft, ChevronRight
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import rutasSanas from "@/data/rutasSanas.json";
 
-type ActorType = "producer" | "cooperative" | "social_kitchen" | "restaurant" | "retail" | "institution" | "logistics" | "processing";
+type ActorType =
+  | "producer" | "cooperative" | "social_kitchen" | "restaurant" | "retail"
+  | "institution" | "logistics" | "processing"
+  | "agroecological_node" | "seed_bank" | "composting_center" | "research_center"
+  | "solidarity_intermediary" | "community_garden" | "consumer_node"
+  | "individual_consumer" | "food_bank" | "consumer_cooperative" | "community_org"
+  | "health_food_store" | "agroecological_store" | "agroecological_fair"
+  | "agroecological_market" | "bio_input_supplier";
 type CertLevel = "red" | "yellow" | "green" | "none_spg";
 
 interface Actor {
@@ -24,11 +34,7 @@ interface Actor {
   name: string;
   type: ActorType;
   location: string;
-  certification: CertLevel;
   description: string;
-  products: string[];
-  capacity: string;
-  spgId?: string;
 }
 
 interface SPG {
@@ -57,19 +63,18 @@ const evalTypeIcons: Record<string, typeof Droplets> = {
   condiciones_laborales: Users,
 };
 
-const actors: Actor[] = [
-  { id: 1, name: "Finca La Esperanza", type: "producer", location: "La Plata, Buenos Aires", certification: "green", description: "Producción agroecológica familiar en 5 hectáreas con rotación de cultivos y manejo integrado.", products: ["Tomate", "Lechuga", "Acelga"], capacity: "2 ton/mes", spgId: "a1111111-1111-1111-1111-111111111111" },
-  { id: 2, name: "Cooperativa Del Sol", type: "cooperative", location: "Florencio Varela", certification: "green", description: "15 familias productoras asociadas para comercialización conjunta.", products: ["Miel", "Frutas", "Conservas"], capacity: "5 ton/mes" },
-  { id: 3, name: "Comedor Los Pibes", type: "social_kitchen", location: "La Matanza", certification: "yellow", description: "Comedor comunitario que sirve 200 raciones diarias.", products: ["Verduras", "Legumbres"], capacity: "200 raciones/día" },
-  { id: 4, name: "Restaurante Raíz", type: "restaurant", location: "CABA, Palermo", certification: "yellow", description: "Restaurante de autor con menú 100% origen local.", products: ["Verduras de hoja", "Huevos"], capacity: "80 cubiertos/día" },
-  { id: 5, name: "Almacén Natural", type: "retail", location: "CABA, Caballito", certification: "green", description: "Dietética y almacén de productos agroecológicos.", products: ["Harinas", "Conservas", "Lácteos"], capacity: "Retail" },
-  { id: 6, name: "Escuela N°42", type: "institution", location: "Quilmes", certification: "red", description: "Comedor escolar para 350 alumnos.", products: ["Frutas", "Verduras"], capacity: "350 raciones/día" },
-  { id: 7, name: "Transporte El Surco", type: "logistics", location: "Avellaneda", certification: "yellow", description: "Fletes refrigerados para alimentos frescos.", products: [], capacity: "3 camiones" },
-  { id: 8, name: "Molino Agroeco", type: "processing", location: "Luján", certification: "green", description: "Molienda artesanal de cereales agroecológicos.", products: ["Harina de trigo", "Harina de maíz"], capacity: "2 ton/día" },
-  { id: 9, name: "Granja El Retiro", type: "producer", location: "San Vicente", certification: "yellow", description: "Granja integral con animales a campo y huerta. En transición agroecológica.", products: ["Huevos", "Pollo", "Cerdos"], capacity: "500 docenas/mes", spgId: "b2222222-2222-2222-2222-222222222222" },
-  { id: 10, name: "Coop. Tierra Viva", type: "cooperative", location: "Cañuelas", certification: "green", description: "Cooperativa de la agricultura familiar periurbana.", products: ["Verduras", "Plantines", "Semillas"], capacity: "8 ton/mes" },
-  { id: 11, name: "Huerta Orgánica Raíces", type: "producer", location: "Marcos Paz", certification: "none_spg", description: "Producción agroecológica sin participación en SPG. Aplica técnicas de permacultura.", products: ["Aromáticas", "Tomate", "Zapallito"], capacity: "1 ton/mes" },
-];
+// Real members imported from "Mapa de las Rutas Sanas del Alimento"
+const realActors: Actor[] = (rutasSanas as Array<{n:string;lat:number;lng:number;t:string;f:string;d:string}>).map((p, i) => {
+  // Extract a short location heuristically (first comma-separated chunk of d, fallback to f)
+  const locGuess = (p.d || "").split(/[-–|]/)[0].trim().split(",").slice(0, 2).join(",").slice(0, 60);
+  return {
+    id: i + 1,
+    name: p.n,
+    type: p.t as ActorType,
+    location: locGuess || p.f || "—",
+    description: p.d || p.f || "",
+  };
+});
 
 const knownSpgs = [
   { name: "SPG FCAL-UNER", region: "Entre Ríos", description: "Sistema Participativo de Garantía de la Facultad de Ciencias de la Alimentación de la Universidad Nacional de Entre Ríos.", url: "https://www.fcal.uner.edu.ar/spg/" },
@@ -97,6 +102,22 @@ const ActorsPage = () => {
     institution: { label: t("actor.institution"), icon: Building2 },
     logistics: { label: t("actor.logistics"), icon: Truck },
     processing: { label: t("actor.processing"), icon: Factory },
+    agroecological_node: { label: "Nodo Agroecológico", icon: Network },
+    seed_bank: { label: "Banco de Semillas", icon: Sprout },
+    composting_center: { label: "Centro de Compostaje", icon: Recycle },
+    research_center: { label: "Centro de Investigación", icon: Microscope },
+    solidarity_intermediary: { label: "Intermediario Solidario", icon: Handshake },
+    community_garden: { label: "Huerta Comunitaria", icon: Trees },
+    consumer_node: { label: "Nodo de Consumo", icon: ShoppingBasket },
+    individual_consumer: { label: "Consumidor/a", icon: User },
+    food_bank: { label: "Banco de Alimentos", icon: Apple },
+    consumer_cooperative: { label: "Coop. de Consumo", icon: HeartHandshake },
+    community_org: { label: "Org. Comunitaria", icon: Users },
+    health_food_store: { label: "Dietética", icon: Store },
+    agroecological_store: { label: "Almacén Agroecológico", icon: Store },
+    agroecological_fair: { label: "Feria Agroecológica", icon: ShoppingBasket },
+    agroecological_market: { label: "Mercado Agroecológico", icon: ShoppingBasket },
+    bio_input_supplier: { label: "Bio-insumos", icon: Carrot },
   };
 
   const certConfig: Record<CertLevel, { label: string; classes: string }> = {
@@ -107,9 +128,12 @@ const ActorsPage = () => {
   };
 
   const filtered = useMemo(() => {
-    return actors.filter((a) => {
+    return realActors.filter((a) => {
       if (activeType !== "all" && a.type !== activeType) return false;
-      if (search && !a.name.toLowerCase().includes(search.toLowerCase())) return false;
+      if (search) {
+        const q = search.toLowerCase();
+        if (!a.name.toLowerCase().includes(q) && !a.description.toLowerCase().includes(q) && !a.location.toLowerCase().includes(q)) return false;
+      }
       return true;
     });
   }, [search, activeType]);
