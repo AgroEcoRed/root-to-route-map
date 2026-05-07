@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage, Lang } from "@/contexts/LanguageContext";
 import { motion, AnimatePresence } from "framer-motion";
-import logo from "@/assets/logo.png";
+import AnimatedLogo from "@/components/AnimatedLogo";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -63,8 +63,12 @@ const Navbar = () => {
     >
       <div className="container flex items-center justify-between h-16">
         <Link to="/" className="flex items-center gap-2 group">
-          <img src={logo} alt="MercadoAgroecológico" className="h-9 w-9 transition-transform group-hover:scale-110" />
-          <span className={`font-display text-xl ${navbarScrolled ? "text-foreground" : "text-white"}`}>Red<span className="text-wheat">AgroEco</span> <span className="text-xs opacity-60">(RAE)</span></span>
+          <div className="transition-transform group-hover:scale-110">
+            <AnimatedLogo size={36} />
+          </div>
+          <span className={`font-display text-xl ${navbarScrolled ? "text-foreground" : "text-white"}`}>
+            AgroEco<span className="text-wheat">.Red</span>
+          </span>
         </Link>
 
         {/* Desktop */}
