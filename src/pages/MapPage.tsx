@@ -113,9 +113,9 @@ const roleLabels: Record<ActorRole, string> = {
 };
 
 const roleColors: Record<ActorRole, string> = {
-  oferta: "#2d6a4f",
-  demanda: "#c0392b",
-  servicio: "#f4a261",
+  oferta: "#2563eb",
+  demanda: "#9333ea",
+  servicio: "#ea580c",
 };
 
 const roleBgClasses: Record<ActorRole, string> = {
