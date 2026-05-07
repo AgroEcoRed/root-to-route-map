@@ -92,6 +92,8 @@ const ActorsPage = () => {
   const [spgEvals, setSpgEvals] = useState<SPGEvaluation[]>([]);
   const [loadingSpg, setLoadingSpg] = useState(false);
   const [dbSpgs, setDbSpgs] = useState<SPG[]>([]);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 12;
 
   const typeConfig: Record<ActorType, { label: string; icon: typeof Sprout }> = {
     producer: { label: t("actor.producer"), icon: Sprout },
@@ -137,6 +139,30 @@ const ActorsPage = () => {
       return true;
     });
   }, [search, activeType]);
+
+  useEffect(() => { setPage(1); }, [search, activeType]);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pageActors = useMemo(
+    () => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [filtered, page]
+  );
+
+  // Active types ordered by count, for nicer filter chips
+  const typeCounts = useMemo(() => {
+    const counts: Partial<Record<ActorType, number>> = {};
+    realActors.forEach(a => { counts[a.type] = (counts[a.type] || 0) + 1; });
+    return counts;
+  }, []);
+  const orderedTypes = useMemo(
+    () => (Object.keys(typeConfig) as ActorType[])
+      .filter(k => (typeCounts[k] || 0) > 0)
+      .sort((a, b) => (typeCounts[b] || 0) - (typeCounts[a] || 0)),
+    [typeCounts, typeConfig]
+  );
+
+  // Helpers to extract contact info from description text
+  const extractEmail = (s: string) => s.match(/[\w.+-]+@[\w-]+\.[\w.-]+/)?.[0];
+  const extractUrl = (s: string) => s.match(/https?:\/\/[^\s)<]+/)?.[0];
 
   useEffect(() => {
     supabase.from("spgs").select("*").then(({ data }) => {
