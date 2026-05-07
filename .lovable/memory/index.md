@@ -1,9 +1,11 @@
-# RedAgroEco (RAE) - Design System & Architecture
+# AgroEco.Red - Design System & Architecture
 
 ## Branding
-- Name: RedAgroEco (RAE) — previously MercadoAgroecológico
+- Name: AgroEco.Red — previously RedAgroEco / MercadoAgroecológico
+- Animated logo: src/components/AnimatedLogo.tsx (network nodes + leaf, framer-motion SVG)
 - Use "sistema alimentario" instead of "cadena"
 - "Marketplace" → "Mercado Agroecológico" / "Accedé al Mercado Agroecológico"
+- Equinoxia agency removed from footer (no longer collaborator)
 
 ## Colors (HSL)
 - Primary: 152 45% 28% (deep green)
