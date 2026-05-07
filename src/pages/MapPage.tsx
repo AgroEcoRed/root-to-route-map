@@ -509,13 +509,13 @@ const MapPage = () => {
                       key={a.id}
                       onClick={() => mapRef.current?.setView([a.lat, a.lng], 15)}
                       className={`text-left p-2.5 rounded-lg border border-border bg-card hover:shadow-md hover:-translate-y-0.5 transition-all border-l-4 ${
-                        role === "oferta" ? "border-l-primary" : role === "demanda" ? "border-l-destructive" : "border-l-wheat"
+                        role === "oferta" ? "border-l-map-oferta" : role === "demanda" ? "border-l-map-demanda" : "border-l-map-servicio"
                       }`}
                     >
                       <p className="text-xs font-semibold text-foreground truncate">{a.name}</p>
                       <div className="flex items-center gap-1.5 mt-1">
                         <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${
-                          role === "oferta" ? "bg-primary/10 text-primary" : role === "demanda" ? "bg-destructive/10 text-destructive" : "bg-wheat/10 text-wheat"
+                          role === "oferta" ? "bg-map-oferta/10 text-map-oferta" : role === "demanda" ? "bg-map-demanda/10 text-map-demanda" : "bg-map-servicio/10 text-map-servicio"
                         }`}>
                           {roleLabels[role]}
                         </span>
