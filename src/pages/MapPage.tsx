@@ -383,79 +383,81 @@ const MapPage = () => {
             </div>
 
             {showFilters && (
-              <div className="rounded-xl border border-border bg-card/60 backdrop-blur p-3 sm:p-4 space-y-3 shadow-card">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div>
-                    <p className="text-xs font-semibold text-map-oferta mb-1.5 flex items-center gap-1">
-                      <ArrowUp className="h-3 w-3" /> Oferta
-                    </p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {ofertaTypes.map((key) => (
-                        <button key={key} onClick={() => toggleType(key)}
-                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors ${
-                            activeTypes.has(key)
-                              ? "border-map-oferta bg-map-oferta text-map-oferta-foreground"
-                              : "border-border bg-background text-muted-foreground hover:border-map-oferta/40"
-                          }`}>
-                          {actorTypeLabels[key]}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-map-demanda mb-1.5 flex items-center gap-1">
-                      <ArrowDown className="h-3 w-3" /> Demanda
-                    </p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {demandaTypes.map((key) => (
-                        <button key={key} onClick={() => toggleType(key)}
-                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors ${
-                            activeTypes.has(key)
-                              ? "border-map-demanda bg-map-demanda text-map-demanda-foreground"
-                              : "border-border bg-background text-muted-foreground hover:border-map-demanda/40"
-                          }`}>
-                          {actorTypeLabels[key]}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-xs font-semibold text-map-servicio mb-1.5 flex items-center gap-1">
-                        <Minus className="h-3 w-3" /> Servicio
-                      </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {servicioTypes.map((key) => (
-                          <button key={key} onClick={() => toggleType(key)}
-                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors ${
-                              activeTypes.has(key)
-                                ? "border-map-servicio bg-map-servicio text-map-servicio-foreground"
-                                : "border-border bg-background text-muted-foreground hover:border-map-servicio/40"
-                            }`}>
+              <div className="flex flex-wrap items-center gap-2">
+                {([
+                  { role: "oferta" as ActorRole, label: "Oferta", icon: <ArrowUp className="h-3 w-3" />, types: ofertaTypes, color: "map-oferta" },
+                  { role: "demanda" as ActorRole, label: "Demanda", icon: <ArrowDown className="h-3 w-3" />, types: demandaTypes, color: "map-demanda" },
+                  { role: "servicio" as ActorRole, label: "Servicio", icon: <Minus className="h-3 w-3" />, types: servicioTypes, color: "map-servicio" },
+                ]).map(({ role, label, icon, types, color }) => {
+                  const activeCount = types.filter(t => activeTypes.has(t)).length;
+                  return (
+                    <DropdownMenu key={role}>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className={`rounded-full text-xs h-8 border-${color}/40 text-${color} hover:bg-${color}/10`}>
+                          {icon}
+                          <span className="ml-1.5">{label}</span>
+                          <span className="ml-1.5 text-[10px] opacity-70">({activeCount}/{types.length})</span>
+                          <ChevronDown className="h-3 w-3 ml-1 opacity-60" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="max-h-80 overflow-y-auto w-64 bg-popover z-[1000]">
+                        <DropdownMenuLabel className="text-xs flex items-center justify-between">
+                          <span>{label}</span>
+                          <button
+                            className="text-[10px] text-primary hover:underline font-normal"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setActiveTypes(prev => {
+                                const next = new Set(prev);
+                                const allOn = types.every(t => next.has(t));
+                                types.forEach(t => allOn ? next.delete(t) : next.add(t));
+                                return next;
+                              });
+                            }}
+                          >
+                            {types.every(t => activeTypes.has(t)) ? "Quitar todos" : "Seleccionar todos"}
+                          </button>
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {types.map((key) => (
+                          <DropdownMenuCheckboxItem
+                            key={key}
+                            checked={activeTypes.has(key)}
+                            onCheckedChange={() => toggleType(key)}
+                            onSelect={(e) => e.preventDefault()}
+                            className="text-xs"
+                          >
                             {actorTypeLabels[key]}
-                          </button>
+                          </DropdownMenuCheckboxItem>
                         ))}
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold text-muted-foreground mb-1.5">Certificación</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {(["green", "yellow", "red"] as const).map((c) => (
-                          <button key={c} onClick={() => toggleCert(c)}
-                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors cursor-pointer ${
-                              activeCerts.has(c)
-                                ? c === "green" ? "bg-primary text-primary-foreground border-primary" : c === "yellow" ? "bg-wheat text-wheat-foreground border-wheat" : "bg-destructive text-destructive-foreground border-destructive"
-                                : "border-border bg-background text-muted-foreground opacity-50"
-                            }`}>
-                            {certLabels[c]}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/60">
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Leyenda:</span>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  );
+                })}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="rounded-full text-xs h-8">
+                      Certificación
+                      <span className="ml-1.5 text-[10px] opacity-70">({activeCerts.size}/3)</span>
+                      <ChevronDown className="h-3 w-3 ml-1 opacity-60" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="bg-popover z-[1000]">
+                    {(["green", "yellow", "red"] as const).map((c) => (
+                      <DropdownMenuCheckboxItem
+                        key={c}
+                        checked={activeCerts.has(c)}
+                        onCheckedChange={() => toggleCert(c)}
+                        onSelect={(e) => e.preventDefault()}
+                        className="text-xs"
+                      >
+                        <span className={`inline-block w-2 h-2 rounded-full mr-2 ${c === "green" ? "bg-primary" : c === "yellow" ? "bg-wheat" : "bg-destructive"}`} />
+                        {certLabels[c]}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <div className="ml-auto flex flex-wrap items-center gap-1.5">
                   <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-map-oferta/15 text-map-oferta text-[10px] font-medium">▲ Oferta</span>
                   <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-map-demanda/15 text-map-demanda text-[10px] font-medium">▼ Demanda</span>
                   <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-map-servicio/15 text-map-servicio text-[10px] font-medium">● Servicio</span>
@@ -468,51 +470,6 @@ const MapPage = () => {
         {/* Map area */}
         <div className="flex-1 min-h-0 relative flex flex-col">
           <div ref={mapContainerRef} className="w-full z-0 flex-1 min-h-[300px]" />
-
-          {/* Floating paginated actor list */}
-          {pagedActors.length > 0 && (
-            <div className="absolute bottom-3 left-3 right-3 z-[500] pointer-events-none">
-              <div className="max-w-5xl mx-auto pointer-events-auto rounded-xl border border-border bg-card/95 backdrop-blur shadow-elevated p-2.5">
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-                {pagedActors.map((a) => {
-                  const role = actorRole[a.type];
-                  return (
-                    <button
-                      key={a.id}
-                      onClick={() => mapRef.current?.setView([a.lat, a.lng], 15)}
-                      className={`text-left p-2 rounded-lg border border-border bg-background hover:shadow-md hover:-translate-y-0.5 transition-all border-l-4 ${
-                        role === "oferta" ? "border-l-map-oferta" : role === "demanda" ? "border-l-map-demanda" : "border-l-map-servicio"
-                      }`}
-                    >
-                      <p className="text-[11px] font-semibold text-foreground truncate">{a.name}</p>
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${
-                          role === "oferta" ? "bg-map-oferta/10 text-map-oferta" : role === "demanda" ? "bg-map-demanda/10 text-map-demanda" : "bg-map-servicio/10 text-map-servicio"
-                        }`}>
-                          {roleLabels[role]}
-                        </span>
-                        <p className="text-[9px] text-muted-foreground truncate">{actorTypeLabels[a.type]}</p>
-                      </div>
-                    </button>
-                  );
-                })}
-                </div>
-                {totalPages > 1 && (
-                  <div className="flex items-center justify-center gap-2 mt-2">
-                    <Button variant="outline" size="sm" className="h-7 text-xs" disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>
-                      Anterior
-                    </Button>
-                    <span className="text-[11px] text-muted-foreground px-1">
-                      <span className="font-semibold text-foreground">{page}</span> / {totalPages}
-                    </span>
-                    <Button variant="outline" size="sm" className="h-7 text-xs" disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))}>
-                      Siguiente
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
