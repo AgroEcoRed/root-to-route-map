@@ -231,7 +231,16 @@ const ServicesPage = () => {
                         </a>
                       ))}
                     </div>
+                    <Link to="/programas" className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+                      Ver todos los programas <ArrowRight className="h-4 w-4" />
+                    </Link>
                   </div>
+                )}
+
+                {cat.id === "knowledge" && (
+                  <Link to="/biblioteca" className="mt-4 flex items-center gap-2 text-sm font-medium text-primary hover:underline">
+                    Ir a la biblioteca <ArrowRight className="h-4 w-4" />
+                  </Link>
                 )}
 
                 {/* Link to map for postharvest */}
