@@ -229,82 +229,112 @@ const ActorsPage = () => {
 
           {activeTab === "actors" && (
             <>
-              <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder={t("actors.search")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+              {/* Big search */}
+              <div className="max-w-3xl mx-auto mb-6">
+                <div className="relative group">
+                  <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-6 w-6 text-primary/70 group-focus-within:text-primary transition-colors" />
+                  <Input
+                    placeholder="Buscar por nombre, lugar o descripción..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="pl-14 h-14 text-base rounded-2xl border-2 border-border bg-card shadow-md focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary placeholder:text-muted-foreground/70"
+                  />
                 </div>
+                <p className="text-xs text-muted-foreground mt-2 text-center">
+                  <span className="font-semibold text-foreground">{filtered.length}</span> miembros{search && <> para "<span className="italic">{search}</span>"</>}
+                </p>
               </div>
 
-              <div className="flex flex-wrap gap-2 mb-8">
+              {/* Type filter chips */}
+              <div className="flex flex-wrap gap-2 justify-center mb-8">
                 <button onClick={() => setActiveType("all")}
-                  className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
-                    activeType === "all" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/40"
-                  }`}>{t("actors.all")}</button>
-                {(Object.entries(typeConfig) as [ActorType, typeof typeConfig.producer][]).map(([key, cfg]) => (
-                  <button key={key} onClick={() => setActiveType(key)}
-                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
-                      activeType === key ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:border-primary/40"
-                    }`}>
-                    <cfg.icon className="h-3.5 w-3.5" />{cfg.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filtered.map((a, i) => {
-                  const cfg = typeConfig[a.type];
-                  const cert = certConfig[a.certification];
-                  const isProducer = a.type === "producer";
+                  className={`px-4 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                    activeType === "all" ? "border-primary bg-primary text-primary-foreground shadow-sm" : "border-border bg-card text-muted-foreground hover:border-primary/40"
+                  }`}>
+                  Todos <span className="opacity-70">· {realActors.length}</span>
+                </button>
+                {orderedTypes.map((key) => {
+                  const cfg = typeConfig[key];
                   return (
-                    <motion.div key={a.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: i * 0.05 }}
-                      className="rounded-xl border border-border bg-card p-6 hover:shadow-elevated transition-all duration-300">
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                          <cfg.icon className="h-6 w-6 text-primary" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-display text-lg text-card-foreground">{a.name}</h3>
-                          <div className="flex items-center gap-2 mt-1 flex-wrap">
-                            <Badge variant="secondary" className="text-[10px]">{cfg.label}</Badge>
-                            {isProducer && (
-                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${cert.classes}`}>
-                                <ShieldCheck className="h-3 w-3" />{cert.label}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      <p className="text-sm text-muted-foreground mt-3">{a.description}</p>
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-3">
-                        <MapPin className="h-3 w-3" /> {a.location}
-                      </div>
-
-                      {a.products.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-3">
-                          {a.products.map((p) => (<Badge key={p} variant="outline" className="text-[10px]">{p}</Badge>))}
-                        </div>
-                      )}
-
-                      <div className="flex items-center justify-between mt-4 pt-4 border-t border-border gap-2">
-                        <span className="text-xs text-muted-foreground">{t("actors.cap")}: {a.capacity}</span>
-                        <div className="flex items-center gap-2">
-                          {isProducer && a.spgId && (
-                            <Button size="sm" variant="outline" className="text-xs" onClick={() => setSelectedSpgId(a.spgId!)}>
-                              <Eye className="h-3 w-3 mr-1" /> SPG
-                            </Button>
-                          )}
-                          <Button size="sm" variant="outline" className="text-xs">
-                            <Mail className="h-3 w-3 mr-1" /> {t("actors.contact")}
-                          </Button>
-                        </div>
-                      </div>
-                    </motion.div>
+                    <button key={key} onClick={() => setActiveType(key)}
+                      className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                        activeType === key ? "border-primary bg-primary text-primary-foreground shadow-sm" : "border-border bg-card text-muted-foreground hover:border-primary/40"
+                      }`}>
+                      <cfg.icon className="h-3.5 w-3.5" />{cfg.label}
+                      <span className="opacity-70">· {typeCounts[key]}</span>
+                    </button>
                   );
                 })}
               </div>
+
+              {/* Cards grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                {pageActors.map((a, i) => {
+                  const cfg = typeConfig[a.type];
+                  const email = extractEmail(a.description);
+                  const url = extractUrl(a.description);
+                  return (
+                    <motion.article key={a.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: Math.min(i, 8) * 0.03 }}
+                      className="group relative rounded-2xl border border-border bg-card overflow-hidden hover:shadow-elevated hover:-translate-y-0.5 transition-all duration-300">
+                      <div className="h-1.5 bg-gradient-to-r from-primary via-leaf to-wheat" />
+                      <div className="p-5">
+                        <div className="flex items-start gap-3 mb-3">
+                          <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 ring-1 ring-primary/20">
+                            <cfg.icon className="h-5 w-5 text-primary" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-display text-base leading-tight text-card-foreground line-clamp-2">{a.name}</h3>
+                            <Badge variant="secondary" className="text-[10px] mt-1.5">{cfg.label}</Badge>
+                          </div>
+                        </div>
+
+                        {a.location && (
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
+                            <MapPin className="h-3 w-3 flex-shrink-0 text-primary/60" />
+                            <span className="truncate">{a.location}</span>
+                          </div>
+                        )}
+
+                        <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">{a.description}</p>
+
+                        {(email || url) && (
+                          <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-border">
+                            {email && (
+                              <a href={`mailto:${email}`} className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline font-medium">
+                                <Mail className="h-3 w-3" /> {email}
+                              </a>
+                            )}
+                            {url && (
+                              <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline font-medium">
+                                <ExternalLink className="h-3 w-3" /> Sitio
+                              </a>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </motion.article>
+                  );
+                })}
+                {pageActors.length === 0 && (
+                  <p className="col-span-full text-center text-sm text-muted-foreground py-12">Sin miembros que coincidan con la búsqueda.</p>
+                )}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-8">
+                  <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>
+                    <ChevronLeft className="h-4 w-4" /> Anterior
+                  </Button>
+                  <span className="text-xs text-muted-foreground px-3">
+                    Página <span className="font-semibold text-foreground">{page}</span> de {totalPages}
+                  </span>
+                  <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))}>
+                    Siguiente <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
             </>
           )}
 
