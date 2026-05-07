@@ -345,148 +345,10 @@ const MapPage = () => {
   return (
     <div className="h-screen overflow-hidden bg-background flex flex-col">
       <Navbar />
-      <div className="flex-1 min-h-0 pt-16 flex flex-col lg:flex-row">
-        {/* Sidebar filters */}
-        <aside className={`${showFilters ? "w-full lg:w-80" : "w-0 overflow-hidden"} transition-all duration-300 border-r border-border bg-card flex-shrink-0 lg:h-full lg:overflow-y-auto`}>
-          <div className="p-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="font-display text-lg text-card-foreground">Filtros</h2>
-              <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setShowFilters(false)}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* How-to guide */}
-            <div className="p-3 rounded-lg border border-primary/20 bg-primary/5 space-y-2">
-              <p className="text-xs font-semibold text-primary uppercase tracking-wider">¿Cómo funciona?</p>
-              <ol className="text-xs text-muted-foreground space-y-1.5 list-decimal pl-4 marker:text-primary marker:font-bold">
-                <li>Usá los filtros para mostrar u ocultar tipos de actores.</li>
-                <li>Hacé clic en un marcador para ver sus datos y productos.</li>
-                <li>Desde el popup podés ir al mercado para contactarlo.</li>
-                <li>
-                  <span className="block">Colores de rol:</span>
-                  <span className="mt-1 flex flex-wrap gap-1">
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-map-oferta/15 text-map-oferta text-[10px] font-medium">▲ Oferta</span>
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-map-demanda/15 text-map-demanda text-[10px] font-medium">▼ Demanda</span>
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-map-servicio/15 text-map-servicio text-[10px] font-medium">● Servicio</span>
-                  </span>
-                </li>
-              </ol>
-            </div>
-
-            {/* Legend */}
-            <div className="p-3 rounded-lg border border-border bg-muted/30 space-y-2">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Leyenda</p>
-              <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-sm bg-map-oferta flex items-center justify-center text-[10px] text-map-oferta-foreground font-bold">▲</span>
-                <span className="text-xs text-foreground font-medium">Oferta</span>
-                <span className="text-xs text-muted-foreground">— Vende productos</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-sm bg-map-demanda flex items-center justify-center text-[10px] text-map-demanda-foreground font-bold">▼</span>
-                <span className="text-xs text-foreground font-medium">Demanda</span>
-                <span className="text-xs text-muted-foreground">— Compra productos</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-map-servicio flex items-center justify-center text-[10px] text-map-servicio-foreground font-bold">●</span>
-                <span className="text-xs text-foreground font-medium">Servicio</span>
-                <span className="text-xs text-muted-foreground">— Logística</span>
-              </div>
-            </div>
-
-            {/* Oferta types */}
-            <div>
-              <p className="text-sm font-medium text-map-oferta mb-2 flex items-center gap-1">
-                <ArrowUp className="h-3.5 w-3.5" /> Oferta
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {ofertaTypes.map((key) => (
-                  <button key={key} onClick={() => toggleType(key)}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                      activeTypes.has(key)
-                        ? "border-map-oferta bg-map-oferta text-map-oferta-foreground"
-                        : "border-border bg-background text-muted-foreground hover:border-map-oferta/40"
-                    }`}>
-                    {actorTypeLabels[key]}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Demanda types */}
-            <div>
-              <p className="text-sm font-medium text-map-demanda mb-2 flex items-center gap-1">
-                <ArrowDown className="h-3.5 w-3.5" /> Demanda
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {demandaTypes.map((key) => (
-                  <button key={key} onClick={() => toggleType(key)}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                      activeTypes.has(key)
-                        ? "border-map-demanda bg-map-demanda text-map-demanda-foreground"
-                        : "border-border bg-background text-muted-foreground hover:border-map-demanda/40"
-                    }`}>
-                    {actorTypeLabels[key]}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Servicio types */}
-            <div>
-              <p className="text-sm font-medium text-map-servicio mb-2 flex items-center gap-1">
-                <Minus className="h-3.5 w-3.5" /> Servicio
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {servicioTypes.map((key) => (
-                  <button key={key} onClick={() => toggleType(key)}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                      activeTypes.has(key)
-                        ? "border-map-servicio bg-map-servicio text-map-servicio-foreground"
-                        : "border-border bg-background text-muted-foreground hover:border-map-servicio/40"
-                    }`}>
-                    {actorTypeLabels[key]}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-sm font-medium text-muted-foreground mb-2">Certificación</p>
-              <div className="flex gap-2">
-                {(["green", "yellow", "red"] as const).map((c) => (
-                  <button key={c} onClick={() => toggleCert(c)}
-                    className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
-                      activeCerts.has(c)
-                        ? c === "green" ? "bg-primary text-primary-foreground border-primary" : c === "yellow" ? "bg-wheat text-wheat-foreground border-wheat" : "bg-destructive text-destructive-foreground border-destructive"
-                        : "border-border bg-background text-muted-foreground opacity-50"
-                    }`}>
-                    {certLabels[c]}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-          </div>
-        </aside>
-
-        {/* Map */}
-        <div className="flex-1 min-h-0 relative flex flex-col">
-          {!showFilters && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="absolute top-4 left-4 z-[1000] bg-card shadow-card"
-              onClick={() => setShowFilters(true)}
-            >
-              <Filter className="h-4 w-4 mr-1" />
-              Filtros
-            </Button>
-          )}
-          <div className="flex flex-col flex-1 min-h-0">
-            {/* Big search bar */}
-            <div className="px-4 sm:px-6 pt-4 pb-3 bg-gradient-to-b from-card/80 to-background border-b border-border">
-              <div className="max-w-3xl mx-auto">
+      <div className="flex-1 min-h-0 pt-16 flex flex-col">
+        {/* Top toolbar: search + filters toggle */}
+        <div className="px-4 sm:px-6 pt-4 pb-3 bg-gradient-to-b from-card/80 to-background border-b border-border">
+          <div className="max-w-5xl mx-auto space-y-3">
                 <div className="relative group">
                   <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-6 w-6 text-primary/70 group-focus-within:text-primary transition-colors" />
                   <Input
@@ -505,59 +367,153 @@ const MapPage = () => {
                     </button>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground mt-2 text-center">
-                  <span className="font-semibold text-foreground">{filtered.length}</span> actores encontrados
-                  {search && <> para "<span className="italic">{search}</span>"</>}
-                </p>
-              </div>
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <p className="text-xs text-muted-foreground">
+                <span className="font-semibold text-foreground">{filtered.length}</span> actores encontrados
+                {search && <> para "<span className="italic">{search}</span>"</>}
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFilters(s => !s)}
+                className="rounded-full"
+              >
+                <Filter className="h-4 w-4 mr-1.5" />
+                {showFilters ? "Ocultar filtros" : "Mostrar filtros"}
+              </Button>
             </div>
 
-            {/* Paginated actor list above map */}
-            <div className="px-4 sm:px-6 py-3 bg-background border-b border-border">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+            {showFilters && (
+              <div className="rounded-xl border border-border bg-card/60 backdrop-blur p-3 sm:p-4 space-y-3 shadow-card">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <p className="text-xs font-semibold text-map-oferta mb-1.5 flex items-center gap-1">
+                      <ArrowUp className="h-3 w-3" /> Oferta
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {ofertaTypes.map((key) => (
+                        <button key={key} onClick={() => toggleType(key)}
+                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors ${
+                            activeTypes.has(key)
+                              ? "border-map-oferta bg-map-oferta text-map-oferta-foreground"
+                              : "border-border bg-background text-muted-foreground hover:border-map-oferta/40"
+                          }`}>
+                          {actorTypeLabels[key]}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-map-demanda mb-1.5 flex items-center gap-1">
+                      <ArrowDown className="h-3 w-3" /> Demanda
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {demandaTypes.map((key) => (
+                        <button key={key} onClick={() => toggleType(key)}
+                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors ${
+                            activeTypes.has(key)
+                              ? "border-map-demanda bg-map-demanda text-map-demanda-foreground"
+                              : "border-border bg-background text-muted-foreground hover:border-map-demanda/40"
+                          }`}>
+                          {actorTypeLabels[key]}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-xs font-semibold text-map-servicio mb-1.5 flex items-center gap-1">
+                        <Minus className="h-3 w-3" /> Servicio
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {servicioTypes.map((key) => (
+                          <button key={key} onClick={() => toggleType(key)}
+                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors ${
+                              activeTypes.has(key)
+                                ? "border-map-servicio bg-map-servicio text-map-servicio-foreground"
+                                : "border-border bg-background text-muted-foreground hover:border-map-servicio/40"
+                            }`}>
+                            {actorTypeLabels[key]}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-muted-foreground mb-1.5">Certificación</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {(["green", "yellow", "red"] as const).map((c) => (
+                          <button key={c} onClick={() => toggleCert(c)}
+                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors cursor-pointer ${
+                              activeCerts.has(c)
+                                ? c === "green" ? "bg-primary text-primary-foreground border-primary" : c === "yellow" ? "bg-wheat text-wheat-foreground border-wheat" : "bg-destructive text-destructive-foreground border-destructive"
+                                : "border-border bg-background text-muted-foreground opacity-50"
+                            }`}>
+                            {certLabels[c]}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/60">
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Leyenda:</span>
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-map-oferta/15 text-map-oferta text-[10px] font-medium">▲ Oferta</span>
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-map-demanda/15 text-map-demanda text-[10px] font-medium">▼ Demanda</span>
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-map-servicio/15 text-map-servicio text-[10px] font-medium">● Servicio</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Map area */}
+        <div className="flex-1 min-h-0 relative flex flex-col">
+          <div ref={mapContainerRef} className="w-full z-0 flex-1 min-h-[300px]" />
+
+          {/* Floating paginated actor list */}
+          {pagedActors.length > 0 && (
+            <div className="absolute bottom-3 left-3 right-3 z-[500] pointer-events-none">
+              <div className="max-w-5xl mx-auto pointer-events-auto rounded-xl border border-border bg-card/95 backdrop-blur shadow-elevated p-2.5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                 {pagedActors.map((a) => {
                   const role = actorRole[a.type];
                   return (
                     <button
                       key={a.id}
                       onClick={() => mapRef.current?.setView([a.lat, a.lng], 15)}
-                      className={`text-left p-2.5 rounded-lg border border-border bg-card hover:shadow-md hover:-translate-y-0.5 transition-all border-l-4 ${
+                      className={`text-left p-2 rounded-lg border border-border bg-background hover:shadow-md hover:-translate-y-0.5 transition-all border-l-4 ${
                         role === "oferta" ? "border-l-map-oferta" : role === "demanda" ? "border-l-map-demanda" : "border-l-map-servicio"
                       }`}
                     >
-                      <p className="text-xs font-semibold text-foreground truncate">{a.name}</p>
-                      <div className="flex items-center gap-1.5 mt-1">
+                      <p className="text-[11px] font-semibold text-foreground truncate">{a.name}</p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
                         <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${
                           role === "oferta" ? "bg-map-oferta/10 text-map-oferta" : role === "demanda" ? "bg-map-demanda/10 text-map-demanda" : "bg-map-servicio/10 text-map-servicio"
                         }`}>
                           {roleLabels[role]}
                         </span>
-                        <p className="text-[10px] text-muted-foreground truncate">{actorTypeLabels[a.type]}</p>
+                        <p className="text-[9px] text-muted-foreground truncate">{actorTypeLabels[a.type]}</p>
                       </div>
                     </button>
                   );
                 })}
-                {pagedActors.length === 0 && (
-                  <p className="col-span-full text-center text-sm text-muted-foreground py-4">Sin resultados.</p>
+                </div>
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 mt-2">
+                    <Button variant="outline" size="sm" className="h-7 text-xs" disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>
+                      Anterior
+                    </Button>
+                    <span className="text-[11px] text-muted-foreground px-1">
+                      <span className="font-semibold text-foreground">{page}</span> / {totalPages}
+                    </span>
+                    <Button variant="outline" size="sm" className="h-7 text-xs" disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))}>
+                      Siguiente
+                    </Button>
+                  </div>
                 )}
               </div>
-              {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-3">
-                  <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>
-                    Anterior
-                  </Button>
-                  <span className="text-xs text-muted-foreground px-2">
-                    Página <span className="font-semibold text-foreground">{page}</span> de {totalPages}
-                  </span>
-                  <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))}>
-                    Siguiente
-                  </Button>
-                </div>
-              )}
             </div>
-
-            <div ref={mapContainerRef} className="w-full z-0 flex-1 min-h-[400px]" />
-          </div>
+          )}
         </div>
       </div>
     </div>
