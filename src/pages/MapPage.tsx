@@ -343,11 +343,11 @@ const MapPage = () => {
   const servicioTypes: ActorType[] = ["logistics"];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-screen overflow-hidden bg-background flex flex-col">
       <Navbar />
-      <div className="flex-1 pt-16 flex flex-col lg:flex-row">
+      <div className="flex-1 min-h-0 pt-16 flex flex-col lg:flex-row">
         {/* Sidebar filters */}
-        <aside className={`${showFilters ? "w-full lg:w-80" : "w-0 overflow-hidden"} transition-all duration-300 border-r border-border bg-card flex-shrink-0`}>
+        <aside className={`${showFilters ? "w-full lg:w-80" : "w-0 overflow-hidden"} transition-all duration-300 border-r border-border bg-card flex-shrink-0 lg:h-full lg:overflow-y-auto`}>
           <div className="p-4 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="font-display text-lg text-card-foreground">Filtros</h2>
@@ -471,7 +471,7 @@ const MapPage = () => {
         </aside>
 
         {/* Map */}
-        <div className="flex-1 relative">
+        <div className="flex-1 min-h-0 relative flex flex-col">
           {!showFilters && (
             <Button
               variant="outline"
@@ -483,7 +483,7 @@ const MapPage = () => {
               Filtros
             </Button>
           )}
-          <div className="flex flex-col">
+          <div className="flex flex-col flex-1 min-h-0">
             {/* Big search bar */}
             <div className="px-4 sm:px-6 pt-4 pb-3 bg-gradient-to-b from-card/80 to-background border-b border-border">
               <div className="max-w-3xl mx-auto">
@@ -556,7 +556,7 @@ const MapPage = () => {
               )}
             </div>
 
-            <div ref={mapContainerRef} className="w-full z-0 h-[calc(100vh-4rem)] min-h-[600px]" />
+            <div ref={mapContainerRef} className="w-full z-0 flex-1 min-h-[400px]" />
           </div>
         </div>
       </div>
