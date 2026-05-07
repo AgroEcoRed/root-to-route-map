@@ -151,7 +151,7 @@ const MapPage = () => {
   const [showFilters, setShowFilters] = useState(true);
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const markersRef = useRef<L.Marker[]>([]);
+  const clusterRef = useRef<L.MarkerClusterGroup | null>(null);
   const [dbActors, setDbActors] = useState<MapActor[]>([]);
 
   // Fetch real profiles from database
@@ -214,23 +214,28 @@ const MapPage = () => {
   // Initialize map
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
-    mapRef.current = L.map(mapContainerRef.current).setView([-34.61, -58.44], 12);
+    mapRef.current = L.map(mapContainerRef.current).setView([-34.61, -58.44], 9);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(mapRef.current);
+    clusterRef.current = L.markerClusterGroup({
+      chunkedLoading: true,
+      maxClusterRadius: 50,
+      showCoverageOnHover: false,
+    });
+    mapRef.current.addLayer(clusterRef.current);
 
     return () => {
       mapRef.current?.remove();
       mapRef.current = null;
+      clusterRef.current = null;
     };
   }, []);
 
   // Update markers
   useEffect(() => {
-    if (!mapRef.current) return;
-
-    markersRef.current.forEach((m) => m.remove());
-    markersRef.current = [];
+    if (!mapRef.current || !clusterRef.current) return;
+    clusterRef.current.clearLayers();
 
     filtered.forEach((a) => {
       const role = actorRole[a.type];
@@ -273,7 +278,6 @@ const MapPage = () => {
       const roleBadgeColor = role === "oferta" ? "#2d6a4f" : role === "demanda" ? "#c0392b" : "#e67e22";
 
       const marker = L.marker([a.lat, a.lng], { icon })
-        .addTo(mapRef.current!)
         .bindPopup(`
           <div style="min-width:240px;font-family:DM Sans,sans-serif;padding:4px">
             <a href="#" class="map-actor-link" data-producer="${encodeURIComponent(a.name)}" style="display:block;background:${roleBadgeColor};color:white;font-weight:700;font-size:14px;margin:0 0 8px;padding:8px 12px;border-radius:8px;text-decoration:none;cursor:pointer;text-align:center;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
@@ -310,7 +314,7 @@ const MapPage = () => {
         }, 50);
       });
 
-      markersRef.current.push(marker);
+      clusterRef.current!.addLayer(marker);
     });
   }, [filtered, navigate]);
 
