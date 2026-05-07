@@ -361,16 +361,6 @@ const MapPage = () => {
               </ul>
             </div>
 
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar producto o actor..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-
             {/* Legend */}
             <div className="p-3 rounded-lg border border-border bg-muted/30 space-y-2">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Leyenda</p>
