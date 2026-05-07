@@ -152,6 +152,8 @@ const MapPage = () => {
   const [activeTypes, setActiveTypes] = useState<Set<ActorType>>(new Set(Object.keys(actorTypeLabels) as ActorType[]));
   const [activeCerts, setActiveCerts] = useState<Set<CertFilter>>(new Set(["green", "yellow", "red"]));
   const [showFilters, setShowFilters] = useState(true);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 8;
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null);
@@ -213,6 +215,14 @@ const MapPage = () => {
       return true;
     });
   }, [activeTypes, activeCerts, search, allActors]);
+
+  // Reset pagination when filters/search change
+  useEffect(() => { setPage(1); }, [search, activeTypes, activeCerts]);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pagedActors = useMemo(
+    () => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [filtered, page]
+  );
 
   // Initialize map
   useEffect(() => {
@@ -351,16 +361,6 @@ const MapPage = () => {
               </ul>
             </div>
 
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar producto o actor..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-
             {/* Legend */}
             <div className="p-3 rounded-lg border border-border bg-muted/30 space-y-2">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Leyenda</p>
@@ -454,50 +454,6 @@ const MapPage = () => {
               </div>
             </div>
 
-            {/* Actor list */}
-            <div className="space-y-2 max-h-[40vh] overflow-y-auto">
-              <p className="text-sm font-medium text-muted-foreground">{filtered.length} resultados</p>
-              {filtered.map((a) => {
-                const role = actorRole[a.type];
-                return (
-                  <div key={a.id}
-                    className={`p-3 rounded-lg border-l-4 border border-border hover:border-primary/30 transition-colors bg-background cursor-pointer ${
-                      role === "oferta" ? "border-l-primary" : role === "demanda" ? "border-l-destructive" : "border-l-wheat"
-                    }`}
-                    onClick={() => mapRef.current?.setView([a.lat, a.lng], 15)}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <p className="text-sm font-medium text-foreground">{a.name}</p>
-                        <div className="flex items-center gap-2">
-                          <p className="text-xs text-muted-foreground">{actorTypeLabels[a.type]}</p>
-                          <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${
-                            role === "oferta" ? "bg-primary/10 text-primary" : role === "demanda" ? "bg-destructive/10 text-destructive" : "bg-wheat/10 text-wheat"
-                          }`}>
-                            {roleLabels[role]}
-                          </span>
-                        </div>
-                      </div>
-                      {(role === "oferta") && (
-                        <span className={`inline-flex w-3 h-3 rounded-full flex-shrink-0 mt-1 ${
-                          a.certification === "green" ? "bg-primary" : a.certification === "yellow" ? "bg-wheat" : "bg-destructive"
-                        }`} />
-                      )}
-                    </div>
-                    {a.products.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        <span className={`text-[9px] font-medium mr-1 ${role === "oferta" ? "text-primary" : "text-destructive"}`}>
-                          {role === "oferta" ? "Ofrece:" : "Demanda:"}
-                        </span>
-                        {a.products.slice(0, 3).map((p) => (
-                          <Badge key={p} variant={role === "oferta" ? "default" : "destructive"} className="text-[10px]">{p}</Badge>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
           </div>
         </aside>
 
@@ -514,7 +470,81 @@ const MapPage = () => {
               Filtros
             </Button>
           )}
-          <div ref={mapContainerRef} className="h-[calc(100vh-4rem)] w-full z-0" />
+          <div className="flex flex-col h-[calc(100vh-4rem)]">
+            {/* Big search bar */}
+            <div className="px-4 sm:px-6 pt-4 pb-3 bg-gradient-to-b from-card/80 to-background border-b border-border">
+              <div className="max-w-3xl mx-auto">
+                <div className="relative group">
+                  <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-6 w-6 text-primary/70 group-focus-within:text-primary transition-colors" />
+                  <Input
+                    placeholder="Buscar producto, productor/a, cooperativa, banco de semillas..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="pl-14 pr-12 h-14 text-base rounded-2xl border-2 border-border bg-card shadow-md focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary placeholder:text-muted-foreground/70"
+                  />
+                  {search && (
+                    <button
+                      onClick={() => setSearch("")}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
+                      aria-label="Limpiar búsqueda"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground mt-2 text-center">
+                  <span className="font-semibold text-foreground">{filtered.length}</span> actores encontrados
+                  {search && <> para "<span className="italic">{search}</span>"</>}
+                </p>
+              </div>
+            </div>
+
+            {/* Paginated actor list above map */}
+            <div className="px-4 sm:px-6 py-3 bg-background border-b border-border">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+                {pagedActors.map((a) => {
+                  const role = actorRole[a.type];
+                  return (
+                    <button
+                      key={a.id}
+                      onClick={() => mapRef.current?.setView([a.lat, a.lng], 15)}
+                      className={`text-left p-2.5 rounded-lg border border-border bg-card hover:shadow-md hover:-translate-y-0.5 transition-all border-l-4 ${
+                        role === "oferta" ? "border-l-primary" : role === "demanda" ? "border-l-destructive" : "border-l-wheat"
+                      }`}
+                    >
+                      <p className="text-xs font-semibold text-foreground truncate">{a.name}</p>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${
+                          role === "oferta" ? "bg-primary/10 text-primary" : role === "demanda" ? "bg-destructive/10 text-destructive" : "bg-wheat/10 text-wheat"
+                        }`}>
+                          {roleLabels[role]}
+                        </span>
+                        <p className="text-[10px] text-muted-foreground truncate">{actorTypeLabels[a.type]}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+                {pagedActors.length === 0 && (
+                  <p className="col-span-full text-center text-sm text-muted-foreground py-4">Sin resultados.</p>
+                )}
+              </div>
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-3">
+                  <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>
+                    Anterior
+                  </Button>
+                  <span className="text-xs text-muted-foreground px-2">
+                    Página <span className="font-semibold text-foreground">{page}</span> de {totalPages}
+                  </span>
+                  <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))}>
+                    Siguiente
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            <div ref={mapContainerRef} className="flex-1 w-full z-0" />
+          </div>
         </div>
       </div>
     </div>
