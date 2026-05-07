@@ -357,7 +357,7 @@ const MapPage = () => {
                 <li className="flex items-start gap-1.5"><span className="text-primary font-bold">1.</span> Usá los filtros de abajo para mostrar u ocultar tipos de actores.</li>
                 <li className="flex items-start gap-1.5"><span className="text-primary font-bold">2.</span> Hacé clic en un marcador del mapa para ver sus datos y productos.</li>
                 <li className="flex items-start gap-1.5"><span className="text-primary font-bold">3.</span> Desde el popup, podés ir directamente al mercado para contactar al actor.</li>
-                <li className="flex items-start gap-1.5"><span className="text-primary font-bold">4.</span> Los colores indican: <span className="text-primary font-medium">verde = oferta</span>, <span className="text-destructive font-medium">rojo = demanda</span>, <span className="text-wheat font-medium">amarillo = servicio</span>.</li>
+                <li className="flex items-start gap-1.5"><span className="text-primary font-bold">4.</span> Los colores de rol: <span className="text-map-oferta font-medium">azul = oferta</span>, <span className="text-map-demanda font-medium">violeta = demanda</span>, <span className="text-map-servicio font-medium">naranja = servicio</span>. La certificación usa verde/amarillo/rojo.</li>
               </ul>
             </div>
 
@@ -365,17 +365,17 @@ const MapPage = () => {
             <div className="p-3 rounded-lg border border-border bg-muted/30 space-y-2">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Leyenda</p>
               <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-sm bg-primary flex items-center justify-center text-[10px] text-primary-foreground font-bold">▲</span>
+                <span className="w-5 h-5 rounded-sm bg-map-oferta flex items-center justify-center text-[10px] text-map-oferta-foreground font-bold">▲</span>
                 <span className="text-xs text-foreground font-medium">Oferta</span>
                 <span className="text-xs text-muted-foreground">— Vende productos</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-sm bg-destructive flex items-center justify-center text-[10px] text-destructive-foreground font-bold">▼</span>
+                <span className="w-5 h-5 rounded-sm bg-map-demanda flex items-center justify-center text-[10px] text-map-demanda-foreground font-bold">▼</span>
                 <span className="text-xs text-foreground font-medium">Demanda</span>
                 <span className="text-xs text-muted-foreground">— Compra productos</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-wheat flex items-center justify-center text-[10px] text-wheat-foreground font-bold">●</span>
+                <span className="w-5 h-5 rounded-full bg-map-servicio flex items-center justify-center text-[10px] text-map-servicio-foreground font-bold">●</span>
                 <span className="text-xs text-foreground font-medium">Servicio</span>
                 <span className="text-xs text-muted-foreground">— Logística</span>
               </div>
@@ -383,7 +383,7 @@ const MapPage = () => {
 
             {/* Oferta types */}
             <div>
-              <p className="text-sm font-medium text-primary mb-2 flex items-center gap-1">
+              <p className="text-sm font-medium text-map-oferta mb-2 flex items-center gap-1">
                 <ArrowUp className="h-3.5 w-3.5" /> Oferta
               </p>
               <div className="flex flex-wrap gap-2">
@@ -391,8 +391,8 @@ const MapPage = () => {
                   <button key={key} onClick={() => toggleType(key)}
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                       activeTypes.has(key)
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-background text-muted-foreground hover:border-primary/40"
+                        ? "border-map-oferta bg-map-oferta text-map-oferta-foreground"
+                        : "border-border bg-background text-muted-foreground hover:border-map-oferta/40"
                     }`}>
                     {actorTypeLabels[key]}
                   </button>
@@ -402,7 +402,7 @@ const MapPage = () => {
 
             {/* Demanda types */}
             <div>
-              <p className="text-sm font-medium text-destructive mb-2 flex items-center gap-1">
+              <p className="text-sm font-medium text-map-demanda mb-2 flex items-center gap-1">
                 <ArrowDown className="h-3.5 w-3.5" /> Demanda
               </p>
               <div className="flex flex-wrap gap-2">
@@ -410,8 +410,8 @@ const MapPage = () => {
                   <button key={key} onClick={() => toggleType(key)}
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                       activeTypes.has(key)
-                        ? "border-destructive bg-destructive text-destructive-foreground"
-                        : "border-border bg-background text-muted-foreground hover:border-destructive/40"
+                        ? "border-map-demanda bg-map-demanda text-map-demanda-foreground"
+                        : "border-border bg-background text-muted-foreground hover:border-map-demanda/40"
                     }`}>
                     {actorTypeLabels[key]}
                   </button>
@@ -421,7 +421,7 @@ const MapPage = () => {
 
             {/* Servicio types */}
             <div>
-              <p className="text-sm font-medium text-wheat mb-2 flex items-center gap-1">
+              <p className="text-sm font-medium text-map-servicio mb-2 flex items-center gap-1">
                 <Minus className="h-3.5 w-3.5" /> Servicio
               </p>
               <div className="flex flex-wrap gap-2">
@@ -429,8 +429,8 @@ const MapPage = () => {
                   <button key={key} onClick={() => toggleType(key)}
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                       activeTypes.has(key)
-                        ? "border-wheat bg-wheat text-wheat-foreground"
-                        : "border-border bg-background text-muted-foreground hover:border-wheat/40"
+                        ? "border-map-servicio bg-map-servicio text-map-servicio-foreground"
+                        : "border-border bg-background text-muted-foreground hover:border-map-servicio/40"
                     }`}>
                     {actorTypeLabels[key]}
                   </button>
