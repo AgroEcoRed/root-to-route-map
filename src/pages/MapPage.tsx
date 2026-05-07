@@ -476,7 +476,7 @@ const MapPage = () => {
               Filtros
             </Button>
           )}
-          <div className="flex flex-col min-h-[calc(100vh-4rem)]">
+          <div className="flex flex-col">
             {/* Big search bar */}
             <div className="px-4 sm:px-6 pt-4 pb-3 bg-gradient-to-b from-card/80 to-background border-b border-border">
               <div className="max-w-3xl mx-auto">
@@ -507,7 +507,7 @@ const MapPage = () => {
 
             {/* Paginated actor list above map */}
             <div className="px-4 sm:px-6 py-3 bg-background border-b border-border">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                 {pagedActors.map((a) => {
                   const role = actorRole[a.type];
                   return (
@@ -549,7 +549,7 @@ const MapPage = () => {
               )}
             </div>
 
-            <div ref={mapContainerRef} className="flex-1 w-full z-0 min-h-[600px]" />
+            <div ref={mapContainerRef} className="w-full z-0 h-[calc(100vh-4rem)] min-h-[600px]" />
           </div>
         </div>
       </div>
