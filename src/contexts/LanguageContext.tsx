@@ -185,6 +185,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "market.review_thanks": "¡Gracias por tu reseña!",
     // Community nav
     "nav.community": "Comunidad",
+    "nav.library": "Biblioteca",
     // Community page
     "community.title": "Comunidad y Co-aprendizaje",
     "community.subtitle": "Espacio de intercambio de conocimiento, experiencias y recursos para la producción agroecológica.",
@@ -423,6 +424,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "market.review_submit": "Submit review",
     "market.review_login": "Log in to leave a review",
     "market.review_thanks": "Thanks for your review!",
+    "nav.library": "Library",
     "nav.community": "Community",
     "community.title": "Community & Co-learning",
     "community.subtitle": "Space for sharing knowledge, experiences and resources for agroecological production.",
@@ -658,6 +660,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "market.review_placeholder": "Partagez votre expérience avec ce vendeur...",
     "market.review_submit": "Envoyer l'avis",
     "market.review_login": "Connectez-vous pour laisser un avis",
+    "nav.library": "Bibliothèque",
     "market.review_thanks": "Merci pour votre avis !",
     "nav.community": "Communauté",
     "community.title": "Communauté et Co-apprentissage",
@@ -893,6 +896,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "market.write_review": "Escrever avaliação",
     "market.review_placeholder": "Conte sua experiência com este vendedor...",
     "market.review_submit": "Enviar avaliação",
+    "nav.library": "Biblioteca",
     "market.review_login": "Faça login para deixar uma avaliação",
     "market.review_thanks": "Obrigado pela sua avaliação!",
     "nav.community": "Comunidade",
