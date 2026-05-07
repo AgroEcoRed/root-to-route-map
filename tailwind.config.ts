@@ -71,6 +71,18 @@ export default {
           DEFAULT: "hsl(var(--forest))",
           foreground: "hsl(var(--forest-foreground))",
         },
+        "map-oferta": {
+          DEFAULT: "hsl(var(--map-oferta))",
+          foreground: "hsl(var(--map-oferta-foreground))",
+        },
+        "map-demanda": {
+          DEFAULT: "hsl(var(--map-demanda))",
+          foreground: "hsl(var(--map-demanda-foreground))",
+        },
+        "map-servicio": {
+          DEFAULT: "hsl(var(--map-servicio))",
+          foreground: "hsl(var(--map-servicio-foreground))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

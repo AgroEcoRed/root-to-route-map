@@ -113,9 +113,9 @@ const roleLabels: Record<ActorRole, string> = {
 };
 
 const roleColors: Record<ActorRole, string> = {
-  oferta: "#2d6a4f",
-  demanda: "#c0392b",
-  servicio: "#f4a261",
+  oferta: "#2563eb",
+  demanda: "#9333ea",
+  servicio: "#ea580c",
 };
 
 const roleBgClasses: Record<ActorRole, string> = {
@@ -224,6 +224,12 @@ const MapPage = () => {
     [filtered, page]
   );
 
+  // Recalculate map size when surrounding layout changes
+  useEffect(() => {
+    const t = setTimeout(() => mapRef.current?.invalidateSize(), 100);
+    return () => clearTimeout(t);
+  }, [pagedActors, showFilters]);
+
   // Initialize map
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
@@ -271,8 +277,8 @@ const MapPage = () => {
 
       const certColor = a.certification === "green" ? "#2d6a4f" : a.certification === "yellow" ? "#d4a017" : "#dc2626";
       const productLabel = role === "oferta" ? "🟢 Ofrece" : role === "demanda" ? "🔴 Demanda" : "Servicio";
-      const productBg = role === "oferta" ? "#e8f5e9" : "#fce4ec";
-      const productColor = role === "oferta" ? "#2d6a4f" : "#c0392b";
+      const productBg = role === "oferta" ? "#dbeafe" : "#f3e8ff";
+      const productColor = role === "oferta" ? "#2563eb" : "#9333ea";
 
       const productsHtml = a.products.length > 0
         ? `<div style="margin-top:8px">
@@ -288,7 +294,7 @@ const MapPage = () => {
             </div>`
         : "";
 
-      const roleBadgeColor = role === "oferta" ? "#2d6a4f" : role === "demanda" ? "#c0392b" : "#e67e22";
+      const roleBadgeColor = role === "oferta" ? "#2563eb" : role === "demanda" ? "#9333ea" : "#ea580c";
 
       const marker = L.marker([a.lat, a.lng], { icon })
         .bindPopup(`
@@ -357,7 +363,7 @@ const MapPage = () => {
                 <li className="flex items-start gap-1.5"><span className="text-primary font-bold">1.</span> Usá los filtros de abajo para mostrar u ocultar tipos de actores.</li>
                 <li className="flex items-start gap-1.5"><span className="text-primary font-bold">2.</span> Hacé clic en un marcador del mapa para ver sus datos y productos.</li>
                 <li className="flex items-start gap-1.5"><span className="text-primary font-bold">3.</span> Desde el popup, podés ir directamente al mercado para contactar al actor.</li>
-                <li className="flex items-start gap-1.5"><span className="text-primary font-bold">4.</span> Los colores indican: <span className="text-primary font-medium">verde = oferta</span>, <span className="text-destructive font-medium">rojo = demanda</span>, <span className="text-wheat font-medium">amarillo = servicio</span>.</li>
+                <li className="flex items-start gap-1.5"><span className="text-primary font-bold">4.</span> Los colores de rol: <span className="text-map-oferta font-medium">azul = oferta</span>, <span className="text-map-demanda font-medium">violeta = demanda</span>, <span className="text-map-servicio font-medium">naranja = servicio</span>. La certificación usa verde/amarillo/rojo.</li>
               </ul>
             </div>
 
@@ -365,17 +371,17 @@ const MapPage = () => {
             <div className="p-3 rounded-lg border border-border bg-muted/30 space-y-2">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Leyenda</p>
               <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-sm bg-primary flex items-center justify-center text-[10px] text-primary-foreground font-bold">▲</span>
+                <span className="w-5 h-5 rounded-sm bg-map-oferta flex items-center justify-center text-[10px] text-map-oferta-foreground font-bold">▲</span>
                 <span className="text-xs text-foreground font-medium">Oferta</span>
                 <span className="text-xs text-muted-foreground">— Vende productos</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-sm bg-destructive flex items-center justify-center text-[10px] text-destructive-foreground font-bold">▼</span>
+                <span className="w-5 h-5 rounded-sm bg-map-demanda flex items-center justify-center text-[10px] text-map-demanda-foreground font-bold">▼</span>
                 <span className="text-xs text-foreground font-medium">Demanda</span>
                 <span className="text-xs text-muted-foreground">— Compra productos</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-wheat flex items-center justify-center text-[10px] text-wheat-foreground font-bold">●</span>
+                <span className="w-5 h-5 rounded-full bg-map-servicio flex items-center justify-center text-[10px] text-map-servicio-foreground font-bold">●</span>
                 <span className="text-xs text-foreground font-medium">Servicio</span>
                 <span className="text-xs text-muted-foreground">— Logística</span>
               </div>
@@ -383,7 +389,7 @@ const MapPage = () => {
 
             {/* Oferta types */}
             <div>
-              <p className="text-sm font-medium text-primary mb-2 flex items-center gap-1">
+              <p className="text-sm font-medium text-map-oferta mb-2 flex items-center gap-1">
                 <ArrowUp className="h-3.5 w-3.5" /> Oferta
               </p>
               <div className="flex flex-wrap gap-2">
@@ -391,8 +397,8 @@ const MapPage = () => {
                   <button key={key} onClick={() => toggleType(key)}
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                       activeTypes.has(key)
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-background text-muted-foreground hover:border-primary/40"
+                        ? "border-map-oferta bg-map-oferta text-map-oferta-foreground"
+                        : "border-border bg-background text-muted-foreground hover:border-map-oferta/40"
                     }`}>
                     {actorTypeLabels[key]}
                   </button>
@@ -402,7 +408,7 @@ const MapPage = () => {
 
             {/* Demanda types */}
             <div>
-              <p className="text-sm font-medium text-destructive mb-2 flex items-center gap-1">
+              <p className="text-sm font-medium text-map-demanda mb-2 flex items-center gap-1">
                 <ArrowDown className="h-3.5 w-3.5" /> Demanda
               </p>
               <div className="flex flex-wrap gap-2">
@@ -410,8 +416,8 @@ const MapPage = () => {
                   <button key={key} onClick={() => toggleType(key)}
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                       activeTypes.has(key)
-                        ? "border-destructive bg-destructive text-destructive-foreground"
-                        : "border-border bg-background text-muted-foreground hover:border-destructive/40"
+                        ? "border-map-demanda bg-map-demanda text-map-demanda-foreground"
+                        : "border-border bg-background text-muted-foreground hover:border-map-demanda/40"
                     }`}>
                     {actorTypeLabels[key]}
                   </button>
@@ -421,7 +427,7 @@ const MapPage = () => {
 
             {/* Servicio types */}
             <div>
-              <p className="text-sm font-medium text-wheat mb-2 flex items-center gap-1">
+              <p className="text-sm font-medium text-map-servicio mb-2 flex items-center gap-1">
                 <Minus className="h-3.5 w-3.5" /> Servicio
               </p>
               <div className="flex flex-wrap gap-2">
@@ -429,8 +435,8 @@ const MapPage = () => {
                   <button key={key} onClick={() => toggleType(key)}
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                       activeTypes.has(key)
-                        ? "border-wheat bg-wheat text-wheat-foreground"
-                        : "border-border bg-background text-muted-foreground hover:border-wheat/40"
+                        ? "border-map-servicio bg-map-servicio text-map-servicio-foreground"
+                        : "border-border bg-background text-muted-foreground hover:border-map-servicio/40"
                     }`}>
                     {actorTypeLabels[key]}
                   </button>
@@ -470,7 +476,7 @@ const MapPage = () => {
               Filtros
             </Button>
           )}
-          <div className="flex flex-col h-[calc(100vh-4rem)]">
+          <div className="flex flex-col min-h-[calc(100vh-4rem)]">
             {/* Big search bar */}
             <div className="px-4 sm:px-6 pt-4 pb-3 bg-gradient-to-b from-card/80 to-background border-b border-border">
               <div className="max-w-3xl mx-auto">
@@ -509,13 +515,13 @@ const MapPage = () => {
                       key={a.id}
                       onClick={() => mapRef.current?.setView([a.lat, a.lng], 15)}
                       className={`text-left p-2.5 rounded-lg border border-border bg-card hover:shadow-md hover:-translate-y-0.5 transition-all border-l-4 ${
-                        role === "oferta" ? "border-l-primary" : role === "demanda" ? "border-l-destructive" : "border-l-wheat"
+                        role === "oferta" ? "border-l-map-oferta" : role === "demanda" ? "border-l-map-demanda" : "border-l-map-servicio"
                       }`}
                     >
                       <p className="text-xs font-semibold text-foreground truncate">{a.name}</p>
                       <div className="flex items-center gap-1.5 mt-1">
                         <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${
-                          role === "oferta" ? "bg-primary/10 text-primary" : role === "demanda" ? "bg-destructive/10 text-destructive" : "bg-wheat/10 text-wheat"
+                          role === "oferta" ? "bg-map-oferta/10 text-map-oferta" : role === "demanda" ? "bg-map-demanda/10 text-map-demanda" : "bg-map-servicio/10 text-map-servicio"
                         }`}>
                           {roleLabels[role]}
                         </span>
@@ -543,7 +549,7 @@ const MapPage = () => {
               )}
             </div>
 
-            <div ref={mapContainerRef} className="flex-1 w-full z-0" />
+            <div ref={mapContainerRef} className="flex-1 w-full z-0 min-h-[600px]" />
           </div>
         </div>
       </div>

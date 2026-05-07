@@ -58,6 +58,14 @@
     --forest: 145 30% 16%;
     --forest-foreground: 38 35% 96%;
 
+    /* Map role tokens (distinct from certification green/yellow/red) */
+    --map-oferta: 210 70% 42%;
+    --map-oferta-foreground: 38 35% 96%;
+    --map-demanda: 280 45% 45%;
+    --map-demanda-foreground: 38 35% 96%;
+    --map-servicio: 25 80% 50%;
+    --map-servicio-foreground: 38 35% 96%;
+
     --font-display: 'Playfair Display', serif;
     --font-body: 'DM Sans', sans-serif;
 
@@ -96,6 +104,12 @@
     --sidebar-accent-foreground: 38 35% 96%;
     --sidebar-border: 145 10% 15%;
     --sidebar-ring: 145 40% 38%;
+    --map-oferta: 210 70% 55%;
+    --map-oferta-foreground: 145 15% 8%;
+    --map-demanda: 280 50% 60%;
+    --map-demanda-foreground: 145 15% 8%;
+    --map-servicio: 25 85% 58%;
+    --map-servicio-foreground: 145 15% 8%;
   }
 }
 
