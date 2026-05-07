@@ -153,7 +153,7 @@ const MapPage = () => {
   const [activeCerts, setActiveCerts] = useState<Set<CertFilter>>(new Set(["green", "yellow", "red"]));
   const [showFilters, setShowFilters] = useState(true);
   const [page, setPage] = useState(1);
-  const PAGE_SIZE = 4;
+  const PAGE_SIZE = 8;
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null);
@@ -359,12 +359,19 @@ const MapPage = () => {
             {/* How-to guide */}
             <div className="p-3 rounded-lg border border-primary/20 bg-primary/5 space-y-2">
               <p className="text-xs font-semibold text-primary uppercase tracking-wider">¿Cómo funciona?</p>
-              <ul className="text-xs text-muted-foreground space-y-1.5 list-none">
-                <li className="flex items-start gap-1.5"><span className="text-primary font-bold">1.</span> Usá los filtros de abajo para mostrar u ocultar tipos de actores.</li>
-                <li className="flex items-start gap-1.5"><span className="text-primary font-bold">2.</span> Hacé clic en un marcador del mapa para ver sus datos y productos.</li>
-                <li className="flex items-start gap-1.5"><span className="text-primary font-bold">3.</span> Desde el popup, podés ir directamente al mercado para contactar al actor.</li>
-                <li className="flex items-start gap-1.5"><span className="text-primary font-bold">4.</span> Los colores de rol: <span className="text-map-oferta font-medium">azul = oferta</span>, <span className="text-map-demanda font-medium">violeta = demanda</span>, <span className="text-map-servicio font-medium">naranja = servicio</span>. La certificación usa verde/amarillo/rojo.</li>
-              </ul>
+              <ol className="text-xs text-muted-foreground space-y-1.5 list-decimal pl-4 marker:text-primary marker:font-bold">
+                <li>Usá los filtros para mostrar u ocultar tipos de actores.</li>
+                <li>Hacé clic en un marcador para ver sus datos y productos.</li>
+                <li>Desde el popup podés ir al mercado para contactarlo.</li>
+                <li>
+                  <span className="block">Colores de rol:</span>
+                  <span className="mt-1 flex flex-wrap gap-1">
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-map-oferta/15 text-map-oferta text-[10px] font-medium">▲ Oferta</span>
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-map-demanda/15 text-map-demanda text-[10px] font-medium">▼ Demanda</span>
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-map-servicio/15 text-map-servicio text-[10px] font-medium">● Servicio</span>
+                  </span>
+                </li>
+              </ol>
             </div>
 
             {/* Legend */}

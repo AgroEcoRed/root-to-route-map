@@ -120,10 +120,31 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
+    letter-spacing: -0.01em;
   }
+  /* Smooth focus rings + global transitions */
+  a, button {
+    @apply transition-all duration-200;
+  }
+  ::selection {
+    background: hsl(var(--primary) / 0.2);
+    color: hsl(var(--foreground));
+  }
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: hsl(var(--background)); }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.25);
+    border-radius: 8px;
+    border: 2px solid hsl(var(--background));
+  }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--primary) / 0.5); }
 }
 
 @layer utilities {
@@ -173,3 +194,45 @@
 .organic-blob-2 {
   border-radius: 40% 60% 30% 70% / 60% 40% 50% 50%;
 }
+
+/* Subtle hover lift for interactive cards */
+.lift-on-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.lift-on-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-elevated);
+}
+
+/* Leaflet popup polish */
+.leaflet-popup-content-wrapper {
+  border-radius: 14px !important;
+  box-shadow: 0 12px 32px -8px hsl(30 15% 15% / 0.18) !important;
+  border: 1px solid hsl(var(--border)) !important;
+}
+.leaflet-popup-tip { box-shadow: none !important; }
+.leaflet-container { font-family: var(--font-body) !important; }
+
+/* Marker cluster polish */
+.marker-cluster-small div,
+.marker-cluster-medium div,
+.marker-cluster-large div {
+  background: hsl(var(--primary) / 0.85) !important;
+  color: hsl(var(--primary-foreground)) !important;
+  font-weight: 600;
+  font-family: var(--font-body);
+  border: 2px solid hsl(var(--background));
+  box-shadow: 0 4px 12px -2px hsl(var(--primary) / 0.4);
+}
+.marker-cluster-small,
+.marker-cluster-medium,
+.marker-cluster-large {
+  background: hsl(var(--primary) / 0.2) !important;
+}
+
+/* Page enter animation */
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+main { animation: page-in 0.35s ease-out; }
