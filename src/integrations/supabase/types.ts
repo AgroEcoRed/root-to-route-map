@@ -38,6 +38,144 @@ export type Database = {
         }
         Relationships: []
       }
+      gov_programs: {
+        Row: {
+          city: string | null
+          contact: string | null
+          country: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          last_synced_at: string | null
+          name: string
+          organization: string | null
+          region: string | null
+          source: string
+          source_html_hash: string | null
+          topics: string[]
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          city?: string | null
+          contact?: string | null
+          country: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          last_synced_at?: string | null
+          name: string
+          organization?: string | null
+          region?: string | null
+          source?: string
+          source_html_hash?: string | null
+          topics?: string[]
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          city?: string | null
+          contact?: string | null
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          last_synced_at?: string | null
+          name?: string
+          organization?: string | null
+          region?: string | null
+          source?: string
+          source_html_hash?: string | null
+          topics?: string[]
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
+      library_collections: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      library_items: {
+        Row: {
+          abstract: string | null
+          authors: string[]
+          collection_id: string | null
+          created_at: string
+          doi: string | null
+          file_path: string | null
+          id: string
+          item_type: string
+          journal: string | null
+          publisher: string | null
+          tags: string[]
+          title: string
+          updated_at: string
+          uploaded_by: string
+          url: string | null
+          year: number | null
+        }
+        Insert: {
+          abstract?: string | null
+          authors?: string[]
+          collection_id?: string | null
+          created_at?: string
+          doi?: string | null
+          file_path?: string | null
+          id?: string
+          item_type?: string
+          journal?: string | null
+          publisher?: string | null
+          tags?: string[]
+          title: string
+          updated_at?: string
+          uploaded_by: string
+          url?: string | null
+          year?: number | null
+        }
+        Update: {
+          abstract?: string | null
+          authors?: string[]
+          collection_id?: string | null
+          created_at?: string
+          doi?: string | null
+          file_path?: string | null
+          id?: string
+          item_type?: string
+          journal?: string | null
+          publisher?: string | null
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          uploaded_by?: string
+          url?: string | null
+          year?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           actor_type: Database["public"]["Enums"]["actor_type"]
