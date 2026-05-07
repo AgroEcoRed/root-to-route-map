@@ -61,9 +61,14 @@ const actorTypes: { key: ActorType; label: string; icon: typeof Sprout; desc: st
   { key: "institution", label: "Institución Pública", icon: Building2, desc: "Escuela, hospital, municipio u oficina pública", color: "from-forest to-primary" },
   { key: "logistics", label: "Proveedor/a Logístico/a", icon: Truck, desc: "Transporte, distribución o almacenamiento", color: "from-soil to-earth" },
   { key: "processing", label: "Planta de Procesamiento", icon: Factory, desc: "Molino, frigorífico, acopio o biofábrica", color: "from-wheat to-leaf" },
+  { key: "bio_input_supplier", label: "Proveedor/a de Bio-insumos", icon: Sprout, desc: "Compost, biopreparados, controladores biológicos, lombricompuesto", color: "from-leaf to-primary" },
+  { key: "seed_bank", label: "Banco de Semillas", icon: Sprout, desc: "Conservación e intercambio de semillas criollas y nativas", color: "from-wheat to-primary" },
+  { key: "composting_center", label: "Centro de Compostaje", icon: Sprout, desc: "Procesamiento de orgánicos y producción de compost / humus", color: "from-soil to-leaf" },
 ];
 
-const isProducerType = (type: ActorType | null) => type === "producer" || type === "cooperative" || type === "processing";
+const isProducerType = (type: ActorType | null) =>
+  type === "producer" || type === "cooperative" || type === "processing" ||
+  type === "bio_input_supplier" || type === "seed_bank" || type === "composting_center";
 
 const RegistrationPage = () => {
   const navigate = useNavigate();

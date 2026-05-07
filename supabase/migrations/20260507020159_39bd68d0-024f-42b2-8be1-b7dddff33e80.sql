@@ -1,0 +1,16 @@
+ALTER TYPE public.actor_type ADD VALUE IF NOT EXISTS 'agroecological_node';
+ALTER TYPE public.actor_type ADD VALUE IF NOT EXISTS 'seed_bank';
+ALTER TYPE public.actor_type ADD VALUE IF NOT EXISTS 'composting_center';
+ALTER TYPE public.actor_type ADD VALUE IF NOT EXISTS 'research_center';
+ALTER TYPE public.actor_type ADD VALUE IF NOT EXISTS 'solidarity_intermediary';
+ALTER TYPE public.actor_type ADD VALUE IF NOT EXISTS 'community_garden';
+ALTER TYPE public.actor_type ADD VALUE IF NOT EXISTS 'consumer_node';
+ALTER TYPE public.actor_type ADD VALUE IF NOT EXISTS 'individual_consumer';
+ALTER TYPE public.actor_type ADD VALUE IF NOT EXISTS 'food_bank';
+ALTER TYPE public.actor_type ADD VALUE IF NOT EXISTS 'consumer_cooperative';
+ALTER TYPE public.actor_type ADD VALUE IF NOT EXISTS 'community_org';
+ALTER TYPE public.actor_type ADD VALUE IF NOT EXISTS 'health_food_store';
+ALTER TYPE public.actor_type ADD VALUE IF NOT EXISTS 'agroecological_store';
+ALTER TYPE public.actor_type ADD VALUE IF NOT EXISTS 'agroecological_fair';
+ALTER TYPE public.actor_type ADD VALUE IF NOT EXISTS 'agroecological_market';
+ALTER TYPE public.actor_type ADD VALUE IF NOT EXISTS 'bio_input_supplier';
