@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface AuthContextType {
   user: User | null;
@@ -29,6 +30,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        // Gate sign-in: only allow users who completed registration.
+        // Runs for both email/password and OAuth (Google) sign-ins.
+        if (_event === "SIGNED_IN" && session?.user) {
+          setTimeout(async () => {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("registration_completed")
+              .eq("user_id", session.user.id)
+              .maybeSingle();
+            if (profile && profile.registration_completed === false) {
+              await supabase.auth.signOut();
+              toast.error(
+                "Esta cuenta no está registrada en AgroEco.Red. Por favor registrate primero para poder ingresar.",
+                { duration: 6000 }
+              );
+              window.location.href = "/registrar";
+            }
+          }, 0);
+        }
       }
     );
 

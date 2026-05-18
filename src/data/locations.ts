@@ -9,7 +9,8 @@ export const locationData: LocationData = {
       name: "Argentina",
       phoneCode: "+54",
       regions: [
-        { code: "BA", name: "Buenos Aires", cities: ["CABA", "La Plata", "Mar del Plata", "Bahía Blanca", "Quilmes", "Moreno", "Florencio Varela", "San Vicente", "Cañuelas", "Luján", "Marcos Paz", "Pilar", "Tigre", "San Isidro", "Avellaneda", "Lanús", "Lomas de Zamora", "Berazategui", "Almirante Brown", "Esteban Echeverría"] },
+        { code: "CABA", name: "Ciudad Autónoma de Buenos Aires (CABA)", cities: ["Ciudad Autónoma de Buenos Aires"] },
+        { code: "BA", name: "Buenos Aires", cities: ["La Plata", "Mar del Plata", "Bahía Blanca", "Quilmes", "Moreno", "Florencio Varela", "San Vicente", "Cañuelas", "Luján", "Marcos Paz", "Pilar", "Tigre", "San Isidro", "Avellaneda", "Lanús", "Lomas de Zamora", "Berazategui", "Almirante Brown", "Esteban Echeverría"] },
         { code: "SF", name: "Santa Fe", cities: ["Rosario", "Santa Fe", "Rafaela", "Reconquista", "Venado Tuerto"] },
         { code: "CB", name: "Córdoba", cities: ["Córdoba", "Villa María", "Río Cuarto", "San Francisco", "Villa Carlos Paz"] },
         { code: "MZ", name: "Mendoza", cities: ["Mendoza", "San Rafael", "Godoy Cruz", "Luján de Cuyo", "Maipú"] },

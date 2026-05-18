@@ -94,8 +94,11 @@ const RegistrationPage = () => {
   const [customCategoryType, setCustomCategoryType] = useState<"oferta" | "demanda" | "servicio">("oferta");
   const [certification, setCertification] = useState<CertLevel>("red");
   const [description, setDescription] = useState("");
-  const [capacity, setCapacity] = useState("");
-  const [methods, setMethods] = useState("");
+  // Per-category capacity & production methods (key = category name)
+  const [capacityByCategory, setCapacityByCategory] = useState<Record<string, string>>({});
+  const [methodsByCategory, setMethodsByCategory] = useState<Record<string, string>>({});
+  // Verification request
+  const [wantsVerification, setWantsVerification] = useState(false);
 
   const selectedCountry = locationData.countries.find(c => c.code === country);
   const selectedRegion2 = selectedCountry?.regions.find(r => r.code === region);
@@ -144,10 +147,40 @@ const RegistrationPage = () => {
     setLoading(true);
 
     try {
+      // Build per-category capacity/methods strings
+      const capacityStr = selectedOferta
+        .filter((c) => capacityByCategory[c]?.trim())
+        .map((c) => `${c}: ${capacityByCategory[c].trim()}`)
+        .join(" | ");
+      const methodsStr = isProducerType(selectedType)
+        ? selectedOferta
+            .filter((c) => methodsByCategory[c]?.trim())
+            .map((c) => `${c}: ${methodsByCategory[c].trim()}`)
+            .join(" | ")
+        : "";
+
+      const products = buildProducts();
+
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
-        options: { emailRedirectTo: window.location.origin },
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: {
+            display_name: name,
+            actor_type: selectedType,
+            phone,
+            location: locationString,
+            lat: lat ?? null,
+            lng: lng ?? null,
+            products: products ?? [],
+            capacity: capacityStr,
+            production_methods: methodsStr,
+            description,
+            certification: isProducerType(selectedType) ? certification : null,
+            registration_completed: true,
+          },
+        },
       });
       if (authError) throw authError;
       if (!authData.user) throw new Error("No se pudo crear el usuario");
@@ -170,24 +203,44 @@ const RegistrationPage = () => {
         }
       }
 
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update({
-          actor_type: selectedType,
-          display_name: name,
-          phone,
-          location: locationString,
-          lat,
-          lng,
-          products: buildProducts(),
-          capacity,
-          production_methods: methods,
-          description,
-          certification: isProducerType(selectedType) ? certification : null,
-        })
-        .eq("user_id", authData.user.id);
+      // Profile data is now persisted automatically by the handle_new_user
+      // trigger using the metadata passed above. No client-side UPDATE
+      // needed (and it would fail under RLS while email is unconfirmed).
 
-      if (profileError) throw profileError;
+      // Verification request: open user's mail client with prefilled message
+      if (wantsVerification) {
+        const to = "andreapatriciasosa@gmail.com";
+        const subject = encodeURIComponent(
+          `Solicitud de verificación — ${name}`
+        );
+        const bodyText = `Hola,
+
+Acabo de registrarme en AgroEco.Red y quiero solicitar la verificación de mi emprendimiento / organización.
+
+Datos del registro:
+- Nombre / Organización: ${name}
+- Email: ${email}
+- Rol: ${selectedType}
+- Ubicación: ${locationString}
+- Coordenadas: ${lat ?? "—"}, ${lng ?? "—"}
+- Teléfono: ${phone}
+- Oferta: ${selectedOferta.join(", ") || "—"}
+- Demanda: ${selectedDemanda.join(", ") || "—"}
+- Servicios: ${selectedServicios.join(", ") || "—"}
+- Capacidad por categoría: ${capacityStr || "—"}
+- Métodos por categoría: ${methodsStr || "—"}
+- Nivel de certificación declarado: ${isProducerType(selectedType) ? certification : "—"}
+
+Descripción:
+${description}
+
+Quedo a disposición para coordinar la verificación.
+
+Gracias.`;
+        const mailto = `mailto:${to}?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
+        // Open in a new tab so the registration flow keeps going.
+        window.open(mailto, "_blank");
+      }
 
       toast.success("¡Registro exitoso! Revisá tu email para confirmar tu cuenta.");
       navigate("/");
@@ -497,17 +550,63 @@ const RegistrationPage = () => {
                       </p>
                     </motion.div>
 
-                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-                      <Label htmlFor="capacity">Capacidad / Volumen</Label>
-                      <Input id="capacity" value={capacity} onChange={(e) => setCapacity(e.target.value)} placeholder="Ej: 500 kg/mes" className="mt-1" />
-                    </motion.div>
-
-                    {isProducerType(selectedType) && (
-                      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
-                        <Label htmlFor="methods">Métodos de producción</Label>
-                        <Input id="methods" value={methods} onChange={(e) => setMethods(e.target.value)} placeholder="Ej: Agroecológico, biodinámico, en transición" className="mt-1" />
+                    {/* Per-category capacity & production methods */}
+                    {selectedOferta.length > 0 && (
+                      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+                        <Label className="text-sm font-medium">📦 Capacidad / Volumen por categoría</Label>
+                        <p className="text-[11px] text-muted-foreground mb-2">
+                          Indicá cuánto producís de cada categoría seleccionada{isProducerType(selectedType) ? " y el método de producción correspondiente" : ""}.
+                        </p>
+                        <div className="space-y-3">
+                          {selectedOferta.map((cat) => (
+                            <div key={cat} className="rounded-lg border border-border p-3 bg-card/50">
+                              <p className="text-xs font-medium text-card-foreground mb-2">🟢 {cat}</p>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <Input
+                                  value={capacityByCategory[cat] || ""}
+                                  onChange={(e) => setCapacityByCategory((p) => ({ ...p, [cat]: e.target.value }))}
+                                  placeholder="Capacidad — ej: 500 kg/mes"
+                                  className="text-xs"
+                                />
+                                {isProducerType(selectedType) && (
+                                  <Input
+                                    value={methodsByCategory[cat] || ""}
+                                    onChange={(e) => setMethodsByCategory((p) => ({ ...p, [cat]: e.target.value }))}
+                                    placeholder="Método — ej: Agroecológico, biodinámico"
+                                    className="text-xs"
+                                  />
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </motion.div>
                     )}
+
+                    {/* Verification request */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className="rounded-lg border border-primary/30 bg-primary/5 p-3"
+                    >
+                      <label className="flex items-start gap-3 cursor-pointer">
+                        <Checkbox
+                          checked={wantsVerification}
+                          onCheckedChange={(v) => setWantsVerification(v === true)}
+                          className="mt-0.5"
+                        />
+                        <div>
+                          <p className="text-sm font-medium text-foreground">
+                            🌿 Quiero solicitar la verificación de mi emprendimiento
+                          </p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
+                            Al finalizar el registro se abrirá tu cliente de email con un mensaje
+                            prellenado dirigido al equipo de verificación de AgroEco.Red.
+                          </p>
+                        </div>
+                      </label>
+                    </motion.div>
 
                     <div className="flex gap-3 pt-4">
                       <Button variant="outline" type="button" onClick={() => setStep(2)} className="flex-1">

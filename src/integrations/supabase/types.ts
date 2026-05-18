@@ -224,6 +224,7 @@ export type Database = {
           phone: string | null
           production_methods: string | null
           products: string[] | null
+          registration_completed: boolean
           spg_id: string | null
           updated_at: string
           user_id: string
@@ -245,6 +246,7 @@ export type Database = {
           phone?: string | null
           production_methods?: string | null
           products?: string[] | null
+          registration_completed?: boolean
           spg_id?: string | null
           updated_at?: string
           user_id: string
@@ -266,6 +268,7 @@ export type Database = {
           phone?: string | null
           production_methods?: string | null
           products?: string[] | null
+          registration_completed?: boolean
           spg_id?: string | null
           updated_at?: string
           user_id?: string
