@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, MapPin, ShoppingBasket, Users, Leaf, LogOut, User, Globe, BookOpen, ShoppingCart, Sprout, Library } from "lucide-react";
+import { Menu, X, MapPin, ShoppingBasket, Users, Leaf, LogOut, User, Globe, BookOpen, ShoppingCart, Sprout, Library, Activity } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -25,6 +25,7 @@ const Navbar = () => {
     { to: "/actores", label: t("nav.actors"), icon: Users },
     { to: "/servicios", label: t("nav.services"), icon: Sprout },
     { to: "/biblioteca", label: t("nav.library") || "Biblioteca", icon: Library },
+    { to: "/transicion", label: t("nav.transition") || "Transición", icon: Activity },
     { to: "/comunidad", label: t("nav.community"), icon: BookOpen },
   ];
 
