@@ -550,17 +550,63 @@ Gracias.`;
                       </p>
                     </motion.div>
 
-                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-                      <Label htmlFor="capacity">Capacidad / Volumen</Label>
-                      <Input id="capacity" value={capacity} onChange={(e) => setCapacity(e.target.value)} placeholder="Ej: 500 kg/mes" className="mt-1" />
-                    </motion.div>
-
-                    {isProducerType(selectedType) && (
-                      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
-                        <Label htmlFor="methods">Métodos de producción</Label>
-                        <Input id="methods" value={methods} onChange={(e) => setMethods(e.target.value)} placeholder="Ej: Agroecológico, biodinámico, en transición" className="mt-1" />
+                    {/* Per-category capacity & production methods */}
+                    {selectedOferta.length > 0 && (
+                      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+                        <Label className="text-sm font-medium">📦 Capacidad / Volumen por categoría</Label>
+                        <p className="text-[11px] text-muted-foreground mb-2">
+                          Indicá cuánto producís de cada categoría seleccionada{isProducerType(selectedType) ? " y el método de producción correspondiente" : ""}.
+                        </p>
+                        <div className="space-y-3">
+                          {selectedOferta.map((cat) => (
+                            <div key={cat} className="rounded-lg border border-border p-3 bg-card/50">
+                              <p className="text-xs font-medium text-card-foreground mb-2">🟢 {cat}</p>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <Input
+                                  value={capacityByCategory[cat] || ""}
+                                  onChange={(e) => setCapacityByCategory((p) => ({ ...p, [cat]: e.target.value }))}
+                                  placeholder="Capacidad — ej: 500 kg/mes"
+                                  className="text-xs"
+                                />
+                                {isProducerType(selectedType) && (
+                                  <Input
+                                    value={methodsByCategory[cat] || ""}
+                                    onChange={(e) => setMethodsByCategory((p) => ({ ...p, [cat]: e.target.value }))}
+                                    placeholder="Método — ej: Agroecológico, biodinámico"
+                                    className="text-xs"
+                                  />
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </motion.div>
                     )}
+
+                    {/* Verification request */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className="rounded-lg border border-primary/30 bg-primary/5 p-3"
+                    >
+                      <label className="flex items-start gap-3 cursor-pointer">
+                        <Checkbox
+                          checked={wantsVerification}
+                          onCheckedChange={(v) => setWantsVerification(v === true)}
+                          className="mt-0.5"
+                        />
+                        <div>
+                          <p className="text-sm font-medium text-foreground">
+                            🌿 Quiero solicitar la verificación de mi emprendimiento
+                          </p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
+                            Al finalizar el registro se abrirá tu cliente de email con un mensaje
+                            prellenado dirigido al equipo de verificación de AgroEco.Red.
+                          </p>
+                        </div>
+                      </label>
+                    </motion.div>
 
                     <div className="flex gap-3 pt-4">
                       <Button variant="outline" type="button" onClick={() => setStep(2)} className="flex-1">
