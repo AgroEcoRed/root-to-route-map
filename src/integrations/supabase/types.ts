@@ -176,6 +176,36 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_milestones: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          milestone_type: string
+          occurred_on: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          milestone_type?: string
+          occurred_on: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          milestone_type?: string
+          occurred_on?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           actor_type: Database["public"]["Enums"]["actor_type"]
@@ -354,6 +384,45 @@ export type Database = {
         }
         Relationships: []
       }
+      transition_records: {
+        Row: {
+          created_at: string
+          dimension: Database["public"]["Enums"]["transition_dimension"]
+          id: string
+          indicator_key: string
+          notes: string | null
+          period_quarter: number | null
+          period_year: number
+          updated_at: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          dimension: Database["public"]["Enums"]["transition_dimension"]
+          id?: string
+          indicator_key: string
+          notes?: string | null
+          period_quarter?: number | null
+          period_year: number
+          updated_at?: string
+          user_id: string
+          value: number
+        }
+        Update: {
+          created_at?: string
+          dimension?: Database["public"]["Enums"]["transition_dimension"]
+          id?: string
+          indicator_key?: string
+          notes?: string | null
+          period_quarter?: number | null
+          period_year?: number
+          updated_at?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -389,6 +458,12 @@ export type Database = {
         | "agroecological_market"
         | "bio_input_supplier"
       certification_level: "red" | "yellow" | "green" | "none_spg"
+      transition_dimension:
+        | "agronomic"
+        | "ecological"
+        | "economic"
+        | "social"
+        | "cultural"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -544,6 +619,13 @@ export const Constants = {
         "bio_input_supplier",
       ],
       certification_level: ["red", "yellow", "green", "none_spg"],
+      transition_dimension: [
+        "agronomic",
+        "ecological",
+        "economic",
+        "social",
+        "cultural",
+      ],
     },
   },
 } as const
