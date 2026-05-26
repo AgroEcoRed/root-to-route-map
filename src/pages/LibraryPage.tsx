@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import type { LibraryItem } from "@/types/library";
 import { toBibtex, toCsv, downloadFile } from "@/lib/bibtex";
+import { TAG_LABELS, CURATED_TAG_SLUGS, tagLabel } from "@/lib/libraryTags";
 
 const ITEM_TYPES = ["article", "book", "thesis", "report", "chapter", "web"];
 
@@ -42,6 +43,7 @@ const fetchDoiMeta = async (doi: string) => {
 
 const LibraryPage = () => {
   const { user } = useAuth();
+  const { lang } = useLanguage();
   const [items, setItems] = useState<LibraryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
@@ -76,10 +78,16 @@ const LibraryPage = () => {
   }, [items, query, tagFilter]);
 
   const allTags = useMemo(() => {
-    const s = new Set<string>();
-    items.forEach((it) => it.tags?.forEach((t) => s.add(t)));
-    return Array.from(s).sort();
-  }, [items]);
+    const counts = new Map<string, number>();
+    items.forEach((it) =>
+      it.tags?.forEach((t) => {
+        if (TAG_LABELS[t]) counts.set(t, (counts.get(t) ?? 0) + 1);
+      })
+    );
+    return CURATED_TAG_SLUGS
+      .filter((s) => counts.has(s))
+      .sort((a, b) => tagLabel(a, lang).localeCompare(tagLabel(b, lang)));
+  }, [items, lang]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -143,13 +151,13 @@ const LibraryPage = () => {
                 onClick={() => setTagFilter(null)}
                 className={`text-xs px-3 py-1 rounded-full border ${!tagFilter ? "bg-primary text-primary-foreground border-primary" : "border-border text-muted-foreground hover:border-primary"}`}
               >Todas</button>
-              {allTags.slice(0, 30).map((t) => (
+              {allTags.map((t) => (
                 <button
                   key={t}
                   onClick={() => setTagFilter(t === tagFilter ? null : t)}
                   className={`text-xs px-3 py-1 rounded-full border flex items-center gap-1 ${t === tagFilter ? "bg-primary text-primary-foreground border-primary" : "border-border text-muted-foreground hover:border-primary"}`}
                 >
-                  <Tag className="h-3 w-3" /> {t}
+                  <Tag className="h-3 w-3" /> {tagLabel(t, lang)}
                 </button>
               ))}
             </div>
