@@ -187,6 +187,7 @@ const LibraryPage = () => {
 };
 
 const ItemCard = ({ item }: { item: LibraryItem }) => {
+  const { lang } = useLanguage();
   const fileUrl = item.file_path
     ? supabase.storage.from("biblioteca").getPublicUrl(item.file_path).data.publicUrl
     : null;
@@ -209,7 +210,7 @@ const ItemCard = ({ item }: { item: LibraryItem }) => {
           {item.tags?.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-2">
               {item.tags.map((t) => (
-                <span key={t} className="text-[11px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{t}</span>
+                <span key={t} className="text-[11px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{tagLabel(t, lang)}</span>
               ))}
             </div>
           )}
