@@ -153,7 +153,7 @@ const Navbar = () => {
                  <User className="h-4 w-4" />
                  {user.email?.split("@")[0]}
                </span>
-               <Button variant="outline" size="sm" onClick={handleSignOut} className="group">
+               <Button variant="outline" size="sm" onClick={handleSignOut} className="group text-foreground">
                  <LogOut className="h-4 w-4 mr-1 transition-transform group-hover:-translate-x-0.5" />
                  {t("nav.logout")}
                </Button>
