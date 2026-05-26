@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { MapPin, Navigation, AlertCircle } from "lucide-react";
 
 interface LocationPickerProps {
@@ -16,6 +17,9 @@ const LocationPicker = ({ lat, lng, onChange }: LocationPickerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [locating, setLocating] = useState(false);
   const [error, setError] = useState("");
+  const [showManual, setShowManual] = useState(false);
+  const [manualLat, setManualLat] = useState("");
+  const [manualLng, setManualLng] = useState("");
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -86,11 +90,27 @@ const LocationPicker = ({ lat, lng, onChange }: LocationPickerProps) => {
         setLocating(false);
       },
       (err) => {
-        setError("No se pudo obtener tu ubicación. Podés marcarla en el mapa.");
+        let msg = "No se pudo obtener tu ubicación. Marcala en el mapa o ingresá coordenadas.";
+        if (err.code === 1) msg = "Permiso de ubicación denegado. Habilitalo en el navegador (ícono 🔒 junto a la URL) o marcá el punto en el mapa.";
+        else if (err.code === 2) msg = "Ubicación no disponible. Probá con GPS activado o marcá el punto en el mapa.";
+        else if (err.code === 3) msg = "Tiempo de espera agotado. Marcá tu ubicación en el mapa.";
+        setError(msg);
+        setShowManual(true);
         setLocating(false);
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
+  };
+
+  const handleManualSubmit = () => {
+    const la = parseFloat(manualLat.replace(",", "."));
+    const ln = parseFloat(manualLng.replace(",", "."));
+    if (isNaN(la) || isNaN(ln) || la < -90 || la > 90 || ln < -180 || ln > 180) {
+      setError("Coordenadas inválidas. Ej: -34.6037, -58.3816");
+      return;
+    }
+    setError("");
+    onChange(la, ln);
   };
 
   return (
@@ -121,6 +141,19 @@ const LocationPicker = ({ lat, lng, onChange }: LocationPickerProps) => {
         <p className="text-xs text-destructive flex items-center gap-1">
           <AlertCircle className="h-3 w-3" /> {error}
         </p>
+      )}
+      {showManual && (
+        <div className="flex gap-2 items-end">
+          <div className="flex-1">
+            <label className="text-xs text-muted-foreground">Latitud</label>
+            <Input value={manualLat} onChange={(e) => setManualLat(e.target.value)} placeholder="-34.6037" className="h-9 text-sm" />
+          </div>
+          <div className="flex-1">
+            <label className="text-xs text-muted-foreground">Longitud</label>
+            <Input value={manualLng} onChange={(e) => setManualLng(e.target.value)} placeholder="-58.3816" className="h-9 text-sm" />
+          </div>
+          <Button type="button" size="sm" onClick={handleManualSubmit}>Usar</Button>
+        </div>
       )}
       {lat && lng && (
         <p className="text-xs text-muted-foreground">
