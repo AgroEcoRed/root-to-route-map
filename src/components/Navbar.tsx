@@ -181,6 +181,20 @@ const Navbar = () => {
               </span>
             )}
           </button>
+          {/* Mobile auth quick action */}
+          {!user ? (
+            <Button size="sm" className="h-8 px-2.5 text-xs bg-gradient-hero text-primary-foreground" asChild>
+              <Link to="/ingresar">{t("nav.login")}</Link>
+            </Button>
+          ) : (
+            <button
+              onClick={handleSignOut}
+              className={`p-2 rounded-md ${navbarScrolled ? "text-foreground hover:bg-muted/50" : "text-white hover:bg-white/10"}`}
+              aria-label={t("nav.logout")}
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          )}
           {/* Mobile lang switcher */}
           <div className="relative">
             <button
