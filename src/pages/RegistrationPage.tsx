@@ -523,7 +523,7 @@ Gracias.`;
                           {certOptions.map((opt) => (
                             <button key={opt.value} type="button" onClick={() => setCertification(opt.value)}
                               className={`flex items-center gap-3 p-3 rounded-lg border transition-all text-left ${
-                                certification === opt.value ? "border-primary bg-primary/5 shadow-sm" : "border-border bg-card hover:border-primary/30"
+                                certification === opt.value ? "border-primary bg-primary/5 shadow-sm" : "border-border bg-white hover:border-primary/30"
                               }`}>
                               <span className={`w-3 h-3 rounded-full ${opt.color} flex-shrink-0`} />
                               <div>
@@ -559,7 +559,7 @@ Gracias.`;
                         </p>
                         <div className="space-y-3">
                           {selectedOferta.map((cat) => (
-                            <div key={cat} className="rounded-lg border border-border p-3 bg-card/50">
+                            <div key={cat} className="rounded-lg border border-border p-3 bg-white/80">
                               <p className="text-xs font-medium text-card-foreground mb-2">🟢 {cat}</p>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 <Input
