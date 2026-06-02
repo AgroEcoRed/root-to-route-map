@@ -176,6 +176,45 @@ export type Database = {
         }
         Relationships: []
       }
+      producer_media: {
+        Row: {
+          caption: string | null
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          media_type: string
+          media_url: string
+          size_bytes: number | null
+          sort_order: number
+          storage_path: string
+          user_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          media_type: string
+          media_url: string
+          size_bytes?: number | null
+          sort_order?: number
+          storage_path: string
+          user_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          media_type?: string
+          media_url?: string
+          size_bytes?: number | null
+          sort_order?: number
+          storage_path?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profile_milestones: {
         Row: {
           created_at: string
