@@ -325,7 +325,7 @@ Gracias.`;
                   <h1 className="text-3xl sm:text-4xl font-display text-foreground mb-2">Datos de contacto</h1>
                   <p className="text-muted-foreground">Completá tu información básica para registrarte.</p>
                 </div>
-                <div className="max-w-md mx-auto rounded-2xl border border-border bg-card p-6 shadow-card">
+                <div className="max-w-md mx-auto rounded-2xl border border-border bg-white p-6 shadow-elevated">
                   <div className="space-y-4">
                     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0 }}>
                       <Label htmlFor="name">Nombre / Organización</Label>
@@ -414,7 +414,7 @@ Gracias.`;
                   <h1 className="text-3xl sm:text-4xl font-display text-foreground mb-2">Tu actividad</h1>
                   <p className="text-muted-foreground">Seleccioná las categorías de lo que ofrecés y/o necesitás.</p>
                 </div>
-                <form onSubmit={handleSubmit} className="max-w-lg mx-auto rounded-2xl border border-border bg-card p-6 shadow-card">
+                <form onSubmit={handleSubmit} className="max-w-lg mx-auto rounded-2xl border border-border bg-white p-6 shadow-elevated">
                   <div className="space-y-5">
                     {/* Oferta categories */}
                     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
@@ -424,7 +424,7 @@ Gracias.`;
                         {ofertaCategories.map((cat) => (
                           <button key={cat} type="button" onClick={() => toggleCategory(cat, selectedOferta, setSelectedOferta)}
                             className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                              selectedOferta.includes(cat) ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/40"
+                              selectedOferta.includes(cat) ? "border-primary bg-primary/10 text-primary" : "border-border bg-white text-muted-foreground hover:border-primary/40"
                             }`}>
                             {cat}
                           </button>
@@ -449,7 +449,7 @@ Gracias.`;
                         {demandaCategories.map((cat) => (
                           <button key={cat} type="button" onClick={() => toggleCategory(cat, selectedDemanda, setSelectedDemanda)}
                             className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                              selectedDemanda.includes(cat) ? "border-destructive bg-destructive/10 text-destructive" : "border-border bg-card text-muted-foreground hover:border-destructive/40"
+                              selectedDemanda.includes(cat) ? "border-destructive bg-destructive/10 text-destructive" : "border-border bg-white text-muted-foreground hover:border-destructive/40"
                             }`}>
                             {cat}
                           </button>
@@ -473,7 +473,7 @@ Gracias.`;
                           {servicioCategories.map((cat) => (
                             <button key={cat} type="button" onClick={() => toggleCategory(cat, selectedServicios, setSelectedServicios)}
                               className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                                selectedServicios.includes(cat) ? "border-accent bg-accent/10 text-accent-foreground" : "border-border bg-card text-muted-foreground hover:border-accent/40"
+                                selectedServicios.includes(cat) ? "border-accent bg-accent/10 text-accent-foreground" : "border-border bg-white text-muted-foreground hover:border-accent/40"
                               }`}>
                               {cat}
                             </button>
