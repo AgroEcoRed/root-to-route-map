@@ -305,7 +305,7 @@ Gracias.`;
                       whileHover={{ y: -4, scale: 1.02 }} whileTap={{ scale: 0.98 }}
                       onClick={() => { setSelectedType(a.key); setStep(2); }}
                       className={`flex flex-col items-center gap-2 p-5 rounded-xl border transition-all duration-200 text-center ${
-                        selectedType === a.key ? "border-primary bg-primary/5 shadow-card" : "border-border bg-card hover:border-primary/40 hover:shadow-card"
+                        selectedType === a.key ? "border-primary bg-primary/5 shadow-card" : "border-border bg-white hover:border-primary/40 hover:shadow-elevated"
                       }`}>
                       <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${a.color} flex items-center justify-center shadow-md`}>
                         <a.icon className="h-5 w-5 text-primary-foreground" />
