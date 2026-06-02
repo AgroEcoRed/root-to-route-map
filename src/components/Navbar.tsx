@@ -149,10 +149,13 @@ const Navbar = () => {
 
            {user ? (
              <>
-               <span className={`text-sm flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${navbarScrolled ? "text-muted-foreground bg-muted/50" : "text-white/80 bg-white/10"}`}>
+               <Link
+                 to="/mi-perfil"
+                 className={`text-sm flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${navbarScrolled ? "text-muted-foreground bg-muted/50 hover:text-foreground" : "text-white/80 bg-white/10 hover:text-white"}`}
+               >
                  <User className="h-4 w-4" />
                  {user.email?.split("@")[0]}
-               </span>
+               </Link>
                <Button variant="outline" size="sm" onClick={handleSignOut} className="group text-foreground">
                  <LogOut className="h-4 w-4 mr-1 transition-transform group-hover:-translate-x-0.5" />
                  {t("nav.logout")}
@@ -269,9 +272,16 @@ const Navbar = () => {
               ))}
               <div className="flex gap-2 pt-2">
                 {user ? (
-                  <Button variant="outline" size="sm" className="flex-1" onClick={() => { handleSignOut(); setOpen(false); }}>
-                    <LogOut className="h-4 w-4 mr-1" /> {t("nav.logout")}
-                  </Button>
+                  <>
+                    <Button variant="outline" size="sm" className="flex-1" asChild>
+                      <Link to="/mi-perfil" onClick={() => setOpen(false)}>
+                        <User className="h-4 w-4 mr-1" /> Mi Perfil
+                      </Link>
+                    </Button>
+                    <Button variant="outline" size="sm" className="flex-1" onClick={() => { handleSignOut(); setOpen(false); }}>
+                      <LogOut className="h-4 w-4 mr-1" /> {t("nav.logout")}
+                    </Button>
+                  </>
                 ) : (
                   <>
                     <Button variant="outline" size="sm" className="flex-1" asChild>
