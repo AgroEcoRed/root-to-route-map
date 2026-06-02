@@ -147,7 +147,7 @@ const LoginPage = () => {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-elevated">
+            <div className="rounded-2xl border border-border bg-white p-6 shadow-elevated">
               {showForgot ? (
                 <form onSubmit={handleForgotPassword} className="space-y-4">
                   <div>
@@ -178,7 +178,7 @@ const LoginPage = () => {
 
                   <div className="relative mb-4">
                     <Separator />
-                    <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-3 text-xs text-muted-foreground">
+                    <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-xs text-muted-foreground">
                       o con email
                     </span>
                   </div>
