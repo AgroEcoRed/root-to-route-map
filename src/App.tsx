@@ -19,6 +19,7 @@ import ServicesPage from "./pages/ServicesPage";
 import LibraryPage from "./pages/LibraryPage";
 import ProgramsPage from "./pages/ProgramsPage";
 import TransitionPage from "./pages/TransitionPage";
+import MiPerfilPage from "./pages/MiPerfilPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,6 +44,7 @@ const App = () => (
               <Route path="/biblioteca" element={<LibraryPage />} />
               <Route path="/programas" element={<ProgramsPage />} />
               <Route path="/transicion" element={<TransitionPage />} />
+              <Route path="/mi-perfil" element={<MiPerfilPage />} />
               <Route path="/registro" element={<RegistrationPage />} />
               <Route path="/ingresar" element={<LoginPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
