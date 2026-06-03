@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Biblioteca readable by authenticated" ON storage.objects;
