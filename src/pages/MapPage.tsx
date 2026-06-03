@@ -170,7 +170,7 @@ const MapPage = () => {
   useEffect(() => {
     const fetchProfiles = async () => {
       const { data, error } = await supabase
-        .from("profiles")
+        .from("public_profiles" as any)
         .select("*")
         .not("lat", "is", null)
         .not("lng", "is", null);
