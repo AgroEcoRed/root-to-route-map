@@ -467,7 +467,77 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_profiles: {
+        Row: {
+          actor_type: Database["public"]["Enums"]["actor_type"] | null
+          avatar_url: string | null
+          capacity: string | null
+          certification:
+            | Database["public"]["Enums"]["certification_level"]
+            | null
+          created_at: string | null
+          description: string | null
+          display_name: string | null
+          id: string | null
+          lat: number | null
+          lng: number | null
+          location: string | null
+          production_methods: string | null
+          products: string[] | null
+          spg_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          actor_type?: Database["public"]["Enums"]["actor_type"] | null
+          avatar_url?: string | null
+          capacity?: string | null
+          certification?:
+            | Database["public"]["Enums"]["certification_level"]
+            | null
+          created_at?: string | null
+          description?: string | null
+          display_name?: string | null
+          id?: string | null
+          lat?: number | null
+          lng?: number | null
+          location?: string | null
+          production_methods?: string | null
+          products?: string[] | null
+          spg_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          actor_type?: Database["public"]["Enums"]["actor_type"] | null
+          avatar_url?: string | null
+          capacity?: string | null
+          certification?:
+            | Database["public"]["Enums"]["certification_level"]
+            | null
+          created_at?: string | null
+          description?: string | null
+          display_name?: string | null
+          id?: string | null
+          lat?: number | null
+          lng?: number | null
+          location?: string | null
+          production_methods?: string | null
+          products?: string[] | null
+          spg_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_spg_id_fkey"
+            columns: ["spg_id"]
+            isOneToOne: false
+            referencedRelation: "spgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
