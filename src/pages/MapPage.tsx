@@ -169,17 +169,17 @@ const MapPage = () => {
   // Fetch real profiles from database
   useEffect(() => {
     const fetchProfiles = async () => {
-      const { data, error } = await supabase
-        .from("public_profiles" as any)
+      const { data, error } = await (supabase as any)
+        .from("public_profiles")
         .select("*")
         .not("lat", "is", null)
         .not("lng", "is", null);
-      
+
       if (error || !data) return;
-      
-      const realActors: MapActor[] = data
-        .filter(p => p.lat && p.lng)
-        .map((p, i) => ({
+
+      const realActors: MapActor[] = (data as any[])
+        .filter((p: any) => p.lat && p.lng)
+        .map((p: any, i: number) => ({
           id: 10000 + i,
           name: p.display_name || "Sin nombre",
           type: (p.actor_type as ActorType) || "producer",
