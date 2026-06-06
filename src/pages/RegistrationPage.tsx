@@ -12,14 +12,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { ChevronsUpDown } from "lucide-react";
 import {
   Sprout, Users, Heart, UtensilsCrossed, Store,
   Building2, Truck, Factory, ShoppingCart, ArrowRight, ArrowLeft, Check, Sparkles, Plus, X
 } from "lucide-react";
 import LocationPicker from "@/components/LocationPicker";
+import CitySearch from "@/components/CitySearch";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
