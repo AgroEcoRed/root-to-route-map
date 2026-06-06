@@ -40,9 +40,14 @@ Deno.serve(async (req) => {
     // Fetch the page content
     let pageText = "";
     let pageTitle = "";
+    let fetchError = "";
+    // Try direct fetch first
     try {
       const pageRes = await fetch(normalizedUrl, {
-        headers: { "User-Agent": "Mozilla/5.0 AgroEcoBot/1.0" },
+        headers: {
+          "User-Agent": "Mozilla/5.0 (compatible; AgroEcoBot/1.0)",
+          "Accept": "text/html,application/xhtml+xml",
+        },
         redirect: "follow",
       });
       if (!pageRes.ok) throw new Error(`HTTP ${pageRes.status}`);
@@ -51,16 +56,34 @@ Deno.serve(async (req) => {
       pageTitle = titleMatch?.[1]?.trim() || "";
       pageText = stripHtml(html);
     } catch (e) {
-      return new Response(JSON.stringify({
-        error: "No pudimos leer esa URL. Verificá que sea pública y accesible.",
-        details: String(e),
-      }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      fetchError = String(e);
+    }
+
+    // Fallback: use r.jina.ai reader proxy (handles SSL/JS-rendered/social sites)
+    if (!pageText || pageText.length < 50) {
+      try {
+        const proxied = "https://r.jina.ai/" + normalizedUrl;
+        const proxyRes = await fetch(proxied, {
+          headers: { "Accept": "text/plain", "User-Agent": "AgroEcoBot/1.0" },
+        });
+        if (proxyRes.ok) {
+          const text = await proxyRes.text();
+          if (!pageTitle) {
+            const m = text.match(/Title:\s*(.+)/i);
+            pageTitle = m?.[1]?.trim() || "";
+          }
+          pageText = text.replace(/\s+/g, " ").trim().slice(0, 12000);
+        }
+      } catch (e) {
+        fetchError = fetchError || String(e);
+      }
     }
 
     if (!pageText || pageText.length < 50) {
       return new Response(JSON.stringify({
-        error: "La página no tiene contenido suficiente para extraer un perfil.",
-      }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        error: "No pudimos leer el contenido de esa URL. Probá con un sitio web público (no Instagram privado).",
+        details: fetchError,
+      }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
@@ -96,16 +119,16 @@ Deno.serve(async (req) => {
       const errTxt = await aiRes.text();
       if (aiRes.status === 429) {
         return new Response(JSON.stringify({ error: "Límite de uso alcanzado. Intentá más tarde." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (aiRes.status === 402) {
         return new Response(JSON.stringify({ error: "Sin créditos de IA disponibles." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       return new Response(JSON.stringify({ error: "Error del servicio de IA", details: errTxt }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
