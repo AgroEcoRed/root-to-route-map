@@ -395,16 +395,23 @@ Gracias.`;
                       )}
 
                       {region && (
-                        <Select value={city} onValueChange={setCity}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Ciudad / Localidad" />
-                          </SelectTrigger>
-                          <SelectContent position="popper" className="max-h-[200px] overflow-y-auto">
+                        <div className="space-y-1">
+                          <Input
+                            list="city-suggestions"
+                            value={city}
+                            onChange={(e) => setCity(e.target.value)}
+                            placeholder="Ciudad / Localidad / Partido (escribí libremente)"
+                            autoComplete="off"
+                          />
+                          <datalist id="city-suggestions">
                             {selectedRegion2?.cities.map((c) => (
-                              <SelectItem key={c} value={c}>{c}</SelectItem>
+                              <option key={c} value={c} />
                             ))}
-                          </SelectContent>
-                        </Select>
+                          </datalist>
+                          <p className="text-xs text-muted-foreground">
+                            Las sugerencias son orientativas. Podés escribir cualquier localidad o partido (ej.: San Martín, Vicente López, etc.).
+                          </p>
+                        </div>
                       )}
                     </motion.div>
 
