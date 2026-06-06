@@ -754,6 +754,14 @@ const translations: Record<Lang, Record<string, string>> = {
     "services.logistics_desc": "Routes partagées et points de distribution pour réduire les coûts.",
     "services.view_on_map": "Voir sur la carte",
     "services.also_explore": "Explorez aussi ces sections :",
+    // Partners
+    "partners.badge": "Alliances institutionnelles",
+    "partners.title": "Ils nous accompagnent",
+    "partners.subtitle": "Réseaux, institutions et organisations qui accompagnent le développement de la plateforme.",
+    "partners.placeholder": "Prochain allié",
+    "partners.cta_title": "Votre institution ou réseau souhaite se joindre ?",
+    "partners.cta_text": "Si vous représentez une université, un organisme de recherche, une organisation de la société civile ou un réseau agroécologique, contactez-nous pour explorer une collaboration.",
+    "partners.cta_button": "Contactez-nous",
   },
   pt: {
     "nav.home": "Início",
@@ -991,6 +999,14 @@ const translations: Record<Lang, Record<string, string>> = {
     "services.logistics_desc": "Rotas compartilhadas e pontos de distribuição para reduzir custos.",
     "services.view_on_map": "Ver no mapa",
     "services.also_explore": "Explore também estas seções:",
+    // Partners
+    "partners.badge": "Alianças institucionais",
+    "partners.title": "Nos acompanham",
+    "partners.subtitle": "Redes, instituições e organizações que acompanham o desenvolvimento da plataforma.",
+    "partners.placeholder": "Próximo aliado",
+    "partners.cta_title": "Sua instituição ou rede quer se juntar?",
+    "partners.cta_text": "Se você representa uma universidade, organismo de pesquisa, organização da sociedade civil ou rede agroecológica, entre em contato para explorar uma colaboração.",
+    "partners.cta_button": "Fale conosco",
   },
 };
 
