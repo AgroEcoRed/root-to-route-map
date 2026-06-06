@@ -59,6 +59,7 @@ interface MapActor {
   products: string[];
   certification: "red" | "yellow" | "green";
   description: string;
+  source: "rutas_sanas" | "agroeco";
 }
 
 const actorTypeLabels: Record<ActorType, string> = {
@@ -151,6 +152,7 @@ const mockActors: MapActor[] = (rutasSanas as Array<{n:string;lat:number;lng:num
   products: [],
   certification: "yellow",
   description: p.d || p.f,
+  source: "rutas_sanas",
 }));
 
 type CertFilter = "green" | "yellow" | "red";
@@ -188,6 +190,7 @@ const MapPage = () => {
           products: (p.products || []).map(pr => pr.replace(/^[🟢🔴]\s*/, "")),
           certification: (p.certification as "red" | "yellow" | "green") || "red",
           description: p.description || p.location || "",
+          source: "agroeco",
         }));
       setDbActors(realActors);
     };
@@ -265,9 +268,13 @@ const MapPage = () => {
         ? `border-radius:50% 50% 4px 4px;`
         : `border-radius:50%;`;
 
+      const borderStyle = a.source === "rutas_sanas"
+        ? "border:2px dashed white;opacity:0.85;"
+        : "border:3px solid white;";
+
       const icon = L.divIcon({
         className: "custom-marker",
-        html: `<div style="background:${color};width:30px;height:30px;${shape}border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">
+        html: `<div style="background:${color};width:30px;height:30px;${shape}${borderStyle}box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">
           <span style="color:white;font-size:12px;font-weight:bold;line-height:1">${arrowIcon}</span>
         </div>`,
         iconSize: [30, 30],
@@ -295,9 +302,14 @@ const MapPage = () => {
 
       const roleBadgeColor = role === "oferta" ? "#2563eb" : role === "demanda" ? "#9333ea" : "#ea580c";
 
+      const sourceBadge = a.source === "rutas_sanas"
+        ? `<span style="display:inline-block;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.3px;text-transform:uppercase">Rutas Sanas</span>`
+        : `<span style="display:inline-block;background:#dcfce7;color:#15803d;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #86efac;letter-spacing:0.3px;text-transform:uppercase">AgroEco.Red</span>`;
+
       const marker = L.marker([a.lat, a.lng], { icon })
         .bindPopup(`
           <div style="min-width:240px;font-family:DM Sans,sans-serif;padding:4px">
+            <div style="margin-bottom:6px">${sourceBadge}</div>
             <a href="#" class="map-actor-link" data-producer="${encodeURIComponent(a.name)}" style="display:block;background:${roleBadgeColor};color:white;font-weight:700;font-size:14px;margin:0 0 8px;padding:8px 12px;border-radius:8px;text-decoration:none;cursor:pointer;text-align:center;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
               ${a.name}
               <span style="display:block;font-size:10px;font-weight:400;opacity:0.85;margin-top:2px">Ver todos sus productos →</span>
