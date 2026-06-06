@@ -17,6 +17,7 @@ import {
   Building2, Truck, Factory, ShoppingCart, ArrowRight, ArrowLeft, Check, Sparkles, Plus, X
 } from "lucide-react";
 import LocationPicker from "@/components/LocationPicker";
+import CitySearch from "@/components/CitySearch";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
@@ -395,23 +396,11 @@ Gracias.`;
                       )}
 
                       {region && (
-                        <div className="space-y-1">
-                          <Input
-                            list="city-suggestions"
-                            value={city}
-                            onChange={(e) => setCity(e.target.value)}
-                            placeholder="Ciudad / Localidad / Partido (escribí libremente)"
-                            autoComplete="off"
-                          />
-                          <datalist id="city-suggestions">
-                            {selectedRegion2?.cities.map((c) => (
-                              <option key={c} value={c} />
-                            ))}
-                          </datalist>
-                          <p className="text-xs text-muted-foreground">
-                            Las sugerencias son orientativas. Podés escribir cualquier localidad o partido (ej.: San Martín, Vicente López, etc.).
-                          </p>
-                        </div>
+                        <CitySearch
+                          cities={selectedRegion2?.cities || []}
+                          value={city}
+                          onChange={setCity}
+                        />
                       )}
                     </motion.div>
 
