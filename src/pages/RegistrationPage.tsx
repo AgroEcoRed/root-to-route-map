@@ -12,6 +12,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { ChevronsUpDown } from "lucide-react";
 import {
   Sprout, Users, Heart, UtensilsCrossed, Store,
   Building2, Truck, Factory, ShoppingCart, ArrowRight, ArrowLeft, Check, Sparkles, Plus, X
@@ -395,23 +398,11 @@ Gracias.`;
                       )}
 
                       {region && (
-                        <div className="space-y-1">
-                          <Input
-                            list="city-suggestions"
-                            value={city}
-                            onChange={(e) => setCity(e.target.value)}
-                            placeholder="Ciudad / Localidad / Partido (escribí libremente)"
-                            autoComplete="off"
-                          />
-                          <datalist id="city-suggestions">
-                            {selectedRegion2?.cities.map((c) => (
-                              <option key={c} value={c} />
-                            ))}
-                          </datalist>
-                          <p className="text-xs text-muted-foreground">
-                            Las sugerencias son orientativas. Podés escribir cualquier localidad o partido (ej.: San Martín, Vicente López, etc.).
-                          </p>
-                        </div>
+                        <CitySearch
+                          cities={selectedRegion2?.cities || []}
+                          value={city}
+                          onChange={setCity}
+                        />
                       )}
                     </motion.div>
 
