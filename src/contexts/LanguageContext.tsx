@@ -264,6 +264,14 @@ const translations: Record<Lang, Record<string, string>> = {
     "services.logistics_desc": "Rutas compartidas, fletes cooperativos y puntos de distribución para reducir costos de transporte.",
     "services.view_on_map": "Ver en el mapa",
     "services.also_explore": "También explorá estas secciones de la plataforma:",
+    // Partners
+    "partners.badge": "Alianzas institucionales",
+    "partners.title": "Nos acompañan",
+    "partners.subtitle": "Redes, instituciones y organizaciones que acompañan el desarrollo de la plataforma.",
+    "partners.placeholder": "Próximo aliado",
+    "partners.cta_title": "¿Tu institución o red quiere sumarse?",
+    "partners.cta_text": "Si representás una universidad, organismo de investigación, organización de la sociedad civil o red agroecológica, contactanos para explorar una colaboración.",
+    "partners.cta_button": "Escribinos",
   },
   en: {
     "nav.home": "Home",
