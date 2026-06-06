@@ -299,6 +299,33 @@ Gracias.`;
                   <h1 className="text-3xl sm:text-4xl font-display text-foreground mb-2">¿Cómo participás de la red?</h1>
                   <p className="text-muted-foreground">Elegí el rol que mejor te represente para conectarte con la comunidad agroecológica.</p>
                 </div>
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="mb-6 mx-auto max-w-2xl rounded-2xl border-2 border-primary/30 bg-gradient-to-r from-primary/10 via-wheat/10 to-primary/5 p-4 sm:p-5 shadow-elevated"
+                >
+                  <div className="flex items-start gap-3 flex-wrap sm:flex-nowrap">
+                    <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-foreground text-sm sm:text-base">
+                        ¿Tenés un sitio, Instagram o Linktree?
+                      </p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">
+                        Registrate en 30 segundos: nuestra IA lee el enlace y arma tu perfil. Vos sólo confirmás.
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={() => navigate("/registro-rapido")}
+                      className="w-full sm:w-auto"
+                    >
+                      Registro rápido <ArrowRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </div>
+                </motion.div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {actorTypes.map((a, i) => (
                     <motion.button key={a.key} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
