@@ -509,6 +509,14 @@ const translations: Record<Lang, Record<string, string>> = {
     "services.logistics_desc": "Shared routes, cooperative freight and distribution points to reduce transport costs.",
     "services.view_on_map": "View on map",
     "services.also_explore": "Also explore these platform sections:",
+    // Partners
+    "partners.badge": "Institutional alliances",
+    "partners.title": "They support us",
+    "partners.subtitle": "Networks, institutions and organizations that support the development of the platform.",
+    "partners.placeholder": "Next ally",
+    "partners.cta_title": "Does your institution or network want to join?",
+    "partners.cta_text": "If you represent a university, research body, civil society organization or agroecological network, contact us to explore a collaboration.",
+    "partners.cta_button": "Contact us",
   },
   fr: {
     "nav.home": "Accueil",
