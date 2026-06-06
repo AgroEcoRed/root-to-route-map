@@ -1,3 +1,5 @@
+import { argentinaRegions } from "./argentinaRegions";
+
 export interface LocationData {
   countries: { code: string; name: string; phoneCode: string; regions: { code: string; name: string; cities: string[] }[] }[];
 }
@@ -8,32 +10,7 @@ export const locationData: LocationData = {
       code: "AR",
       name: "Argentina",
       phoneCode: "+54",
-      regions: [
-        { code: "CABA", name: "Ciudad Autónoma de Buenos Aires (CABA)", cities: ["Ciudad Autónoma de Buenos Aires"] },
-        { code: "BA", name: "Buenos Aires", cities: ["La Plata", "Mar del Plata", "Bahía Blanca", "Quilmes", "Moreno", "Florencio Varela", "San Vicente", "Cañuelas", "Luján", "Marcos Paz", "Pilar", "Tigre", "San Isidro", "Avellaneda", "Lanús", "Lomas de Zamora", "Berazategui", "Almirante Brown", "Esteban Echeverría"] },
-        { code: "SF", name: "Santa Fe", cities: ["Rosario", "Santa Fe", "Rafaela", "Reconquista", "Venado Tuerto"] },
-        { code: "CB", name: "Córdoba", cities: ["Córdoba", "Villa María", "Río Cuarto", "San Francisco", "Villa Carlos Paz"] },
-        { code: "MZ", name: "Mendoza", cities: ["Mendoza", "San Rafael", "Godoy Cruz", "Luján de Cuyo", "Maipú"] },
-        { code: "ER", name: "Entre Ríos", cities: ["Paraná", "Concordia", "Gualeguaychú", "Concepción del Uruguay", "Villaguay"] },
-        { code: "TU", name: "Tucumán", cities: ["San Miguel de Tucumán", "Yerba Buena", "Tafí Viejo", "Concepción", "Aguilares"] },
-        { code: "MI", name: "Misiones", cities: ["Posadas", "Oberá", "Eldorado", "Puerto Iguazú", "Apóstoles"] },
-        { code: "CH", name: "Chaco", cities: ["Resistencia", "Presidencia Roque Sáenz Peña", "Villa Ángela", "Charata"] },
-        { code: "CO", name: "Corrientes", cities: ["Corrientes", "Goya", "Mercedes", "Paso de los Libres", "Curuzú Cuatiá"] },
-        { code: "SA", name: "Salta", cities: ["Salta", "San Ramón de la Nueva Orán", "Tartagal", "Cafayate", "General Güemes"] },
-        { code: "RN", name: "Río Negro", cities: ["Viedma", "San Carlos de Bariloche", "General Roca", "Cipolletti", "Allen"] },
-        { code: "NQ", name: "Neuquén", cities: ["Neuquén", "San Martín de los Andes", "Centenario", "Plottier", "Cutral-Có"] },
-        { code: "JU", name: "Jujuy", cities: ["San Salvador de Jujuy", "Palpalá", "San Pedro de Jujuy", "Tilcara", "Humahuaca"] },
-        { code: "SJ", name: "San Juan", cities: ["San Juan", "Rawson", "Rivadavia", "Chimbas", "Pocito"] },
-        { code: "SL", name: "San Luis", cities: ["San Luis", "Villa Mercedes", "Merlo", "Juana Koslay"] },
-        { code: "CT", name: "Catamarca", cities: ["San Fernando del Valle de Catamarca", "Recreo", "Tinogasta", "Belén"] },
-        { code: "LP", name: "La Pampa", cities: ["Santa Rosa", "General Pico", "Toay", "Victorica"] },
-        { code: "LR", name: "La Rioja", cities: ["La Rioja", "Chilecito", "Aimogasta", "Chamical"] },
-        { code: "SE", name: "Santiago del Estero", cities: ["Santiago del Estero", "La Banda", "Termas de Río Hondo", "Añatuya"] },
-        { code: "FO", name: "Formosa", cities: ["Formosa", "Clorinda", "Pirané", "El Colorado"] },
-        { code: "SC", name: "Santa Cruz", cities: ["Río Gallegos", "Caleta Olivia", "El Calafate", "Pico Truncado"] },
-        { code: "CH2", name: "Chubut", cities: ["Rawson", "Comodoro Rivadavia", "Trelew", "Puerto Madryn", "Esquel"] },
-        { code: "TF", name: "Tierra del Fuego", cities: ["Ushuaia", "Río Grande", "Tolhuin"] },
-      ],
+      regions: argentinaRegions as unknown as { code: string; name: string; cities: string[] }[],
     },
     {
       code: "UY",
