@@ -1,1 +1,7 @@
 project_id = "volvxnnxnynqtlmfapvp"
+
+[functions.ocr-extract]
+verify_jwt = false
+
+[functions.extract-profile-from-url]
+verify_jwt = false
