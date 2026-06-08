@@ -27,18 +27,15 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <section className="py-24 bg-background relative overflow-hidden">
+    <section className="py-28 bg-background relative overflow-hidden">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-wheat/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
       <div className="container relative">
-        <motion.div className="text-center max-w-2xl mx-auto mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
-          <motion.span className="inline-block text-sm font-semibold text-secondary uppercase tracking-wider px-4 py-1 rounded-full bg-secondary/10"
-            initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}>
-            {t("features.badge")}
-          </motion.span>
-          <h2 className="text-3xl sm:text-4xl font-display text-foreground mt-4 mb-4">{t("features.title")}</h2>
-          <p className="text-muted-foreground">{t("features.subtitle")}</p>
+        <motion.div className="text-center max-w-2xl mx-auto mb-20" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
+          <span className="eyebrow text-secondary justify-center">{t("features.badge")}</span>
+          <h2 className="text-4xl sm:text-5xl font-display text-foreground mt-5 mb-5 leading-[1.1] tracking-tight text-balance">{t("features.title")}</h2>
+          <p className="text-muted-foreground text-lg leading-relaxed text-pretty">{t("features.subtitle")}</p>
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
