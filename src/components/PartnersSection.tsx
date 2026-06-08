@@ -25,18 +25,11 @@ const PartnersSection = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
         >
-          <motion.span
-            className="inline-block text-sm font-semibold text-secondary uppercase tracking-wider px-4 py-1 rounded-full bg-secondary/10"
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-          >
-            {t("partners.badge")}
-          </motion.span>
-          <h2 className="text-3xl sm:text-4xl font-display text-foreground mt-4 mb-4">
+          <span className="eyebrow text-secondary justify-center">{t("partners.badge")}</span>
+          <h2 className="text-4xl sm:text-5xl font-display text-foreground mt-5 mb-5 leading-[1.1] tracking-tight text-balance">
             {t("partners.title")}
           </h2>
-          <p className="text-muted-foreground">{t("partners.subtitle")}</p>
+          <p className="text-muted-foreground text-lg leading-relaxed text-pretty">{t("partners.subtitle")}</p>
         </motion.div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 items-center justify-items-center mb-12">
