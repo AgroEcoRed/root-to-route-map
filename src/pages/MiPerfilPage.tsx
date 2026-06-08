@@ -38,6 +38,10 @@ const MiPerfilPage = () => {
   const [attribution, setAttribution] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Profile-level default license (applies to public profile + new uploads)
+  const [profileLicense, setProfileLicense] = useState<LicenseCode>(DEFAULT_LICENSE);
+  const [savingProfileLicense, setSavingProfileLicense] = useState(false);
+
   // OCR state
   const [ocrLoading, setOcrLoading] = useState(false);
   const [ocrText, setOcrText] = useState("");
@@ -46,7 +50,34 @@ const MiPerfilPage = () => {
   useEffect(() => {
     if (!user) return;
     loadMedia();
+    loadProfileLicense();
   }, [user]);
+
+  const loadProfileLicense = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("profiles")
+      .select("content_license")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    const lic = (data?.content_license as LicenseCode) || DEFAULT_LICENSE;
+    setProfileLicense(lic);
+    setLicense(lic);
+  };
+
+  const saveProfileLicense = async (lic: LicenseCode) => {
+    if (!user) return;
+    setProfileLicense(lic);
+    setLicense(lic);
+    setSavingProfileLicense(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ content_license: lic })
+      .eq("user_id", user.id);
+    setSavingProfileLicense(false);
+    if (error) toast.error("No se pudo guardar la licencia");
+    else toast.success("Licencia del perfil actualizada");
+  };
 
   const loadMedia = async () => {
     if (!user) return;
@@ -171,6 +202,31 @@ const MiPerfilPage = () => {
         <div className="container max-w-5xl">
           <h1 className="font-display text-3xl mb-2">Mi Perfil</h1>
           <p className="text-muted-foreground mb-8">Compartí fotos y videos de tu producción y digitalizá documentos manuscritos.</p>
+
+          {/* Profile-level default license */}
+          <section className="rounded-2xl border border-border bg-card p-6 mb-8">
+            <div className="flex items-start justify-between gap-4 flex-wrap mb-3">
+              <div>
+                <h2 className="font-display text-xl mb-1">Licencia de mi perfil público</h2>
+                <p className="text-sm text-muted-foreground max-w-2xl">
+                  Define cómo otras personas pueden reutilizar la información que compartís
+                  en tu perfil público (descripción, productos, ubicación, fotos y videos).
+                  Se aplicará por defecto a tus nuevas publicaciones. Podés cambiarla cuando quieras.
+                </p>
+              </div>
+              <LicenseBadge code={profileLicense} />
+            </div>
+            <div className="max-w-xl">
+              <LicenseSelector
+                value={profileLicense}
+                onChange={saveProfileLicense}
+                showAttribution={false}
+              />
+              {savingProfileLicense && (
+                <p className="text-xs text-muted-foreground mt-2">Guardando…</p>
+              )}
+            </div>
+          </section>
 
           {/* Gallery uploader */}
           <section className="rounded-2xl border border-border bg-card p-6 mb-8">
