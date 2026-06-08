@@ -19,19 +19,18 @@ const ActorTypesSection = () => {
   ];
 
   return (
-    <section className="py-24 bg-muted/50 relative overflow-hidden">
+    <section className="py-28 bg-muted/40 relative overflow-hidden grain-overlay">
       <div className="absolute inset-0 opacity-30">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full border border-primary/10" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full border border-primary/5" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] rounded-full border border-primary/5" />
       </div>
 
       <div className="container relative">
-        <motion.div className="text-center max-w-2xl mx-auto mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
-          <span className="inline-block text-sm font-semibold text-earth uppercase tracking-wider px-4 py-1 rounded-full bg-earth/10">
-            {t("actors_section.badge")}
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-display text-foreground mt-4 mb-4">{t("actors_section.title")}</h2>
-          <p className="text-muted-foreground">{t("actors_section.subtitle")}</p>
+        <motion.div className="text-center max-w-2xl mx-auto mb-20" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
+          <span className="eyebrow text-earth justify-center">{t("actors_section.badge")}</span>
+          <h2 className="text-4xl sm:text-5xl font-display text-foreground mt-5 mb-5 leading-[1.1] tracking-tight text-balance">{t("actors_section.title")}</h2>
+          <p className="text-muted-foreground text-lg leading-relaxed text-pretty">{t("actors_section.subtitle")}</p>
         </motion.div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
