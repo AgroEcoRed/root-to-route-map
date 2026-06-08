@@ -26,11 +26,11 @@ const CTASection = () => {
               {t("cta.badge")}
             </motion.div>
 
-            <motion.h2 className="text-3xl sm:text-4xl lg:text-5xl font-display text-primary-foreground mb-4"
+            <motion.h2 className="text-4xl sm:text-5xl lg:text-6xl font-display text-primary-foreground mb-5 leading-[1.05] tracking-tight text-balance"
               initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.1 }}>
               {t("cta.title")}
             </motion.h2>
-            <motion.p className="text-primary-foreground/80 text-lg mb-8 leading-relaxed"
+            <motion.p className="text-primary-foreground/85 text-lg sm:text-xl mb-10 leading-relaxed text-pretty"
               initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }}>
               {t("cta.subtitle")}
             </motion.p>
