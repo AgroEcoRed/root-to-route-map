@@ -191,6 +191,7 @@ const MapPage = () => {
           certification: (p.certification as "red" | "yellow" | "green") || "red",
           description: p.description || p.location || "",
           source: "agroeco",
+          contentLicense: p.content_license || null,
         }));
       setDbActors(realActors);
     };
