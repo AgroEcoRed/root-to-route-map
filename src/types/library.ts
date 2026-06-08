@@ -13,4 +13,6 @@ export interface LibraryItem {
   journal: string | null;
   uploaded_by: string;
   created_at: string;
+  license?: string | null;
+  attribution?: string | null;
 }

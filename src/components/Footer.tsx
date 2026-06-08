@@ -59,7 +59,12 @@ const Footer = () => {
         <div className="mt-12 pt-8 border-t border-forest-foreground/10 flex flex-col items-center gap-4 text-xs text-forest-foreground/40">
           <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-4">
             <span>{t("footer.copyright")}</span>
-            <span>{t("footer.tagline")}</span>
+            <div className="flex items-center gap-4">
+              <Link to="/licencias" className="hover:text-wheat transition-colors">
+                Licencias · CC BY-SA 4.0
+              </Link>
+              <span>{t("footer.tagline")}</span>
+            </div>
           </div>
         </div>
       </div>

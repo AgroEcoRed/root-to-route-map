@@ -21,6 +21,7 @@ import ProgramsPage from "./pages/ProgramsPage";
 import TransitionPage from "./pages/TransitionPage";
 import MiPerfilPage from "./pages/MiPerfilPage";
 import QuickRegistrationPage from "./pages/QuickRegistrationPage";
+import LicensesPage from "./pages/LicensesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App = () => (
               <Route path="/registro-rapido" element={<QuickRegistrationPage />} />
               <Route path="/ingresar" element={<LoginPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/licencias" element={<LicensesPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AuthProvider>

@@ -122,6 +122,7 @@ export type Database = {
       library_items: {
         Row: {
           abstract: string | null
+          attribution: string | null
           authors: string[]
           collection_id: string | null
           created_at: string
@@ -130,6 +131,7 @@ export type Database = {
           id: string
           item_type: string
           journal: string | null
+          license: string
           publisher: string | null
           tags: string[]
           title: string
@@ -140,6 +142,7 @@ export type Database = {
         }
         Insert: {
           abstract?: string | null
+          attribution?: string | null
           authors?: string[]
           collection_id?: string | null
           created_at?: string
@@ -148,6 +151,7 @@ export type Database = {
           id?: string
           item_type?: string
           journal?: string | null
+          license?: string
           publisher?: string | null
           tags?: string[]
           title: string
@@ -158,6 +162,7 @@ export type Database = {
         }
         Update: {
           abstract?: string | null
+          attribution?: string | null
           authors?: string[]
           collection_id?: string | null
           created_at?: string
@@ -166,6 +171,7 @@ export type Database = {
           id?: string
           item_type?: string
           journal?: string | null
+          license?: string
           publisher?: string | null
           tags?: string[]
           title?: string
@@ -178,10 +184,12 @@ export type Database = {
       }
       producer_media: {
         Row: {
+          attribution: string | null
           caption: string | null
           created_at: string
           duration_seconds: number | null
           id: string
+          license: string
           media_type: string
           media_url: string
           size_bytes: number | null
@@ -190,10 +198,12 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          attribution?: string | null
           caption?: string | null
           created_at?: string
           duration_seconds?: number | null
           id?: string
+          license?: string
           media_type: string
           media_url: string
           size_bytes?: number | null
@@ -202,10 +212,12 @@ export type Database = {
           user_id: string
         }
         Update: {
+          attribution?: string | null
           caption?: string | null
           created_at?: string
           duration_seconds?: number | null
           id?: string
+          license?: string
           media_type?: string
           media_url?: string
           size_bytes?: number | null
@@ -253,6 +265,7 @@ export type Database = {
           certification:
             | Database["public"]["Enums"]["certification_level"]
             | null
+          content_license: string
           created_at: string
           description: string | null
           display_name: string | null
@@ -275,6 +288,7 @@ export type Database = {
           certification?:
             | Database["public"]["Enums"]["certification_level"]
             | null
+          content_license?: string
           created_at?: string
           description?: string | null
           display_name?: string | null
@@ -297,6 +311,7 @@ export type Database = {
           certification?:
             | Database["public"]["Enums"]["certification_level"]
             | null
+          content_license?: string
           created_at?: string
           description?: string | null
           display_name?: string | null

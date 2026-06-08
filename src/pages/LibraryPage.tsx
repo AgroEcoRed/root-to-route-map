@@ -17,6 +17,9 @@ import {
 import type { LibraryItem } from "@/types/library";
 import { toBibtex, toCsv, downloadFile } from "@/lib/bibtex";
 import { TAG_LABELS, CURATED_TAG_SLUGS, tagLabel } from "@/lib/libraryTags";
+import LicenseSelector from "@/components/LicenseSelector";
+import LicenseBadge from "@/components/LicenseBadge";
+import { DEFAULT_LICENSE, LicenseCode } from "@/lib/licenses";
 
 const ITEM_TYPES = ["article", "book", "thesis", "report", "chapter", "web"];
 
@@ -214,6 +217,9 @@ const ItemCard = ({ item }: { item: LibraryItem }) => {
               ))}
             </div>
           )}
+          <div className="mt-2">
+            <LicenseBadge code={item.license} attribution={item.attribution} />
+          </div>
         </div>
         <div className="flex flex-col gap-2 shrink-0">
           {fileUrl && (
@@ -250,6 +256,8 @@ const UploadDialog = ({ onClose }: { onClose: () => void }) => {
   const [tags, setTags] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
+  const [license, setLicense] = useState<LicenseCode>(DEFAULT_LICENSE);
+  const [attribution, setAttribution] = useState("");
 
   const lookup = async () => {
     if (!doi.trim()) return;
@@ -291,6 +299,8 @@ const UploadDialog = ({ onClose }: { onClose: () => void }) => {
       tags: tags.split(",").map((t) => t.trim()).filter(Boolean),
       file_path: filePath,
       uploaded_by: user.id,
+      license,
+      attribution: attribution.trim() || null,
     });
     setBusy(false);
     if (error) return toast.error(error.message);
@@ -326,6 +336,12 @@ const UploadDialog = ({ onClose }: { onClose: () => void }) => {
             <Upload className="h-4 w-4" /> {file ? file.name : "Adjuntar PDF/EPUB (opcional)"}
           </label>
         </div>
+        <LicenseSelector
+          value={license}
+          onChange={setLicense}
+          attribution={attribution}
+          onAttributionChange={setAttribution}
+        />
       </div>
       <DialogFooter>
         <Button variant="ghost" onClick={onClose}>Cancelar</Button>
