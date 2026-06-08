@@ -10,6 +10,9 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Upload, Trash2, Image as ImageIcon, Video, FileText, Copy, ScanText } from "lucide-react";
+import LicenseSelector from "@/components/LicenseSelector";
+import LicenseBadge from "@/components/LicenseBadge";
+import { DEFAULT_LICENSE, LicenseCode } from "@/lib/licenses";
 
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB
 const MAX_VIDEO_BYTES = 25 * 1024 * 1024; // 25MB
@@ -20,6 +23,8 @@ interface MediaItem {
   storage_path: string;
   media_type: "image" | "video";
   caption: string | null;
+  license?: string | null;
+  attribution?: string | null;
   signedUrl?: string;
 }
 
@@ -29,6 +34,8 @@ const MiPerfilPage = () => {
   const [items, setItems] = useState<MediaItem[]>([]);
   const [uploading, setUploading] = useState(false);
   const [caption, setCaption] = useState("");
+  const [license, setLicense] = useState<LicenseCode>(DEFAULT_LICENSE);
+  const [attribution, setAttribution] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   // OCR state
@@ -100,10 +107,13 @@ const MiPerfilPage = () => {
         media_type: isImage ? "image" : "video",
         caption: caption || null,
         size_bytes: file.size,
+        license,
+        attribution: attribution.trim() || null,
       });
       if (dbErr) throw dbErr;
       toast.success("Archivo subido");
       setCaption("");
+      setAttribution("");
       if (fileRef.current) fileRef.current.value = "";
       loadMedia();
     } catch (e: any) {
@@ -175,6 +185,12 @@ const MiPerfilPage = () => {
                 onChange={(e) => setCaption(e.target.value)}
                 rows={2}
               />
+              <LicenseSelector
+                value={license}
+                onChange={setLicense}
+                attribution={attribution}
+                onAttributionChange={setAttribution}
+              />
               <div className="flex gap-3 items-center">
                 <input
                   ref={fileRef}
@@ -204,6 +220,9 @@ const MiPerfilPage = () => {
                     {it.caption && (
                       <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] p-1.5 line-clamp-2">{it.caption}</div>
                     )}
+                    <div className="absolute bottom-1 right-1 z-10">
+                      <LicenseBadge code={it.license} attribution={it.attribution} className="text-[9px] px-1.5 py-0" />
+                    </div>
                     <button
                       onClick={() => deleteItem(it)}
                       className="absolute top-1.5 right-1.5 bg-black/60 hover:bg-destructive text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
