@@ -39,7 +39,7 @@ const CTASection = () => {
               <Button size="lg" className="bg-wheat text-wheat-foreground hover:bg-wheat/90 font-semibold group" asChild>
                 <Link to="/registro">{t("cta.register")}<ArrowRight className="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" /></Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 backdrop-blur-sm" asChild>
+              <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground backdrop-blur-sm font-semibold" asChild>
                 <Link to="/mapa">{t("cta.explore")}</Link>
               </Button>
             </motion.div>
