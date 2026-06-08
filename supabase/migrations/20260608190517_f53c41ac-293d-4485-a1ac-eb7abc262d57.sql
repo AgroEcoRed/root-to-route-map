@@ -1,0 +1,11 @@
+
+ALTER TABLE public.library_items
+  ADD COLUMN IF NOT EXISTS license TEXT NOT NULL DEFAULT 'CC-BY-SA-4.0',
+  ADD COLUMN IF NOT EXISTS attribution TEXT;
+
+ALTER TABLE public.producer_media
+  ADD COLUMN IF NOT EXISTS license TEXT NOT NULL DEFAULT 'CC-BY-SA-4.0',
+  ADD COLUMN IF NOT EXISTS attribution TEXT;
+
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS content_license TEXT NOT NULL DEFAULT 'CC-BY-SA-4.0';
