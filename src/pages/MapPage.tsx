@@ -60,6 +60,7 @@ interface MapActor {
   certification: "red" | "yellow" | "green";
   description: string;
   source: "rutas_sanas" | "agroeco";
+  contentLicense?: string | null;
 }
 
 const actorTypeLabels: Record<ActorType, string> = {
