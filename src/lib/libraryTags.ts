@@ -183,6 +183,36 @@ export const TAG_LABELS: Record<string, Record<Lang, string>> = {
     fr: "Agroécologie",
     pt: "Agroecologia",
   },
+  "argentina": {
+    es: "Argentina",
+    en: "Argentina",
+    fr: "Argentine",
+    pt: "Argentina",
+  },
+  "school-meals": {
+    es: "Comedores escolares y compras públicas",
+    en: "School meals & public procurement",
+    fr: "Cantines scolaires et achats publics",
+    pt: "Alimentação escolar e compras públicas",
+  },
+  "indicators-evaluation": {
+    es: "Indicadores y evaluación de transiciones",
+    en: "Indicators & transition assessment",
+    fr: "Indicateurs et évaluation des transitions",
+    pt: "Indicadores e avaliação de transições",
+  },
+  "rural-women": {
+    es: "Mujeres rurales y campesinas",
+    en: "Rural & peasant women",
+    fr: "Femmes rurales et paysannes",
+    pt: "Mulheres rurais e camponesas",
+  },
+  "territorial-development": {
+    es: "Desarrollo territorial",
+    en: "Territorial development",
+    fr: "Développement territorial",
+    pt: "Desenvolvimento territorial",
+  },
 };
 
 export const CURATED_TAG_SLUGS = Object.keys(TAG_LABELS);
