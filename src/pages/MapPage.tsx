@@ -7,6 +7,7 @@ import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet.markercluster";
 import rutasSanas from "@/data/rutasSanas.json";
+import { getLicense } from "@/lib/licenses";
 import Navbar from "@/components/Navbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -60,6 +61,7 @@ interface MapActor {
   certification: "red" | "yellow" | "green";
   description: string;
   source: "rutas_sanas" | "agroeco";
+  contentLicense?: string | null;
 }
 
 const actorTypeLabels: Record<ActorType, string> = {
@@ -191,6 +193,7 @@ const MapPage = () => {
           certification: (p.certification as "red" | "yellow" | "green") || "red",
           description: p.description || p.location || "",
           source: "agroeco",
+          contentLicense: p.content_license || null,
         }));
       setDbActors(realActors);
     };
@@ -300,6 +303,16 @@ const MapPage = () => {
             </div>`
         : "";
 
+      const licenseHtml = a.contentLicense
+        ? (() => {
+            const lic = getLicense(a.contentLicense);
+            const link = lic.url
+              ? `<a href="${lic.url}" target="_blank" rel="noopener noreferrer" style="color:#15803d;text-decoration:underline">${lic.short}</a>`
+              : `<span style="color:#6b7280">${lic.short}</span>`;
+            return `<p style="font-size:10px;color:#6b7280;margin:8px 0 0">Datos compartidos bajo ${link}</p>`;
+          })()
+        : "";
+
       const roleBadgeColor = role === "oferta" ? "#2563eb" : role === "demanda" ? "#9333ea" : "#ea580c";
 
       const sourceBadge = a.source === "rutas_sanas"
@@ -318,6 +331,7 @@ const MapPage = () => {
             <p style="font-size:12px;margin:4px 0">${a.description}</p>
             ${productsHtml}
             ${certHtml}
+            ${licenseHtml}
           </div>
         `);
 

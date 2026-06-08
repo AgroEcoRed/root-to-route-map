@@ -490,6 +490,7 @@ export type Database = {
           certification:
             | Database["public"]["Enums"]["certification_level"]
             | null
+          content_license: string | null
           created_at: string | null
           description: string | null
           display_name: string | null
@@ -510,6 +511,7 @@ export type Database = {
           certification?:
             | Database["public"]["Enums"]["certification_level"]
             | null
+          content_license?: string | null
           created_at?: string | null
           description?: string | null
           display_name?: string | null
@@ -530,6 +532,7 @@ export type Database = {
           certification?:
             | Database["public"]["Enums"]["certification_level"]
             | null
+          content_license?: string | null
           created_at?: string | null
           description?: string | null
           display_name?: string | null
