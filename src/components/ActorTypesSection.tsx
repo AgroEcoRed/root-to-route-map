@@ -26,7 +26,7 @@ const ActorTypesSection = () => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] rounded-full border border-primary/5" />
       </div>
 
-      <div className="container relative">
+      <div className="container relative z-10">
         <motion.div className="text-center max-w-2xl mx-auto mb-20" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
           <span className="eyebrow text-earth justify-center">{t("actors_section.badge")}</span>
           <h2 className="text-4xl sm:text-5xl font-display text-foreground mt-5 mb-5 leading-[1.1] tracking-tight text-balance">{t("actors_section.title")}</h2>
