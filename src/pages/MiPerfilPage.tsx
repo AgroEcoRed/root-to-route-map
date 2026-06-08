@@ -246,7 +246,11 @@ const MiPerfilPage = () => {
                 onChange={setLicense}
                 attribution={attribution}
                 onAttributionChange={setAttribution}
+                compact
               />
+              <p className="text-[11px] text-muted-foreground -mt-1">
+                Por defecto se usa la licencia de tu perfil. Podés cambiarla solo para este archivo si querés.
+              </p>
               <div className="flex gap-3 items-center">
                 <input
                   ref={fileRef}
