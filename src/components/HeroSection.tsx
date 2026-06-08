@@ -37,10 +37,10 @@ const HeroSection = () => {
   ];
 
   return (
-    <section ref={ref} className="relative min-h-screen flex items-center overflow-hidden">
+    <section ref={ref} className="relative min-h-screen flex items-center overflow-hidden grain-overlay">
       <motion.div className="absolute inset-0" style={{ y: bgY }}>
         <img src={heroImage} alt="Campo agroecológico" className="w-full h-[120%] object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-r from-forest/95 via-forest/75 to-forest/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-forest/95 via-forest/80 to-forest/30" />
         <div className="absolute inset-0 bg-gradient-to-t from-forest/60 via-transparent to-transparent" />
       </motion.div>
 
@@ -51,8 +51,8 @@ const HeroSection = () => {
         />
       ))}
 
-      <motion.div className="container relative z-10 pt-24 pb-16" style={{ y: textY }}>
-        <div className="max-w-2xl">
+      <motion.div className="container relative z-10 pt-28 pb-20" style={{ y: textY }}>
+        <div className="max-w-3xl">
           <motion.div initial={{ opacity: 0, y: 40, filter: "blur(10px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.8 }}>
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-wheat/20 text-wheat text-sm font-medium mb-6 backdrop-blur-sm border border-wheat/10">
               <ShieldCheck className="h-4 w-4" />
@@ -61,16 +61,16 @@ const HeroSection = () => {
           </motion.div>
 
           <motion.h1 initial={{ opacity: 0, y: 40, filter: "blur(10px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.8, delay: 0.15 }}
-            className="text-4xl sm:text-5xl lg:text-6xl font-display leading-tight text-white mb-6">
+            className="text-[2.75rem] sm:text-6xl lg:text-7xl font-display leading-[1.05] tracking-tight text-white mb-6 text-balance">
             {t("hero.title_1")}
-            <span className="relative inline-block">
+            <span className="relative inline-block font-display-italic text-wheat">
               {t("hero.title_highlight")}
               <motion.span className="absolute -bottom-1 left-0 h-1 bg-wheat rounded-full" initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 0.8, delay: 1 }} />
             </span>
           </motion.h1>
 
           <motion.p initial={{ opacity: 0, y: 40, filter: "blur(10px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-lg text-white/80 mb-8 max-w-xl leading-relaxed">
+            className="text-lg sm:text-xl text-white/85 mb-10 max-w-xl leading-relaxed text-pretty">
             {t("hero.subtitle")}
           </motion.p>
 
@@ -83,11 +83,18 @@ const HeroSection = () => {
             </Button>
           </motion.div>
 
-          <div className="flex gap-8 mt-12 pt-8 border-t border-white/20">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-px mt-14 pt-8 border-t border-white/15 bg-white/10 sm:bg-transparent rounded-lg sm:rounded-none overflow-hidden">
             {stats.map((s, i) => (
-              <motion.div key={s.label} custom={i} variants={counterVariants} initial="hidden" animate="visible">
-                <div className="text-2xl sm:text-3xl font-display text-wheat">{s.num}</div>
-                <div className="text-sm text-white/60">{s.label}</div>
+              <motion.div
+                key={s.label}
+                custom={i}
+                variants={counterVariants}
+                initial="hidden"
+                animate="visible"
+                className="bg-transparent sm:border-l sm:first:border-l-0 border-white/15 px-4 sm:px-6 py-2"
+              >
+                <div className="text-3xl sm:text-4xl font-display text-wheat tracking-tight">{s.num}</div>
+                <div className="text-[0.7rem] sm:text-xs text-white/55 uppercase tracking-[0.18em] mt-1">{s.label}</div>
               </motion.div>
             ))}
           </div>
