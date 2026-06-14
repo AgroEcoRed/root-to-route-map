@@ -751,6 +751,7 @@ const MarketplacePage = () => {
         </div>
       </main>
       <Footer />
+      <DataSourceToggle position="bottom-6 right-6" />
     </div>
   );
 };
