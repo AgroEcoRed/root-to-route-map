@@ -38,6 +38,30 @@ export type Database = {
         }
         Relationships: []
       }
+      data_source_settings: {
+        Row: {
+          enabled: boolean
+          label: string
+          source_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          enabled?: boolean
+          label: string
+          source_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          enabled?: boolean
+          label?: string
+          source_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       gov_programs: {
         Row: {
           city: string | null
@@ -179,6 +203,108 @@ export type Database = {
           uploaded_by?: string
           url?: string | null
           year?: number | null
+        }
+        Relationships: []
+      }
+      mtr_facets: {
+        Row: {
+          code: string
+          external_id: string | null
+          facet_code: string | null
+          facet_name: string | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          external_id?: string | null
+          facet_code?: string | null
+          facet_name?: string | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          external_id?: string | null
+          facet_code?: string | null
+          facet_name?: string | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      mtr_products: {
+        Row: {
+          collection_ids: string[] | null
+          currency: string | null
+          description: string | null
+          facet_value_ids: string[] | null
+          image_url: string | null
+          in_stock: boolean | null
+          name: string
+          price_cents: number | null
+          product_id: string
+          slug: string | null
+          source_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          collection_ids?: string[] | null
+          currency?: string | null
+          description?: string | null
+          facet_value_ids?: string[] | null
+          image_url?: string | null
+          in_stock?: boolean | null
+          name: string
+          price_cents?: number | null
+          product_id: string
+          slug?: string | null
+          source_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          collection_ids?: string[] | null
+          currency?: string | null
+          description?: string | null
+          facet_value_ids?: string[] | null
+          image_url?: string | null
+          in_stock?: boolean | null
+          name?: string
+          price_cents?: number | null
+          product_id?: string
+          slug?: string | null
+          source_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      mtr_sync_log: {
+        Row: {
+          error_message: string | null
+          facets_synced: number | null
+          finished_at: string | null
+          id: string
+          products_synced: number | null
+          started_at: string
+          status: string
+        }
+        Insert: {
+          error_message?: string | null
+          facets_synced?: number | null
+          finished_at?: string | null
+          id?: string
+          products_synced?: number | null
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          error_message?: string | null
+          facets_synced?: number | null
+          finished_at?: string | null
+          id?: string
+          products_synced?: number | null
+          started_at?: string
+          status?: string
         }
         Relationships: []
       }
@@ -480,6 +606,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       public_profiles: {
@@ -558,7 +705,13 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       actor_type:
@@ -587,6 +740,7 @@ export type Database = {
         | "agroecological_fair"
         | "agroecological_market"
         | "bio_input_supplier"
+      app_role: "admin" | "moderator" | "user"
       certification_level: "red" | "yellow" | "green" | "none_spg"
       transition_dimension:
         | "agronomic"
@@ -748,6 +902,7 @@ export const Constants = {
         "agroecological_market",
         "bio_input_supplier",
       ],
+      app_role: ["admin", "moderator", "user"],
       certification_level: ["red", "yellow", "green", "none_spg"],
       transition_dimension: [
         "agronomic",

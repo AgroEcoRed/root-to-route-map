@@ -16,15 +16,18 @@ import {
 } from "@/components/ui/dialog";
 import {
   Search, MapPin, Calendar, ShoppingBasket,
-  TrendingUp, DollarSign, Navigation, ShieldCheck, Star, SlidersHorizontal, Store, Users, AlertTriangle, MessageSquare
+  TrendingUp, DollarSign, Navigation, ShieldCheck, Star, SlidersHorizontal, Store, Users, AlertTriangle, MessageSquare, ExternalLink
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useDataSources } from "@/hooks/useDataSources";
+import { DataSourceToggle } from "@/components/admin/DataSourceToggle";
 import { toast } from "sonner";
 
 type SortOption = "relevance" | "price_asc" | "price_desc" | "proximity" | "best_seller" | "cert_green" | "seasonal";
 type ListingType = "oferta" | "demanda";
+type ProductSource = "mock" | "mercado_territorial" | "agroeco" | "rutas_sanas";
 
 interface Product {
   id: number;
@@ -43,6 +46,11 @@ interface Product {
   soldCount: number;
   distanceKm: number;
   listingType: ListingType;
+  imageUrl?: string;
+  sellos?: { code: string; name: string }[];
+  source?: ProductSource;
+  sourceUrl?: string;
+  description?: string;
 }
 
 // Main categories (intermediate approach)
@@ -158,6 +166,9 @@ const MarketplacePage = () => {
   const { t } = useLanguage();
   const { user } = useAuth();
   const { addItem } = useCart();
+  const { isEnabled } = useDataSources();
+  const sourceParam = searchParams.get("source") as ProductSource | null;
+  const nodeParam = searchParams.get("node");
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [activeAlmacenSub, setActiveAlmacenSub] = useState("all_almacen");
@@ -166,6 +177,7 @@ const MarketplacePage = () => {
   const [filterProducer, setFilterProducer] = useState("all");
   const [filterZone, setFilterZone] = useState("all");
   const [filterType, setFilterType] = useState<"all" | ListingType>("all");
+  const [mtrProducts, setMtrProducts] = useState<Product[]>([]);
 
   // Reviews state
   const [reviews, setReviews] = useState<SellerReview[]>([]);
@@ -181,6 +193,52 @@ const MarketplacePage = () => {
       if (data) setReviews(data as SellerReview[]);
     };
     fetchReviews();
+  }, []);
+
+  // Fetch MTR catalog (cached from tiendaschasqui.ar/mtr/catalogo)
+  useEffect(() => {
+    (async () => {
+      const [facetsRes, productsRes] = await Promise.all([
+        (supabase as any).from("mtr_facets").select("code,name,facet_code"),
+        (supabase as any).from("mtr_products").select("*").order("name"),
+      ]);
+      const fmap = new Map<string, { name: string; group: string | null }>();
+      (facetsRes.data || []).forEach((f: any) =>
+        fmap.set(f.code, { name: f.name, group: f.facet_code })
+      );
+      const mapped: Product[] = (productsRes.data || []).map((p: any, idx: number) => {
+        const sellos = (p.facet_value_ids || [])
+          .map((id: string) => {
+            const f = fmap.get(id);
+            return f && f.group === "sello_producto" ? { code: id, name: f.name } : null;
+          })
+          .filter(Boolean) as { code: string; name: string }[];
+        const price = (p.price_cents ?? 0) / 100;
+        return {
+          id: 1_000_000 + idx,
+          name: p.name,
+          producer: "Mercado Territorial",
+          location: "Red MTR",
+          category: "Mercado Híbrido",
+          price,
+          priceDisplay: `$${price.toLocaleString("es-AR", { maximumFractionDigits: 0 })}`,
+          unit: "u",
+          available: p.in_stock ? "Disponible" : "Sin stock",
+          certification: "green" as const,
+          image: "🛒",
+          seasonal: "Todo el año",
+          soldCount: 0,
+          distanceKm: 0,
+          listingType: "oferta" as const,
+          imageUrl: p.image_url || undefined,
+          sellos,
+          source: "mercado_territorial",
+          sourceUrl: p.source_url || `https://tiendaschasqui.ar/mtr/catalogo/${p.slug || ""}`,
+          description: p.description || undefined,
+        };
+      });
+      setMtrProducts(mapped);
+    })();
   }, []);
 
   const getSellerRating = (sellerName: string) => {
@@ -237,12 +295,21 @@ const MarketplacePage = () => {
   ];
 
   const filtered = useMemo(() => {
-    let results = mockProducts.filter((p) => {
+    const baseMock: Product[] = mockProducts.map(p => ({ ...p, source: (p as Product).source || "mock" }));
+    const merged: Product[] = [
+      ...baseMock,
+      ...(isEnabled("mercado_territorial") ? mtrProducts : []),
+    ];
+    const sourceScoped = sourceParam
+      ? merged.filter(p => p.source === sourceParam)
+      : merged;
+    let results = sourceScoped.filter((p) => {
+      const isMtr = p.source === "mercado_territorial";
       if (activeCategory !== "Todos" && p.category !== activeCategory) return false;
       if (activeCategory === "Huevos" && activeEggSub !== "all_eggs" && p.subcategory !== activeEggSub) return false;
       if (activeCategory === "Almacén" && activeAlmacenSub !== "all_almacen" && p.subcategory !== activeAlmacenSub) return false;
-      if (filterProducer !== "all" && p.producer !== filterProducer) return false;
-      if (filterZone !== "all" && p.location !== filterZone) return false;
+      if (!isMtr && filterProducer !== "all" && p.producer !== filterProducer) return false;
+      if (!isMtr && filterZone !== "all" && p.location !== filterZone) return false;
       if (filterType !== "all" && p.listingType !== filterType) return false;
       if (search && !p.name.toLowerCase().includes(search.toLowerCase()) && !p.producer.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
@@ -261,7 +328,7 @@ const MarketplacePage = () => {
         sorted.sort((a, b) => (isInSeason(a.seasonal) ? 0 : 1) - (isInSeason(b.seasonal) ? 0 : 1)); break;
     }
     return sorted;
-  }, [search, activeCategory, activeEggSub, activeAlmacenSub, sortBy, filterProducer, filterZone, filterType]);
+  }, [search, activeCategory, activeEggSub, activeAlmacenSub, sortBy, filterProducer, filterZone, filterType, mtrProducts, isEnabled, sourceParam]);
 
   const hasActiveFilters = filterProducer !== "all" || filterZone !== "all" || filterType !== "all" || sortBy !== "relevance";
 
@@ -293,6 +360,31 @@ const MarketplacePage = () => {
         </div>
 
         <div className="container py-8">
+          {/* Source banner (from map MTR node clicks) */}
+          {sourceParam === "mercado_territorial" && (
+            <div className="mb-6 rounded-xl border-2 border-amber-300 bg-amber-50 p-4 flex items-start gap-3">
+              <ShoppingBasket className="h-5 w-5 text-amber-700 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="font-display text-sm text-amber-900">
+                  Catálogo del Mercado Territorial
+                  {nodeParam && <> · Nodo: <span className="font-bold">{decodeURIComponent(nodeParam)}</span></>}
+                </h3>
+                <p className="text-xs text-amber-800/80 mt-1">
+                  Productos sincronizados desde{" "}
+                  <a href="https://tiendaschasqui.ar/mtr/catalogo" target="_blank" rel="noopener noreferrer" className="underline font-medium">
+                    tiendaschasqui.ar/mtr/catalogo
+                  </a>. La compra se gestiona en el sitio original.
+                </p>
+              </div>
+              <a
+                href={window.location.pathname}
+                className="text-xs text-amber-900 underline whitespace-nowrap"
+              >
+                Ver todos
+              </a>
+            </div>
+          )}
+
           {/* Trust warning - moved to bottom */}
           {/* Search + Sort row */}
           <div className="flex flex-col sm:flex-row gap-4 mb-4">
@@ -433,8 +525,12 @@ const MarketplacePage = () => {
                   className={`rounded-xl border overflow-hidden hover:shadow-elevated transition-all duration-300 group ${
                     p.listingType === "demanda" ? "border-destructive/30 bg-card" : "border-border bg-card"
                   }`}>
-                  <div className="h-36 bg-muted flex items-center justify-center text-5xl group-hover:scale-105 transition-transform duration-300 relative">
-                    {p.image}
+                  <div className="h-36 bg-muted flex items-center justify-center group-hover:scale-105 transition-transform duration-300 relative overflow-hidden">
+                    {p.imageUrl ? (
+                      <img src={p.imageUrl} alt={p.name} loading="lazy" className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="text-5xl">{p.image}</span>
+                    )}
                     <span className={`absolute bottom-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full ${
                       p.listingType === "oferta"
                         ? "bg-primary text-primary-foreground"
@@ -442,8 +538,13 @@ const MarketplacePage = () => {
                     }`}>
                       {p.listingType === "oferta" ? t("market.badge_oferta") : t("market.badge_demanda")}
                     </span>
+                    {p.source === "mercado_territorial" && (
+                      <span className="absolute top-2 right-2 bg-amber-100 text-amber-900 text-[9px] font-bold px-2 py-0.5 rounded-full border border-amber-300 uppercase tracking-wide shadow-sm">
+                        Mercado Territorial
+                      </span>
+                    )}
                     {isInSeason(p.seasonal) && p.listingType === "oferta" && (
-                      <span className="absolute top-2 right-2 bg-primary text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
+                      <span className={`absolute ${p.source === "mercado_territorial" ? "top-9" : "top-2"} right-2 bg-primary text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full`}>
                         {t("market.in_season")}
                       </span>
                     )}
@@ -473,6 +574,15 @@ const MarketplacePage = () => {
                         </Badge>
                       )}
                     </div>
+                    {p.sellos && p.sellos.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {p.sellos.map((s) => (
+                          <Badge key={s.code} variant="secondary" className="text-[9px] bg-primary/10 text-primary border border-primary/20">
+                            {s.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
                     {/* Seller rating */}
                     {(() => {
                       const { avg, count } = getSellerRating(p.producer);
@@ -543,14 +653,27 @@ const MarketplacePage = () => {
                       <span className="font-display text-lg text-foreground">
                         {p.priceDisplay}<span className="text-sm text-muted-foreground font-body">/{p.unit}</span>
                       </span>
-                      <Button size="sm" className={`text-xs ${
-                        p.listingType === "oferta"
-                          ? "bg-gradient-hero text-primary-foreground"
-                          : "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      }`}
-                        onClick={() => addItem({ id: p.id, name: p.name, producer: p.producer, location: p.location, price: p.price, priceDisplay: p.priceDisplay, unit: p.unit, image: p.image })}>
-                        {p.listingType === "oferta" ? t("market.add_cart") : t("market.contact")}
-                      </Button>
+                      {p.source === "mercado_territorial" ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-xs border-amber-400 text-amber-900 hover:bg-amber-50"
+                          asChild
+                        >
+                          <a href={p.sourceUrl || "https://tiendaschasqui.ar/mtr/catalogo"} target="_blank" rel="noopener noreferrer">
+                            Comprar en MTR <ExternalLink className="h-3 w-3 ml-1" />
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button size="sm" className={`text-xs ${
+                          p.listingType === "oferta"
+                            ? "bg-gradient-hero text-primary-foreground"
+                            : "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        }`}
+                          onClick={() => addItem({ id: p.id, name: p.name, producer: p.producer, location: p.location, price: p.price, priceDisplay: p.priceDisplay, unit: p.unit, image: p.image })}>
+                          {p.listingType === "oferta" ? t("market.add_cart") : t("market.contact")}
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </motion.div>
@@ -628,6 +751,7 @@ const MarketplacePage = () => {
         </div>
       </main>
       <Footer />
+      <DataSourceToggle position="bottom-6 right-6" />
     </div>
   );
 };
