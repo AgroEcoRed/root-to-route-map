@@ -166,6 +166,9 @@ const MarketplacePage = () => {
   const { t } = useLanguage();
   const { user } = useAuth();
   const { addItem } = useCart();
+  const { isEnabled } = useDataSources();
+  const sourceParam = searchParams.get("source") as ProductSource | null;
+  const nodeParam = searchParams.get("node");
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [activeAlmacenSub, setActiveAlmacenSub] = useState("all_almacen");
@@ -174,6 +177,7 @@ const MarketplacePage = () => {
   const [filterProducer, setFilterProducer] = useState("all");
   const [filterZone, setFilterZone] = useState("all");
   const [filterType, setFilterType] = useState<"all" | ListingType>("all");
+  const [mtrProducts, setMtrProducts] = useState<Product[]>([]);
 
   // Reviews state
   const [reviews, setReviews] = useState<SellerReview[]>([]);
@@ -189,6 +193,52 @@ const MarketplacePage = () => {
       if (data) setReviews(data as SellerReview[]);
     };
     fetchReviews();
+  }, []);
+
+  // Fetch MTR catalog (cached from tiendaschasqui.ar/mtr/catalogo)
+  useEffect(() => {
+    (async () => {
+      const [facetsRes, productsRes] = await Promise.all([
+        (supabase as any).from("mtr_facets").select("code,name,facet_code"),
+        (supabase as any).from("mtr_products").select("*").order("name"),
+      ]);
+      const fmap = new Map<string, { name: string; group: string | null }>();
+      (facetsRes.data || []).forEach((f: any) =>
+        fmap.set(f.code, { name: f.name, group: f.facet_code })
+      );
+      const mapped: Product[] = (productsRes.data || []).map((p: any, idx: number) => {
+        const sellos = (p.facet_value_ids || [])
+          .map((id: string) => {
+            const f = fmap.get(id);
+            return f && f.group === "sello_producto" ? { code: id, name: f.name } : null;
+          })
+          .filter(Boolean) as { code: string; name: string }[];
+        const price = (p.price_cents ?? 0) / 100;
+        return {
+          id: 1_000_000 + idx,
+          name: p.name,
+          producer: "Mercado Territorial",
+          location: "Red MTR",
+          category: "Mercado Híbrido",
+          price,
+          priceDisplay: `$${price.toLocaleString("es-AR", { maximumFractionDigits: 0 })}`,
+          unit: "u",
+          available: p.in_stock ? "Disponible" : "Sin stock",
+          certification: "green" as const,
+          image: "🛒",
+          seasonal: "Todo el año",
+          soldCount: 0,
+          distanceKm: 0,
+          listingType: "oferta" as const,
+          imageUrl: p.image_url || undefined,
+          sellos,
+          source: "mercado_territorial",
+          sourceUrl: p.source_url || `https://tiendaschasqui.ar/mtr/catalogo/${p.slug || ""}`,
+          description: p.description || undefined,
+        };
+      });
+      setMtrProducts(mapped);
+    })();
   }, []);
 
   const getSellerRating = (sellerName: string) => {
@@ -245,12 +295,21 @@ const MarketplacePage = () => {
   ];
 
   const filtered = useMemo(() => {
-    let results = mockProducts.filter((p) => {
+    const baseMock: Product[] = mockProducts.map(p => ({ ...p, source: (p as Product).source || "mock" }));
+    const merged: Product[] = [
+      ...baseMock,
+      ...(isEnabled("mercado_territorial") ? mtrProducts : []),
+    ];
+    const sourceScoped = sourceParam
+      ? merged.filter(p => p.source === sourceParam)
+      : merged;
+    let results = sourceScoped.filter((p) => {
+      const isMtr = p.source === "mercado_territorial";
       if (activeCategory !== "Todos" && p.category !== activeCategory) return false;
       if (activeCategory === "Huevos" && activeEggSub !== "all_eggs" && p.subcategory !== activeEggSub) return false;
       if (activeCategory === "Almacén" && activeAlmacenSub !== "all_almacen" && p.subcategory !== activeAlmacenSub) return false;
-      if (filterProducer !== "all" && p.producer !== filterProducer) return false;
-      if (filterZone !== "all" && p.location !== filterZone) return false;
+      if (!isMtr && filterProducer !== "all" && p.producer !== filterProducer) return false;
+      if (!isMtr && filterZone !== "all" && p.location !== filterZone) return false;
       if (filterType !== "all" && p.listingType !== filterType) return false;
       if (search && !p.name.toLowerCase().includes(search.toLowerCase()) && !p.producer.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
@@ -269,7 +328,7 @@ const MarketplacePage = () => {
         sorted.sort((a, b) => (isInSeason(a.seasonal) ? 0 : 1) - (isInSeason(b.seasonal) ? 0 : 1)); break;
     }
     return sorted;
-  }, [search, activeCategory, activeEggSub, activeAlmacenSub, sortBy, filterProducer, filterZone, filterType]);
+  }, [search, activeCategory, activeEggSub, activeAlmacenSub, sortBy, filterProducer, filterZone, filterType, mtrProducts, isEnabled, sourceParam]);
 
   const hasActiveFilters = filterProducer !== "all" || filterZone !== "all" || filterType !== "all" || sortBy !== "relevance";
 
