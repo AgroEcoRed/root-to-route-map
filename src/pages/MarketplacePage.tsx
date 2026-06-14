@@ -500,8 +500,12 @@ const MarketplacePage = () => {
                   className={`rounded-xl border overflow-hidden hover:shadow-elevated transition-all duration-300 group ${
                     p.listingType === "demanda" ? "border-destructive/30 bg-card" : "border-border bg-card"
                   }`}>
-                  <div className="h-36 bg-muted flex items-center justify-center text-5xl group-hover:scale-105 transition-transform duration-300 relative">
-                    {p.image}
+                  <div className="h-36 bg-muted flex items-center justify-center group-hover:scale-105 transition-transform duration-300 relative overflow-hidden">
+                    {p.imageUrl ? (
+                      <img src={p.imageUrl} alt={p.name} loading="lazy" className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="text-5xl">{p.image}</span>
+                    )}
                     <span className={`absolute bottom-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full ${
                       p.listingType === "oferta"
                         ? "bg-primary text-primary-foreground"
@@ -509,8 +513,13 @@ const MarketplacePage = () => {
                     }`}>
                       {p.listingType === "oferta" ? t("market.badge_oferta") : t("market.badge_demanda")}
                     </span>
+                    {p.source === "mercado_territorial" && (
+                      <span className="absolute top-2 right-2 bg-amber-100 text-amber-900 text-[9px] font-bold px-2 py-0.5 rounded-full border border-amber-300 uppercase tracking-wide shadow-sm">
+                        Mercado Territorial
+                      </span>
+                    )}
                     {isInSeason(p.seasonal) && p.listingType === "oferta" && (
-                      <span className="absolute top-2 right-2 bg-primary text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
+                      <span className={`absolute ${p.source === "mercado_territorial" ? "top-9" : "top-2"} right-2 bg-primary text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full`}>
                         {t("market.in_season")}
                       </span>
                     )}
@@ -540,6 +549,15 @@ const MarketplacePage = () => {
                         </Badge>
                       )}
                     </div>
+                    {p.sellos && p.sellos.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {p.sellos.map((s) => (
+                          <Badge key={s.code} variant="secondary" className="text-[9px] bg-primary/10 text-primary border border-primary/20">
+                            {s.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
                     {/* Seller rating */}
                     {(() => {
                       const { avg, count } = getSellerRating(p.producer);
