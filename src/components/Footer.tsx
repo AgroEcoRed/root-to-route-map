@@ -59,7 +59,7 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <a href="mailto:hola@agroeco.red" className="hover:text-wheat transition-colors hover:translate-x-1 inline-block">
+                <a href="mailto:apsosa@unsam.edu.ar" className="hover:text-wheat transition-colors hover:translate-x-1 inline-block">
                   {t("footer.contact")}
                 </a>
               </li>
