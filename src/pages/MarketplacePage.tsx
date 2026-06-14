@@ -653,14 +653,27 @@ const MarketplacePage = () => {
                       <span className="font-display text-lg text-foreground">
                         {p.priceDisplay}<span className="text-sm text-muted-foreground font-body">/{p.unit}</span>
                       </span>
-                      <Button size="sm" className={`text-xs ${
-                        p.listingType === "oferta"
-                          ? "bg-gradient-hero text-primary-foreground"
-                          : "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      }`}
-                        onClick={() => addItem({ id: p.id, name: p.name, producer: p.producer, location: p.location, price: p.price, priceDisplay: p.priceDisplay, unit: p.unit, image: p.image })}>
-                        {p.listingType === "oferta" ? t("market.add_cart") : t("market.contact")}
-                      </Button>
+                      {p.source === "mercado_territorial" ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-xs border-amber-400 text-amber-900 hover:bg-amber-50"
+                          asChild
+                        >
+                          <a href={p.sourceUrl || "https://tiendaschasqui.ar/mtr/catalogo"} target="_blank" rel="noopener noreferrer">
+                            Comprar en MTR <ExternalLink className="h-3 w-3 ml-1" />
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button size="sm" className={`text-xs ${
+                          p.listingType === "oferta"
+                            ? "bg-gradient-hero text-primary-foreground"
+                            : "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        }`}
+                          onClick={() => addItem({ id: p.id, name: p.name, producer: p.producer, location: p.location, price: p.price, priceDisplay: p.priceDisplay, unit: p.unit, image: p.image })}>
+                          {p.listingType === "oferta" ? t("market.add_cart") : t("market.contact")}
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </motion.div>
