@@ -7,6 +7,7 @@ import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet.markercluster";
 import rutasSanas from "@/data/rutasSanas.json";
+import mercadoTerritorial from "@/data/mercadoTerritorial.json";
 import { getLicense } from "@/lib/licenses";
 import Navbar from "@/components/Navbar";
 import { Badge } from "@/components/ui/badge";
@@ -60,7 +61,7 @@ interface MapActor {
   products: string[];
   certification: "red" | "yellow" | "green";
   description: string;
-  source: "rutas_sanas" | "agroeco";
+  source: "rutas_sanas" | "mercado_territorial" | "agroeco";
   contentLicense?: string | null;
 }
 
@@ -157,6 +158,18 @@ const mockActors: MapActor[] = (rutasSanas as Array<{n:string;lat:number;lng:num
   source: "rutas_sanas",
 }));
 
+const mercadoTerritorialActors: MapActor[] = (mercadoTerritorial as Array<{n:string;lat:number;lng:number;t:string;f:string;d:string}>).map((p, i) => ({
+  id: 50000 + i,
+  name: p.n,
+  type: "consumer_node" as ActorType,
+  lat: p.lat,
+  lng: p.lng,
+  products: [],
+  certification: "yellow",
+  description: p.d ? `${p.d} — ${p.f}` : p.f,
+  source: "mercado_territorial",
+}));
+
 type CertFilter = "green" | "yellow" | "red";
 
 const MapPage = () => {
@@ -200,7 +213,7 @@ const MapPage = () => {
     fetchProfiles();
   }, []);
 
-  const allActors = useMemo(() => [...mockActors, ...dbActors], [dbActors]);
+  const allActors = useMemo(() => [...mockActors, ...mercadoTerritorialActors, ...dbActors], [dbActors]);
 
   const toggleType = (type: ActorType) => {
     setActiveTypes((prev) => {
@@ -273,6 +286,8 @@ const MapPage = () => {
 
       const borderStyle = a.source === "rutas_sanas"
         ? "border:2px dashed white;opacity:0.85;"
+        : a.source === "mercado_territorial"
+        ? "border:2px dotted white;opacity:0.9;"
         : "border:3px solid white;";
 
       const icon = L.divIcon({
@@ -317,6 +332,8 @@ const MapPage = () => {
 
       const sourceBadge = a.source === "rutas_sanas"
         ? `<span style="display:inline-block;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.3px;text-transform:uppercase">Rutas Sanas</span>`
+        : a.source === "mercado_territorial"
+        ? `<a href="https://mercadoterritorial.com.ar/buscador-de-nodos/" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#fef3c7;color:#92400e;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dotted #d97706;letter-spacing:0.3px;text-transform:uppercase;text-decoration:none">Mercado Territorial</a>`
         : `<span style="display:inline-block;background:#dcfce7;color:#15803d;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #86efac;letter-spacing:0.3px;text-transform:uppercase">AgroEco.Red</span>`;
 
       const marker = L.marker([a.lat, a.lng], { icon })

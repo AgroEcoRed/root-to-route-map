@@ -1,0 +1,306 @@
+[
+{
+"n": "Almacen Casa Común",
+"lat": -34.6230825,
+"lng": -58.44333629999999,
+"t": "consumer_node",
+"f": "Av Alberdi 1092, CABA",
+"d": "Marcela"
+},
+{
+"n": "C. C. Juana Azurduy",
+"lat": -34.6837926,
+"lng": -58.3822753,
+"t": "consumer_node",
+"f": "Victoriano Montes 2020, Gerli, Buenos Aires",
+"d": "Eirú"
+},
+{
+"n": "Nodo Almacén Autogestivo",
+"lat": -34.7062083,
+"lng": -58.2771472,
+"t": "consumer_node",
+"f": "Roque Sáenz Peña 352, Bernal, Buenos Aires",
+"d": "Sofía"
+},
+{
+"n": "Nodo Am-An",
+"lat": -34.6911634,
+"lng": -58.4117779,
+"t": "consumer_node",
+"f": "Tacuarí 1859, Lanús Oeste, Buenos Aires",
+"d": "Cinthia"
+},
+{
+"n": "Nodo Azulado",
+"lat": -34.7032077,
+"lng": -58.31262109999999,
+"t": "consumer_node",
+"f": "Raquel Español 276, Wilde, Buenos Aires",
+"d": "Andrés"
+},
+{
+"n": "Nodo Barraca Natural",
+"lat": -34.6453053,
+"lng": -58.3796576,
+"t": "consumer_node",
+"f": "San Antonio 311, Barracas, Buenos Aires",
+"d": "Eugenia"
+},
+{
+"n": "Nodo Caballito",
+"lat": -34.6159904,
+"lng": -58.44373309999999,
+"t": "consumer_node",
+"f": "Neuquén 818 , Caballito, Buenos Aires",
+"d": "Karina"
+},
+{
+"n": "Nodo Casa Balam",
+"lat": -34.6406221,
+"lng": -58.4728568,
+"t": "consumer_node",
+"f": "Garzon 3653, Parque Avellaneda, Buenos Aires",
+"d": "MALENA"
+},
+{
+"n": "Nodo Chamigue (San Telmo)",
+"lat": -34.621114,
+"lng": -58.3839465,
+"t": "consumer_node",
+"f": "Humberto 1274, Ciudad Autonoma de Buenos Aires, Buenos Aires",
+"d": "Zaira"
+},
+{
+"n": "Nodo Club Larrazábal",
+"lat": -34.6473841,
+"lng": -58.5074994,
+"t": "consumer_node",
+"f": "Av. Larrazábal 829, Liniers, Buenos Aires",
+"d": "Marcelo"
+},
+{
+"n": "Nodo Coghlan",
+"lat": -34.5635332,
+"lng": -58.4804169,
+"t": "consumer_node",
+"f": "Plaza 3099, Coghlan, Buenos Aires",
+"d": "Luli"
+},
+{
+"n": "Nodo CTA Mercado Territorial",
+"lat": -34.673934,
+"lng": -58.56631559999999,
+"t": "consumer_node",
+"f": "Florencio Varela 2481, San Justo, Buenos Aires",
+"d": "Eva / Gustavo"
+},
+{
+"n": "Nodo Escalada",
+"lat": -34.7313758,
+"lng": -58.39587030000001,
+"t": "consumer_node",
+"f": "José Ingenieros 4957, Remedios de Escalada, Buenos Aires",
+"d": "Javier"
+},
+{
+"n": "Nodo Escuela Libre De Constitución",
+"lat": -34.6353897,
+"lng": -58.3889625,
+"t": "consumer_node",
+"f": "Finochietto 1802, Constitución, Buenos Aires",
+"d": "Gise / Fernanda"
+},
+{
+"n": "Nodo Espacio Aquelarre",
+"lat": -34.6903336,
+"lng": -58.340286,
+"t": "consumer_node",
+"f": "San Lorenzo 235, Sarandí, Buenos Aires",
+"d": "Coni"
+},
+{
+"n": "Nodo Floresta",
+"lat": -34.6224692,
+"lng": -58.4949689,
+"t": "consumer_node",
+"f": "Sanabria 1486, Floresta, Buenos Aires",
+"d": "Valeria"
+},
+{
+"n": "Nodo Kita Gorban",
+"lat": -34.7678337,
+"lng": -58.3792534,
+"t": "consumer_node",
+"f": "Balcarce 476, Temperley, Temperley",
+"d": "Laura"
+},
+{
+"n": "Nodo la casa de Teresa",
+"lat": -34.6019215,
+"lng": -58.42232949999999,
+"t": "consumer_node",
+"f": "Acuña de Figueroa 797, CABA",
+"d": "Victoria / Catalina"
+},
+{
+"n": "Nodo La Casa Del Te Delicias",
+"lat": -34.6436971,
+"lng": -58.539415,
+"t": "consumer_node",
+"f": "CAXARAVILLE 3906, Ciudadela, Buenos Aires",
+"d": "Ana"
+},
+{
+"n": "Nodo la Casita de Derqui",
+"lat": -34.7064687,
+"lng": -58.4065015,
+"t": "consumer_node",
+"f": "Derqui 965, Lanus Oeste",
+"d": "Barral"
+},
+{
+"n": "Nodo La Centenaria",
+"lat": -34.7080121,
+"lng": -58.34662590000001,
+"t": "consumer_node",
+"f": "Centenario Uruguayo 1629, Ciudad de Buenos Aires, Buenos Aires",
+"d": "Andrea / Ceci"
+},
+{
+"n": "Nodo La Corvaleta",
+"lat": -34.7111226,
+"lng": -58.33569679999999,
+"t": "consumer_node",
+"f": "Gral. Manuel Corvalan 1246, Wilde, Buenos Aires",
+"d": "Juieta / Pablo"
+},
+{
+"n": "Nodo La Pacha",
+"lat": -34.7206336,
+"lng": -58.25460510000001,
+"t": "consumer_node",
+"f": "Entre Ríos 90, CABA, Quilmes",
+"d": "Daniela"
+},
+{
+"n": "Nodo La Semilla",
+"lat": -34.6003698,
+"lng": -58.40451989999999,
+"t": "consumer_node",
+"f": "Pueyrredón 848, CABA",
+"d": "Débora"
+},
+{
+"n": "Nodo Maga",
+"lat": -34.6136644,
+"lng": -58.48049659999999,
+"t": "consumer_node",
+"f": "Alejandro Magariños Cervantes 2949, Villa Santa Rita, Buenos Aires",
+"d": "Elina"
+},
+{
+"n": "Nodo Marea Creciente",
+"lat": -34.7248325,
+"lng": -58.3084595,
+"t": "consumer_node",
+"f": "Calle 164 N° 661, Bernal, Buenos Aires",
+"d": "Melisa"
+},
+{
+"n": "Nodo Mercadito Autogestivo",
+"lat": -34.6179214,
+"lng": -58.5082315,
+"t": "consumer_node",
+"f": "Nazarre 5074, Devoto, Buenos Aires",
+"d": "Julieta"
+},
+{
+"n": "Nodo Natural",
+"lat": -34.5894425,
+"lng": -58.5892693,
+"t": "consumer_node",
+"f": "Nahuel Huapi 6658, Martín Coronado",
+"d": "Danisa"
+},
+{
+"n": "Nodo Neo",
+"lat": -34.7384215,
+"lng": -58.22687719999999,
+"t": "consumer_node",
+"f": "Santa Fe 1353, Ezpeleta, Buenos Aires",
+"d": "Sonia"
+},
+{
+"n": "Nodo Piñeyro",
+"lat": -34.6741161,
+"lng": -58.3846788,
+"t": "consumer_node",
+"f": "Méjico 196, Buenos Aires",
+"d": "Analía"
+},
+{
+"n": "Nodo San Telmo",
+"lat": -34.6174495,
+"lng": -58.3753005,
+"t": "consumer_node",
+"f": "Independencia 658. Dpto 8, San Telmo, Buenos Aires",
+"d": "Diana"
+},
+{
+"n": "Nodo Terra",
+"lat": -34.60814180000001,
+"lng": -58.4575505,
+"t": "consumer_node",
+"f": "Fragata Sarmiento 1470, Ciudad Autonoma de Buenos Aires",
+"d": "Micaela"
+},
+{
+"n": "Nodo Terra II",
+"lat": -34.5753112,
+"lng": -58.5004127,
+"t": "consumer_node",
+"f": "Av. Congreso 6000, CABA",
+"d": "Micaela"
+},
+{
+"n": "Nodo Un Lugar De Encuentro",
+"lat": -34.7532471,
+"lng": -58.2290475,
+"t": "consumer_node",
+"f": "Florencia Varela Y Cuenca (Ferreteria), Ezpeleta, Buenos Aires",
+"d": "Stella"
+},
+{
+"n": "Nodo Vecinxs de Temperley",
+"lat": -34.7791595,
+"lng": -58.3844646,
+"t": "consumer_node",
+"f": "Triunvirato 808, Temperley, Buenos Aires",
+"d": "María Esther / Mayra"
+},
+{
+"n": "Nodo Villa Raffo",
+"lat": -34.6086492,
+"lng": -58.53232749999999,
+"t": "consumer_node",
+"f": "Colón 1274, 3 de Febrero, Villa Raffo",
+"d": "Andy"
+},
+{
+"n": "Sumak Kausay",
+"lat": -34.7582885,
+"lng": -58.4165548,
+"t": "consumer_node",
+"f": "LAPRIDA 1345, Lomas De Zamora Oeste, Buenos Aires",
+"d": "Adriana"
+},
+{
+"n": "Vecinxs La Selva",
+"lat": -34.6378348,
+"lng": -58.48233649999999,
+"t": "consumer_node",
+"f": "La Selva 4022, Floresta, Buenos Aires",
+"d": "Leandro"
+}
+]
