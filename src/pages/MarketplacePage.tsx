@@ -360,6 +360,31 @@ const MarketplacePage = () => {
         </div>
 
         <div className="container py-8">
+          {/* Source banner (from map MTR node clicks) */}
+          {sourceParam === "mercado_territorial" && (
+            <div className="mb-6 rounded-xl border-2 border-amber-300 bg-amber-50 p-4 flex items-start gap-3">
+              <ShoppingBasket className="h-5 w-5 text-amber-700 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="font-display text-sm text-amber-900">
+                  Catálogo del Mercado Territorial
+                  {nodeParam && <> · Nodo: <span className="font-bold">{decodeURIComponent(nodeParam)}</span></>}
+                </h3>
+                <p className="text-xs text-amber-800/80 mt-1">
+                  Productos sincronizados desde{" "}
+                  <a href="https://tiendaschasqui.ar/mtr/catalogo" target="_blank" rel="noopener noreferrer" className="underline font-medium">
+                    tiendaschasqui.ar/mtr/catalogo
+                  </a>. La compra se gestiona en el sitio original.
+                </p>
+              </div>
+              <a
+                href={window.location.pathname}
+                className="text-xs text-amber-900 underline whitespace-nowrap"
+              >
+                Ver todos
+              </a>
+            </div>
+          )}
+
           {/* Trust warning - moved to bottom */}
           {/* Search + Sort row */}
           <div className="flex flex-col sm:flex-row gap-4 mb-4">
