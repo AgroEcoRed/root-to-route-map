@@ -14,6 +14,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Filter, X, ArrowUp, ArrowDown, Minus } from "lucide-react";
+import { DataSourceToggle } from "@/components/admin/DataSourceToggle";
+import { useDataSources } from "@/hooks/useDataSources";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -182,6 +184,7 @@ const MapPage = () => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null);
   const [dbActors, setDbActors] = useState<MapActor[]>([]);
+  const { isEnabled } = useDataSources();
 
   // Fetch real profiles from database
   useEffect(() => {
@@ -213,7 +216,13 @@ const MapPage = () => {
     fetchProfiles();
   }, []);
 
-  const allActors = useMemo(() => [...mockActors, ...mercadoTerritorialActors, ...dbActors], [dbActors]);
+  const allActors = useMemo(() => {
+    const out: MapActor[] = [];
+    if (isEnabled("rutas_sanas")) out.push(...mockActors);
+    if (isEnabled("mercado_territorial")) out.push(...mercadoTerritorialActors);
+    if (isEnabled("agroeco")) out.push(...dbActors);
+    return out;
+  }, [dbActors, isEnabled]);
 
   const toggleType = (type: ActorType) => {
     setActiveTypes((prev) => {
@@ -515,6 +524,7 @@ const MapPage = () => {
           <div ref={mapContainerRef} className="w-full z-0 flex-1 min-h-[300px]" />
         </div>
       </div>
+      <DataSourceToggle position="bottom-6 right-6" />
     </div>
   );
 };
