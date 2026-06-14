@@ -16,15 +16,18 @@ import {
 } from "@/components/ui/dialog";
 import {
   Search, MapPin, Calendar, ShoppingBasket,
-  TrendingUp, DollarSign, Navigation, ShieldCheck, Star, SlidersHorizontal, Store, Users, AlertTriangle, MessageSquare
+  TrendingUp, DollarSign, Navigation, ShieldCheck, Star, SlidersHorizontal, Store, Users, AlertTriangle, MessageSquare, ExternalLink
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useDataSources } from "@/hooks/useDataSources";
+import { DataSourceToggle } from "@/components/admin/DataSourceToggle";
 import { toast } from "sonner";
 
 type SortOption = "relevance" | "price_asc" | "price_desc" | "proximity" | "best_seller" | "cert_green" | "seasonal";
 type ListingType = "oferta" | "demanda";
+type ProductSource = "mock" | "mercado_territorial" | "agroeco" | "rutas_sanas";
 
 interface Product {
   id: number;
@@ -43,6 +46,11 @@ interface Product {
   soldCount: number;
   distanceKm: number;
   listingType: ListingType;
+  imageUrl?: string;
+  sellos?: { code: string; name: string }[];
+  source?: ProductSource;
+  sourceUrl?: string;
+  description?: string;
 }
 
 // Main categories (intermediate approach)
