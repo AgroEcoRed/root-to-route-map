@@ -349,9 +349,9 @@ const MapPage = () => {
         .bindPopup(`
           <div style="min-width:240px;font-family:DM Sans,sans-serif;padding:4px">
             <div style="margin-bottom:6px">${sourceBadge}</div>
-            <a href="#" class="map-actor-link" data-producer="${encodeURIComponent(a.name)}" style="display:block;background:${roleBadgeColor};color:white;font-weight:700;font-size:14px;margin:0 0 8px;padding:8px 12px;border-radius:8px;text-decoration:none;cursor:pointer;text-align:center;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+            <a href="#" class="map-actor-link" data-producer="${encodeURIComponent(a.name)}" data-source="${a.source}" style="display:block;background:${roleBadgeColor};color:white;font-weight:700;font-size:14px;margin:0 0 8px;padding:8px 12px;border-radius:8px;text-decoration:none;cursor:pointer;text-align:center;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
               ${a.name}
-              <span style="display:block;font-size:10px;font-weight:400;opacity:0.85;margin-top:2px">Ver todos sus productos →</span>
+              <span style="display:block;font-size:10px;font-weight:400;opacity:0.85;margin-top:2px">${a.source === 'mercado_territorial' ? 'Ver catálogo Mercado Territorial →' : 'Ver todos sus productos →'}</span>
             </a>
             <p style="font-size:12px;color:#666;margin:0">${actorTypeLabels[a.type]}</p>
             <p style="font-size:12px;margin:4px 0">${a.description}</p>
@@ -369,7 +369,12 @@ const MapPage = () => {
             el.addEventListener("click", (e) => {
               e.preventDefault();
               const producer = decodeURIComponent((el as HTMLElement).dataset.producer || "");
-              navigate(`/mercado?producer=${encodeURIComponent(producer)}`);
+              const source = (el as HTMLElement).dataset.source || "";
+              if (source === "mercado_territorial") {
+                navigate(`/mercado?source=mercado_territorial&node=${encodeURIComponent(producer)}`);
+              } else {
+                navigate(`/mercado?producer=${encodeURIComponent(producer)}`);
+              }
             });
           });
           // Product click → marketplace filtered by producer + search for product
