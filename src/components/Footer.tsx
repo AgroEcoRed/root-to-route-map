@@ -48,11 +48,21 @@ const Footer = () => {
           <div>
             <h4 className="font-display text-sm mb-4 text-forest-foreground/90">{t("footer.resources")}</h4>
             <ul className="space-y-2.5 text-sm text-forest-foreground/60">
-              {["footer.api_docs", "footer.participatory_cert", "footer.contact"].map((key) => (
-                <li key={key}>
-                  <span className="hover:text-wheat transition-colors cursor-pointer hover:translate-x-1 inline-block">{t(key)}</span>
-                </li>
-              ))}
+              <li>
+                <Link to="/biblioteca" className="hover:text-wheat transition-colors hover:translate-x-1 inline-block">
+                  {t("footer.api_docs")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/actores?tab=spg" className="hover:text-wheat transition-colors hover:translate-x-1 inline-block">
+                  {t("footer.participatory_cert")}
+                </Link>
+              </li>
+              <li>
+                <a href="mailto:hola@agroeco.red" className="hover:text-wheat transition-colors hover:translate-x-1 inline-block">
+                  {t("footer.contact")}
+                </a>
+              </li>
             </ul>
           </div>
         </div>
