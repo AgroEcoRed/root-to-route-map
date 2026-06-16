@@ -317,49 +317,78 @@ const CommunityPage = () => {
 
             {/* EVENTS */}
             <TabsContent value="events">
+              <div className="flex justify-end mb-4">
+                <Button
+                  className="gap-2 bg-gradient-to-r from-[#E94560] via-[#F5C518] to-[#3B82F6] text-white"
+                  onClick={() => {
+                    if (!user) {
+                      toast("Necesitás ingresar para publicar una actividad", { action: { label: "Ingresar", onClick: () => navigate("/ingresar") } });
+                      return;
+                    }
+                    setEventDialogOpen(true);
+                  }}
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Publicar actividad
+                </Button>
+              </div>
+
+              {eventsLoading ? (
+                <p className="text-sm text-muted-foreground text-center py-12">Cargando actividades…</p>
+              ) : dbEvents.length === 0 ? (
+                <div className="text-center py-12 border border-dashed border-border rounded-xl">
+                  <CalendarDays className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+                  <p className="text-sm text-muted-foreground">Aún no hay actividades futuras publicadas.</p>
+                  <p className="text-xs text-muted-foreground mt-1">Sé la primera persona en publicar una feria, intercambio o formación.</p>
+                </div>
+              ) : (
               <div className="space-y-4">
-                {events.map((event, i) => (
+                {dbEvents.map((event, i) => (
                   <motion.div key={event.id} initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, delay: i * 0.06 }}
                     className="rounded-xl border border-border bg-card p-6 hover:shadow-elevated transition-all duration-300">
                     <div className="flex flex-col sm:flex-row gap-4">
                       <div className="flex-shrink-0 w-20 text-center">
-                        <div className="text-3xl font-display text-primary">{new Date(event.date).getDate()}</div>
+                        <div className="text-3xl font-display text-primary">{new Date(event.starts_at).getDate()}</div>
                         <div className="text-xs text-muted-foreground uppercase">
-                          {new Date(event.date).toLocaleDateString("es", { month: "short", year: "numeric" })}
+                          {new Date(event.starts_at).toLocaleDateString("es", { month: "short", year: "numeric" })}
                         </div>
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-display text-lg text-card-foreground">{event.title}</h3>
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${eventTypeColors[event.type]}`}>
-                            {t(`community.event_type.${event.type}`)}
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${eventTypeColors[event.event_type] || eventTypeColors.otro}`}>
+                            {event.event_type}
                           </span>
                         </div>
-                        <p className="text-sm text-muted-foreground mb-3">{event.description}</p>
+                        {event.description && <p className="text-sm text-muted-foreground mb-3">{event.description}</p>}
                         <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{event.location}</span>
-                          <span className="flex items-center gap-1"><Users className="h-3 w-3" />{event.attendees} {t("community.attendees")}</span>
+                          {event.location_name && <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{event.location_name}</span>}
+                          <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{new Date(event.starts_at).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}</span>
                         </div>
                       </div>
                       <div className="flex items-center">
-                        <Button size="sm" variant="outline" className="text-xs" onClick={() => {
-                          if (!user) {
-                            toast("Necesitás ingresar para inscribirte", { action: { label: "Ingresar", onClick: () => navigate("/ingresar") } });
-                          } else {
-                            toast.success(`¡Te inscribiste a "${event.title}"!`);
-                          }
-                        }}>{t("community.register_event")}</Button>
+                        {event.link ? (
+                          <a href={event.link} target="_blank" rel="noopener noreferrer">
+                            <Button size="sm" variant="outline" className="text-xs gap-1">
+                              <ExternalLink className="h-3 w-3" /> Más info
+                            </Button>
+                          </a>
+                        ) : event.contact ? (
+                          <span className="text-xs text-muted-foreground">📞 {event.contact}</span>
+                        ) : null}
                       </div>
                     </div>
                   </motion.div>
                 ))}
               </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>
       </main>
       <Footer />
+      <EventFormDialog open={eventDialogOpen} onOpenChange={setEventDialogOpen} />
     </div>
   );
 };
