@@ -13,9 +13,14 @@ import Navbar from "@/components/Navbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, X, ArrowUp, ArrowDown, Minus } from "lucide-react";
+import { Search, Filter, X, ArrowUp, ArrowDown, Minus, CalendarPlus, Network, Sparkles } from "lucide-react";
 import { DataSourceToggle } from "@/components/admin/DataSourceToggle";
 import { useDataSources } from "@/hooks/useDataSources";
+import { useUpcomingEvents } from "@/hooks/useUpcomingEvents";
+import { useActorConnections } from "@/hooks/useActorConnections";
+import { useAuth } from "@/contexts/AuthContext";
+import { EventFormDialog } from "@/components/events/EventFormDialog";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -183,8 +188,17 @@ const MapPage = () => {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null);
+  const eventsLayerRef = useRef<L.LayerGroup | null>(null);
+  const networkLayerRef = useRef<L.LayerGroup | null>(null);
+  const profileIdByCoordsRef = useRef<Map<string, { id: string; lat: number; lng: number; name: string }>>(new Map());
   const [dbActors, setDbActors] = useState<MapActor[]>([]);
+  const [dbProfilesById, setDbProfilesById] = useState<Map<string, { id: string; lat: number; lng: number; name: string }>>(new Map());
   const { isEnabled } = useDataSources();
+  const { user } = useAuth();
+  const { events } = useUpcomingEvents();
+  const { connections } = useActorConnections();
+  const [showNetwork, setShowNetwork] = useState(false);
+  const [eventDialogOpen, setEventDialogOpen] = useState(false);
 
   // Fetch real profiles from database
   useEffect(() => {
@@ -212,6 +226,11 @@ const MapPage = () => {
           contentLicense: p.content_license || null,
         }));
       setDbActors(realActors);
+      const m = new Map<string, { id: string; lat: number; lng: number; name: string }>();
+      (data as any[]).forEach((p: any) => {
+        if (p.id && p.lat && p.lng) m.set(p.id as string, { id: p.id, lat: p.lat, lng: p.lng, name: p.display_name || "" });
+      });
+      setDbProfilesById(m);
     };
     fetchProfiles();
   }, []);
