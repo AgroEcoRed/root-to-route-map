@@ -289,11 +289,15 @@ const MapPage = () => {
       showCoverageOnHover: false,
     });
     mapRef.current.addLayer(clusterRef.current);
+    eventsLayerRef.current = L.layerGroup().addTo(mapRef.current);
+    networkLayerRef.current = L.layerGroup().addTo(mapRef.current);
 
     return () => {
       mapRef.current?.remove();
       mapRef.current = null;
       clusterRef.current = null;
+      eventsLayerRef.current = null;
+      networkLayerRef.current = null;
     };
   }, []);
 
