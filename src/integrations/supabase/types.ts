@@ -14,6 +14,74 @@ export type Database = {
   }
   public: {
     Tables: {
+      actor_connections: {
+        Row: {
+          connection_type: Database["public"]["Enums"]["connection_type"]
+          created_at: string
+          created_by: string | null
+          declared: boolean
+          id: string
+          note: string | null
+          source_profile_id: string
+          strength: number
+          target_profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          connection_type?: Database["public"]["Enums"]["connection_type"]
+          created_at?: string
+          created_by?: string | null
+          declared?: boolean
+          id?: string
+          note?: string | null
+          source_profile_id: string
+          strength?: number
+          target_profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          connection_type?: Database["public"]["Enums"]["connection_type"]
+          created_at?: string
+          created_by?: string | null
+          declared?: boolean
+          id?: string
+          note?: string | null
+          source_profile_id?: string
+          strength?: number
+          target_profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "actor_connections_source_profile_id_fkey"
+            columns: ["source_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "actor_connections_source_profile_id_fkey"
+            columns: ["source_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "actor_connections_target_profile_id_fkey"
+            columns: ["target_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "actor_connections_target_profile_id_fkey"
+            columns: ["target_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       custom_categories: {
         Row: {
           created_at: string
@@ -59,6 +127,63 @@ export type Database = {
           source_id?: string
           updated_at?: string
           updated_by?: string | null
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          approved: boolean
+          contact: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          ends_at: string | null
+          event_type: Database["public"]["Enums"]["event_type"]
+          id: string
+          lat: number | null
+          link: string | null
+          lng: number | null
+          location_name: string | null
+          source: Database["public"]["Enums"]["event_source"]
+          starts_at: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          approved?: boolean
+          contact?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string | null
+          event_type?: Database["public"]["Enums"]["event_type"]
+          id?: string
+          lat?: number | null
+          link?: string | null
+          lng?: number | null
+          location_name?: string | null
+          source?: Database["public"]["Enums"]["event_source"]
+          starts_at: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          approved?: boolean
+          contact?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string | null
+          event_type?: Database["public"]["Enums"]["event_type"]
+          id?: string
+          lat?: number | null
+          link?: string | null
+          lng?: number | null
+          location_name?: string | null
+          source?: Database["public"]["Enums"]["event_source"]
+          starts_at?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -742,6 +867,16 @@ export type Database = {
         | "bio_input_supplier"
       app_role: "admin" | "moderator" | "user"
       certification_level: "red" | "yellow" | "green" | "none_spg"
+      connection_type:
+        | "proveedor"
+        | "comprador"
+        | "colaboracion"
+        | "spg"
+        | "intercambio"
+        | "red"
+        | "otro"
+      event_source: "user" | "admin" | "community"
+      event_type: "feria" | "intercambio" | "formacion" | "otro"
       transition_dimension:
         | "agronomic"
         | "ecological"
@@ -904,6 +1039,17 @@ export const Constants = {
       ],
       app_role: ["admin", "moderator", "user"],
       certification_level: ["red", "yellow", "green", "none_spg"],
+      connection_type: [
+        "proveedor",
+        "comprador",
+        "colaboracion",
+        "spg",
+        "intercambio",
+        "red",
+        "otro",
+      ],
+      event_source: ["user", "admin", "community"],
+      event_type: ["feria", "intercambio", "formacion", "otro"],
       transition_dimension: [
         "agronomic",
         "ecological",

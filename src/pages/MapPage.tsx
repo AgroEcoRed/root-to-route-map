@@ -13,9 +13,14 @@ import Navbar from "@/components/Navbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, X, ArrowUp, ArrowDown, Minus } from "lucide-react";
+import { Search, Filter, X, ArrowUp, ArrowDown, Minus, CalendarPlus, Network, Sparkles } from "lucide-react";
 import { DataSourceToggle } from "@/components/admin/DataSourceToggle";
 import { useDataSources } from "@/hooks/useDataSources";
+import { useUpcomingEvents } from "@/hooks/useUpcomingEvents";
+import { useActorConnections } from "@/hooks/useActorConnections";
+import { useAuth } from "@/contexts/AuthContext";
+import { EventFormDialog } from "@/components/events/EventFormDialog";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -183,8 +188,17 @@ const MapPage = () => {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null);
+  const eventsLayerRef = useRef<L.LayerGroup | null>(null);
+  const networkLayerRef = useRef<L.LayerGroup | null>(null);
+  const profileIdByCoordsRef = useRef<Map<string, { id: string; lat: number; lng: number; name: string }>>(new Map());
   const [dbActors, setDbActors] = useState<MapActor[]>([]);
+  const [dbProfilesById, setDbProfilesById] = useState<Map<string, { id: string; lat: number; lng: number; name: string }>>(new Map());
   const { isEnabled } = useDataSources();
+  const { user } = useAuth();
+  const { events } = useUpcomingEvents();
+  const { connections } = useActorConnections();
+  const [showNetwork, setShowNetwork] = useState(false);
+  const [eventDialogOpen, setEventDialogOpen] = useState(false);
 
   // Fetch real profiles from database
   useEffect(() => {
@@ -212,6 +226,11 @@ const MapPage = () => {
           contentLicense: p.content_license || null,
         }));
       setDbActors(realActors);
+      const m = new Map<string, { id: string; lat: number; lng: number; name: string }>();
+      (data as any[]).forEach((p: any) => {
+        if (p.id && p.lat && p.lng) m.set(p.id as string, { id: p.id, lat: p.lat, lng: p.lng, name: p.display_name || "" });
+      });
+      setDbProfilesById(m);
     };
     fetchProfiles();
   }, []);
@@ -270,11 +289,15 @@ const MapPage = () => {
       showCoverageOnHover: false,
     });
     mapRef.current.addLayer(clusterRef.current);
+    eventsLayerRef.current = L.layerGroup().addTo(mapRef.current);
+    networkLayerRef.current = L.layerGroup().addTo(mapRef.current);
 
     return () => {
       mapRef.current?.remove();
       mapRef.current = null;
       clusterRef.current = null;
+      eventsLayerRef.current = null;
+      networkLayerRef.current = null;
     };
   }, []);
 
@@ -392,6 +415,126 @@ const MapPage = () => {
       clusterRef.current!.addLayer(marker);
     });
   }, [filtered, navigate]);
+
+  // Render upcoming events as confetti markers
+  useEffect(() => {
+    if (!mapRef.current || !eventsLayerRef.current) return;
+    eventsLayerRef.current.clearLayers();
+    if (!isEnabled("eventos")) return;
+
+    events.forEach((ev) => {
+      if (ev.lat == null || ev.lng == null) return;
+      const icon = L.divIcon({
+        className: "",
+        html: `<div class="event-marker">
+          <div class="em-ring">
+            <span class="em-dot d1"></span><span class="em-dot d2"></span>
+            <span class="em-dot d3"></span><span class="em-dot d4"></span>
+          </div>
+          <div class="em-core">★</div>
+        </div>`,
+        iconSize: [38, 38],
+        iconAnchor: [19, 19],
+      });
+      const date = new Date(ev.starts_at);
+      const dateStr = date.toLocaleString("es-AR", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+      const typeLabels: Record<string, string> = { feria: "Feria", intercambio: "Intercambio", formacion: "Formación", otro: "Actividad" };
+      const typeColor: Record<string, string> = { feria: "#E94560", intercambio: "#22C55E", formacion: "#3B82F6", otro: "#F5C518" };
+      const linkHtml = ev.link ? `<a href="${ev.link}" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-top:8px;background:#F5C518;color:#1a1a1a;padding:6px 12px;border-radius:8px;text-decoration:none;font-weight:700;font-size:12px">Más info / inscripción →</a>` : "";
+      const contactHtml = ev.contact ? `<p style="font-size:11px;color:#666;margin:6px 0 0">📞 ${ev.contact}</p>` : "";
+      const descHtml = ev.description ? `<p style="font-size:12px;color:#444;margin:6px 0">${ev.description}</p>` : "";
+      const locHtml = ev.location_name ? `<p style="font-size:11px;color:#666;margin:4px 0">📍 ${ev.location_name}</p>` : "";
+      L.marker([ev.lat, ev.lng], { icon, zIndexOffset: 1000 })
+        .bindPopup(`
+          <div style="min-width:240px;font-family:DM Sans,sans-serif;padding:4px">
+            <span style="display:inline-block;background:${typeColor[ev.event_type]};color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:0.4px">${typeLabels[ev.event_type]}</span>
+            <h3 style="font-family:Playfair Display,serif;font-size:16px;margin:8px 0 4px;color:#1a1a1a">${ev.title}</h3>
+            <p style="font-size:12px;color:#444;margin:0;font-weight:600">🗓️ ${dateStr}</p>
+            ${locHtml}${descHtml}${contactHtml}${linkHtml}
+          </div>
+        `)
+        .addTo(eventsLayerRef.current!);
+    });
+  }, [events, isEnabled]);
+
+  // Render actor network (lines + halos) — declared + inferred (same MTR node coord)
+  useEffect(() => {
+    if (!mapRef.current || !networkLayerRef.current) return;
+    networkLayerRef.current.clearLayers();
+    if (!showNetwork) return;
+
+    // Build position lookup
+    const posById = new Map<string, [number, number]>();
+    dbProfilesById.forEach((p) => posById.set(p.id, [p.lat, p.lng]));
+
+    // Declared edges
+    const edges: { from: [number, number]; to: [number, number]; type: string; declared: boolean; strength: number }[] = [];
+    connections.forEach((c) => {
+      const a = posById.get(c.source_profile_id);
+      const b = posById.get(c.target_profile_id);
+      if (a && b) edges.push({ from: a, to: b, type: c.connection_type, declared: c.declared, strength: c.strength });
+    });
+
+    // Inferred edges: actors within ~5km share a "red" edge (light)
+    const ids = Array.from(posById.keys());
+    const km = (a: [number, number], b: [number, number]) => {
+      const R = 6371;
+      const dLat = (b[0] - a[0]) * Math.PI / 180;
+      const dLng = (b[1] - a[1]) * Math.PI / 180;
+      const s = Math.sin(dLat / 2) ** 2 + Math.cos(a[0] * Math.PI/180) * Math.cos(b[0] * Math.PI/180) * Math.sin(dLng / 2) ** 2;
+      return 2 * R * Math.asin(Math.sqrt(s));
+    };
+    const seen = new Set<string>();
+    connections.forEach(c => seen.add([c.source_profile_id, c.target_profile_id].sort().join("|")));
+    for (let i = 0; i < ids.length; i++) {
+      for (let j = i + 1; j < ids.length; j++) {
+        const k = [ids[i], ids[j]].sort().join("|");
+        if (seen.has(k)) continue;
+        const a = posById.get(ids[i])!;
+        const b = posById.get(ids[j])!;
+        if (km(a, b) < 5) {
+          edges.push({ from: a, to: b, type: "red", declared: false, strength: 1 });
+          seen.add(k);
+        }
+      }
+    }
+
+    const typeColor: Record<string, string> = {
+      proveedor: "#2563eb", comprador: "#9333ea", colaboracion: "#16a34a",
+      spg: "#d97706", intercambio: "#0891b2", red: "#6b7280", otro: "#6b7280",
+    };
+
+    // Degree count for halos
+    const degree = new Map<string, number>();
+    connections.forEach(c => {
+      degree.set(c.source_profile_id, (degree.get(c.source_profile_id) || 0) + 1);
+      degree.set(c.target_profile_id, (degree.get(c.target_profile_id) || 0) + 1);
+    });
+
+    edges.forEach((e) => {
+      L.polyline([e.from, e.to], {
+        color: typeColor[e.type] || "#6b7280",
+        weight: e.declared ? 1.5 + e.strength * 0.6 : 1,
+        opacity: e.declared ? 0.7 : 0.3,
+        dashArray: e.declared ? undefined : "4 6",
+        interactive: false,
+      }).addTo(networkLayerRef.current!);
+    });
+
+    // Halos for actors with degree >= 2
+    posById.forEach((pos, id) => {
+      const d = degree.get(id) || 0;
+      if (d < 2) return;
+      const size = 32 + Math.min(d, 6) * 4;
+      const haloIcon = L.divIcon({
+        className: "",
+        html: `<div class="network-halo" style="width:${size}px;height:${size}px;background:hsl(var(--primary)/0.08);border:2px solid hsl(var(--primary)/0.5)"></div>`,
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size / 2],
+      });
+      L.marker(pos, { icon: haloIcon, interactive: false, zIndexOffset: -500 }).addTo(networkLayerRef.current!);
+    });
+  }, [showNetwork, connections, dbProfilesById]);
 
   // Group actor types by role for filter display
   const ofertaTypes: ActorType[] = ["producer", "cooperative", "processing", "agroecological_node", "seed_bank", "composting_center", "research_center", "solidarity_intermediary", "community_garden", "bio_input_supplier"];
@@ -527,9 +670,38 @@ const MapPage = () => {
         {/* Map area */}
         <div className="flex-1 min-h-0 relative flex flex-col">
           <div ref={mapContainerRef} className="w-full z-0 flex-1 min-h-[300px]" />
+
+          {/* Floating action buttons */}
+          <div className="absolute bottom-6 left-6 z-[1000] flex flex-col gap-2">
+            <Button
+              size="sm"
+              onClick={() => setShowNetwork(s => !s)}
+              className={`rounded-full shadow-elevated gap-2 ${showNetwork ? "bg-primary text-primary-foreground" : "bg-card text-foreground border-2 border-primary/30"}`}
+              title="Mostrar/ocultar análisis de redes"
+            >
+              <Network className="h-4 w-4" />
+              {showNetwork ? "Ocultar red" : "Ver red de vínculos"}
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                if (!user) {
+                  toast("Necesitás ingresar para publicar una actividad", { action: { label: "Ingresar", onClick: () => navigate("/ingresar") } });
+                  return;
+                }
+                setEventDialogOpen(true);
+              }}
+              className="rounded-full shadow-elevated gap-2 bg-gradient-to-r from-[#E94560] via-[#F5C518] to-[#3B82F6] text-white border-2 border-white/40 hover:opacity-90"
+              title="Publicar feria, intercambio o formación"
+            >
+              <Sparkles className="h-4 w-4" />
+              + Actividad futura
+            </Button>
+          </div>
         </div>
       </div>
       <DataSourceToggle position="bottom-6 right-6" />
+      <EventFormDialog open={eventDialogOpen} onOpenChange={setEventDialogOpen} />
     </div>
   );
 };
