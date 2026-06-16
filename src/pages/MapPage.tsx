@@ -670,9 +670,38 @@ const MapPage = () => {
         {/* Map area */}
         <div className="flex-1 min-h-0 relative flex flex-col">
           <div ref={mapContainerRef} className="w-full z-0 flex-1 min-h-[300px]" />
+
+          {/* Floating action buttons */}
+          <div className="absolute bottom-6 left-6 z-[1000] flex flex-col gap-2">
+            <Button
+              size="sm"
+              onClick={() => setShowNetwork(s => !s)}
+              className={`rounded-full shadow-elevated gap-2 ${showNetwork ? "bg-primary text-primary-foreground" : "bg-card text-foreground border-2 border-primary/30"}`}
+              title="Mostrar/ocultar análisis de redes"
+            >
+              <Network className="h-4 w-4" />
+              {showNetwork ? "Ocultar red" : "Ver red de vínculos"}
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                if (!user) {
+                  toast("Necesitás ingresar para publicar una actividad", { action: { label: "Ingresar", onClick: () => navigate("/ingresar") } });
+                  return;
+                }
+                setEventDialogOpen(true);
+              }}
+              className="rounded-full shadow-elevated gap-2 bg-gradient-to-r from-[#E94560] via-[#F5C518] to-[#3B82F6] text-white border-2 border-white/40 hover:opacity-90"
+              title="Publicar feria, intercambio o formación"
+            >
+              <Sparkles className="h-4 w-4" />
+              + Actividad futura
+            </Button>
+          </div>
         </div>
       </div>
       <DataSourceToggle position="bottom-6 right-6" />
+      <EventFormDialog open={eventDialogOpen} onOpenChange={setEventDialogOpen} />
     </div>
   );
 };
