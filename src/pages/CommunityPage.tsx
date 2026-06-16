@@ -12,10 +12,12 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   MessageSquare, BookOpen, CalendarDays, Search, ThumbsUp,
   Clock, User, Tag, ChevronRight, ChevronLeft, Sprout, Droplets, Bug, Leaf,
-  MapPin, Users, Send
+  MapPin, Users, Send, Sparkles, ExternalLink
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useUpcomingEvents } from "@/hooks/useUpcomingEvents";
+import { EventFormDialog } from "@/components/events/EventFormDialog";
 
 interface ForumPost {
   id: number;
@@ -48,46 +50,9 @@ interface Event {
   description: string;
 }
 
-const forumPosts: ForumPost[] = [
-  { id: 1, title: "Control biológico de pulgones en tomate", author: "María G.", date: "2026-03-05", category: "plagas", replies: 12, likes: 34, excerpt: "Compartí mi experiencia con mariquitas y crisopas para el control del pulgón verde en cultivo de tomate bajo invernadero.",
-    mockReplies: [
-      { author: "Pedro L.", text: "¡Excelente experiencia María! Yo también probé con crisopas y funciona muy bien. ¿Cuántas liberaste por metro cuadrado?", date: "2026-03-05", likes: 8 },
-      { author: "Ana R.", text: "En mi caso usé purín de ortiga como complemento y el resultado fue muy bueno. Les comparto la receta si les interesa.", date: "2026-03-06", likes: 12 },
-      { author: "Jorge M.", text: "¿Funcionará también para pulgón negro en habas? Tengo el mismo problema pero no encuentro mariquitas en mi zona.", date: "2026-03-06", likes: 3 },
-    ]
-  },
-  { id: 2, title: "Rotación de cultivos en huerta familiar", author: "Pedro L.", date: "2026-03-04", category: "técnicas", replies: 8, likes: 21, excerpt: "¿Cómo organizan la rotación en parcelas pequeñas? Tengo 2000m² y me cuesta no repetir familias botánicas.",
-    mockReplies: [
-      { author: "María G.", text: "Te recomiendo dividir en 4 sectores y rotar por familias: solanáceas → leguminosas → cucurbitáceas → brassicáceas.", date: "2026-03-04", likes: 15 },
-      { author: "Lucía S.", text: "Yo uso una planilla simple en papel. La clave es no repetir familia en el mismo cantero por 3 temporadas.", date: "2026-03-05", likes: 6 },
-    ]
-  },
-  { id: 3, title: "Experiencia con bokashi para mejorar suelos arcillosos", author: "Ana R.", date: "2026-03-03", category: "suelo", replies: 15, likes: 45, excerpt: "Después de 6 meses aplicando bokashi, los resultados en estructura y retención de agua son impresionantes.",
-    mockReplies: [
-      { author: "Carlos D.", text: "¿Qué proporción de materiales usás para tu bokashi? Yo tengo mucha arcilla roja y no logro que drene bien.", date: "2026-03-03", likes: 7 },
-    ]
-  },
-  { id: 4, title: "Semillas criollas de zapallo: variedades y conservación", author: "Jorge M.", date: "2026-03-02", category: "semillas", replies: 6, likes: 18, excerpt: "Estoy armando un banco de semillas de zapallos criollos. Tengo 8 variedades, busco intercambiar." },
-  { id: 5, title: "Problemas con mosca blanca en invernadero", author: "Lucía S.", date: "2026-03-01", category: "plagas", replies: 20, likes: 28, excerpt: "Probé con trampas amarillas y encarsia formosa pero sigo teniendo problemas. ¿Sugerencias?" },
-  { id: 6, title: "Certificación participativa: ¿cómo empezar?", author: "Carlos D.", date: "2026-02-28", category: "certificación", replies: 9, likes: 32, excerpt: "Quiero iniciar el proceso de SPG en mi zona. ¿Quiénes han pasado por el proceso? ¿Qué necesito saber?" },
-];
-
-const wikiArticles: WikiArticle[] = [
-  { id: 1, title: "Preparación de bioinsumos", category: "técnicas", icon: Sprout, excerpt: "Guía completa para elaborar purines, caldos minerales y preparados biodinámicos.", readTime: "12 min" },
-  { id: 2, title: "Manejo integrado de plagas (MIP)", category: "plagas", icon: Bug, excerpt: "Estrategias para controlar plagas sin agroquímicos: control biológico, cultural y físico.", readTime: "15 min" },
-  { id: 3, title: "Análisis de suelo: interpretación de resultados", category: "suelo", icon: Droplets, excerpt: "Cómo leer un análisis de suelo, qué indicadores mirar y cómo mejorar la fertilidad.", readTime: "10 min" },
-  { id: 4, title: "Cosecha y postcosecha de hortalizas", category: "técnicas", icon: Leaf, excerpt: "Técnicas para maximizar la vida útil de verduras y frutas después de la cosecha.", readTime: "8 min" },
-  { id: 5, title: "Compostaje: del residuo al abono", category: "suelo", icon: Sprout, excerpt: "Tipos de compostaje, materiales, tiempos y cómo saber cuándo está listo.", readTime: "11 min" },
-  { id: 6, title: "Sistemas Participativos de Garantía (SPG)", category: "certificación", icon: Users, excerpt: "Qué son, cómo funcionan y por qué son una alternativa a la certificación de tercera parte.", readTime: "14 min" },
-];
-
-const events: Event[] = [
-  { id: 1, title: "Taller de bioinsumos caseros", date: "2026-03-15", location: "La Plata", type: "workshop", attendees: 25, description: "Aprendé a preparar purín de ortiga, caldo bordelés y supermagro con insumos locales." },
-  { id: 2, title: "Jornada de campo: Finca La Esperanza", date: "2026-03-22", location: "La Plata", type: "field_day", attendees: 40, description: "Visita a la finca con demostración de rotación de cultivos y manejo de plagas." },
-  { id: 3, title: "Curso de análisis de suelo participativo", date: "2026-04-05", location: "Online", type: "course", attendees: 60, description: "4 clases sobre cómo hacer y entender análisis de suelo sin laboratorio." },
-  { id: 4, title: "Encuentro de intercambio de semillas", date: "2026-04-12", location: "Florencio Varela", type: "meeting", attendees: 80, description: "Traé tus semillas y llevate nuevas variedades. Charlas sobre conservación de biodiversidad." },
-  { id: 5, title: "Formación en SPG para nuevos evaluadores", date: "2026-04-20", location: "CABA", type: "course", attendees: 30, description: "Capacitación para quienes quieran ser evaluadores pares en Sistemas Participativos de Garantía." },
-];
+// Real content only. Forum and wiki are now empty placeholders until the community publishes.
+const forumPosts: ForumPost[] = [];
+const wikiArticles: WikiArticle[] = [];
 
 const forumCategoryIcons: Record<string, typeof Sprout> = {
   plagas: Bug,
@@ -98,10 +63,10 @@ const forumCategoryIcons: Record<string, typeof Sprout> = {
 };
 
 const eventTypeColors: Record<string, string> = {
-  workshop: "bg-primary/10 text-primary",
-  field_day: "bg-wheat/20 text-wheat-foreground",
-  course: "bg-secondary/10 text-secondary",
-  meeting: "bg-earth/10 text-earth",
+  feria: "bg-[#E94560]/15 text-[#E94560]",
+  intercambio: "bg-primary/10 text-primary",
+  formacion: "bg-[#3B82F6]/15 text-[#3B82F6]",
+  otro: "bg-wheat/20 text-wheat-foreground",
 };
 
 const CommunityPage = () => {
@@ -115,6 +80,8 @@ const CommunityPage = () => {
   const [newPostTitle, setNewPostTitle] = useState("");
   const [newPostContent, setNewPostContent] = useState("");
   const [replyText, setReplyText] = useState("");
+  const [eventDialogOpen, setEventDialogOpen] = useState(false);
+  const { events: dbEvents, loading: eventsLoading } = useUpcomingEvents();
 
   const filteredPosts = forumPosts.filter((p) =>
     !forumSearch || p.title.toLowerCase().includes(forumSearch.toLowerCase()) || p.excerpt.toLowerCase().includes(forumSearch.toLowerCase())
