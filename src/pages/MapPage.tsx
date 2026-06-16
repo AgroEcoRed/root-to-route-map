@@ -416,6 +416,126 @@ const MapPage = () => {
     });
   }, [filtered, navigate]);
 
+  // Render upcoming events as confetti markers
+  useEffect(() => {
+    if (!mapRef.current || !eventsLayerRef.current) return;
+    eventsLayerRef.current.clearLayers();
+    if (!isEnabled("eventos")) return;
+
+    events.forEach((ev) => {
+      if (ev.lat == null || ev.lng == null) return;
+      const icon = L.divIcon({
+        className: "",
+        html: `<div class="event-marker">
+          <div class="em-ring">
+            <span class="em-dot d1"></span><span class="em-dot d2"></span>
+            <span class="em-dot d3"></span><span class="em-dot d4"></span>
+          </div>
+          <div class="em-core">★</div>
+        </div>`,
+        iconSize: [38, 38],
+        iconAnchor: [19, 19],
+      });
+      const date = new Date(ev.starts_at);
+      const dateStr = date.toLocaleString("es-AR", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+      const typeLabels: Record<string, string> = { feria: "Feria", intercambio: "Intercambio", formacion: "Formación", otro: "Actividad" };
+      const typeColor: Record<string, string> = { feria: "#E94560", intercambio: "#22C55E", formacion: "#3B82F6", otro: "#F5C518" };
+      const linkHtml = ev.link ? `<a href="${ev.link}" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-top:8px;background:#F5C518;color:#1a1a1a;padding:6px 12px;border-radius:8px;text-decoration:none;font-weight:700;font-size:12px">Más info / inscripción →</a>` : "";
+      const contactHtml = ev.contact ? `<p style="font-size:11px;color:#666;margin:6px 0 0">📞 ${ev.contact}</p>` : "";
+      const descHtml = ev.description ? `<p style="font-size:12px;color:#444;margin:6px 0">${ev.description}</p>` : "";
+      const locHtml = ev.location_name ? `<p style="font-size:11px;color:#666;margin:4px 0">📍 ${ev.location_name}</p>` : "";
+      L.marker([ev.lat, ev.lng], { icon, zIndexOffset: 1000 })
+        .bindPopup(`
+          <div style="min-width:240px;font-family:DM Sans,sans-serif;padding:4px">
+            <span style="display:inline-block;background:${typeColor[ev.event_type]};color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:0.4px">${typeLabels[ev.event_type]}</span>
+            <h3 style="font-family:Playfair Display,serif;font-size:16px;margin:8px 0 4px;color:#1a1a1a">${ev.title}</h3>
+            <p style="font-size:12px;color:#444;margin:0;font-weight:600">🗓️ ${dateStr}</p>
+            ${locHtml}${descHtml}${contactHtml}${linkHtml}
+          </div>
+        `)
+        .addTo(eventsLayerRef.current!);
+    });
+  }, [events, isEnabled]);
+
+  // Render actor network (lines + halos) — declared + inferred (same MTR node coord)
+  useEffect(() => {
+    if (!mapRef.current || !networkLayerRef.current) return;
+    networkLayerRef.current.clearLayers();
+    if (!showNetwork) return;
+
+    // Build position lookup
+    const posById = new Map<string, [number, number]>();
+    dbProfilesById.forEach((p) => posById.set(p.id, [p.lat, p.lng]));
+
+    // Declared edges
+    const edges: { from: [number, number]; to: [number, number]; type: string; declared: boolean; strength: number }[] = [];
+    connections.forEach((c) => {
+      const a = posById.get(c.source_profile_id);
+      const b = posById.get(c.target_profile_id);
+      if (a && b) edges.push({ from: a, to: b, type: c.connection_type, declared: c.declared, strength: c.strength });
+    });
+
+    // Inferred edges: actors within ~5km share a "red" edge (light)
+    const ids = Array.from(posById.keys());
+    const km = (a: [number, number], b: [number, number]) => {
+      const R = 6371;
+      const dLat = (b[0] - a[0]) * Math.PI / 180;
+      const dLng = (b[1] - a[1]) * Math.PI / 180;
+      const s = Math.sin(dLat / 2) ** 2 + Math.cos(a[0] * Math.PI/180) * Math.cos(b[0] * Math.PI/180) * Math.sin(dLng / 2) ** 2;
+      return 2 * R * Math.asin(Math.sqrt(s));
+    };
+    const seen = new Set<string>();
+    connections.forEach(c => seen.add([c.source_profile_id, c.target_profile_id].sort().join("|")));
+    for (let i = 0; i < ids.length; i++) {
+      for (let j = i + 1; j < ids.length; j++) {
+        const k = [ids[i], ids[j]].sort().join("|");
+        if (seen.has(k)) continue;
+        const a = posById.get(ids[i])!;
+        const b = posById.get(ids[j])!;
+        if (km(a, b) < 5) {
+          edges.push({ from: a, to: b, type: "red", declared: false, strength: 1 });
+          seen.add(k);
+        }
+      }
+    }
+
+    const typeColor: Record<string, string> = {
+      proveedor: "#2563eb", comprador: "#9333ea", colaboracion: "#16a34a",
+      spg: "#d97706", intercambio: "#0891b2", red: "#6b7280", otro: "#6b7280",
+    };
+
+    // Degree count for halos
+    const degree = new Map<string, number>();
+    connections.forEach(c => {
+      degree.set(c.source_profile_id, (degree.get(c.source_profile_id) || 0) + 1);
+      degree.set(c.target_profile_id, (degree.get(c.target_profile_id) || 0) + 1);
+    });
+
+    edges.forEach((e) => {
+      L.polyline([e.from, e.to], {
+        color: typeColor[e.type] || "#6b7280",
+        weight: e.declared ? 1.5 + e.strength * 0.6 : 1,
+        opacity: e.declared ? 0.7 : 0.3,
+        dashArray: e.declared ? undefined : "4 6",
+        interactive: false,
+      }).addTo(networkLayerRef.current!);
+    });
+
+    // Halos for actors with degree >= 2
+    posById.forEach((pos, id) => {
+      const d = degree.get(id) || 0;
+      if (d < 2) return;
+      const size = 32 + Math.min(d, 6) * 4;
+      const haloIcon = L.divIcon({
+        className: "",
+        html: `<div class="network-halo" style="width:${size}px;height:${size}px;background:hsl(var(--primary)/0.08);border:2px solid hsl(var(--primary)/0.5)"></div>`,
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size / 2],
+      });
+      L.marker(pos, { icon: haloIcon, interactive: false, zIndexOffset: -500 }).addTo(networkLayerRef.current!);
+    });
+  }, [showNetwork, connections, dbProfilesById]);
+
   // Group actor types by role for filter display
   const ofertaTypes: ActorType[] = ["producer", "cooperative", "processing", "agroecological_node", "seed_bank", "composting_center", "research_center", "solidarity_intermediary", "community_garden", "bio_input_supplier"];
   const demandaTypes: ActorType[] = ["restaurant", "social_kitchen", "institution", "retail", "consumer_node", "individual_consumer", "food_bank", "consumer_cooperative", "community_org", "health_food_store", "agroecological_store", "agroecological_fair", "agroecological_market"];
