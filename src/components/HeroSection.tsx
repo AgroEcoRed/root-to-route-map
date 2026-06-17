@@ -5,6 +5,9 @@ import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-farm.jpg";
 import { useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import conicetLogo from "@/assets/logo-conicet.png";
+import unsamLogo from "@/assets/logo-unsam.png";
+import ubaLogo from "@/assets/logo-uba.png";
 
 const floatingVariants = {
   animate: (i: number) => ({
@@ -52,6 +55,17 @@ const HeroSection = () => {
       ))}
 
       <motion.div className="container relative z-10 pt-28 pb-20" style={{ y: textY }}>
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.2 }}
+          className="absolute top-20 right-4 sm:right-8 flex items-center gap-4 sm:gap-6 opacity-70"
+          aria-label="Instituciones impulsoras"
+        >
+          <img src={conicetLogo} alt="CONICET" className="h-10 sm:h-12 w-auto object-contain brightness-0 invert opacity-80" loading="lazy" />
+          <img src={unsamLogo} alt="UNSAM" className="h-10 sm:h-12 w-auto object-contain brightness-0 invert opacity-80" loading="lazy" />
+          <img src={ubaLogo} alt="UBA" className="h-10 sm:h-12 w-auto object-contain brightness-0 invert opacity-80" loading="lazy" />
+        </motion.div>
         <div className="max-w-3xl">
           <motion.div initial={{ opacity: 0, y: 40, filter: "blur(10px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.8 }}>
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-wheat/20 text-wheat text-sm font-medium mb-6 backdrop-blur-sm border border-wheat/10">
