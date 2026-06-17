@@ -50,6 +50,10 @@ const doc = new Document({
         spacing: { after: 200 },
         children: [new TextRun({ text: "La plataforma opera como una herramienta de investigación-acción participativa, articulando saberes científicos, productivos y comunitarios en un entorno colaborativo que favorece la toma de decisiones informada a nivel territorial.", size: 24, font: "Arial" })]
       }),
+      new Paragraph({
+        spacing: { after: 200 },
+        children: [new TextRun({ text: "En el marco del proyecto FONICS, AgroEco.Red se presenta como una iniciativa de articulación multisectorial que vincula la investigación académica con la acción territorial. La propuesta implica una activa coordinación con municipios, el Nodo Agroecológico Territorial (NAT), organizaciones de productores, centros de investigación y organismos gubernamentales, consolidando una red de actores comprometidos con la transición agroecológica y la soberanía alimentaria en los territorios de intervención.", size: 24, font: "Arial" })]
+      }),
 
       // 2. Contexto y problemática
       new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("2. Contexto y problemática")] }),
