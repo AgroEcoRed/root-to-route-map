@@ -3,10 +3,12 @@ import { Plus, Mail } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import conicetLogo from "@/assets/logo-conicet.png";
 import unsamLogo from "@/assets/logo-unsam.png";
+import ubaLogo from "@/assets/logo-uba.png";
 
 const partners = [
   { name: "CONICET", logo: conicetLogo, url: "https://www.conicet.gov.ar" },
   { name: "UNSAM", logo: unsamLogo, url: "https://www.unsam.edu.ar" },
+  { name: "UBA", logo: ubaLogo, url: "https://www.uba.ar" },
 ];
 
 const PartnersSection = () => {
