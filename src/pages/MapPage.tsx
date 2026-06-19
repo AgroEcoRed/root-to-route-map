@@ -302,6 +302,8 @@ const MapPage = () => {
     if (isEnabled("rutas_sanas")) out.push(...mockActors);
     if (isEnabled("mercado_territorial")) out.push(...mercadoTerritorialActors);
     if (isEnabled("agroeco")) out.push(...dbActors);
+    if (isEnabled("el_click")) out.push(...elClickActors);
+    if (isEnabled("el_brote")) out.push(...elBroteActors);
     return out;
   }, [dbActors, isEnabled]);
 
