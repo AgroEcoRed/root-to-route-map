@@ -26,10 +26,12 @@ import { DataSourceToggle } from "@/components/admin/DataSourceToggle";
 import { toast } from "sonner";
 import elClickData from "@/data/elClick.json";
 import elBroteData from "@/data/elBrote.json";
+import uttNodesData from "@/data/uttNodes.json";
 
 type SortOption = "relevance" | "price_asc" | "price_desc" | "proximity" | "best_seller" | "cert_green" | "seasonal";
 type ListingType = "oferta" | "demanda";
-type ProductSource = "mock" | "mercado_territorial" | "agroeco" | "rutas_sanas" | "el_click" | "el_brote";
+type ProductSource = "mock" | "mercado_territorial" | "agroeco" | "rutas_sanas" | "el_click" | "el_brote" | "utt_nodos";
+type DeliveryFilter = "all" | "jueves" | "sabados" | "ambos" | "lun_vie" | "domicilio" | "feria" | "nodo_abierto" | "sin_info";
 
 interface Product {
   id: number;
@@ -53,6 +55,8 @@ interface Product {
   source?: ProductSource;
   sourceUrl?: string;
   description?: string;
+  /** Free-text label about delivery days, opening hours, feria days, etc. */
+  deliveryInfo?: string;
 }
 
 // Main categories (intermediate approach)
