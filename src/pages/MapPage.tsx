@@ -209,6 +209,34 @@ const mercadoTerritorialActors: MapActor[] = (mercadoTerritorial as Array<{n:str
   lastUpdated: SOURCE_IMPORT_DATE.mercado_territorial,
 }));
 
+const elClickActors: MapActor[] = [{
+  id: 60000,
+  name: elClickData.store.name,
+  type: (elClickData.store.type as ActorType) || "retail",
+  lat: elClickData.store.lat,
+  lng: elClickData.store.lng,
+  products: [],
+  certification: "yellow",
+  description: `${elClickData.store.description} — ${elClickData.store.location}`,
+  source: "el_click",
+  verified: true,
+  lastUpdated: elClickData.store.lastUpdated || SOURCE_IMPORT_DATE.el_click,
+}];
+
+const elBroteActors: MapActor[] = [{
+  id: 70000,
+  name: elBroteData.store.name,
+  type: (elBroteData.store.type as ActorType) || "retail",
+  lat: elBroteData.store.lat,
+  lng: elBroteData.store.lng,
+  products: [],
+  certification: "yellow",
+  description: `${elBroteData.store.description} — ${elBroteData.store.location}`,
+  source: "el_brote",
+  verified: true,
+  lastUpdated: elBroteData.store.lastUpdated || SOURCE_IMPORT_DATE.el_brote,
+}];
+
 type CertFilter = "green" | "yellow" | "red";
 
 const MapPage = () => {
