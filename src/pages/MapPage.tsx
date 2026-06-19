@@ -241,7 +241,9 @@ const elBroteActors: MapActor[] = [{
 
 const uttNodesActors: MapActor[] = (uttNodesData.nodes as any[]).map((n, i) => {
   const contactBits: string[] = [];
+  if (n.address) contactBits.push(n.address);
   if (n.phone) contactBits.push(`Tel/WhatsApp: ${n.phone}`);
+  if (n.deliveryDays) contactBits.push(`Entrega: ${n.deliveryDays}`);
   if (n.url) contactBits.push(n.url);
   if (n.notes) contactBits.push(n.notes);
   const desc = [`${n.barrio} — ${n.zone}`, contactBits.join(" · ")].filter(Boolean).join(" · ");
@@ -255,8 +257,8 @@ const uttNodesActors: MapActor[] = (uttNodesData.nodes as any[]).map((n, i) => {
     certification: "yellow",
     description: desc,
     source: "utt_nodos",
-    verified: false,
-    lastUpdated: SOURCE_IMPORT_DATE.utt_nodos,
+    verified: Boolean(n.verified),
+    lastUpdated: n.lastUpdated || SOURCE_IMPORT_DATE.utt_nodos,
   };
 });
 
@@ -468,12 +470,12 @@ const MapPage = () => {
       const dateLabel = a.lastUpdated ? formatUpdateDate(a.lastUpdated) : "";
       const freshnessBadge = (() => {
         if (state === "verified-recent") {
-          return `<span title="Verificado por el propio actor · Actualizado ${dateLabel}" style="display:inline-flex;align-items:center;gap:3px;background:#dcfce7;color:#15803d;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #86efac;letter-spacing:0.2px">✓ Verificado · ${dateLabel}</span>`;
+          return `<span title="Información verificada recientemente · Actualizado ${dateLabel}" style="display:inline-flex;align-items:center;gap:3px;background:#e0e7ff;color:#3730a3;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #a5b4fc;letter-spacing:0.2px">✓ Verificado · ${dateLabel}</span>`;
         }
         if (state === "verified-old") {
-          return `<span title="Verificado por el propio actor pero hace más de 12 meses${dateLabel ? ` · Última actualización ${dateLabel}` : ""}" style="display:inline-flex;align-items:center;gap:3px;background:#fef9c3;color:#854d0e;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #fde047;letter-spacing:0.2px">✓ Verificado · ${dateLabel || "sin fecha"}</span>`;
+          return `<span title="Verificado en algún momento, pero hace más de 12 meses${dateLabel ? ` · Última actualización ${dateLabel}` : ""}" style="display:inline-flex;align-items:center;gap:3px;background:#e2e8f0;color:#475569;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #94a3b8;letter-spacing:0.2px">✓ Verificado · ${dateLabel || "sin fecha"} (antigua)</span>`;
         }
-        return `<span title="Datos heredados de la fuente original, aún no confirmados por el actor${dateLabel ? ` · Importado ${dateLabel}` : ""}" style="display:inline-flex;align-items:center;gap:3px;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.2px">○ Sin verificar${dateLabel ? ` · ${dateLabel}` : ""}</span>`;
+        return `<span title="Datos heredados de la fuente original, aún no confirmados${dateLabel ? ` · Importado ${dateLabel}` : ""}" style="display:inline-flex;align-items:center;gap:3px;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.2px">⟳ Por verificar${dateLabel ? ` · ${dateLabel}` : ""}</span>`;
       })();
 
       const marker = L.marker([a.lat, a.lng], { icon })

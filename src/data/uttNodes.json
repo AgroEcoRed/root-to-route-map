@@ -4,9 +4,714 @@
     "name": "Nodos UTT (Unión de Trabajadores de la Tierra)",
     "description": "Red de nodos de consumo y comercialización de la UTT en CABA y GBA.",
     "url": "https://uniondetrabajadoresdelatierra.com.ar/comercializacion-2/",
-    "lastUpdated": "2022-05-02"
+    "lastUpdated": "2026-06-19"
   },
   "nodes": [
+    {
+      "name": "Esteban",
+      "barrio": "San Telmo",
+      "zone": "CABA",
+      "address": "Carlos Calvo 869 Dpto 2°9, San Telmo, Caba",
+      "phone": "1135664739",
+      "deliveryDays": "Sábados",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.621,
+      "lng": -58.3736,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Dietética Orígenes",
+      "barrio": "Villa Luro",
+      "zone": "CABA",
+      "address": "Dupuy 138, Villa Luro, Caba",
+      "phone": "1131818919",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.6356,
+      "lng": -58.5023,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Silvana",
+      "barrio": "Boedo",
+      "zone": "CABA",
+      "address": "Av. Juan de Garay 3361 Dpto C, Boedo, Caba",
+      "phone": "1155638885",
+      "deliveryDays": "Sábados",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.6286,
+      "lng": -58.4173,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Páramo Almacén",
+      "barrio": "Boedo",
+      "zone": "CABA",
+      "address": "Carlos Calvo 3974, Boedo, Caba",
+      "phone": "1165239343",
+      "deliveryDays": "Sábados",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.62780456412522,
+      "lng": -58.41663001360527,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Sochori",
+      "barrio": "Flores",
+      "zone": "CABA",
+      "address": "Gregorio de Laferrere 2971, Flores, Caba",
+      "phone": "1154576045",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.628,
+      "lng": -58.464,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Martín",
+      "barrio": "Devoto",
+      "zone": "CABA",
+      "address": "José Pedro Varela 5241 Dto. 8°, Devoto, Caba",
+      "phone": "1165929322",
+      "deliveryDays": "Sábados",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.6005,
+      "lng": -58.5125,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Tierra Firme",
+      "barrio": "Saavedra",
+      "zone": "CABA",
+      "address": "Mariano Acha 3939, Saavedra, Caba",
+      "phone": "1168743010",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.557,
+      "lng": -58.487,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Sachawasi",
+      "barrio": "Saavedra",
+      "zone": "CABA",
+      "address": "Av. Melián 3509, Saavedra, Caba",
+      "phone": "1140240079",
+      "deliveryDays": "Ambos días",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.556204564125224,
+      "lng": -58.486330013605276,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Revolución Humana",
+      "barrio": "Colegiales",
+      "zone": "CABA",
+      "address": "Benjamín Matienzo 2450 Dpto C, Colegiales, Caba",
+      "phone": "1162247649",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.574,
+      "lng": -58.449,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Casa Verde",
+      "barrio": "San Isidro",
+      "zone": "Zona Norte",
+      "address": "25 de Mayo 629, San Isidro, Norte",
+      "phone": "1144357166",
+      "deliveryDays": "Ambos días",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.4708,
+      "lng": -58.5128,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Pachamama Poderosa",
+      "barrio": "Beccar",
+      "zone": "Zona Norte",
+      "address": "Brasil 677 Beccar",
+      "phone": "1134101834",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.464,
+      "lng": -58.517,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Salud Arte",
+      "barrio": "José León Suárez",
+      "zone": "Zona Norte",
+      "address": "Mármol 3522 (ex 626), José León Suárez, Norte",
+      "phone": "1144088015",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.524,
+      "lng": -58.565,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "La Familia",
+      "barrio": "Don Torcuato",
+      "zone": "Zona Norte",
+      "address": "Av. María 1375, Don Torcuato, Norte",
+      "phone": "1134678611",
+      "deliveryDays": "Sábados",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.488,
+      "lng": -58.626,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Casa A",
+      "barrio": "La Tablada",
+      "zone": "Zona Oeste",
+      "address": "Honduras 4510, La Tablada, Oeste",
+      "phone": "1126041191",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.677,
+      "lng": -58.507,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Energías de la Tierra",
+      "barrio": "Virrey Del Pino",
+      "zone": "Zona Oeste",
+      "address": "Arrecifes 1829, Virrey del Pino, Oeste",
+      "phone": "1122699774",
+      "deliveryDays": "Ambos días",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.79,
+      "lng": -58.679,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Micaela",
+      "barrio": "Ituzaingó",
+      "zone": "Zona Oeste",
+      "address": "Ombú 1350, Ituzaingó, Oeste",
+      "phone": "1126578543",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.658,
+      "lng": -58.668,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Almacén de Sabores",
+      "barrio": "Muñiz",
+      "zone": "Zona Oeste",
+      "address": "Muñoz 952, Muñiz, Oeste",
+      "phone": "1157360679",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.55,
+      "lng": -58.705,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Marcela",
+      "barrio": "Ramos Mejía",
+      "zone": "Zona Oeste",
+      "address": "Alvear 673 timbre de abajo, Ramos Mejía, Oeste",
+      "phone": "1136536686",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.645,
+      "lng": -58.568,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Graciela",
+      "barrio": "Ciudadela",
+      "zone": "Zona Oeste",
+      "address": "Cuevas 3472, Ciudadela, Oeste",
+      "phone": "1166076792",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.6394,
+      "lng": -58.538,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Mónica",
+      "barrio": "Gerli",
+      "zone": "Zona Sur",
+      "address": "Lacarra 565, Gerli, Sur",
+      "phone": null,
+      "deliveryDays": "Sábados",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.685,
+      "lng": -58.376,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Rubén",
+      "barrio": "Lanús",
+      "zone": "Zona Sur",
+      "address": "Gaebeler 1672, Lanús, Sur",
+      "phone": "1159490842",
+      "deliveryDays": "Sábados",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.706,
+      "lng": -58.392,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Florencia",
+      "barrio": "Banfield",
+      "zone": "Zona Sur",
+      "address": "Berutti 806, Banfield, Sur",
+      "phone": "1153446835",
+      "deliveryDays": "Sábados",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.7456,
+      "lng": -58.397,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Nodo UTT",
+      "barrio": "Lomas De Zamora",
+      "zone": "Zona Sur",
+      "address": "Saenz 2456, Lomas de Zamora, Sur",
+      "phone": "1162243891",
+      "deliveryDays": "Sábados",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.76,
+      "lng": -58.4,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Ceres",
+      "barrio": "Claypole",
+      "zone": "Zona Sur",
+      "address": "Leandro N. Alem 4412, Claypole, Sur",
+      "phone": "1132533215",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.798,
+      "lng": -58.347,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Mercado compa",
+      "barrio": "Flores",
+      "zone": "CABA",
+      "address": "Avellaneda 2177, Flores, Caba",
+      "phone": "1134900333",
+      "deliveryDays": "Ambos días",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.62720456412522,
+      "lng": -58.46333001360527,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Daniel",
+      "barrio": "Vicente Lopez",
+      "zone": "Zona Norte",
+      "address": "Chile 675, Villa Martelli, Vicente López, Norte",
+      "phone": "1157625321",
+      "deliveryDays": "Sábados",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.526,
+      "lng": -58.483,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Mirtha Beatriz",
+      "barrio": "Fco Alvarez",
+      "zone": "Zona Oeste",
+      "address": "Los fresnos 1650, Fco Alvarez",
+      "phone": "1124088867",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.644,
+      "lng": -58.859,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "ConectArte",
+      "barrio": "San Miguel",
+      "zone": "Zona Norte",
+      "address": "San Ramon 979, Villa Bosch",
+      "phone": "1151042920",
+      "deliveryDays": "Ambos días",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.543,
+      "lng": -58.712,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Alejandra",
+      "barrio": "La Matanza",
+      "zone": "Zona Oeste",
+      "address": "Llorente 6850 Villa Dorrego .González catan",
+      "phone": "1122600797",
+      "deliveryDays": "Sabados",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.77,
+      "lng": -58.544,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Soledad",
+      "barrio": "Caballito",
+      "zone": "CABA",
+      "address": "Felipe vallese 1002, caballito",
+      "phone": "1151600421",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.6189,
+      "lng": -58.4407,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Micaela de Elia Olivieri",
+      "barrio": "Parque Chas.",
+      "zone": "CABA",
+      "address": "Tomas le bretón 5675, ph 4, Villa Urquiza",
+      "phone": "1168898137",
+      "deliveryDays": "Sabados",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.584,
+      "lng": -58.479,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Nodo Feten, (Nadia)",
+      "barrio": "El Palomar",
+      "zone": "Zona Norte",
+      "address": "Aromos 619, esq. boulevard San Martín,El Palomar",
+      "phone": "1122603607",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.6087,
+      "lng": -58.609,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "La Casa de la esquina",
+      "barrio": "Mataderos",
+      "zone": "Zona Oeste",
+      "address": "Tapalqué 5394, mataderos",
+      "phone": "1538834513",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.6586,
+      "lng": -58.505,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Mary Berneron",
+      "barrio": "Laferrere",
+      "zone": "Zona Oeste",
+      "address": "Santa rosa 4738 Laferrere",
+      "phone": "1134955840",
+      "deliveryDays": "Ambos dias",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.743,
+      "lng": -58.587,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Mary Berneron",
+      "barrio": "Laferrere",
+      "zone": "Zona Oeste",
+      "address": "Carlos casares 4455 laferrere centro cultural",
+      "phone": "1134955840",
+      "deliveryDays": "Ambos dias",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.742204564125224,
+      "lng": -58.58633001360528,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Carlaier",
+      "barrio": "Capital Federal",
+      "zone": "CABA",
+      "address": "Av. Corrientes 5943 6 C (entre Humboldt y Darwin).Capital Federal",
+      "phone": "1133374690",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.6118,
+      "lng": -58.4173,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Luz",
+      "barrio": "Caballito",
+      "zone": "CABA",
+      "address": "Av. Juan Bautista Alberdi 1553",
+      "phone": "1135204422",
+      "deliveryDays": "Sábados",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.61810456412522,
+      "lng": -58.44003001360527,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Rocio",
+      "barrio": "Villa Devoto",
+      "zone": "CABA",
+      "address": "Simbron 4368",
+      "phone": "1135965700",
+      "deliveryDays": "Sábados",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.59970456412522,
+      "lng": -58.51183001360528,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Verde Ser (Daniela )",
+      "barrio": "San Martín",
+      "zone": "Zona Norte",
+      "address": "Libertad 6140 Villa Libertad",
+      "phone": "1157507937",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.5728,
+      "lng": -58.536,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Tienda YPY",
+      "barrio": "Malvinas Argentinas.",
+      "zone": "Zona Norte",
+      "address": "Oncativo 1860, Ingeniero Adolfo Sordeaux",
+      "phone": "1167841810",
+      "deliveryDays": "Sábados",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.486,
+      "lng": -58.705,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Nodo Pestaña (Angeles)",
+      "barrio": "Martinez",
+      "zone": "Zona Norte",
+      "address": "DR Manuel Pestaña 1396 ",
+      "phone": "1168462939",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.49,
+      "lng": -58.5085,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Mariela",
+      "barrio": "Gral Las Heras, Bs As",
+      "zone": "Zona Oeste",
+      "address": "Santiago villamayor 582",
+      "phone": "1162014364",
+      "deliveryDays": "Sábados",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.929,
+      "lng": -58.943,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Tierra Libre",
+      "barrio": "San Isidro",
+      "zone": "Zona Norte",
+      "address": "Ing Marconi 1157 , Beccar",
+      "phone": "1169424557",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.47000456412522,
+      "lng": -58.51213001360527,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Nodo Utt San Justo",
+      "barrio": "La Matanza",
+      "zone": "Zona Oeste",
+      "address": "Formosa 2929, San Justo",
+      "phone": "1176685034",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.769204564125225,
+      "lng": -58.54333001360527,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Villa Pueyrredón Verde (Solange)",
+      "barrio": "Villa Pueyrredón",
+      "zone": "CABA",
+      "address": "Campana 5471",
+      "phone": "1124019026",
+      "deliveryDays": "Jueves",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.579,
+      "lng": -58.501,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Auroum Sport (Cristal Sofía)",
+      "barrio": "Villa Madero",
+      "zone": "Zona Oeste",
+      "address": "Blanco Encalada 982",
+      "phone": "1171505498",
+      "deliveryDays": "Ambos días",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.694,
+      "lng": -58.504,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
+    {
+      "name": "Cecilia García",
+      "barrio": "Pompeya",
+      "zone": "CABA",
+      "address": "Av Riestra 1424",
+      "phone": "1165582705",
+      "deliveryDays": "Sabados",
+      "url": null,
+      "notes": null,
+      "openNode": false,
+      "lat": -34.6486,
+      "lng": -58.4133,
+      "verified": true,
+      "lastUpdated": "2026-06-19"
+    },
     {
       "name": "Casona Humahuaca",
       "barrio": "Almagro",
@@ -16,7 +721,9 @@
       "notes": "envío a domicilio",
       "openNode": false,
       "lat": -34.6093,
-      "lng": -58.4197
+      "lng": -58.4197,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Nuevo Abasto",
@@ -27,7 +734,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.60850456412522,
-      "lng": -58.41903001360527
+      "lng": -58.41903001360527,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Almendrón",
@@ -38,7 +747,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.60908244205709,
-      "lng": -58.41843862434561
+      "lng": -58.41843862434561,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Casa de Teresa",
@@ -49,7 +760,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.61006736607899,
-      "lng": -58.418387921762694
+      "lng": -58.418387921762694,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Nodo UTT",
@@ -60,7 +773,9 @@
       "notes": "envíos a domicilio",
       "openNode": false,
       "lat": -34.6098,
-      "lng": -58.409
+      "lng": -58.409,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Almina Almacén",
@@ -71,7 +786,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.5621,
-      "lng": -58.4567
+      "lng": -58.4567,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Jessica",
@@ -82,7 +799,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.56130456412522,
-      "lng": -58.45603001360527
+      "lng": -58.45603001360527,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Estilo Natural",
@@ -93,18 +812,9 @@
       "notes": "envío a domicilio",
       "openNode": false,
       "lat": -34.56188244205709,
-      "lng": -58.45543862434561
-    },
-    {
-      "name": "Páramo Almacén",
-      "barrio": "Boedo",
-      "zone": "CABA",
-      "phone": "1165239343",
-      "url": null,
-      "notes": "envío a domicilio",
-      "openNode": false,
-      "lat": -34.6286,
-      "lng": -58.4173
+      "lng": -58.45543862434561,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Geo paca vivero",
@@ -115,7 +825,9 @@
       "notes": "envío a domicilio",
       "openNode": false,
       "lat": -34.62780456412522,
-      "lng": -58.41663001360527
+      "lng": -58.41663001360527,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Romina",
@@ -126,18 +838,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.62838244205709,
-      "lng": -58.41603862434561
-    },
-    {
-      "name": "Silvana",
-      "barrio": "Boedo",
-      "zone": "CABA",
-      "phone": "1155638885",
-      "url": null,
-      "notes": "sólo envíos",
-      "openNode": false,
-      "lat": -34.62936736607899,
-      "lng": -58.41598792176269
+      "lng": -58.41603862434561,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Amapola horario: 10 a 17",
@@ -147,8 +850,10 @@
       "url": null,
       "notes": null,
       "openNode": false,
-      "lat": -34.6189,
-      "lng": -58.4407
+      "lat": -34.618682442057086,
+      "lng": -58.43943862434561,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Constanza",
@@ -159,7 +864,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.61810456412522,
-      "lng": -58.44003001360527
+      "lng": -58.44003001360527,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Sergio",
@@ -169,8 +876,10 @@
       "url": null,
       "notes": "envíos a domicilio",
       "openNode": false,
-      "lat": -34.618682442057086,
-      "lng": -58.43943862434561
+      "lat": -34.61788700618231,
+      "lng": -58.438768637950886,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "MandarfrUTTa",
@@ -181,29 +890,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.5859,
-      "lng": -58.453
-    },
-    {
-      "name": "Revolución Humana",
-      "barrio": "Colegiales - Palermo",
-      "zone": "CABA",
-      "phone": "1162247649",
-      "url": null,
-      "notes": "nodo abierto, envío a domicilio",
-      "openNode": true,
-      "lat": -34.574,
-      "lng": -58.449
-    },
-    {
-      "name": "Sochori",
-      "barrio": "Flores",
-      "zone": "CABA",
-      "phone": "1154576045",
-      "url": null,
-      "notes": "envíos a domicilio",
-      "openNode": false,
-      "lat": -34.628,
-      "lng": -58.464
+      "lng": -58.453,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Celeste",
@@ -214,7 +903,9 @@
       "notes": "envío a domicilio",
       "openNode": false,
       "lat": -34.6307,
-      "lng": -58.4844
+      "lng": -58.4844,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Bella Vie",
@@ -225,7 +916,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.62990456412522,
-      "lng": -58.483730013605275
+      "lng": -58.483730013605275,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Liniers Verde",
@@ -236,7 +929,9 @@
       "notes": "envío a domicilio",
       "openNode": false,
       "lat": -34.6432,
-      "lng": -58.5188
+      "lng": -58.5188,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Andrea",
@@ -246,8 +941,10 @@
       "url": null,
       "notes": null,
       "openNode": false,
-      "lat": -34.6586,
-      "lng": -58.505
+      "lat": -34.65780456412522,
+      "lng": -58.504330013605276,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Nodo UTT Mataderos",
@@ -257,8 +954,10 @@
       "url": null,
       "notes": null,
       "openNode": false,
-      "lat": -34.65780456412522,
-      "lng": -58.504330013605276
+      "lat": -34.65700912825044,
+      "lng": -58.50366002721055,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "El Hormiguero horario: de 12 a 14",
@@ -269,7 +968,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.6133,
-      "lng": -58.3819
+      "lng": -58.3819,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "América Rebelde",
@@ -280,7 +981,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.612504564125224,
-      "lng": -58.381230013605276
+      "lng": -58.381230013605276,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Santo Remedio  (envíos a domicilio)",
@@ -291,7 +994,9 @@
       "notes": "almacén natural",
       "openNode": false,
       "lat": -34.61308244205709,
-      "lng": -58.380638624345615
+      "lng": -58.380638624345615,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "María Noel",
@@ -302,7 +1007,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.6193,
-      "lng": -58.5093
+      "lng": -58.5093,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Pañuelos en Rebeldía",
@@ -312,8 +1019,10 @@
       "url": null,
       "notes": "1er y 3er sábado de cada mes",
       "openNode": false,
-      "lat": -34.6486,
-      "lng": -58.4133
+      "lat": -34.647804564125224,
+      "lng": -58.41263001360527,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Feria verde",
@@ -324,7 +1033,9 @@
       "notes": "envío a domicilio",
       "openNode": false,
       "lat": -34.5454,
-      "lng": -58.4624
+      "lng": -58.4624,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Puente Saavedra",
@@ -335,18 +1046,9 @@
       "notes": "envío a domicilio",
       "openNode": false,
       "lat": -34.54460456412522,
-      "lng": -58.461730013605276
-    },
-    {
-      "name": "Revolución Humana",
-      "barrio": "Palermo - Colegiales",
-      "zone": "CABA",
-      "phone": "1162247649",
-      "url": null,
-      "notes": "nodo abierto, envío a domicilio",
-      "openNode": true,
-      "lat": -34.578,
-      "lng": -58.4244
+      "lng": -58.461730013605276,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Organicamente",
@@ -357,7 +1059,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.577204564125225,
-      "lng": -58.42373001360527
+      "lng": -58.42373001360527,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Libario Multiespacio",
@@ -368,7 +1072,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.57778244205709,
-      "lng": -58.42313862434561
+      "lng": -58.42313862434561,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Almacenata",
@@ -379,7 +1085,9 @@
       "notes": "nodo abierto, envío a domicilio",
       "openNode": true,
       "lat": -34.57876736607899,
-      "lng": -58.42308792176269
+      "lng": -58.42308792176269,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "La Comuna",
@@ -390,7 +1098,9 @@
       "notes": "nodo abierto",
       "openNode": true,
       "lat": -34.6362,
-      "lng": -58.4014
+      "lng": -58.4014,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Francisco",
@@ -401,7 +1111,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.635404564125224,
-      "lng": -58.400730013605276
+      "lng": -58.400730013605276,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Isabel",
@@ -412,7 +1124,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.5984,
-      "lng": -58.467
+      "lng": -58.467,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Almacén Del Aleph",
@@ -423,7 +1137,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.5887,
-      "lng": -58.3933
+      "lng": -58.3933,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Vida más natural",
@@ -434,7 +1150,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.587904564125225,
-      "lng": -58.39263001360528
+      "lng": -58.39263001360528,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Nodo UTT",
@@ -444,8 +1162,10 @@
       "url": "https://www.instagram.com/oli.va.feriaverde/",
       "notes": "envío a domicilio",
       "openNode": false,
-      "lat": -34.557,
-      "lng": -58.487
+      "lat": -34.55678244205709,
+      "lng": -58.485738624345615,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Puente Saavedra",
@@ -456,7 +1176,9 @@
       "notes": "envío a domicilio",
       "openNode": false,
       "lat": -34.556204564125224,
-      "lng": -58.486330013605276
+      "lng": -58.486330013605276,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Nodo Saavedra Norte",
@@ -466,30 +1188,10 @@
       "url": null,
       "notes": "envíos a domicilio",
       "openNode": false,
-      "lat": -34.55678244205709,
-      "lng": -58.485738624345615
-    },
-    {
-      "name": "Sachawasi",
-      "barrio": "Saavedra",
-      "zone": "CABA",
-      "phone": "1140240079",
-      "url": null,
-      "notes": "envíos a domicilio",
-      "openNode": false,
-      "lat": -34.55776736607899,
-      "lng": -58.4856879217627
-    },
-    {
-      "name": "Tierra Firme",
-      "barrio": "Saavedra",
-      "zone": "CABA",
-      "phone": "1168743010",
-      "url": "https://www.tierrafirmenodoutt.com.ar/",
-      "notes": "envíos a domicilio",
-      "openNode": false,
-      "lat": -34.558658311319576,
-      "lng": -58.48641042085573
+      "lat": -34.55598700618231,
+      "lng": -58.48506863795089,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Nodo San Cristóbal",
@@ -500,7 +1202,9 @@
       "notes": "pedidos la semana 2 y 4 del mes",
       "openNode": false,
       "lat": -34.6237,
-      "lng": -58.4023
+      "lng": -58.4023,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Alicia",
@@ -510,19 +1214,10 @@
       "url": null,
       "notes": null,
       "openNode": false,
-      "lat": -34.621,
-      "lng": -58.3736
-    },
-    {
-      "name": "Esteban",
-      "barrio": "San Telmo",
-      "zone": "CABA",
-      "phone": "1135664739",
-      "url": null,
-      "notes": null,
-      "openNode": false,
       "lat": -34.620204564125224,
-      "lng": -58.37293001360528
+      "lng": -58.37293001360528,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "San Telmo Calvo Martina",
@@ -533,7 +1228,9 @@
       "notes": "cada 15 días",
       "openNode": false,
       "lat": -34.62078244205709,
-      "lng": -58.372338624345616
+      "lng": -58.372338624345616,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Nodo UTT",
@@ -544,7 +1241,9 @@
       "notes": "envíos a domicilio",
       "openNode": false,
       "lat": -34.6028,
-      "lng": -58.4869
+      "lng": -58.4869,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Alimentos Sudashiva",
@@ -555,7 +1254,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.675,
-      "lng": -58.472
+      "lng": -58.472,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Paseo Plaza Sudamérica",
@@ -566,7 +1267,9 @@
       "notes": "nodo abierto",
       "openNode": true,
       "lat": -34.67420456412522,
-      "lng": -58.471330013605275
+      "lng": -58.471330013605275,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Dietética Infinito horario: 10 a 14 / 17 a 20",
@@ -576,8 +1279,10 @@
       "url": null,
       "notes": null,
       "openNode": false,
-      "lat": -34.6356,
-      "lng": -58.5023
+      "lat": -34.63480456412522,
+      "lng": -58.50163001360527,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Claudia",
@@ -587,8 +1292,10 @@
       "url": null,
       "notes": null,
       "openNode": false,
-      "lat": -34.63480456412522,
-      "lng": -58.50163001360527
+      "lat": -34.63400912825044,
+      "lng": -58.500960027210546,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Florencia",
@@ -599,7 +1306,9 @@
       "notes": "nodo abierto, envíos a domicilio",
       "openNode": true,
       "lat": -34.575,
-      "lng": -58.49
+      "lng": -58.49,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Pampa Mercado",
@@ -610,29 +1319,9 @@
       "notes": "envío a domicilio",
       "openNode": false,
       "lat": -34.579,
-      "lng": -58.472
-    },
-    {
-      "name": "Verde Ser",
-      "barrio": "Billinghurst",
-      "zone": "Zona Norte",
-      "phone": "1157507937",
-      "url": null,
-      "notes": null,
-      "openNode": false,
-      "lat": -34.5712,
-      "lng": -58.5604
-    },
-    {
-      "name": "La Familia",
-      "barrio": "Don Torcuato",
-      "zone": "Zona Norte",
-      "phone": "1134678611",
-      "url": null,
-      "notes": null,
-      "openNode": false,
-      "lat": -34.488,
-      "lng": -58.626
+      "lng": -58.472,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "La Semilla",
@@ -643,7 +1332,9 @@
       "notes": "nodo abierto",
       "openNode": true,
       "lat": -34.48720456412522,
-      "lng": -58.62533001360527
+      "lng": -58.62533001360527,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "MásOrgánicos",
@@ -654,7 +1345,9 @@
       "notes": "nodo abierto, envíos a domicilio",
       "openNode": true,
       "lat": -34.475,
-      "lng": -58.636
+      "lng": -58.636,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Natalia",
@@ -665,7 +1358,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.538,
-      "lng": -58.506
+      "lng": -58.506,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Silvana",
@@ -676,18 +1371,9 @@
       "notes": "nodo abierto, envío a domicilio",
       "openNode": true,
       "lat": -34.537,
-      "lng": -58.494
-    },
-    {
-      "name": "Salud Arte",
-      "barrio": "José León Suárez",
-      "zone": "Zona Norte",
-      "phone": "1144088015",
-      "url": null,
-      "notes": null,
-      "openNode": false,
-      "lat": -34.524,
-      "lng": -58.565
+      "lng": -58.494,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Sergio  horario: L a V 10 a 13 / 16 a 19 ; S 9 a 15",
@@ -697,8 +1383,10 @@
       "url": null,
       "notes": "nodo abierto, envío a domicilio",
       "openNode": true,
-      "lat": -34.49,
-      "lng": -58.5085
+      "lat": -34.489204564125224,
+      "lng": -58.50783001360527,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Emilia",
@@ -709,29 +1397,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.4585,
-      "lng": -58.914
-    },
-    {
-      "name": "Pachamama Poderosa  horario mar y jue: 8 a 16 sab 9 a 14",
-      "barrio": "San Fernando",
-      "zone": "Zona Norte",
-      "phone": "1134101834",
-      "url": null,
-      "notes": "envíos a domicilio",
-      "openNode": false,
-      "lat": -34.4419,
-      "lng": -58.5601
-    },
-    {
-      "name": "Casa Verde",
-      "barrio": "San Isidro",
-      "zone": "Zona Norte",
-      "phone": "1144357166",
-      "url": null,
-      "notes": null,
-      "openNode": false,
-      "lat": -34.4708,
-      "lng": -58.5128
+      "lng": -58.914,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Munay",
@@ -742,7 +1410,9 @@
       "notes": "envío a domicilio",
       "openNode": false,
       "lat": -34.5267,
-      "lng": -58.551
+      "lng": -58.551,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "La Isla Florida",
@@ -753,7 +1423,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.5495,
-      "lng": -58.526
+      "lng": -58.526,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Tienda Pura",
@@ -764,7 +1436,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.5793,
-      "lng": -58.5847
+      "lng": -58.5847,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Silvia",
@@ -775,7 +1449,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.65,
-      "lng": -58.647
+      "lng": -58.647,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "El Pampero",
@@ -786,7 +1462,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.722,
-      "lng": -58.532
+      "lng": -58.532,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Abuela Estela",
@@ -797,18 +1475,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.72120456412522,
-      "lng": -58.53133001360527
-    },
-    {
-      "name": "Graciela",
-      "barrio": "Ciudadela",
-      "zone": "Zona Oeste",
-      "phone": "1166076792",
-      "url": null,
-      "notes": null,
-      "openNode": false,
-      "lat": -34.6394,
-      "lng": -58.538
+      "lng": -58.53133001360527,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Nodo UTT",
@@ -819,18 +1488,9 @@
       "notes": "nodo abierto",
       "openNode": true,
       "lat": -34.591,
-      "lng": -58.639
-    },
-    {
-      "name": "Micaela",
-      "barrio": "Ituzaingo",
-      "zone": "Zona Oeste",
-      "phone": "1126578543",
-      "url": "https://www.instagram.com/la_yuyera_almacen_natural/",
-      "notes": null,
-      "openNode": false,
-      "lat": -34.658,
-      "lng": -58.668
+      "lng": -58.639,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "YEIPORÁ",
@@ -841,7 +1501,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.517,
-      "lng": -58.767
+      "lng": -58.767,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Verónica",
@@ -852,7 +1514,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.516204564125225,
-      "lng": -58.76633001360528
+      "lng": -58.76633001360528,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Nueces y Almendras",
@@ -863,7 +1527,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.51678244205709,
-      "lng": -58.765738624345616
+      "lng": -58.765738624345616,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Bárbara",
@@ -873,8 +1539,10 @@
       "url": null,
       "notes": null,
       "openNode": false,
-      "lat": -34.743,
-      "lng": -58.587
+      "lat": -34.74278244205709,
+      "lng": -58.585738624345616,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Muya",
@@ -885,7 +1553,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.742204564125224,
-      "lng": -58.58633001360528
+      "lng": -58.58633001360528,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Patricio",
@@ -895,19 +1565,10 @@
       "url": null,
       "notes": null,
       "openNode": false,
-      "lat": -34.74278244205709,
-      "lng": -58.585738624345616
-    },
-    {
-      "name": "Claudia",
-      "barrio": "La Tablada - Lomas del Mirador",
-      "zone": "Zona Oeste",
-      "phone": "1126041191",
-      "url": null,
-      "notes": "envío a domicilio",
-      "openNode": false,
-      "lat": -34.677,
-      "lng": -58.507
+      "lat": -34.74198700618231,
+      "lng": -58.58506863795089,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Colores Tierra",
@@ -918,7 +1579,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.681,
-      "lng": -58.517
+      "lng": -58.517,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "www.agroalimentacion.com.ar/tienda",
@@ -929,7 +1592,9 @@
       "notes": "envío a domicilio",
       "openNode": false,
       "lat": -34.666,
-      "lng": -58.729
+      "lng": -58.729,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Julieta",
@@ -940,7 +1605,9 @@
       "notes": "envío a domicilio",
       "openNode": false,
       "lat": -34.651,
-      "lng": -58.79
+      "lng": -58.79,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Corriente Orgánica",
@@ -951,7 +1618,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.650204564125225,
-      "lng": -58.78933001360527
+      "lng": -58.78933001360527,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Lembas www.instagram.com/lembas_agro_ecologia - 1161597050",
@@ -962,7 +1631,9 @@
       "notes": "envío a domicilio",
       "openNode": false,
       "lat": -34.65,
-      "lng": -58.619
+      "lng": -58.619,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Almacén Agroecológico Ciruela  horario: sab 8 a 17",
@@ -972,19 +1643,10 @@
       "url": null,
       "notes": "envío a domicilio",
       "openNode": false,
-      "lat": -34.55,
-      "lng": -58.705
-    },
-    {
-      "name": "Almacén de sabores",
-      "barrio": "Muñiz",
-      "zone": "Zona Oeste",
-      "phone": "1157360679",
-      "url": null,
-      "notes": null,
-      "openNode": false,
       "lat": -34.54920456412522,
-      "lng": -58.70433001360527
+      "lng": -58.70433001360527,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Mundo Abeja",
@@ -995,7 +1657,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.658,
-      "lng": -58.76
+      "lng": -58.76,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Julieta",
@@ -1006,7 +1670,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.743,
-      "lng": -58.717
+      "lng": -58.717,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Semillas del Oeste 1160066765",
@@ -1017,7 +1683,9 @@
       "notes": "nodo abierto",
       "openNode": true,
       "lat": -34.724,
-      "lng": -58.628
+      "lng": -58.628,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Nuestra Casa",
@@ -1027,8 +1695,10 @@
       "url": null,
       "notes": null,
       "openNode": false,
-      "lat": -34.645,
-      "lng": -58.568
+      "lat": -34.644204564125225,
+      "lng": -58.56733001360527,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Lihue",
@@ -1038,19 +1708,10 @@
       "url": null,
       "notes": null,
       "openNode": false,
-      "lat": -34.644204564125225,
-      "lng": -58.56733001360527
-    },
-    {
-      "name": "Marcela",
-      "barrio": "Ramos Mejía",
-      "zone": "Zona Oeste",
-      "phone": "1136536686",
-      "url": "http://www.uttnodoramosmejia.com.ar",
-      "notes": "envío a domicilio",
-      "openNode": false,
-      "lat": -34.64478244205709,
-      "lng": -58.56673862434561
+      "lat": -34.64340912825045,
+      "lng": -58.566660027210546,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "@AlmaZenRamos",
@@ -1061,7 +1722,9 @@
       "notes": "envío a domicilio",
       "openNode": false,
       "lat": -34.64576736607899,
-      "lng": -58.56668792176269
+      "lng": -58.56668792176269,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Mercadito Ñangapiri",
@@ -1072,7 +1735,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.526,
-      "lng": -58.694
+      "lng": -58.694,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Rocío",
@@ -1082,8 +1747,10 @@
       "url": null,
       "notes": null,
       "openNode": false,
-      "lat": -34.694,
-      "lng": -58.504
+      "lat": -34.693204564125224,
+      "lng": -58.50333001360527,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Orgánicos Caqui",
@@ -1093,8 +1760,10 @@
       "url": null,
       "notes": null,
       "openNode": false,
-      "lat": -34.693204564125224,
-      "lng": -58.50333001360527
+      "lat": -34.692409128250446,
+      "lng": -58.502660027210545,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Germán",
@@ -1105,18 +1774,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.645,
-      "lng": -58.555
-    },
-    {
-      "name": "Energías de la Tierra",
-      "barrio": "Virrey del Pino - La Matanza",
-      "zone": "Zona Oeste",
-      "phone": "1122699774",
-      "url": "https://www.instagram.com/nodoutt_energias/",
-      "notes": null,
-      "openNode": false,
-      "lat": -34.79,
-      "lng": -58.679
+      "lng": -58.555,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Chavo Pastel",
@@ -1127,18 +1787,9 @@
       "notes": "envíos a domicilio",
       "openNode": false,
       "lat": -34.663,
-      "lng": -58.365
-    },
-    {
-      "name": "Florencia",
-      "barrio": "Banfield",
-      "zone": "Zona Sur",
-      "phone": "1165730293",
-      "url": null,
-      "notes": null,
-      "openNode": false,
-      "lat": -34.7456,
-      "lng": -58.397
+      "lng": -58.365,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Nodo Verde",
@@ -1149,7 +1800,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.753,
-      "lng": -58.408
+      "lng": -58.408,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Tres Estrellas",
@@ -1160,7 +1813,9 @@
       "notes": "cada 15 días. Envíos a domicilio",
       "openNode": false,
       "lat": -34.7456,
-      "lng": -58.39
+      "lng": -58.39,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Lía",
@@ -1171,7 +1826,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.764,
-      "lng": -58.212
+      "lng": -58.212,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Nathia",
@@ -1182,7 +1839,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.763204564125225,
-      "lng": -58.21133001360528
+      "lng": -58.21133001360528,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Alma Natura",
@@ -1193,7 +1852,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.76378244205709,
-      "lng": -58.210738624345616
+      "lng": -58.210738624345616,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Reverdecer",
@@ -1204,18 +1865,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.718,
-      "lng": -58.282
-    },
-    {
-      "name": "Ceres",
-      "barrio": "Claypole",
-      "zone": "Zona Sur",
-      "phone": "1132533215",
-      "url": "https://www.instagram.com/ceresnodoutt/",
-      "notes": null,
-      "openNode": false,
-      "lat": -34.798,
-      "lng": -58.347
+      "lng": -58.282,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Antonela",
@@ -1226,18 +1878,9 @@
       "notes": "cada 15 días, envíos a domicilio",
       "openNode": false,
       "lat": -34.853,
-      "lng": -58.523
-    },
-    {
-      "name": "Mónica",
-      "barrio": "Gerli",
-      "zone": "Zona Sur",
-      "phone": "1166112516",
-      "url": null,
-      "notes": null,
-      "openNode": false,
-      "lat": -34.685,
-      "lng": -58.376
+      "lng": -58.523,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Mudra",
@@ -1248,18 +1891,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.787,
-      "lng": -58.373
-    },
-    {
-      "name": "Rubén",
-      "barrio": "Lanús",
-      "zone": "Zona Sur",
-      "phone": "1159490842",
-      "url": null,
-      "notes": null,
-      "openNode": false,
-      "lat": -34.706,
-      "lng": -58.392
+      "lng": -58.373,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Mariela",
@@ -1270,18 +1904,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.709,
-      "lng": -58.407
-    },
-    {
-      "name": "Silvina",
-      "barrio": "Lomas de Zamora",
-      "zone": "Zona Sur",
-      "phone": "1162243891",
-      "url": "https://www.instagram.com/nodouttlomas/",
-      "notes": "envíos a domicilio",
-      "openNode": false,
-      "lat": -34.76,
-      "lng": -58.4
+      "lng": -58.407,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Santa Albahaca  horario: lun a vier 8:30 a 13:30 / 16 a 20 sab 9 a 14:30",
@@ -1292,7 +1917,9 @@
       "notes": "envío a domicilio",
       "openNode": false,
       "lat": -34.722,
-      "lng": -58.254
+      "lng": -58.254,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "La Locomotora",
@@ -1303,7 +1930,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.73,
-      "lng": -58.398
+      "lng": -58.398,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Nacho",
@@ -1314,7 +1943,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.674,
-      "lng": -58.418
+      "lng": -58.418,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     },
     {
       "name": "Nadia",
@@ -1325,7 +1956,9 @@
       "notes": null,
       "openNode": false,
       "lat": -34.777,
-      "lng": -58.396
+      "lng": -58.396,
+      "verified": false,
+      "lastUpdated": "2022-05-02"
     }
   ]
 }
