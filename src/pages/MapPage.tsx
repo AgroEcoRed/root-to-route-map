@@ -8,6 +8,8 @@ import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet.markercluster";
 import rutasSanas from "@/data/rutasSanas.json";
 import mercadoTerritorial from "@/data/mercadoTerritorial.json";
+import elClickData from "@/data/elClick.json";
+import elBroteData from "@/data/elBrote.json";
 import { getLicense } from "@/lib/licenses";
 import Navbar from "@/components/Navbar";
 import { Badge } from "@/components/ui/badge";
@@ -68,7 +70,7 @@ interface MapActor {
   products: string[];
   certification: "red" | "yellow" | "green";
   description: string;
-  source: "rutas_sanas" | "mercado_territorial" | "agroeco";
+  source: "rutas_sanas" | "mercado_territorial" | "agroeco" | "el_click" | "el_brote";
   contentLicense?: string | null;
   /** ISO date of last update of this actor's data. Null = never updated since import (inherited). */
   lastUpdated?: string | null;
@@ -81,6 +83,8 @@ const SOURCE_IMPORT_DATE: Record<MapActor["source"], string> = {
   rutas_sanas: "2023-06-01",
   mercado_territorial: "2024-09-01",
   agroeco: new Date().toISOString().slice(0, 10),
+  el_click: "2026-06-19",
+  el_brote: "2026-06-19",
 };
 
 function formatUpdateDate(iso: string): string {
