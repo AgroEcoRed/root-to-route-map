@@ -485,6 +485,16 @@ const MapPage = () => {
         return `<span title="Datos heredados de la fuente original, aún no confirmados${dateLabel ? ` · Importado ${dateLabel}` : ""}" style="display:inline-flex;align-items:center;gap:3px;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.2px">⟳ Por verificar${dateLabel ? ` · ${dateLabel}` : ""}</span>`;
       })();
 
+      const deliveryHtml = a.deliveryInfo
+        ? `<div style="display:flex;align-items:center;gap:6px;margin:8px 0 4px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:6px 10px">
+              <span style="font-size:14px;line-height:1">🗓️</span>
+              <div style="font-size:11px;line-height:1.3">
+                <span style="font-weight:600;color:#1e3a8a">Entrega / apertura:</span>
+                <span style="color:#1e40af">&nbsp;${a.deliveryInfo}</span>
+              </div>
+            </div>`
+        : "";
+
       const marker = L.marker([a.lat, a.lng], { icon })
         .bindPopup(`
           <div style="min-width:240px;font-family:DM Sans,sans-serif;padding:4px">
@@ -495,6 +505,7 @@ const MapPage = () => {
             </a>
             <p style="font-size:12px;color:#666;margin:0">${actorTypeLabels[a.type]}</p>
             <p style="font-size:12px;margin:4px 0">${a.description}</p>
+            ${deliveryHtml}
             ${productsHtml}
             ${certHtml}
             ${licenseHtml}
