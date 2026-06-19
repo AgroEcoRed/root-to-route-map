@@ -1,0 +1,1 @@
+INSERT INTO public.data_source_settings (source_id, label, enabled) VALUES ('utt_nodos', 'Nodos UTT (Unión de Trabajadores de la Tierra)', true) ON CONFLICT (source_id) DO NOTHING;

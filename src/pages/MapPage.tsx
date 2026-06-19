@@ -10,6 +10,7 @@ import rutasSanas from "@/data/rutasSanas.json";
 import mercadoTerritorial from "@/data/mercadoTerritorial.json";
 import elClickData from "@/data/elClick.json";
 import elBroteData from "@/data/elBrote.json";
+import uttNodesData from "@/data/uttNodes.json";
 import { getLicense } from "@/lib/licenses";
 import Navbar from "@/components/Navbar";
 import { Badge } from "@/components/ui/badge";
@@ -70,7 +71,7 @@ interface MapActor {
   products: string[];
   certification: "red" | "yellow" | "green";
   description: string;
-  source: "rutas_sanas" | "mercado_territorial" | "agroeco" | "el_click" | "el_brote";
+  source: "rutas_sanas" | "mercado_territorial" | "agroeco" | "el_click" | "el_brote" | "utt_nodos";
   contentLicense?: string | null;
   /** ISO date of last update of this actor's data. Null = never updated since import (inherited). */
   lastUpdated?: string | null;
@@ -85,6 +86,7 @@ const SOURCE_IMPORT_DATE: Record<MapActor["source"], string> = {
   agroeco: new Date().toISOString().slice(0, 10),
   el_click: "2026-06-19",
   el_brote: "2026-06-19",
+  utt_nodos: "2022-05-02",
 };
 
 function formatUpdateDate(iso: string): string {
@@ -237,6 +239,27 @@ const elBroteActors: MapActor[] = [{
   lastUpdated: elBroteData.store.lastUpdated || SOURCE_IMPORT_DATE.el_brote,
 }];
 
+const uttNodesActors: MapActor[] = (uttNodesData.nodes as any[]).map((n, i) => {
+  const contactBits: string[] = [];
+  if (n.phone) contactBits.push(`Tel/WhatsApp: ${n.phone}`);
+  if (n.url) contactBits.push(n.url);
+  if (n.notes) contactBits.push(n.notes);
+  const desc = [`${n.barrio} — ${n.zone}`, contactBits.join(" · ")].filter(Boolean).join(" · ");
+  return {
+    id: 80000 + i,
+    name: n.name || "Nodo UTT",
+    type: "consumer_node" as ActorType,
+    lat: n.lat,
+    lng: n.lng,
+    products: [],
+    certification: "yellow",
+    description: desc,
+    source: "utt_nodos",
+    verified: false,
+    lastUpdated: SOURCE_IMPORT_DATE.utt_nodos,
+  };
+});
+
 type CertFilter = "green" | "yellow" | "red";
 
 const MapPage = () => {
@@ -304,6 +327,7 @@ const MapPage = () => {
     if (isEnabled("agroeco")) out.push(...dbActors);
     if (isEnabled("el_click")) out.push(...elClickActors);
     if (isEnabled("el_brote")) out.push(...elBroteActors);
+    if (isEnabled("utt_nodos")) out.push(...uttNodesActors);
     return out;
   }, [dbActors, isEnabled]);
 
@@ -384,6 +408,8 @@ const MapPage = () => {
         ? "border:2px dashed white;opacity:0.85;"
         : a.source === "mercado_territorial"
         ? "border:2px dotted white;opacity:0.9;"
+        : a.source === "utt_nodos"
+        ? "border:2px solid #fde047;opacity:0.95;"
         : "border:3px solid white;";
 
       const icon = L.divIcon({
@@ -434,6 +460,8 @@ const MapPage = () => {
         ? `<a href="https://elclick.com.ar/" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#e0f2fe;color:#075985;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #7dd3fc;letter-spacing:0.3px;text-transform:uppercase;text-decoration:none">El Click</a>`
         : a.source === "el_brote"
         ? `<a href="https://elbrotetienda.com/" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#d1fae5;color:#065f46;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #6ee7b7;letter-spacing:0.3px;text-transform:uppercase;text-decoration:none">El Brote</a>`
+        : a.source === "utt_nodos"
+        ? `<a href="https://uniondetrabajadoresdelatierra.com.ar/comercializacion-2/" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#fef9c3;color:#854d0e;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #fde047;letter-spacing:0.3px;text-transform:uppercase;text-decoration:none">Nodo UTT</a>`
         : `<span style="display:inline-block;background:#dcfce7;color:#15803d;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #86efac;letter-spacing:0.3px;text-transform:uppercase">AgroEco.Red</span>`;
 
       const state = freshnessState(a.lastUpdated, a.verified);
