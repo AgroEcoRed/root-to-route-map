@@ -209,6 +209,7 @@ const MarketplacePage = () => {
       source: "el_click" as ProductSource,
       sourceUrl: elClickData.store.url,
       description: p.description,
+      deliveryInfo: (elClickData.store as any).deliveryInfo,
     }));
   }, []);
 
@@ -234,7 +235,36 @@ const MarketplacePage = () => {
       source: "el_brote" as ProductSource,
       sourceUrl: elBroteData.store.url,
       description: p.description,
+      deliveryInfo: (elBroteData.store as any).deliveryInfo,
     }));
+  }, []);
+
+  // UTT aggregated bolsón — links back to the map to choose a nearby node.
+  const uttProducts = useMemo<Product[]>(() => {
+    const nodesWithDays = (uttNodesData.nodes as any[]).filter(n => n.deliveryDays);
+    if (nodesWithDays.length === 0) return [];
+    return [{
+      id: 4_000_000,
+      name: "Bolsón verdurero UTT (retiro en nodo de cercanía)",
+      producer: "Nodos UTT",
+      location: "CABA y GBA",
+      category: "Verduras",
+      price: 0,
+      priceDisplay: "Consultar en nodo",
+      unit: "bolsón",
+      available: `${uttNodesData.nodes.length} nodos activos`,
+      certification: "yellow" as const,
+      image: "🥬",
+      seasonal: "Estacional",
+      soldCount: 0,
+      distanceKm: 0,
+      listingType: "oferta" as const,
+      sellos: [{ code: "utt", name: "UTT — Productores familiares" }],
+      source: "utt_nodos" as ProductSource,
+      sourceUrl: "https://uniondetrabajadoresdelatierra.com.ar/comercializacion-2/",
+      description: "Bolsón de verduras agroecológicas/de transición producidas por familias de la UTT. Retiro semanal en el nodo de tu barrio.",
+      deliveryInfo: "Jueves o Sábados (según nodo · ver mapa para tu zona)",
+    }];
   }, []);
 
   // Reviews state
