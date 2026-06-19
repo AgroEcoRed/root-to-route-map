@@ -225,6 +225,7 @@ const elClickActors: MapActor[] = [{
   source: "el_click",
   verified: true,
   lastUpdated: elClickData.store.lastUpdated || SOURCE_IMPORT_DATE.el_click,
+  deliveryInfo: (elClickData.store as any).deliveryInfo,
 }];
 
 const elBroteActors: MapActor[] = [{
@@ -239,6 +240,7 @@ const elBroteActors: MapActor[] = [{
   source: "el_brote",
   verified: true,
   lastUpdated: elBroteData.store.lastUpdated || SOURCE_IMPORT_DATE.el_brote,
+  deliveryInfo: (elBroteData.store as any).deliveryInfo,
 }];
 
 const uttNodesActors: MapActor[] = (uttNodesData.nodes as any[]).map((n, i) => {
