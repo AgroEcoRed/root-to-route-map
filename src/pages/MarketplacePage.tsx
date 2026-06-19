@@ -729,6 +729,18 @@ const MarketplacePage = () => {
                             Comprar en MTR <ExternalLink className="h-3 w-3 ml-1" />
                           </a>
                         </Button>
+                      ) : p.source === "el_click" ? (
+                        <Button size="sm" variant="outline" className="text-xs border-sky-400 text-sky-900 hover:bg-sky-50" asChild>
+                          <a href={p.sourceUrl || "https://elclick.com.ar/"} target="_blank" rel="noopener noreferrer">
+                            Comprar en El Click <ExternalLink className="h-3 w-3 ml-1" />
+                          </a>
+                        </Button>
+                      ) : p.source === "el_brote" ? (
+                        <Button size="sm" variant="outline" className="text-xs border-emerald-400 text-emerald-900 hover:bg-emerald-50" asChild>
+                          <a href={p.sourceUrl || "https://elbrotetienda.com/"} target="_blank" rel="noopener noreferrer">
+                            Comprar en El Brote <ExternalLink className="h-3 w-3 ml-1" />
+                          </a>
+                        </Button>
                       ) : (
                         <Button size="sm" className={`text-xs ${
                           p.listingType === "oferta"
