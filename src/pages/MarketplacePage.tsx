@@ -352,6 +352,8 @@ const MarketplacePage = () => {
     const merged: Product[] = [
       ...baseMock,
       ...(isEnabled("mercado_territorial") ? mtrProducts : []),
+      ...(isEnabled("el_click") ? elClickProducts : []),
+      ...(isEnabled("el_brote") ? elBroteProducts : []),
     ];
     const sourceScoped = sourceParam
       ? merged.filter(p => p.source === sourceParam)
@@ -381,7 +383,7 @@ const MarketplacePage = () => {
         sorted.sort((a, b) => (isInSeason(a.seasonal) ? 0 : 1) - (isInSeason(b.seasonal) ? 0 : 1)); break;
     }
     return sorted;
-  }, [search, activeCategory, activeEggSub, activeAlmacenSub, sortBy, filterProducer, filterZone, filterType, mtrProducts, isEnabled, sourceParam]);
+  }, [search, activeCategory, activeEggSub, activeAlmacenSub, sortBy, filterProducer, filterZone, filterType, mtrProducts, elClickProducts, elBroteProducts, isEnabled, sourceParam]);
 
   const hasActiveFilters = filterProducer !== "all" || filterZone !== "all" || filterType !== "all" || sortBy !== "relevance";
 
