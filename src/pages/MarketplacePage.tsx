@@ -24,10 +24,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useDataSources } from "@/hooks/useDataSources";
 import { DataSourceToggle } from "@/components/admin/DataSourceToggle";
 import { toast } from "sonner";
+import elClickData from "@/data/elClick.json";
+import elBroteData from "@/data/elBrote.json";
 
 type SortOption = "relevance" | "price_asc" | "price_desc" | "proximity" | "best_seller" | "cert_green" | "seasonal";
 type ListingType = "oferta" | "demanda";
-type ProductSource = "mock" | "mercado_territorial" | "agroeco" | "rutas_sanas";
+type ProductSource = "mock" | "mercado_territorial" | "agroeco" | "rutas_sanas" | "el_click" | "el_brote";
 
 interface Product {
   id: number;
@@ -179,6 +181,57 @@ const MarketplacePage = () => {
   const [filterType, setFilterType] = useState<"all" | ListingType>("all");
   const [mtrProducts, setMtrProducts] = useState<Product[]>([]);
 
+  // Static catalogs from integrated layers (El Click & El Brote)
+  const elClickProducts = useMemo<Product[]>(() => {
+    const sellos = (elClickData.certifications || []).map((c: any) => ({ code: c.code, name: c.name }));
+    return (elClickData.products || []).map((p: any, i: number) => ({
+      id: 2_000_000 + i,
+      name: p.name,
+      producer: elClickData.store.name,
+      location: elClickData.store.location,
+      category: p.category,
+      price: p.price,
+      priceDisplay: `$${p.price.toLocaleString("es-AR")}`,
+      unit: p.unit,
+      available: "Disponible",
+      certification: "yellow" as const,
+      image: p.image,
+      seasonal: "Estacional",
+      soldCount: 0,
+      distanceKm: 0,
+      listingType: "oferta" as const,
+      sellos,
+      source: "el_click" as ProductSource,
+      sourceUrl: elClickData.store.url,
+      description: p.description,
+    }));
+  }, []);
+
+  const elBroteProducts = useMemo<Product[]>(() => {
+    const sellos = (elBroteData.certifications || []).map((c: any) => ({ code: c.code, name: c.name }));
+    return (elBroteData.products || []).map((p: any, i: number) => ({
+      id: 3_000_000 + i,
+      name: p.name,
+      producer: elBroteData.store.name,
+      location: elBroteData.store.location,
+      category: p.category,
+      price: p.price,
+      priceDisplay: `$${p.price.toLocaleString("es-AR")}`,
+      unit: p.unit,
+      available: "Disponible",
+      certification: "yellow" as const,
+      image: p.image,
+      seasonal: "Estacional",
+      soldCount: 0,
+      distanceKm: 0,
+      listingType: "oferta" as const,
+      sellos,
+      source: "el_brote" as ProductSource,
+      sourceUrl: elBroteData.store.url,
+      description: p.description,
+    }));
+  }, []);
+
   // Reviews state
   const [reviews, setReviews] = useState<SellerReview[]>([]);
   const [reviewSeller, setReviewSeller] = useState<string | null>(null);
@@ -299,6 +352,8 @@ const MarketplacePage = () => {
     const merged: Product[] = [
       ...baseMock,
       ...(isEnabled("mercado_territorial") ? mtrProducts : []),
+      ...(isEnabled("el_click") ? elClickProducts : []),
+      ...(isEnabled("el_brote") ? elBroteProducts : []),
     ];
     const sourceScoped = sourceParam
       ? merged.filter(p => p.source === sourceParam)
@@ -328,7 +383,7 @@ const MarketplacePage = () => {
         sorted.sort((a, b) => (isInSeason(a.seasonal) ? 0 : 1) - (isInSeason(b.seasonal) ? 0 : 1)); break;
     }
     return sorted;
-  }, [search, activeCategory, activeEggSub, activeAlmacenSub, sortBy, filterProducer, filterZone, filterType, mtrProducts, isEnabled, sourceParam]);
+  }, [search, activeCategory, activeEggSub, activeAlmacenSub, sortBy, filterProducer, filterZone, filterType, mtrProducts, elClickProducts, elBroteProducts, isEnabled, sourceParam]);
 
   const hasActiveFilters = filterProducer !== "all" || filterZone !== "all" || filterType !== "all" || sortBy !== "relevance";
 
@@ -543,8 +598,18 @@ const MarketplacePage = () => {
                         Mercado Territorial
                       </span>
                     )}
+                    {p.source === "el_click" && (
+                      <span className="absolute top-2 right-2 bg-sky-100 text-sky-900 text-[9px] font-bold px-2 py-0.5 rounded-full border border-sky-300 uppercase tracking-wide shadow-sm">
+                        El Click
+                      </span>
+                    )}
+                    {p.source === "el_brote" && (
+                      <span className="absolute top-2 right-2 bg-emerald-100 text-emerald-900 text-[9px] font-bold px-2 py-0.5 rounded-full border border-emerald-300 uppercase tracking-wide shadow-sm">
+                        El Brote
+                      </span>
+                    )}
                     {isInSeason(p.seasonal) && p.listingType === "oferta" && (
-                      <span className={`absolute ${p.source === "mercado_territorial" ? "top-9" : "top-2"} right-2 bg-primary text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full`}>
+                      <span className={`absolute ${(p.source === "mercado_territorial" || p.source === "el_click" || p.source === "el_brote") ? "top-9" : "top-2"} right-2 bg-primary text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full`}>
                         {t("market.in_season")}
                       </span>
                     )}
@@ -662,6 +727,18 @@ const MarketplacePage = () => {
                         >
                           <a href={p.sourceUrl || "https://tiendaschasqui.ar/mtr/catalogo"} target="_blank" rel="noopener noreferrer">
                             Comprar en MTR <ExternalLink className="h-3 w-3 ml-1" />
+                          </a>
+                        </Button>
+                      ) : p.source === "el_click" ? (
+                        <Button size="sm" variant="outline" className="text-xs border-sky-400 text-sky-900 hover:bg-sky-50" asChild>
+                          <a href={p.sourceUrl || "https://elclick.com.ar/"} target="_blank" rel="noopener noreferrer">
+                            Comprar en El Click <ExternalLink className="h-3 w-3 ml-1" />
+                          </a>
+                        </Button>
+                      ) : p.source === "el_brote" ? (
+                        <Button size="sm" variant="outline" className="text-xs border-emerald-400 text-emerald-900 hover:bg-emerald-50" asChild>
+                          <a href={p.sourceUrl || "https://elbrotetienda.com/"} target="_blank" rel="noopener noreferrer">
+                            Comprar en El Brote <ExternalLink className="h-3 w-3 ml-1" />
                           </a>
                         </Button>
                       ) : (

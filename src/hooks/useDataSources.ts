@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export type DataSourceId = "rutas_sanas" | "mercado_territorial" | "agroeco" | "eventos";
+export type DataSourceId = "rutas_sanas" | "mercado_territorial" | "agroeco" | "eventos" | "el_click" | "el_brote";
 
 export interface DataSourceSetting {
   source_id: DataSourceId;
@@ -14,6 +14,8 @@ const DEFAULTS: DataSourceSetting[] = [
   { source_id: "mercado_territorial", label: "Mercado Territorial", enabled: true },
   { source_id: "agroeco", label: "AgroEco.Red (perfiles propios)", enabled: true },
   { source_id: "eventos", label: "Actividades futuras", enabled: true },
+  { source_id: "el_click", label: "El Click Bolsones", enabled: true },
+  { source_id: "el_brote", label: "El Brote Tienda", enabled: true },
 ];
 
 export const useDataSources = () => {
