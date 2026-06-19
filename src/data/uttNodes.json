@@ -1152,6 +1152,17 @@
       "lng": -58.408
     },
     {
+      "name": "Tres Estrellas",
+      "barrio": "Banfield este",
+      "zone": "Zona Sur",
+      "phone": "1169400455",
+      "url": "https://www.instagram.com/nodotresestrellasutt/",
+      "notes": "cada 15 días. Envíos a domicilio",
+      "openNode": false,
+      "lat": -34.7456,
+      "lng": -58.39
+    },
+    {
       "name": "Lía",
       "barrio": "Berazategui",
       "zone": "Zona Sur",
