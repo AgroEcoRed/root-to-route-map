@@ -187,6 +187,8 @@ const mockActors: MapActor[] = (rutasSanas as Array<{n:string;lat:number;lng:num
   certification: "yellow",
   description: p.d || p.f,
   source: "rutas_sanas",
+  verified: false,
+  lastUpdated: SOURCE_IMPORT_DATE.rutas_sanas,
 }));
 
 const mercadoTerritorialActors: MapActor[] = (mercadoTerritorial as Array<{n:string;lat:number;lng:number;t:string;f:string;d:string}>).map((p, i) => ({
@@ -199,6 +201,8 @@ const mercadoTerritorialActors: MapActor[] = (mercadoTerritorial as Array<{n:str
   certification: "yellow",
   description: p.d ? `${p.d} — ${p.f}` : p.f,
   source: "mercado_territorial",
+  verified: false,
+  lastUpdated: SOURCE_IMPORT_DATE.mercado_territorial,
 }));
 
 type CertFilter = "green" | "yellow" | "red";
