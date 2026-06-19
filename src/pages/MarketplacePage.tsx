@@ -26,10 +26,12 @@ import { DataSourceToggle } from "@/components/admin/DataSourceToggle";
 import { toast } from "sonner";
 import elClickData from "@/data/elClick.json";
 import elBroteData from "@/data/elBrote.json";
+import uttNodesData from "@/data/uttNodes.json";
 
 type SortOption = "relevance" | "price_asc" | "price_desc" | "proximity" | "best_seller" | "cert_green" | "seasonal";
 type ListingType = "oferta" | "demanda";
-type ProductSource = "mock" | "mercado_territorial" | "agroeco" | "rutas_sanas" | "el_click" | "el_brote";
+type ProductSource = "mock" | "mercado_territorial" | "agroeco" | "rutas_sanas" | "el_click" | "el_brote" | "utt_nodos";
+type DeliveryFilter = "all" | "jueves" | "sabados" | "ambos" | "lun_vie" | "domicilio" | "feria" | "nodo_abierto" | "sin_info";
 
 interface Product {
   id: number;
@@ -53,6 +55,8 @@ interface Product {
   source?: ProductSource;
   sourceUrl?: string;
   description?: string;
+  /** Free-text label about delivery days, opening hours, feria days, etc. */
+  deliveryInfo?: string;
 }
 
 // Main categories (intermediate approach)
@@ -179,6 +183,7 @@ const MarketplacePage = () => {
   const [filterProducer, setFilterProducer] = useState("all");
   const [filterZone, setFilterZone] = useState("all");
   const [filterType, setFilterType] = useState<"all" | ListingType>("all");
+  const [filterDelivery, setFilterDelivery] = useState<DeliveryFilter>("all");
   const [mtrProducts, setMtrProducts] = useState<Product[]>([]);
 
   // Static catalogs from integrated layers (El Click & El Brote)
@@ -204,6 +209,7 @@ const MarketplacePage = () => {
       source: "el_click" as ProductSource,
       sourceUrl: elClickData.store.url,
       description: p.description,
+      deliveryInfo: (elClickData.store as any).deliveryInfo,
     }));
   }, []);
 
@@ -229,7 +235,36 @@ const MarketplacePage = () => {
       source: "el_brote" as ProductSource,
       sourceUrl: elBroteData.store.url,
       description: p.description,
+      deliveryInfo: (elBroteData.store as any).deliveryInfo,
     }));
+  }, []);
+
+  // UTT aggregated bolsón — links back to the map to choose a nearby node.
+  const uttProducts = useMemo<Product[]>(() => {
+    const nodesWithDays = (uttNodesData.nodes as any[]).filter(n => n.deliveryDays);
+    if (nodesWithDays.length === 0) return [];
+    return [{
+      id: 4_000_000,
+      name: "Bolsón verdurero UTT (retiro en nodo de cercanía)",
+      producer: "Nodos UTT",
+      location: "CABA y GBA",
+      category: "Verduras",
+      price: 0,
+      priceDisplay: "Consultar en nodo",
+      unit: "bolsón",
+      available: `${uttNodesData.nodes.length} nodos activos`,
+      certification: "yellow" as const,
+      image: "🥬",
+      seasonal: "Estacional",
+      soldCount: 0,
+      distanceKm: 0,
+      listingType: "oferta" as const,
+      sellos: [{ code: "utt", name: "UTT — Productores familiares" }],
+      source: "utt_nodos" as ProductSource,
+      sourceUrl: "https://uniondetrabajadoresdelatierra.com.ar/comercializacion-2/",
+      description: "Bolsón de verduras agroecológicas/de transición producidas por familias de la UTT. Retiro semanal en el nodo de tu barrio.",
+      deliveryInfo: "Jueves o Sábados (según nodo · ver mapa para tu zona)",
+    }];
   }, []);
 
   // Reviews state
@@ -354,10 +389,27 @@ const MarketplacePage = () => {
       ...(isEnabled("mercado_territorial") ? mtrProducts : []),
       ...(isEnabled("el_click") ? elClickProducts : []),
       ...(isEnabled("el_brote") ? elBroteProducts : []),
+      ...(isEnabled("utt_nodos") ? uttProducts : []),
     ];
     const sourceScoped = sourceParam
       ? merged.filter(p => p.source === sourceParam)
       : merged;
+    const normalize = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const matchDelivery = (info: string | undefined): boolean => {
+      if (filterDelivery === "all") return true;
+      if (!info) return filterDelivery === "sin_info";
+      const n = normalize(info);
+      switch (filterDelivery) {
+        case "jueves": return /\bjueves\b/.test(n) || /ambos/.test(n);
+        case "sabados": return /\bsabados?\b/.test(n) || /ambos/.test(n);
+        case "ambos": return /ambos/.test(n);
+        case "lun_vie": return /lunes/.test(n) || /viernes/.test(n) || /lun-/.test(n) || /lun a/.test(n);
+        case "domicilio": return /domicilio/.test(n) || /envio/.test(n);
+        case "feria": return /feria/.test(n);
+        case "nodo_abierto": return /nodo abierto/.test(n) || /apertura/.test(n);
+        case "sin_info": return false;
+      }
+    };
     let results = sourceScoped.filter((p) => {
       const isMtr = p.source === "mercado_territorial";
       if (activeCategory !== "Todos" && p.category !== activeCategory) return false;
@@ -366,6 +418,7 @@ const MarketplacePage = () => {
       if (!isMtr && filterProducer !== "all" && p.producer !== filterProducer) return false;
       if (!isMtr && filterZone !== "all" && p.location !== filterZone) return false;
       if (filterType !== "all" && p.listingType !== filterType) return false;
+      if (!matchDelivery(p.deliveryInfo)) return false;
       if (search && !p.name.toLowerCase().includes(search.toLowerCase()) && !p.producer.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
@@ -383,9 +436,9 @@ const MarketplacePage = () => {
         sorted.sort((a, b) => (isInSeason(a.seasonal) ? 0 : 1) - (isInSeason(b.seasonal) ? 0 : 1)); break;
     }
     return sorted;
-  }, [search, activeCategory, activeEggSub, activeAlmacenSub, sortBy, filterProducer, filterZone, filterType, mtrProducts, elClickProducts, elBroteProducts, isEnabled, sourceParam]);
+  }, [search, activeCategory, activeEggSub, activeAlmacenSub, sortBy, filterProducer, filterZone, filterType, filterDelivery, mtrProducts, elClickProducts, elBroteProducts, uttProducts, isEnabled, sourceParam]);
 
-  const hasActiveFilters = filterProducer !== "all" || filterZone !== "all" || filterType !== "all" || sortBy !== "relevance";
+  const hasActiveFilters = filterProducer !== "all" || filterZone !== "all" || filterType !== "all" || filterDelivery !== "all" || sortBy !== "relevance";
 
   const getCategoryLabel = (cat: string) => {
     if (cat === "Todos") return t("market.all");
@@ -396,6 +449,7 @@ const MarketplacePage = () => {
     setFilterProducer("all");
     setFilterZone("all");
     setFilterType("all");
+    setFilterDelivery("all");
     setSortBy("relevance");
     setSearch("");
     setActiveCategory("Todos");
@@ -515,6 +569,26 @@ const MarketplacePage = () => {
                 ))}
               </SelectContent>
             </Select>
+
+            <Select value={filterDelivery} onValueChange={(v) => setFilterDelivery(v as DeliveryFilter)}>
+              <SelectTrigger className="w-full sm:w-56">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <SelectValue />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Entrega / apertura: todas</SelectItem>
+                <SelectItem value="jueves">🗓️ Jueves</SelectItem>
+                <SelectItem value="sabados">🗓️ Sábados</SelectItem>
+                <SelectItem value="ambos">🗓️ Jueves y sábados</SelectItem>
+                <SelectItem value="lun_vie">🗓️ Lunes a viernes</SelectItem>
+                <SelectItem value="domicilio">🚚 Entrega a domicilio</SelectItem>
+                <SelectItem value="feria">🛒 Feria / mercado abierto</SelectItem>
+                <SelectItem value="nodo_abierto">🏠 Nodo abierto</SelectItem>
+                <SelectItem value="sin_info">— Sin información cargada</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Category pills */}
@@ -608,8 +682,13 @@ const MarketplacePage = () => {
                         El Brote
                       </span>
                     )}
+                    {p.source === "utt_nodos" && (
+                      <span className="absolute top-2 right-2 bg-yellow-100 text-yellow-900 text-[9px] font-bold px-2 py-0.5 rounded-full border border-yellow-300 uppercase tracking-wide shadow-sm">
+                        Nodo UTT
+                      </span>
+                    )}
                     {isInSeason(p.seasonal) && p.listingType === "oferta" && (
-                      <span className={`absolute ${(p.source === "mercado_territorial" || p.source === "el_click" || p.source === "el_brote") ? "top-9" : "top-2"} right-2 bg-primary text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full`}>
+                      <span className={`absolute ${(p.source === "mercado_territorial" || p.source === "el_click" || p.source === "el_brote" || p.source === "utt_nodos") ? "top-9" : "top-2"} right-2 bg-primary text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full`}>
                         {t("market.in_season")}
                       </span>
                     )}
@@ -707,6 +786,14 @@ const MarketplacePage = () => {
                       <div className="flex items-center gap-1.5">
                         <Calendar className="h-3 w-3" /> {p.seasonal}
                       </div>
+                      {p.deliveryInfo && (
+                        <div className="flex items-start gap-1.5 bg-blue-50 border border-blue-200 rounded-md px-2 py-1 -mx-1">
+                          <Calendar className="h-3 w-3 mt-0.5 text-blue-700 flex-shrink-0" />
+                          <span className="text-blue-900 leading-snug">
+                            <span className="font-semibold">Entrega / apertura:</span> {p.deliveryInfo}
+                          </span>
+                        </div>
+                      )}
                       {p.listingType === "oferta" && p.soldCount > 0 && (
                         <div className="flex items-center gap-1.5">
                           <TrendingUp className="h-3 w-3" /> {p.soldCount} {t("market.sold")}
@@ -739,6 +826,12 @@ const MarketplacePage = () => {
                         <Button size="sm" variant="outline" className="text-xs border-emerald-400 text-emerald-900 hover:bg-emerald-50" asChild>
                           <a href={p.sourceUrl || "https://elbrotetienda.com/"} target="_blank" rel="noopener noreferrer">
                             Comprar en El Brote <ExternalLink className="h-3 w-3 ml-1" />
+                          </a>
+                        </Button>
+                      ) : p.source === "utt_nodos" ? (
+                        <Button size="sm" variant="outline" className="text-xs border-yellow-500 text-yellow-900 hover:bg-yellow-50" asChild>
+                          <a href="/mapa">
+                            Ver nodos en el mapa <ExternalLink className="h-3 w-3 ml-1" />
                           </a>
                         </Button>
                       ) : (
