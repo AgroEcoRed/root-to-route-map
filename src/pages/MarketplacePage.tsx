@@ -682,8 +682,13 @@ const MarketplacePage = () => {
                         El Brote
                       </span>
                     )}
+                    {p.source === "utt_nodos" && (
+                      <span className="absolute top-2 right-2 bg-yellow-100 text-yellow-900 text-[9px] font-bold px-2 py-0.5 rounded-full border border-yellow-300 uppercase tracking-wide shadow-sm">
+                        Nodo UTT
+                      </span>
+                    )}
                     {isInSeason(p.seasonal) && p.listingType === "oferta" && (
-                      <span className={`absolute ${(p.source === "mercado_territorial" || p.source === "el_click" || p.source === "el_brote") ? "top-9" : "top-2"} right-2 bg-primary text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full`}>
+                      <span className={`absolute ${(p.source === "mercado_territorial" || p.source === "el_click" || p.source === "el_brote" || p.source === "utt_nodos") ? "top-9" : "top-2"} right-2 bg-primary text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full`}>
                         {t("market.in_season")}
                       </span>
                     )}
