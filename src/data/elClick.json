@@ -1,0 +1,27 @@
+{
+  "store": {
+    "name": "El Click Bolsones",
+    "lat": -34.5895,
+    "lng": -58.4173,
+    "location": "CABA y GBA",
+    "type": "retail",
+    "url": "https://elclick.com.ar/",
+    "description": "Servicio de bolsones de frutas y verduras de estación con entrega a domicilio.",
+    "lastUpdated": "2026-06-19"
+  },
+  "certifications": [
+    { "code": "productor_directo", "name": "Productor directo" },
+    { "code": "estacional", "name": "Selección estacional" },
+    { "code": "sin_intermediarios", "name": "Sin intermediarios" }
+  ],
+  "products": [
+    { "name": "Bolsón chico de frutas y verduras (5 kg)", "category": "Verduras", "price": 22900, "unit": "bolsón", "image": "🧺", "description": "Papas, cebollas, batatas, zapallo, naranjas, mandarinas, manzanas, limones, peras." },
+    { "name": "Bolsón de frutas y verduras (8 kg)", "category": "Verduras", "price": 31900, "unit": "bolsón", "image": "🧺", "description": "Zapallo, papines, acelga, cebollas, mandarinas, naranjas, manzanas, peras, limones." },
+    { "name": "Cajoncito de Frutas (5 kg)", "category": "Frutas", "price": 29500, "unit": "cajón", "image": "🍎", "description": "Naranjas, mandarinas, bananas, manzanas Pink, peras Williams." },
+    { "name": "Bolsón Verde (verduras de estación)", "category": "Verduras", "price": 18900, "unit": "bolsón", "image": "🥬", "description": "Acelga, espinaca, lechuga, zanahoria, cebolla, zapallo." },
+    { "name": "Cajón de Mandarinas", "category": "Frutas", "price": 14500, "unit": "cajón", "image": "🍊", "description": "Mandarinas Okitsu seleccionadas." },
+    { "name": "Manzanas Pink (3 kg)", "category": "Frutas", "price": 8900, "unit": "3 kg", "image": "🍏", "description": "Manzanas Pink Lady de la Patagonia." },
+    { "name": "Combo Almacén Saludable", "category": "Almacén", "price": 26500, "unit": "combo", "image": "🌾", "description": "Frutos secos, cereales, legumbres y semillas seleccionadas." },
+    { "name": "Bolsa de Papas (5 kg)", "category": "Verduras", "price": 5800, "unit": "5 kg", "image": "🥔", "description": "Papa colorada de productor." }
+  ]
+}
