@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Settings, Layers, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Settings, Layers, Eye, EyeOff, Loader2, UserCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -8,6 +8,7 @@ import {
 import { useDataSources } from "@/hooks/useDataSources";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 interface Props {
   /** floating button position class (e.g. "bottom-6 right-6") */
@@ -68,6 +69,14 @@ export const DataSourceToggle = ({ position = "bottom-6 right-6" }: Props) => {
                     : <Switch checked={s.enabled} onCheckedChange={(v) => handleToggle(s.source_id, v)} />}
                 </div>
               ))}
+            </div>
+            <div className="pt-2 mt-2 border-t border-border">
+              <Button asChild size="sm" variant="outline" className="w-full">
+                <Link to="/admin/capas">
+                  <UserCog className="h-4 w-4 mr-2" />
+                  Gestores de capa
+                </Link>
+              </Button>
             </div>
           </div>
         </PopoverContent>

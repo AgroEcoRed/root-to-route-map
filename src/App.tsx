@@ -23,6 +23,8 @@ import MiPerfilPage from "./pages/MiPerfilPage";
 import QuickRegistrationPage from "./pages/QuickRegistrationPage";
 import LicensesPage from "./pages/LicensesPage";
 import ImportInstagramPage from "./pages/ImportInstagramPage";
+import AdminLayersPage from "./pages/AdminLayersPage";
+import LayerAdminPage from "./pages/LayerAdminPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,6 +56,8 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/licencias" element={<LicensesPage />} />
               <Route path="/importar/instagram" element={<ImportInstagramPage />} />
+              <Route path="/admin/capas" element={<AdminLayersPage />} />
+              <Route path="/admin/capas/:layerId" element={<LayerAdminPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AuthProvider>

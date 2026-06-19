@@ -244,6 +244,33 @@ export type Database = {
         }
         Relationships: []
       }
+      layer_managers: {
+        Row: {
+          created_at: string
+          granted_by: string | null
+          id: string
+          layer_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          layer_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          layer_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       library_collections: {
         Row: {
           created_at: string
@@ -830,6 +857,10 @@ export type Database = {
       }
     }
     Functions: {
+      can_manage_layer: {
+        Args: { _layer_id: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
