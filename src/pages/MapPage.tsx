@@ -327,6 +327,7 @@ const MapPage = () => {
     if (isEnabled("agroeco")) out.push(...dbActors);
     if (isEnabled("el_click")) out.push(...elClickActors);
     if (isEnabled("el_brote")) out.push(...elBroteActors);
+    if (isEnabled("utt_nodos")) out.push(...uttNodesActors);
     return out;
   }, [dbActors, isEnabled]);
 
@@ -407,6 +408,8 @@ const MapPage = () => {
         ? "border:2px dashed white;opacity:0.85;"
         : a.source === "mercado_territorial"
         ? "border:2px dotted white;opacity:0.9;"
+        : a.source === "utt_nodos"
+        ? "border:2px solid #fde047;opacity:0.95;"
         : "border:3px solid white;";
 
       const icon = L.divIcon({
@@ -457,6 +460,8 @@ const MapPage = () => {
         ? `<a href="https://elclick.com.ar/" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#e0f2fe;color:#075985;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #7dd3fc;letter-spacing:0.3px;text-transform:uppercase;text-decoration:none">El Click</a>`
         : a.source === "el_brote"
         ? `<a href="https://elbrotetienda.com/" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#d1fae5;color:#065f46;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #6ee7b7;letter-spacing:0.3px;text-transform:uppercase;text-decoration:none">El Brote</a>`
+        : a.source === "utt_nodos"
+        ? `<a href="https://uniondetrabajadoresdelatierra.com.ar/comercializacion-2/" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#fef9c3;color:#854d0e;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #fde047;letter-spacing:0.3px;text-transform:uppercase;text-decoration:none">Nodo UTT</a>`
         : `<span style="display:inline-block;background:#dcfce7;color:#15803d;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #86efac;letter-spacing:0.3px;text-transform:uppercase">AgroEco.Red</span>`;
 
       const state = freshnessState(a.lastUpdated, a.verified);
