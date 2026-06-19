@@ -24,10 +24,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useDataSources } from "@/hooks/useDataSources";
 import { DataSourceToggle } from "@/components/admin/DataSourceToggle";
 import { toast } from "sonner";
+import elClickData from "@/data/elClick.json";
+import elBroteData from "@/data/elBrote.json";
 
 type SortOption = "relevance" | "price_asc" | "price_desc" | "proximity" | "best_seller" | "cert_green" | "seasonal";
 type ListingType = "oferta" | "demanda";
-type ProductSource = "mock" | "mercado_territorial" | "agroeco" | "rutas_sanas";
+type ProductSource = "mock" | "mercado_territorial" | "agroeco" | "rutas_sanas" | "el_click" | "el_brote";
 
 interface Product {
   id: number;
