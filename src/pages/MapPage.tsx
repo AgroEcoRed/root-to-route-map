@@ -430,6 +430,10 @@ const MapPage = () => {
         ? `<span style="display:inline-block;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.3px;text-transform:uppercase">Rutas Sanas</span>`
         : a.source === "mercado_territorial"
         ? `<a href="https://mercadoterritorial.com.ar/buscador-de-nodos/" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#fef3c7;color:#92400e;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dotted #d97706;letter-spacing:0.3px;text-transform:uppercase;text-decoration:none">Mercado Territorial</a>`
+        : a.source === "el_click"
+        ? `<a href="https://elclick.com.ar/" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#e0f2fe;color:#075985;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #7dd3fc;letter-spacing:0.3px;text-transform:uppercase;text-decoration:none">El Click</a>`
+        : a.source === "el_brote"
+        ? `<a href="https://elbrotetienda.com/" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#d1fae5;color:#065f46;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #6ee7b7;letter-spacing:0.3px;text-transform:uppercase;text-decoration:none">El Brote</a>`
         : `<span style="display:inline-block;background:#dcfce7;color:#15803d;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #86efac;letter-spacing:0.3px;text-transform:uppercase">AgroEco.Red</span>`;
 
       const state = freshnessState(a.lastUpdated, a.verified);
