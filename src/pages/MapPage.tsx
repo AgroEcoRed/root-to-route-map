@@ -70,6 +70,30 @@ interface MapActor {
   description: string;
   source: "rutas_sanas" | "mercado_territorial" | "agroeco";
   contentLicense?: string | null;
+  /** ISO date of last update of this actor's data. Null = never updated since import (inherited). */
+  lastUpdated?: string | null;
+  /** true when the actor itself confirmed/updated the data on AgroEco.Red. */
+  verified?: boolean;
+}
+
+// Approximate import dates for inherited datasets (used until each actor claims their record).
+const SOURCE_IMPORT_DATE: Record<MapActor["source"], string> = {
+  rutas_sanas: "2023-06-01",
+  mercado_territorial: "2024-09-01",
+  agroeco: new Date().toISOString().slice(0, 10),
+};
+
+function formatUpdateDate(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("es-AR", { month: "short", year: "numeric" });
+}
+
+function freshnessState(iso: string | null | undefined, verified: boolean | undefined): "verified-recent" | "verified-old" | "unverified" {
+  if (!verified) return "unverified";
+  if (!iso) return "verified-old";
+  const months = (Date.now() - new Date(iso).getTime()) / (1000 * 60 * 60 * 24 * 30);
+  return months <= 12 ? "verified-recent" : "verified-old";
 }
 
 const actorTypeLabels: Record<ActorType, string> = {
@@ -163,6 +187,8 @@ const mockActors: MapActor[] = (rutasSanas as Array<{n:string;lat:number;lng:num
   certification: "yellow",
   description: p.d || p.f,
   source: "rutas_sanas",
+  verified: false,
+  lastUpdated: SOURCE_IMPORT_DATE.rutas_sanas,
 }));
 
 const mercadoTerritorialActors: MapActor[] = (mercadoTerritorial as Array<{n:string;lat:number;lng:number;t:string;f:string;d:string}>).map((p, i) => ({
@@ -175,6 +201,8 @@ const mercadoTerritorialActors: MapActor[] = (mercadoTerritorial as Array<{n:str
   certification: "yellow",
   description: p.d ? `${p.d} — ${p.f}` : p.f,
   source: "mercado_territorial",
+  verified: false,
+  lastUpdated: SOURCE_IMPORT_DATE.mercado_territorial,
 }));
 
 type CertFilter = "green" | "yellow" | "red";
@@ -224,6 +252,8 @@ const MapPage = () => {
           description: p.description || p.location || "",
           source: "agroeco",
           contentLicense: p.content_license || null,
+          verified: true,
+          lastUpdated: p.updated_at || p.created_at || null,
         }));
       setDbActors(realActors);
       const m = new Map<string, { id: string; lat: number; lng: number; name: string }>();
@@ -368,10 +398,22 @@ const MapPage = () => {
         ? `<a href="https://mercadoterritorial.com.ar/buscador-de-nodos/" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#fef3c7;color:#92400e;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dotted #d97706;letter-spacing:0.3px;text-transform:uppercase;text-decoration:none">Mercado Territorial</a>`
         : `<span style="display:inline-block;background:#dcfce7;color:#15803d;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #86efac;letter-spacing:0.3px;text-transform:uppercase">AgroEco.Red</span>`;
 
+      const state = freshnessState(a.lastUpdated, a.verified);
+      const dateLabel = a.lastUpdated ? formatUpdateDate(a.lastUpdated) : "";
+      const freshnessBadge = (() => {
+        if (state === "verified-recent") {
+          return `<span title="Verificado por el propio actor · Actualizado ${dateLabel}" style="display:inline-flex;align-items:center;gap:3px;background:#dcfce7;color:#15803d;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #86efac;letter-spacing:0.2px">✓ Verificado · ${dateLabel}</span>`;
+        }
+        if (state === "verified-old") {
+          return `<span title="Verificado por el propio actor pero hace más de 12 meses${dateLabel ? ` · Última actualización ${dateLabel}` : ""}" style="display:inline-flex;align-items:center;gap:3px;background:#fef9c3;color:#854d0e;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #fde047;letter-spacing:0.2px">✓ Verificado · ${dateLabel || "sin fecha"}</span>`;
+        }
+        return `<span title="Datos heredados de la fuente original, aún no confirmados por el actor${dateLabel ? ` · Importado ${dateLabel}` : ""}" style="display:inline-flex;align-items:center;gap:3px;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.2px">○ Sin verificar${dateLabel ? ` · ${dateLabel}` : ""}</span>`;
+      })();
+
       const marker = L.marker([a.lat, a.lng], { icon })
         .bindPopup(`
           <div style="min-width:240px;font-family:DM Sans,sans-serif;padding:4px">
-            <div style="margin-bottom:6px">${sourceBadge}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">${sourceBadge}${freshnessBadge}</div>
             <a href="#" class="map-actor-link" data-producer="${encodeURIComponent(a.name)}" data-source="${a.source}" style="display:block;background:${roleBadgeColor};color:white;font-weight:700;font-size:14px;margin:0 0 8px;padding:8px 12px;border-radius:8px;text-decoration:none;cursor:pointer;text-align:center;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
               ${a.name}
               <span style="display:block;font-size:10px;font-weight:400;opacity:0.85;margin-top:2px">${a.source === 'mercado_territorial' ? 'Ver catálogo Mercado Territorial →' : 'Ver todos sus productos →'}</span>
