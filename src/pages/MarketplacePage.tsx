@@ -781,6 +781,14 @@ const MarketplacePage = () => {
                       <div className="flex items-center gap-1.5">
                         <Calendar className="h-3 w-3" /> {p.seasonal}
                       </div>
+                      {p.deliveryInfo && (
+                        <div className="flex items-start gap-1.5 bg-blue-50 border border-blue-200 rounded-md px-2 py-1 -mx-1">
+                          <Calendar className="h-3 w-3 mt-0.5 text-blue-700 flex-shrink-0" />
+                          <span className="text-blue-900 leading-snug">
+                            <span className="font-semibold">Entrega / apertura:</span> {p.deliveryInfo}
+                          </span>
+                        </div>
+                      )}
                       {p.listingType === "oferta" && p.soldCount > 0 && (
                         <div className="flex items-center gap-1.5">
                           <TrendingUp className="h-3 w-3" /> {p.soldCount} {t("market.sold")}
