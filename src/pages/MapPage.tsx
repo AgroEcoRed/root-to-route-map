@@ -70,6 +70,30 @@ interface MapActor {
   description: string;
   source: "rutas_sanas" | "mercado_territorial" | "agroeco";
   contentLicense?: string | null;
+  /** ISO date of last update of this actor's data. Null = never updated since import (inherited). */
+  lastUpdated?: string | null;
+  /** true when the actor itself confirmed/updated the data on AgroEco.Red. */
+  verified?: boolean;
+}
+
+// Approximate import dates for inherited datasets (used until each actor claims their record).
+const SOURCE_IMPORT_DATE: Record<MapActor["source"], string> = {
+  rutas_sanas: "2023-06-01",
+  mercado_territorial: "2024-09-01",
+  agroeco: new Date().toISOString().slice(0, 10),
+};
+
+function formatUpdateDate(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("es-AR", { month: "short", year: "numeric" });
+}
+
+function freshnessState(iso: string | null | undefined, verified: boolean | undefined): "verified-recent" | "verified-old" | "unverified" {
+  if (!verified) return "unverified";
+  if (!iso) return "verified-old";
+  const months = (Date.now() - new Date(iso).getTime()) / (1000 * 60 * 60 * 24 * 30);
+  return months <= 12 ? "verified-recent" : "verified-old";
 }
 
 const actorTypeLabels: Record<ActorType, string> = {
