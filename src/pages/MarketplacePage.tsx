@@ -569,6 +569,26 @@ const MarketplacePage = () => {
                 ))}
               </SelectContent>
             </Select>
+
+            <Select value={filterDelivery} onValueChange={(v) => setFilterDelivery(v as DeliveryFilter)}>
+              <SelectTrigger className="w-full sm:w-56">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <SelectValue />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Entrega / apertura: todas</SelectItem>
+                <SelectItem value="jueves">🗓️ Jueves</SelectItem>
+                <SelectItem value="sabados">🗓️ Sábados</SelectItem>
+                <SelectItem value="ambos">🗓️ Jueves y sábados</SelectItem>
+                <SelectItem value="lun_vie">🗓️ Lunes a viernes</SelectItem>
+                <SelectItem value="domicilio">🚚 Entrega a domicilio</SelectItem>
+                <SelectItem value="feria">🛒 Feria / mercado abierto</SelectItem>
+                <SelectItem value="nodo_abierto">🏠 Nodo abierto</SelectItem>
+                <SelectItem value="sin_info">— Sin información cargada</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Category pills */}
