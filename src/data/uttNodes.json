@@ -10,7 +10,7 @@
     {
       "name": "Casona Humahuaca",
       "barrio": "Almagro",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1130683916",
       "url": null,
       "notes": "envío a domicilio",
@@ -21,7 +21,7 @@
     {
       "name": "Nuevo Abasto",
       "barrio": "Almagro",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1136584954",
       "url": null,
       "notes": null,
@@ -32,7 +32,7 @@
     {
       "name": "Almendrón",
       "barrio": "Almagro",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1160192976",
       "url": null,
       "notes": null,
@@ -43,7 +43,7 @@
     {
       "name": "Casa de Teresa",
       "barrio": "Almagro",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1135763647",
       "url": null,
       "notes": null,
@@ -54,7 +54,7 @@
     {
       "name": "Nodo UTT",
       "barrio": "Balvanera",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1173665934",
       "url": "https://www.lasemillaquecrece.com.ar/",
       "notes": "envíos a domicilio",
@@ -65,7 +65,7 @@
     {
       "name": "Almina Almacén",
       "barrio": "Belgrano",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1126643692",
       "url": null,
       "notes": null,
@@ -76,7 +76,7 @@
     {
       "name": "Jessica",
       "barrio": "Belgrano",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1154904578",
       "url": null,
       "notes": null,
@@ -87,7 +87,7 @@
     {
       "name": "Estilo Natural",
       "barrio": "Belgrano",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1124030747",
       "url": null,
       "notes": "envío a domicilio",
@@ -98,7 +98,7 @@
     {
       "name": "Páramo Almacén",
       "barrio": "Boedo",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1165239343",
       "url": null,
       "notes": "envío a domicilio",
@@ -109,7 +109,7 @@
     {
       "name": "Geo paca vivero",
       "barrio": "Boedo - Parque Patricios",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1140645462",
       "url": null,
       "notes": "envío a domicilio",
@@ -120,7 +120,7 @@
     {
       "name": "Romina",
       "barrio": "Boedo",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1137995457",
       "url": null,
       "notes": null,
@@ -131,7 +131,7 @@
     {
       "name": "Silvana",
       "barrio": "Boedo",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1155638885",
       "url": null,
       "notes": "sólo envíos",
@@ -142,7 +142,7 @@
     {
       "name": "Amapola horario: 10 a 17",
       "barrio": "Caballito",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1173674872",
       "url": null,
       "notes": null,
@@ -153,7 +153,7 @@
     {
       "name": "Constanza",
       "barrio": "Caballito",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1164771140",
       "url": null,
       "notes": null,
@@ -164,7 +164,7 @@
     {
       "name": "Sergio",
       "barrio": "Caballito",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1164639677",
       "url": null,
       "notes": "envíos a domicilio",
@@ -175,7 +175,7 @@
     {
       "name": "MandarfrUTTa",
       "barrio": "Chacarita",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1162346343",
       "url": null,
       "notes": null,
@@ -186,7 +186,7 @@
     {
       "name": "Revolución Humana",
       "barrio": "Colegiales - Palermo",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1162247649",
       "url": null,
       "notes": "nodo abierto, envío a domicilio",
@@ -197,7 +197,7 @@
     {
       "name": "Sochori",
       "barrio": "Flores",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1154576045",
       "url": null,
       "notes": "envíos a domicilio",
@@ -208,7 +208,7 @@
     {
       "name": "Celeste",
       "barrio": "Floresta",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1124749483",
       "url": null,
       "notes": "envío a domicilio",
@@ -219,7 +219,7 @@
     {
       "name": "Bella Vie",
       "barrio": "Floresta",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1165206150",
       "url": null,
       "notes": null,
@@ -230,7 +230,7 @@
     {
       "name": "Liniers Verde",
       "barrio": "Liniers",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1165594661",
       "url": null,
       "notes": "envío a domicilio",
@@ -241,7 +241,7 @@
     {
       "name": "Andrea",
       "barrio": "Mataderos",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1155799687",
       "url": null,
       "notes": null,
@@ -252,7 +252,7 @@
     {
       "name": "Nodo UTT Mataderos",
       "barrio": "Mataderos",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1132915279",
       "url": null,
       "notes": null,
@@ -263,7 +263,7 @@
     {
       "name": "El Hormiguero horario: de 12 a 14",
       "barrio": "Monserrat",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1127512429",
       "url": null,
       "notes": null,
@@ -274,7 +274,7 @@
     {
       "name": "América Rebelde",
       "barrio": "Monserrat",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1131902063",
       "url": null,
       "notes": null,
@@ -285,7 +285,7 @@
     {
       "name": "Santo Remedio  (envíos a domicilio)",
       "barrio": "Monserrat",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1132354562",
       "url": null,
       "notes": "almacén natural",
@@ -296,7 +296,7 @@
     {
       "name": "María Noel",
       "barrio": "Monte Castro",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1166552892",
       "url": null,
       "notes": null,
@@ -307,7 +307,7 @@
     {
       "name": "Pañuelos en Rebeldía",
       "barrio": "Nueva Pompeya",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1132956414",
       "url": null,
       "notes": "1er y 3er sábado de cada mes",
@@ -318,7 +318,7 @@
     {
       "name": "Feria verde",
       "barrio": "Nuñez - Saavedra",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1160212229",
       "url": "https://www.instagram.com/oli.va.feriaverde/",
       "notes": "envío a domicilio",
@@ -329,7 +329,7 @@
     {
       "name": "Puente Saavedra",
       "barrio": "Nuñez - Saavedra",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1156260303",
       "url": null,
       "notes": "envío a domicilio",
@@ -340,7 +340,7 @@
     {
       "name": "Revolución Humana",
       "barrio": "Palermo - Colegiales",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1162247649",
       "url": null,
       "notes": "nodo abierto, envío a domicilio",
@@ -351,7 +351,7 @@
     {
       "name": "Organicamente",
       "barrio": "Palermo",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1137667827",
       "url": null,
       "notes": null,
@@ -362,7 +362,7 @@
     {
       "name": "Libario Multiespacio",
       "barrio": "Palermo",
-      "zone": "",
+      "zone": "CABA",
       "phone": null,
       "url": null,
       "notes": null,
@@ -373,7 +373,7 @@
     {
       "name": "Almacenata",
       "barrio": "Palermo",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1160101748",
       "url": null,
       "notes": "nodo abierto, envío a domicilio",
@@ -384,7 +384,7 @@
     {
       "name": "La Comuna",
       "barrio": "Parque Patricios",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1164067189",
       "url": null,
       "notes": "nodo abierto",
@@ -395,7 +395,7 @@
     {
       "name": "Francisco",
       "barrio": "Parque Patricios",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1128369009",
       "url": null,
       "notes": null,
@@ -406,7 +406,7 @@
     {
       "name": "Isabel",
       "barrio": "Paternal",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1132017860",
       "url": null,
       "notes": null,
@@ -417,7 +417,7 @@
     {
       "name": "Almacén Del Aleph",
       "barrio": "Recoleta",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1163625446",
       "url": null,
       "notes": null,
@@ -428,7 +428,7 @@
     {
       "name": "Vida más natural",
       "barrio": "Recoleta",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1144041132",
       "url": null,
       "notes": null,
@@ -439,7 +439,7 @@
     {
       "name": "Nodo UTT",
       "barrio": "Saavedra - Núñez",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1160212229",
       "url": "https://www.instagram.com/oli.va.feriaverde/",
       "notes": "envío a domicilio",
@@ -450,7 +450,7 @@
     {
       "name": "Puente Saavedra",
       "barrio": "Saavedra - Núñez",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1156260303",
       "url": null,
       "notes": "envío a domicilio",
@@ -461,7 +461,7 @@
     {
       "name": "Nodo Saavedra Norte",
       "barrio": "Saavedra",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1158216725",
       "url": null,
       "notes": "envíos a domicilio",
@@ -472,7 +472,7 @@
     {
       "name": "Sachawasi",
       "barrio": "Saavedra",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1140240079",
       "url": null,
       "notes": "envíos a domicilio",
@@ -483,7 +483,7 @@
     {
       "name": "Tierra Firme",
       "barrio": "Saavedra",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1168743010",
       "url": "https://www.tierrafirmenodoutt.com.ar/",
       "notes": "envíos a domicilio",
@@ -494,7 +494,7 @@
     {
       "name": "Nodo San Cristóbal",
       "barrio": "San Cristóbal",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1168666775",
       "url": null,
       "notes": "pedidos la semana 2 y 4 del mes",
@@ -505,7 +505,7 @@
     {
       "name": "Alicia",
       "barrio": "San Telmo",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1144352286",
       "url": null,
       "notes": null,
@@ -516,7 +516,7 @@
     {
       "name": "Esteban",
       "barrio": "San Telmo",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1135664739",
       "url": null,
       "notes": null,
@@ -527,7 +527,7 @@
     {
       "name": "San Telmo Calvo Martina",
       "barrio": "San Telmo",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1161518855",
       "url": null,
       "notes": "cada 15 días",
@@ -538,7 +538,7 @@
     {
       "name": "Nodo UTT",
       "barrio": "Villa del Parque",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1163705886",
       "url": "https://www.instagram.com/nodo.utt.biarritz/",
       "notes": "envíos a domicilio",
@@ -549,7 +549,7 @@
     {
       "name": "Alimentos Sudashiva",
       "barrio": "Villa Lugano",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1157596296",
       "url": null,
       "notes": null,
@@ -560,7 +560,7 @@
     {
       "name": "Paseo Plaza Sudamérica",
       "barrio": "Villa Lugano",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1158666847",
       "url": null,
       "notes": "nodo abierto",
@@ -571,7 +571,7 @@
     {
       "name": "Dietética Infinito horario: 10 a 14 / 17 a 20",
       "barrio": "Villa Luro",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1171351160",
       "url": null,
       "notes": null,
@@ -582,7 +582,7 @@
     {
       "name": "Claudia",
       "barrio": "Villa Luro",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1165206150",
       "url": null,
       "notes": null,
@@ -593,7 +593,7 @@
     {
       "name": "Florencia",
       "barrio": "Villa Urquiza",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1162301260",
       "url": null,
       "notes": "nodo abierto, envíos a domicilio",
@@ -604,7 +604,7 @@
     {
       "name": "Pampa Mercado",
       "barrio": "Villa Ortuzar",
-      "zone": "",
+      "zone": "CABA",
       "phone": "1161257872",
       "url": null,
       "notes": "envío a domicilio",
