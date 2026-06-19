@@ -77,6 +77,8 @@ interface MapActor {
   lastUpdated?: string | null;
   /** true when the actor itself confirmed/updated the data on AgroEco.Red. */
   verified?: boolean;
+  /** Days / schedule when the actor receives, opens, delivers, or runs the feria. */
+  deliveryInfo?: string;
 }
 
 // Approximate import dates for inherited datasets (used until each actor claims their record).
