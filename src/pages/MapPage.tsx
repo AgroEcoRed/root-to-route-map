@@ -10,6 +10,7 @@ import rutasSanas from "@/data/rutasSanas.json";
 import mercadoTerritorial from "@/data/mercadoTerritorial.json";
 import elClickData from "@/data/elClick.json";
 import elBroteData from "@/data/elBrote.json";
+import uttNodesData from "@/data/uttNodes.json";
 import { getLicense } from "@/lib/licenses";
 import Navbar from "@/components/Navbar";
 import { Badge } from "@/components/ui/badge";
@@ -70,7 +71,7 @@ interface MapActor {
   products: string[];
   certification: "red" | "yellow" | "green";
   description: string;
-  source: "rutas_sanas" | "mercado_territorial" | "agroeco" | "el_click" | "el_brote";
+  source: "rutas_sanas" | "mercado_territorial" | "agroeco" | "el_click" | "el_brote" | "utt_nodos";
   contentLicense?: string | null;
   /** ISO date of last update of this actor's data. Null = never updated since import (inherited). */
   lastUpdated?: string | null;
@@ -85,6 +86,7 @@ const SOURCE_IMPORT_DATE: Record<MapActor["source"], string> = {
   agroeco: new Date().toISOString().slice(0, 10),
   el_click: "2026-06-19",
   el_brote: "2026-06-19",
+  utt_nodos: "2022-05-02",
 };
 
 function formatUpdateDate(iso: string): string {
