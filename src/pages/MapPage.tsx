@@ -252,6 +252,8 @@ const MapPage = () => {
           description: p.description || p.location || "",
           source: "agroeco",
           contentLicense: p.content_license || null,
+          verified: true,
+          lastUpdated: p.updated_at || p.created_at || null,
         }));
       setDbActors(realActors);
       const m = new Map<string, { id: string; lat: number; lng: number; name: string }>();
