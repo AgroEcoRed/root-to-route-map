@@ -181,6 +181,57 @@ const MarketplacePage = () => {
   const [filterType, setFilterType] = useState<"all" | ListingType>("all");
   const [mtrProducts, setMtrProducts] = useState<Product[]>([]);
 
+  // Static catalogs from integrated layers (El Click & El Brote)
+  const elClickProducts = useMemo<Product[]>(() => {
+    const sellos = (elClickData.certifications || []).map((c: any) => ({ code: c.code, name: c.name }));
+    return (elClickData.products || []).map((p: any, i: number) => ({
+      id: 2_000_000 + i,
+      name: p.name,
+      producer: elClickData.store.name,
+      location: elClickData.store.location,
+      category: p.category,
+      price: p.price,
+      priceDisplay: `$${p.price.toLocaleString("es-AR")}`,
+      unit: p.unit,
+      available: "Disponible",
+      certification: "yellow" as const,
+      image: p.image,
+      seasonal: "Estacional",
+      soldCount: 0,
+      distanceKm: 0,
+      listingType: "oferta" as const,
+      sellos,
+      source: "el_click" as ProductSource,
+      sourceUrl: elClickData.store.url,
+      description: p.description,
+    }));
+  }, []);
+
+  const elBroteProducts = useMemo<Product[]>(() => {
+    const sellos = (elBroteData.certifications || []).map((c: any) => ({ code: c.code, name: c.name }));
+    return (elBroteData.products || []).map((p: any, i: number) => ({
+      id: 3_000_000 + i,
+      name: p.name,
+      producer: elBroteData.store.name,
+      location: elBroteData.store.location,
+      category: p.category,
+      price: p.price,
+      priceDisplay: `$${p.price.toLocaleString("es-AR")}`,
+      unit: p.unit,
+      available: "Disponible",
+      certification: "yellow" as const,
+      image: p.image,
+      seasonal: "Estacional",
+      soldCount: 0,
+      distanceKm: 0,
+      listingType: "oferta" as const,
+      sellos,
+      source: "el_brote" as ProductSource,
+      sourceUrl: elBroteData.store.url,
+      description: p.description,
+    }));
+  }, []);
+
   // Reviews state
   const [reviews, setReviews] = useState<SellerReview[]>([]);
   const [reviewSeller, setReviewSeller] = useState<string | null>(null);
