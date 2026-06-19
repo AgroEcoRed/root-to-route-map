@@ -828,6 +828,12 @@ const MarketplacePage = () => {
                             Comprar en El Brote <ExternalLink className="h-3 w-3 ml-1" />
                           </a>
                         </Button>
+                      ) : p.source === "utt_nodos" ? (
+                        <Button size="sm" variant="outline" className="text-xs border-yellow-500 text-yellow-900 hover:bg-yellow-50" asChild>
+                          <a href="/mapa">
+                            Ver nodos en el mapa <ExternalLink className="h-3 w-3 ml-1" />
+                          </a>
+                        </Button>
                       ) : (
                         <Button size="sm" className={`text-xs ${
                           p.listingType === "oferta"
