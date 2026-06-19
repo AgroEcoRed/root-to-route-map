@@ -239,6 +239,27 @@ const elBroteActors: MapActor[] = [{
   lastUpdated: elBroteData.store.lastUpdated || SOURCE_IMPORT_DATE.el_brote,
 }];
 
+const uttNodesActors: MapActor[] = (uttNodesData.nodes as any[]).map((n, i) => {
+  const contactBits: string[] = [];
+  if (n.phone) contactBits.push(`Tel/WhatsApp: ${n.phone}`);
+  if (n.url) contactBits.push(n.url);
+  if (n.notes) contactBits.push(n.notes);
+  const desc = [`${n.barrio} — ${n.zone}`, contactBits.join(" · ")].filter(Boolean).join(" · ");
+  return {
+    id: 80000 + i,
+    name: n.name || "Nodo UTT",
+    type: "consumer_node" as ActorType,
+    lat: n.lat,
+    lng: n.lng,
+    products: [],
+    certification: "yellow",
+    description: desc,
+    source: "utt_nodos",
+    verified: false,
+    lastUpdated: SOURCE_IMPORT_DATE.utt_nodos,
+  };
+});
+
 type CertFilter = "green" | "yellow" | "red";
 
 const MapPage = () => {
