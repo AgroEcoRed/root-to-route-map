@@ -183,6 +183,7 @@ const MarketplacePage = () => {
   const [filterProducer, setFilterProducer] = useState("all");
   const [filterZone, setFilterZone] = useState("all");
   const [filterType, setFilterType] = useState<"all" | ListingType>("all");
+  const [filterDelivery, setFilterDelivery] = useState<DeliveryFilter>("all");
   const [mtrProducts, setMtrProducts] = useState<Product[]>([]);
 
   // Static catalogs from integrated layers (El Click & El Brote)
