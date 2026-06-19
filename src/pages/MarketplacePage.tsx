@@ -598,8 +598,18 @@ const MarketplacePage = () => {
                         Mercado Territorial
                       </span>
                     )}
+                    {p.source === "el_click" && (
+                      <span className="absolute top-2 right-2 bg-sky-100 text-sky-900 text-[9px] font-bold px-2 py-0.5 rounded-full border border-sky-300 uppercase tracking-wide shadow-sm">
+                        El Click
+                      </span>
+                    )}
+                    {p.source === "el_brote" && (
+                      <span className="absolute top-2 right-2 bg-emerald-100 text-emerald-900 text-[9px] font-bold px-2 py-0.5 rounded-full border border-emerald-300 uppercase tracking-wide shadow-sm">
+                        El Brote
+                      </span>
+                    )}
                     {isInSeason(p.seasonal) && p.listingType === "oferta" && (
-                      <span className={`absolute ${p.source === "mercado_territorial" ? "top-9" : "top-2"} right-2 bg-primary text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full`}>
+                      <span className={`absolute ${(p.source === "mercado_territorial" || p.source === "el_click" || p.source === "el_brote") ? "top-9" : "top-2"} right-2 bg-primary text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full`}>
                         {t("market.in_season")}
                       </span>
                     )}
