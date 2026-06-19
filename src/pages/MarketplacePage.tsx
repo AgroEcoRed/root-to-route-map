@@ -389,10 +389,27 @@ const MarketplacePage = () => {
       ...(isEnabled("mercado_territorial") ? mtrProducts : []),
       ...(isEnabled("el_click") ? elClickProducts : []),
       ...(isEnabled("el_brote") ? elBroteProducts : []),
+      ...(isEnabled("utt_nodos") ? uttProducts : []),
     ];
     const sourceScoped = sourceParam
       ? merged.filter(p => p.source === sourceParam)
       : merged;
+    const normalize = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const matchDelivery = (info: string | undefined): boolean => {
+      if (filterDelivery === "all") return true;
+      if (!info) return filterDelivery === "sin_info";
+      const n = normalize(info);
+      switch (filterDelivery) {
+        case "jueves": return /\bjueves\b/.test(n) || /ambos/.test(n);
+        case "sabados": return /\bsabados?\b/.test(n) || /ambos/.test(n);
+        case "ambos": return /ambos/.test(n);
+        case "lun_vie": return /lunes/.test(n) || /viernes/.test(n) || /lun-/.test(n) || /lun a/.test(n);
+        case "domicilio": return /domicilio/.test(n) || /envio/.test(n);
+        case "feria": return /feria/.test(n);
+        case "nodo_abierto": return /nodo abierto/.test(n) || /apertura/.test(n);
+        case "sin_info": return false;
+      }
+    };
     let results = sourceScoped.filter((p) => {
       const isMtr = p.source === "mercado_territorial";
       if (activeCategory !== "Todos" && p.category !== activeCategory) return false;
@@ -401,6 +418,7 @@ const MarketplacePage = () => {
       if (!isMtr && filterProducer !== "all" && p.producer !== filterProducer) return false;
       if (!isMtr && filterZone !== "all" && p.location !== filterZone) return false;
       if (filterType !== "all" && p.listingType !== filterType) return false;
+      if (!matchDelivery(p.deliveryInfo)) return false;
       if (search && !p.name.toLowerCase().includes(search.toLowerCase()) && !p.producer.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
@@ -418,9 +436,9 @@ const MarketplacePage = () => {
         sorted.sort((a, b) => (isInSeason(a.seasonal) ? 0 : 1) - (isInSeason(b.seasonal) ? 0 : 1)); break;
     }
     return sorted;
-  }, [search, activeCategory, activeEggSub, activeAlmacenSub, sortBy, filterProducer, filterZone, filterType, mtrProducts, elClickProducts, elBroteProducts, isEnabled, sourceParam]);
+  }, [search, activeCategory, activeEggSub, activeAlmacenSub, sortBy, filterProducer, filterZone, filterType, filterDelivery, mtrProducts, elClickProducts, elBroteProducts, uttProducts, isEnabled, sourceParam]);
 
-  const hasActiveFilters = filterProducer !== "all" || filterZone !== "all" || filterType !== "all" || sortBy !== "relevance";
+  const hasActiveFilters = filterProducer !== "all" || filterZone !== "all" || filterType !== "all" || filterDelivery !== "all" || sortBy !== "relevance";
 
   const getCategoryLabel = (cat: string) => {
     if (cat === "Todos") return t("market.all");
@@ -431,6 +449,7 @@ const MarketplacePage = () => {
     setFilterProducer("all");
     setFilterZone("all");
     setFilterType("all");
+    setFilterDelivery("all");
     setSortBy("relevance");
     setSearch("");
     setActiveCategory("Todos");
