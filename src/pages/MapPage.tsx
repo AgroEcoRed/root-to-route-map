@@ -247,10 +247,12 @@ const uttNodesActors: MapActor[] = (uttNodesData.nodes as any[]).map((n, i) => {
   const contactBits: string[] = [];
   if (n.address) contactBits.push(n.address);
   if (n.phone) contactBits.push(`Tel/WhatsApp: ${n.phone}`);
-  if (n.deliveryDays) contactBits.push(`Entrega: ${n.deliveryDays}`);
   if (n.url) contactBits.push(n.url);
   if (n.notes) contactBits.push(n.notes);
   const desc = [`${n.barrio} — ${n.zone}`, contactBits.join(" · ")].filter(Boolean).join(" · ");
+  const deliveryBits: string[] = [];
+  if (n.deliveryDays) deliveryBits.push(n.deliveryDays);
+  if (n.openNode) deliveryBits.push("Nodo abierto");
   return {
     id: 80000 + i,
     name: n.name || "Nodo UTT",
@@ -263,6 +265,7 @@ const uttNodesActors: MapActor[] = (uttNodesData.nodes as any[]).map((n, i) => {
     source: "utt_nodos",
     verified: Boolean(n.verified),
     lastUpdated: n.lastUpdated || SOURCE_IMPORT_DATE.utt_nodos,
+    deliveryInfo: deliveryBits.length ? deliveryBits.join(" · ") : undefined,
   };
 });
 
