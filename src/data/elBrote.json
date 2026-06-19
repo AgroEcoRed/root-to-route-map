@@ -1,0 +1,27 @@
+{
+  "store": {
+    "name": "El Brote Tienda",
+    "lat": -34.5631,
+    "lng": -58.4544,
+    "location": "CABA y GBA Norte",
+    "type": "retail",
+    "url": "https://elbrotetienda.com/",
+    "description": "Tienda online de fruta y verdura premium y orgánica, del productor a tu mesa.",
+    "lastUpdated": "2026-06-19"
+  },
+  "certifications": [
+    { "code": "premium", "name": "Selección Premium" },
+    { "code": "organico_donde_aplica", "name": "Orgánico (donde aplica)" },
+    { "code": "del_productor", "name": "Del Productor" }
+  ],
+  "products": [
+    { "name": "Combo Familiar de Estación", "category": "Verduras", "price": 28900, "unit": "combo", "image": "🧺", "description": "Fruta y verdura premium 100% natural, de estación." },
+    { "name": "Combo Verde Premium", "category": "Verduras", "price": 19500, "unit": "combo", "image": "🥗", "description": "Lechugas, rúcula, espinaca, acelga, brócoli." },
+    { "name": "Combo Frutas Premium", "category": "Frutas", "price": 23900, "unit": "combo", "image": "🍓", "description": "Manzanas, peras, bananas, cítricos y frutilla en temporada." },
+    { "name": "Palta Hass (1 kg)", "category": "Frutas", "price": 7900, "unit": "kg", "image": "🥑", "description": "Palta Hass seleccionada." },
+    { "name": "Tomate Cherry Orgánico", "category": "Verduras", "price": 4200, "unit": "500 g", "image": "🍅", "description": "Tomate cherry orgánico de productor." },
+    { "name": "Hongos Portobello", "category": "Verduras", "price": 5800, "unit": "500 g", "image": "🍄", "description": "Portobello frescos seleccionados." },
+    { "name": "Frutillas (500 g)", "category": "Frutas", "price": 6500, "unit": "500 g", "image": "🍓", "description": "Frutillas de estación." },
+    { "name": "Combo Desayuno Saludable", "category": "Almacén", "price": 18900, "unit": "combo", "image": "🥣", "description": "Granola, frutos secos, miel y avena." }
+  ]
+}
