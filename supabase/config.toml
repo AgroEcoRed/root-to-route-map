@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.import-instagram-stories]
 verify_jwt = false
+
+[functions.seed-rutas-sanas]
+verify_jwt = false
