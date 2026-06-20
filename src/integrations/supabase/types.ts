@@ -244,6 +244,60 @@ export type Database = {
         }
         Relationships: []
       }
+      layer_actors: {
+        Row: {
+          actor_type: string | null
+          address: string | null
+          contact: string | null
+          created_at: string
+          delivery_days: string[] | null
+          description: string | null
+          extra: Json
+          family: string | null
+          id: string
+          lat: number
+          lng: number
+          name: string
+          source_id: string
+          updated_at: string
+          verified_at: string | null
+        }
+        Insert: {
+          actor_type?: string | null
+          address?: string | null
+          contact?: string | null
+          created_at?: string
+          delivery_days?: string[] | null
+          description?: string | null
+          extra?: Json
+          family?: string | null
+          id?: string
+          lat: number
+          lng: number
+          name: string
+          source_id: string
+          updated_at?: string
+          verified_at?: string | null
+        }
+        Update: {
+          actor_type?: string | null
+          address?: string | null
+          contact?: string | null
+          created_at?: string
+          delivery_days?: string[] | null
+          description?: string | null
+          extra?: Json
+          family?: string | null
+          id?: string
+          lat?: number
+          lng?: number
+          name?: string
+          source_id?: string
+          updated_at?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       layer_managers: {
         Row: {
           created_at: string
