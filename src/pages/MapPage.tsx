@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Search, Filter, X, ArrowUp, ArrowDown, Minus, CalendarPlus, Network, Sparkles } from "lucide-react";
 import { DataSourceToggle } from "@/components/admin/DataSourceToggle";
 import { useDataSources } from "@/hooks/useDataSources";
+import { useLayerActors } from "@/hooks/useLayerActors";
 import { useUpcomingEvents } from "@/hooks/useUpcomingEvents";
 import { useActorConnections } from "@/hooks/useActorConnections";
 import { useAuth } from "@/contexts/AuthContext";
@@ -184,8 +185,8 @@ const roleBorderClasses: Record<ActorRole, string> = {
 
 const certLabels = { red: "Básico", yellow: "En transición", green: "Certificado" };
 
-// Real points imported from "Mapa de las Rutas Sanas del Alimento" (Red Interregional de Nodos Agroecológicos)
-const mockActors: MapActor[] = (rutasSanas as Array<{n:string;lat:number;lng:number;t:string;f:string;d:string}>).map((p, i) => ({
+// Fallback while DB rows are loading (or for legacy reference). Rutas Sanas is now served from `layer_actors`.
+const fallbackRutasSanasActors: MapActor[] = (rutasSanas as Array<{n:string;lat:number;lng:number;t:string;f:string;d:string}>).map((p, i) => ({
   id: i + 1,
   name: p.n,
   type: p.t as ActorType,
