@@ -18,6 +18,7 @@ import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import rutasSanas from "@/data/rutasSanas.json";
+import { useLayerActors } from "@/hooks/useLayerActors";
 
 type ActorType =
   | "producer" | "cooperative" | "social_kitchen" | "restaurant" | "retail"
@@ -63,8 +64,8 @@ const evalTypeIcons: Record<string, typeof Droplets> = {
   condiciones_laborales: Users,
 };
 
-// Real members imported from "Mapa de las Rutas Sanas del Alimento"
-const realActors: Actor[] = (rutasSanas as Array<{n:string;lat:number;lng:number;t:string;f:string;d:string}>).map((p, i) => {
+// Fallback used until DB data loads. Rutas Sanas now lives in `layer_actors`.
+const fallbackRealActors: Actor[] = (rutasSanas as Array<{n:string;lat:number;lng:number;t:string;f:string;d:string}>).map((p, i) => {
   // Extract a short location heuristically (first comma-separated chunk of d, fallback to f)
   const locGuess = (p.d || "").split(/[-–|]/)[0].trim().split(",").slice(0, 2).join(",").slice(0, 60);
   return {
@@ -94,6 +95,21 @@ const ActorsPage = () => {
   const [dbSpgs, setDbSpgs] = useState<SPG[]>([]);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 12;
+
+  const { actors: rsDb } = useLayerActors("rutas_sanas");
+  const realActors: Actor[] = useMemo(() => {
+    if (!rsDb || rsDb.length === 0) return fallbackRealActors;
+    return rsDb.map((p, i) => {
+      const locGuess = (p.description || "").split(/[-–|]/)[0].trim().split(",").slice(0, 2).join(",").slice(0, 60);
+      return {
+        id: i + 1,
+        name: p.name,
+        type: (p.actor_type as ActorType) || "consumer_node",
+        location: locGuess || p.family || "—",
+        description: p.description || p.family || "",
+      } as Actor;
+    });
+  }, [rsDb]);
 
   const typeConfig: Record<ActorType, { label: string; icon: typeof Sprout }> = {
     producer: { label: t("actor.producer"), icon: Sprout },
