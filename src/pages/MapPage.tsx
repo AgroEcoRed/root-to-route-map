@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Search, Filter, X, ArrowUp, ArrowDown, Minus, CalendarPlus, Network, Sparkles } from "lucide-react";
 import { DataSourceToggle } from "@/components/admin/DataSourceToggle";
 import { useDataSources } from "@/hooks/useDataSources";
+import { useLayerActors } from "@/hooks/useLayerActors";
 import { useUpcomingEvents } from "@/hooks/useUpcomingEvents";
 import { useActorConnections } from "@/hooks/useActorConnections";
 import { useAuth } from "@/contexts/AuthContext";
@@ -184,8 +185,8 @@ const roleBorderClasses: Record<ActorRole, string> = {
 
 const certLabels = { red: "Básico", yellow: "En transición", green: "Certificado" };
 
-// Real points imported from "Mapa de las Rutas Sanas del Alimento" (Red Interregional de Nodos Agroecológicos)
-const mockActors: MapActor[] = (rutasSanas as Array<{n:string;lat:number;lng:number;t:string;f:string;d:string}>).map((p, i) => ({
+// Fallback while DB rows are loading (or for legacy reference). Rutas Sanas is now served from `layer_actors`.
+const fallbackRutasSanasActors: MapActor[] = (rutasSanas as Array<{n:string;lat:number;lng:number;t:string;f:string;d:string}>).map((p, i) => ({
   id: i + 1,
   name: p.n,
   type: p.t as ActorType,
@@ -292,6 +293,28 @@ const MapPage = () => {
   const [showNetwork, setShowNetwork] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
 
+  // Rutas Sanas is now served from the layer_actors DB table (editable by layer managers).
+  const { actors: rutasSanasDb } = useLayerActors("rutas_sanas");
+  const rutasSanasActors = useMemo<MapActor[]>(() => {
+    if (!rutasSanasDb || rutasSanasDb.length === 0) return fallbackRutasSanasActors;
+    return rutasSanasDb.map((p, i) => ({
+      id: 1 + i,
+      name: p.name,
+      type: (p.actor_type as ActorType) || "consumer_node",
+      lat: p.lat,
+      lng: p.lng,
+      products: [],
+      certification: "yellow",
+      description: p.description || p.family || "",
+      source: "rutas_sanas",
+      verified: !!p.verified_at,
+      lastUpdated: p.verified_at || p.updated_at || SOURCE_IMPORT_DATE.rutas_sanas,
+      deliveryInfo: (p.delivery_days && p.delivery_days.length > 0)
+        ? p.delivery_days.join(", ")
+        : ((p.extra as any) || {}).deliveryInfo,
+    }));
+  }, [rutasSanasDb]);
+
   // Fetch real profiles from database
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -331,14 +354,14 @@ const MapPage = () => {
 
   const allActors = useMemo(() => {
     const out: MapActor[] = [];
-    if (isEnabled("rutas_sanas")) out.push(...mockActors);
+    if (isEnabled("rutas_sanas")) out.push(...rutasSanasActors);
     if (isEnabled("mercado_territorial")) out.push(...mercadoTerritorialActors);
     if (isEnabled("agroeco")) out.push(...dbActors);
     if (isEnabled("el_click")) out.push(...elClickActors);
     if (isEnabled("el_brote")) out.push(...elBroteActors);
     if (isEnabled("utt_nodos")) out.push(...uttNodesActors);
     return out;
-  }, [dbActors, isEnabled]);
+  }, [dbActors, isEnabled, rutasSanasActors]);
 
   const toggleType = (type: ActorType) => {
     setActiveTypes((prev) => {
