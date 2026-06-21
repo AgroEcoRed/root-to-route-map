@@ -4,6 +4,22 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
+import { createClient } from "npm:@supabase/supabase-js@2";
+
+async function requireUser(req: Request): Promise<string> {
+  const auth = req.headers.get("Authorization") ?? "";
+  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  if (!token) throw new Error("UNAUTHORIZED");
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: `Bearer ${token}` } } },
+  );
+  const { data, error } = await supabase.auth.getUser(token);
+  if (error || !data.user) throw new Error("UNAUTHORIZED");
+  return data.user.id;
+}
+
 const ACTOR_TYPES = [
   "producer","cooperative","social_kitchen","restaurant","retail","consumer",
   "institution","logistics","processing","agroecological_node","seed_bank",
@@ -57,6 +73,14 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
+    try {
+      await requireUser(req);
+    } catch {
+      return new Response(JSON.stringify({ error: "Necesitás iniciar sesión para usar el importador." }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { url, pastedText } = await req.json();
     let normalizedUrl = (url ?? "").toString().trim();
     if (normalizedUrl && !/^https?:\/\//i.test(normalizedUrl)) {
