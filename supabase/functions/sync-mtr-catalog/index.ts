@@ -62,6 +62,43 @@ function priceFromItem(p: any): number | null {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  // Restrict to trusted callers: require either the shared scheduler secret
+  // (header `x-sync-secret` matching env MTR_SYNC_SECRET) or an authenticated
+  // admin user. Anonymous calls are rejected to prevent log spam and
+  // exhaustion of the upstream catalog API quota.
+  const sharedSecret = Deno.env.get("MTR_SYNC_SECRET");
+  const providedSecret = req.headers.get("x-sync-secret") ?? "";
+  let authorized = false;
+  if (sharedSecret && providedSecret && providedSecret === sharedSecret) {
+    authorized = true;
+  } else {
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+    if (token) {
+      const authClient = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+      );
+      const { data: userData } = await authClient.auth.getUser(token);
+      if (userData?.user) {
+        const adminClient = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+        );
+        const { data: isAdmin } = await adminClient.rpc("has_role", {
+          _user_id: userData.user.id,
+          _role: "admin",
+        });
+        if (isAdmin === true) authorized = true;
+      }
+    }
+  }
+  if (!authorized) {
+    return new Response(JSON.stringify({ error: "unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!

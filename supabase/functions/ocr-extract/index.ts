@@ -1,9 +1,32 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { createClient } from "npm:@supabase/supabase-js@2";
+
+async function requireUser(req: Request): Promise<string> {
+  const auth = req.headers.get("Authorization") ?? "";
+  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  if (!token) throw new Error("UNAUTHORIZED");
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_ANON_KEY")!,
+    { global: { headers: { Authorization: `Bearer ${token}` } } },
+  );
+  const { data, error } = await supabase.auth.getUser(token);
+  if (error || !data.user) throw new Error("UNAUTHORIZED");
+  return data.user.id;
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
+    try {
+      await requireUser(req);
+    } catch {
+      return new Response(JSON.stringify({ error: "Necesitás iniciar sesión para usar OCR." }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { imageBase64, mimeType, language } = await req.json();
     if (!imageBase64 || !mimeType) {
       return new Response(JSON.stringify({ error: "Falta imagen o tipo MIME" }), {
