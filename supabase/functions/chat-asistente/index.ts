@@ -1,7 +1,11 @@
 // Chat asistente AgroEco — modos: general | onboarding | map
 // Usa Lovable AI Gateway con fetch directo (sin AI SDK).
-// Por defecto Gemini 3 Flash. Cambiá CHAT_MODEL para usar otro modelo.
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+// Por defecto Gemini 3 Flash. Cambiá CHAT_MODEL para usar otro modelo (ej: openai/gpt-5.4).
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
 
 const CHAT_MODEL = "google/gemini-3-flash-preview";
 
