@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, X, Send, Sprout, RotateCcw } from "lucide-react";
+import { X, Send, Sprout, RotateCcw, MessageCircle } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useChatHistory } from "@/hooks/useChatHistory";
@@ -63,7 +64,12 @@ const ChatAsistente = () => {
         append({ role: "assistant", content: "⚠️ " + t("chat.error") });
       } else {
         const reply = (data as { text?: string })?.text ?? "";
-        append({ role: "assistant", content: reply || "…" });
+        const toolsUsed = (data as { tools_used?: string[] })?.tools_used ?? [];
+        const footer =
+          toolsUsed.length > 0
+            ? `\n\n<small>🔧 _Herramientas usadas: ${toolsUsed.join(", ")}_</small>`
+            : "";
+        append({ role: "assistant", content: (reply || "…") + footer });
       }
     } catch (err) {
       console.error("[chat] send error", err);
@@ -83,16 +89,27 @@ const ChatAsistente = () => {
 
   return (
     <>
-      {/* Floating button */}
+      {/* Floating button — assistant avatar + visible "Asistente" label */}
       <motion.button
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
         onClick={() => setOpen((v) => !v)}
         aria-label={t("chat.title")}
-        className="fixed bottom-5 right-5 z-[60] flex items-center justify-center h-14 w-14 rounded-full bg-gradient-hero text-primary-foreground shadow-elevated hover:scale-110 transition-transform"
+        className="fixed bottom-5 right-5 z-[60] flex items-center gap-2 pl-2 pr-4 py-2 rounded-full bg-gradient-hero text-primary-foreground shadow-elevated hover:scale-105 transition-transform"
       >
-        {open ? <X className="h-6 w-6" /> : <Sprout className="h-6 w-6" />}
+        <span className="relative flex items-center justify-center h-10 w-10 rounded-full bg-white/95 text-primary shadow-inner">
+          {open ? <X className="h-5 w-5" /> : <Sprout className="h-5 w-5" />}
+          {!open && (
+            <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 border-2 border-white" />
+          )}
+        </span>
+        {!open && (
+          <span className="flex flex-col items-start leading-tight">
+            <span className="text-[10px] uppercase tracking-wider opacity-80">Asistente</span>
+            <span className="text-sm font-display font-semibold">Sembra</span>
+          </span>
+        )}
       </motion.button>
 
       <AnimatePresence>
@@ -106,9 +123,10 @@ const ChatAsistente = () => {
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-gradient-to-br from-primary/10 to-wheat/10">
-              <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-full bg-gradient-hero flex items-center justify-center">
-                  <Sprout className="h-4 w-4 text-primary-foreground" />
+              <div className="flex items-center gap-2.5">
+                <div className="relative h-10 w-10 rounded-full bg-gradient-hero flex items-center justify-center ring-2 ring-white">
+                  <Sprout className="h-5 w-5 text-primary-foreground" />
+                  <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 border-2 border-white" />
                 </div>
                 <div>
                   <h3 className="font-display text-sm leading-tight">{t("chat.title")}</h3>
@@ -144,8 +162,10 @@ const ChatAsistente = () => {
             {/* Messages */}
             <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
               {messages.length === 0 && (
-                <div className="text-sm text-muted-foreground bg-muted/40 rounded-xl px-4 py-3 leading-relaxed">
-                  {t(MODES.find((m) => m.key === mode)?.emptyKey ?? "chat.empty.general")}
+                <div className="text-sm text-foreground/80 bg-muted/40 rounded-xl px-4 py-3 leading-relaxed prose prose-sm max-w-none">
+                  <ReactMarkdown>
+                    {t(MODES.find((m) => m.key === mode)?.emptyKey ?? "chat.empty.general")}
+                  </ReactMarkdown>
                 </div>
               )}
               {messages.map((m) => (
@@ -158,8 +178,18 @@ const ChatAsistente = () => {
                       {m.content}
                     </div>
                   ) : (
-                    <div className="max-w-[90%] text-sm whitespace-pre-wrap break-words text-foreground leading-relaxed">
-                      {m.content}
+                    <div className="max-w-[90%] text-sm text-foreground leading-relaxed prose prose-sm max-w-none prose-a:text-primary prose-a:underline prose-p:my-2 prose-ul:my-2">
+                      <ReactMarkdown
+                        components={{
+                          a: ({ href, children }) => (
+                            <a href={href ?? "#"} target="_blank" rel="noopener noreferrer">
+                              {children}
+                            </a>
+                          ),
+                        }}
+                      >
+                        {m.content}
+                      </ReactMarkdown>
                     </div>
                   )}
                 </div>
