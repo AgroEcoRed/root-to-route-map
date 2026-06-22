@@ -292,9 +292,11 @@ const translations: Record<Lang, Record<string, string>> = {
   },
   en: {
     "nav.home": "Home",
-    "nav.map": "Map",
-    "nav.market": "Market",
+    "nav.map": "Living Map",
+    "nav.market": "Agroecological Market",
     "nav.actors": "Network",
+    "nav.spg": "Participatory Guarantees",
+    "nav.observatory": "Observatory",
     "nav.register": "Sign Up",
     "nav.login": "Log In",
     "nav.logout": "Log Out",
