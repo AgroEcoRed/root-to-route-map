@@ -84,7 +84,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "footer.tagline": "Hecho con 🌱 para la tierra",
     // Marketplace
     "market.title": "Mercado Agroecológico",
-    "market.subtitle": "Productos frescos directamente de productores agroecológicos certificados. Sin intermediarios, con trazabilidad completa.",
+    "market.subtitle": "Espacio para fortalecer circuitos cortos de comercialización, intercambio (de semillas, herramientas y otros insumos) y abastecimiento agroecológico.",
     "market.search": "Buscar producto o productor...",
     "market.all": "Todos",
     "market.products_available": "productos disponibles",
