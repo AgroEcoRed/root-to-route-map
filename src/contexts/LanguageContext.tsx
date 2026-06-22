@@ -10,9 +10,11 @@ const translations: Record<Lang, Record<string, string>> = {
   es: {
     // Navbar
     "nav.home": "Inicio",
-    "nav.map": "Mapa",
-    "nav.market": "Mercado",
+    "nav.map": "Mapa Vivo",
+    "nav.market": "Mercado Agroecológico",
     "nav.actors": "Red",
+    "nav.spg": "Garantías Participativas",
+    "nav.observatory": "Observatorio",
     "nav.register": "Registrarse",
     "nav.login": "Ingresar",
     "nav.logout": "Salir",
@@ -184,7 +186,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "market.review_login": "Ingresá para dejar una reseña",
     "market.review_thanks": "¡Gracias por tu reseña!",
     // Community nav
-    "nav.community": "Comunidad",
+    "nav.community": "Comunidad y Saberes",
     "nav.library": "Biblioteca",
     // Community page
     "community.title": "Comunidad y Co-aprendizaje",
@@ -221,7 +223,22 @@ const translations: Record<Lang, Record<string, string>> = {
     "cart.order_email_sent": "También se enviará un email con el detalle del pedido al productor.",
     "cart.order_next_steps": "Próximos pasos: el productor confirmará disponibilidad, acordarán forma de pago y entrega.",
     // Services
-    "nav.services": "Servicios",
+    "nav.services": "Recursos Compartidos",
+    // Chatbot
+    "chat.title": "Asistente AgroEco",
+    "chat.subtitle": "Asistente agroecológico",
+    "chat.placeholder": "Preguntá sobre actores, productos, SPG...",
+    "chat.new": "Nueva conversación",
+    "chat.mode.general": "General",
+    "chat.mode.onboarding": "Registro guiado",
+    "chat.mode.map": "Buscar en el mapa",
+    "chat.empty.general": "Hola 🌱 Preguntame sobre productores, ferias, SPG o cómo usar la plataforma.",
+    "chat.empty.onboarding": "Te acompaño a registrarte. ¿Qué tipo de actor sos?",
+    "chat.empty.map": "Pedime búsquedas como \"hortalizas a 50 km de La Plata\".",
+    "chat.error": "Hubo un problema. Intentá de nuevo.",
+    "chat.rate_limit": "Demasiadas consultas seguidas. Esperá un momento.",
+    "chat.credits": "Sin créditos disponibles para el asistente AI.",
+    "chat.thinking": "Pensando...",
     "services.badge": "Soluciones integrales",
     "services.title": "Todo lo que necesitás para tu transición agroecológica",
     "services.subtitle": "Bio-insumos, semillas, asistencia técnica, financiamiento, almacenamiento, logística y más. Tu ventanilla única de confianza.",
