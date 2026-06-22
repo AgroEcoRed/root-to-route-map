@@ -486,8 +486,6 @@ const translations: Record<Lang, Record<string, string>> = {
     "cart.order_email_sent": "An email with the order details will also be sent to the producer.",
     "cart.order_next_steps": "Next steps: the producer will confirm availability, and you'll agree on payment and delivery.",
     "nav.services": "Shared Resources",
-    "nav.spg": "Participatory Guarantees",
-    "nav.observatory": "Observatory",
     "services.badge": "Holistic solutions",
     "services.title": "Everything you need for your agroecological transition",
     "services.subtitle": "Bio-inputs, seeds, technical assistance, financing, storage, logistics and more. Your trusted one-stop shop.",
