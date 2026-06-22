@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, MapPin, ShoppingBasket, Users, Leaf, LogOut, User, Globe, BookOpen, ShoppingCart, Sprout, Library, Activity } from "lucide-react";
+import { Menu, X, MapPin, ShoppingBasket, Leaf, LogOut, User, Globe, BookOpen, ShoppingCart, Sprout, Activity, ShieldCheck, BarChart3 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -22,11 +22,10 @@ const Navbar = () => {
     { to: "/", label: t("nav.home"), icon: Leaf },
     { to: "/mapa", label: t("nav.map"), icon: MapPin },
     { to: "/mercado", label: t("nav.market"), icon: ShoppingBasket },
-    { to: "/actores", label: t("nav.actors"), icon: Users },
-    { to: "/servicios", label: t("nav.services"), icon: Sprout },
-    { to: "/biblioteca", label: t("nav.library") || "Biblioteca", icon: Library },
-    { to: "/transicion", label: t("nav.transition") || "Transición", icon: Activity },
+    { to: "/garantias", label: t("nav.spg"), icon: ShieldCheck },
     { to: "/comunidad", label: t("nav.community"), icon: BookOpen },
+    { to: "/recursos", label: t("nav.services"), icon: Sprout },
+    { to: "/observatorio", label: t("nav.observatory"), icon: BarChart3 },
   ];
 
   useEffect(() => {

@@ -352,6 +352,7 @@ export type Database = {
       library_items: {
         Row: {
           abstract: string | null
+          actor_id: string | null
           attribution: string | null
           authors: string[]
           collection_id: string | null
@@ -361,8 +362,11 @@ export type Database = {
           id: string
           item_type: string
           journal: string | null
+          lat: number | null
           license: string
+          lng: number | null
           publisher: string | null
+          route_geojson: Json | null
           tags: string[]
           title: string
           updated_at: string
@@ -372,6 +376,7 @@ export type Database = {
         }
         Insert: {
           abstract?: string | null
+          actor_id?: string | null
           attribution?: string | null
           authors?: string[]
           collection_id?: string | null
@@ -381,8 +386,11 @@ export type Database = {
           id?: string
           item_type?: string
           journal?: string | null
+          lat?: number | null
           license?: string
+          lng?: number | null
           publisher?: string | null
+          route_geojson?: Json | null
           tags?: string[]
           title: string
           updated_at?: string
@@ -392,6 +400,7 @@ export type Database = {
         }
         Update: {
           abstract?: string | null
+          actor_id?: string | null
           attribution?: string | null
           authors?: string[]
           collection_id?: string | null
@@ -401,8 +410,11 @@ export type Database = {
           id?: string
           item_type?: string
           journal?: string | null
+          lat?: number | null
           license?: string
+          lng?: number | null
           publisher?: string | null
+          route_geojson?: Json | null
           tags?: string[]
           title?: string
           updated_at?: string

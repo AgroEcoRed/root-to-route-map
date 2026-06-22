@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { CartProvider } from "@/contexts/CartContext";
@@ -25,6 +25,8 @@ import LicensesPage from "./pages/LicensesPage";
 import ImportInstagramPage from "./pages/ImportInstagramPage";
 import AdminLayersPage from "./pages/AdminLayersPage";
 import LayerAdminPage from "./pages/LayerAdminPage";
+import ObservatorioPage from "./pages/ObservatorioPage";
+import ChatAsistente from "./components/chat/ChatAsistente";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,9 +45,18 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/mapa" element={<MapPage />} />
               <Route path="/mercado" element={<MarketplacePage />} />
+              {/* Alias: Marketplace -> Mercado Agroecológico */}
+              <Route path="/marketplace" element={<Navigate to="/mercado" replace />} />
               <Route path="/actores" element={<ActorsPage />} />
               <Route path="/comunidad" element={<CommunityPage />} />
+              {/* Garantías Participativas (SPG) — por ahora reusa CommunityPage hasta tener página dedicada */}
+              <Route path="/garantias" element={<CommunityPage />} />
+              <Route path="/spg" element={<Navigate to="/garantias" replace />} />
+              {/* Recursos Compartidos (ex Servicios) */}
+              <Route path="/recursos" element={<ServicesPage />} />
               <Route path="/servicios" element={<ServicesPage />} />
+              {/* Observatorio Agroecológico */}
+              <Route path="/observatorio" element={<ObservatorioPage />} />
               <Route path="/biblioteca" element={<LibraryPage />} />
               <Route path="/programas" element={<ProgramsPage />} />
               <Route path="/transicion" element={<TransitionPage />} />
@@ -60,6 +71,7 @@ const App = () => (
               <Route path="/admin/capas/:layerId" element={<LayerAdminPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <ChatAsistente />
           </AuthProvider>
           </CartProvider>
         </LanguageProvider>
