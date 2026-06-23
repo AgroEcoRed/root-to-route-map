@@ -82,6 +82,45 @@ export type Database = {
           },
         ]
       }
+      ai_hints: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string | null
+          enabled: boolean
+          id: string
+          priority: number
+          scope: Database["public"]["Enums"]["ai_hint_scope"]
+          tags: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          id?: string
+          priority?: number
+          scope?: Database["public"]["Enums"]["ai_hint_scope"]
+          tags?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          id?: string
+          priority?: number
+          scope?: Database["public"]["Enums"]["ai_hint_scope"]
+          tags?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       custom_categories: {
         Row: {
           created_at: string
@@ -962,6 +1001,7 @@ export type Database = {
         | "agroecological_fair"
         | "agroecological_market"
         | "bio_input_supplier"
+      ai_hint_scope: "registration" | "chatbot" | "both"
       app_role: "admin" | "moderator" | "user"
       certification_level: "red" | "yellow" | "green" | "none_spg"
       connection_type:
@@ -1134,6 +1174,7 @@ export const Constants = {
         "agroecological_market",
         "bio_input_supplier",
       ],
+      ai_hint_scope: ["registration", "chatbot", "both"],
       app_role: ["admin", "moderator", "user"],
       certification_level: ["red", "yellow", "green", "none_spg"],
       connection_type: [

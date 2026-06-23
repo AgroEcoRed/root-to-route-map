@@ -25,6 +25,9 @@ import LicensesPage from "./pages/LicensesPage";
 import ImportInstagramPage from "./pages/ImportInstagramPage";
 import AdminLayersPage from "./pages/AdminLayersPage";
 import LayerAdminPage from "./pages/LayerAdminPage";
+import AdminPage from "./pages/AdminPage";
+import AdminHintsPage from "./pages/AdminHintsPage";
+import AdminUsersPage from "./pages/AdminUsersPage";
 import ObservatorioPage from "./pages/ObservatorioPage";
 import ChatAsistente from "./components/chat/ChatAsistente";
 import NotFound from "./pages/NotFound";
@@ -69,6 +72,9 @@ const App = () => (
               <Route path="/importar/instagram" element={<ImportInstagramPage />} />
               <Route path="/admin/capas" element={<AdminLayersPage />} />
               <Route path="/admin/capas/:layerId" element={<LayerAdminPage />} />
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="/admin/hints" element={<AdminHintsPage />} />
+              <Route path="/admin/usuarios" element={<AdminUsersPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <ChatAsistente />

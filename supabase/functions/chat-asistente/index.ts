@@ -41,6 +41,29 @@ const SYSTEM_PROMPTS: Record<ChatMode, string> = {
     `con nombre, qué ofrecen, distancia y contacto. Sugerí abrir el Mapa Vivo en /mapa para verlos.`,
 };
 
+// Fetch admin-curated hints to inject as extra context.
+async function fetchHints(mode: ChatMode): Promise<string> {
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const sb = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
+    const scopeForMode = mode === "onboarding" ? "registration" : "chatbot";
+    const { data, error } = await sb
+      .from("ai_hints")
+      .select("title, content, priority")
+      .eq("enabled", true)
+      .in("scope", [scopeForMode, "both"])
+      .order("priority", { ascending: false })
+      .limit(40);
+    if (error || !data || data.length === 0) return "";
+    const lines = data.map((h: any) => `- **${h.title}**: ${h.content}`).join("\n");
+    return `\n\nReglas y conocimiento curado por la administración (priorizá esto si aplica):\n${lines}`;
+  } catch (e) {
+    console.error("[chat-asistente] fetchHints error", e);
+    return "";
+  }
+}
+
 // ---------- Tools ----------
 
 const TOOLS = [
@@ -273,9 +296,11 @@ Deno.serve(async (req) => {
       );
     }
 
+    const hintsBlock = await fetchHints(mode);
+
     // Tool-calling loop (max 4 iterations).
     const conversation: any[] = [
-      { role: "system", content: SYSTEM_PROMPTS[mode] },
+      { role: "system", content: SYSTEM_PROMPTS[mode] + hintsBlock },
       ...cleaned,
     ];
     const toolsUsed: string[] = [];

@@ -5,6 +5,7 @@ import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage, Lang } from "@/contexts/LanguageContext";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { motion, AnimatePresence } from "framer-motion";
 import AnimatedLogo from "@/components/AnimatedLogo";
 
@@ -15,6 +16,7 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const { t, lang, setLang, langs } = useLanguage();
   const { totalItems, setIsOpen: setCartOpen } = useCart();
 
@@ -155,6 +157,16 @@ const Navbar = () => {
                  <User className="h-4 w-4" />
                  {user.email?.split("@")[0]}
                </Link>
+               {isAdmin && (
+                 <Link
+                   to="/admin"
+                   className={`text-sm flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${navbarScrolled ? "text-primary bg-primary/10 hover:bg-primary/20" : "text-white bg-white/15 hover:bg-white/25"}`}
+                   title="Panel de administración"
+                 >
+                   <ShieldCheck className="h-4 w-4" />
+                   Admin
+                 </Link>
+               )}
                <Button variant="outline" size="sm" onClick={handleSignOut} className="group text-foreground">
                  <LogOut className="h-4 w-4 mr-1 transition-transform group-hover:-translate-x-0.5" />
                  {t("nav.logout")}
