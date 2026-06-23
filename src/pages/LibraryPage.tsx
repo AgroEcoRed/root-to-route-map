@@ -191,9 +191,17 @@ const LibraryPage = () => {
 
 const ItemCard = ({ item }: { item: LibraryItem }) => {
   const { lang } = useLanguage();
-  const fileUrl = item.file_path
-    ? supabase.storage.from("biblioteca").getPublicUrl(item.file_path).data.publicUrl
-    : null;
+  const openFile = async () => {
+    if (!item.file_path) return;
+    const { data, error } = await supabase.storage
+      .from("biblioteca")
+      .createSignedUrl(item.file_path, 60 * 10);
+    if (error || !data?.signedUrl) {
+      toast.error("Iniciá sesión para acceder al archivo");
+      return;
+    }
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  };
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
@@ -222,10 +230,10 @@ const ItemCard = ({ item }: { item: LibraryItem }) => {
           </div>
         </div>
         <div className="flex flex-col gap-2 shrink-0">
-          {fileUrl && (
-            <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-xs flex items-center gap-1 text-primary hover:underline">
+          {item.file_path && (
+            <button onClick={openFile} className="text-xs flex items-center gap-1 text-primary hover:underline">
               <FileText className="h-3.5 w-3.5" /> PDF
-            </a>
+            </button>
           )}
           {item.url && (
             <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-xs flex items-center gap-1 text-primary hover:underline">
