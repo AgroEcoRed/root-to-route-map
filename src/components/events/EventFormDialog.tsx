@@ -324,6 +324,30 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
             />
             <p className="text-[10px] text-muted-foreground mt-1">Cada organización mencionada genera una línea en la red de vínculos.</p>
           </div>
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-3">
+            <p className="text-xs font-semibold text-foreground">Punto focal de la actividad</p>
+            <p className="text-[11px] text-muted-foreground -mt-2">
+              Quien aparezca acá recibirá un mail con el link privado para revisar y modificar los datos.
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs">Nombre del punto focal</Label>
+                <Input value={form.focal_name} onChange={(e) => update("focal_name", e.target.value)} placeholder="Ej: María Pérez" />
+              </div>
+              <div>
+                <Label className="text-xs">Email del punto focal</Label>
+                <Input value={form.focal_email} onChange={(e) => update("focal_email", e.target.value)} placeholder="focal@correo.com" />
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs">Quién carga la actividad</Label>
+              <Input
+                value={form.submitted_by_name}
+                onChange={(e) => update("submitted_by_name", e.target.value)}
+                placeholder={`Tu nombre (default: ${(user?.user_metadata as any)?.display_name || user?.email || "tu cuenta"})`}
+              />
+            </div>
+          </div>
           {!quick && (
             <>
               <div>
