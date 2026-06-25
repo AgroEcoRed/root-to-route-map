@@ -358,3 +358,9 @@ main { animation: page-in 0.35s ease-out; }
   color: #fff; font-size: 14px; font-weight: 800;
   animation: event-glow-pulse var(--glow-speed, 2.2s) ease-in-out infinite;
 }
+.event-star {
+  display: flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px;
+  animation: event-glow-pulse var(--star-speed, 2.2s) ease-in-out infinite;
+  transform-origin: center;
+}
