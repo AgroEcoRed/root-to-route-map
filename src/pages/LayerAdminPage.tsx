@@ -16,7 +16,7 @@ import { useLayerManager } from "@/hooks/useLayerManager";
 import { useDataSources, type DataSourceId } from "@/hooks/useDataSources";
 import { useLayerActors, type LayerActor } from "@/hooks/useLayerActors";
 import { toast } from "sonner";
-import { Layers, Loader2, ArrowLeft, MapPin, ShoppingBag, Power, Pencil, Plus, Trash2, CheckCircle2, Search } from "lucide-react";
+import { Layers, Loader2, ArrowLeft, MapPin, ShoppingBag, Power, Pencil, Plus, Trash2, CheckCircle2, Search, Send, Copy } from "lucide-react";
 
 const EDITABLE_LAYERS: DataSourceId[] = ["rutas_sanas"];
 
@@ -130,6 +130,37 @@ export default function LayerAdminPage() {
     if (error) return toast.error("No se pudo verificar: " + error.message);
     toast.success("Marcado como verificado");
     reload();
+  };
+
+  const sendToConfirm = async (actor: LayerActor) => {
+    const contact = prompt(
+      "Email o teléfono del actor a quien enviar la confirmación (se guarda como referencia):",
+      (actor as any).confirmation_email || (actor as any).confirmation_phone || actor.contact || ""
+    );
+    if (contact === null) return;
+    const isEmail = /@/.test(contact);
+    const token = crypto.randomUUID();
+    const { error } = await (supabase as any)
+      .from("layer_actors")
+      .update({
+        confirmation_token: token,
+        confirmation_status: "pending",
+        confirmation_sent_at: new Date().toISOString(),
+        confirmation_email: isEmail ? contact : null,
+        confirmation_phone: isEmail ? null : contact,
+      })
+      .eq("id", actor.id);
+    if (error) return toast.error("No se pudo generar el link: " + error.message);
+    const url = `${window.location.origin}/confirmar/${token}`;
+    try { await navigator.clipboard.writeText(url); } catch { /* ignore */ }
+    toast.success("Link de confirmación copiado al portapapeles");
+    reload();
+  };
+
+  const copyConfirmLink = async (token: string) => {
+    const url = `${window.location.origin}/confirmar/${token}`;
+    try { await navigator.clipboard.writeText(url); toast.success("Link copiado"); }
+    catch { toast.error("No se pudo copiar"); }
   };
 
   return (
@@ -255,6 +286,15 @@ export default function LayerAdminPage() {
                         {!a.verified_at && (
                           <Button size="sm" variant="ghost" onClick={() => markVerified(a.id)} title="Marcar verificado">
                             <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
+                          </Button>
+                        )}
+                        {(a as any).confirmation_token && (a as any).confirmation_status === "pending" ? (
+                          <Button size="sm" variant="ghost" onClick={() => copyConfirmLink((a as any).confirmation_token)} title="Copiar link de confirmación">
+                            <Copy className="h-3.5 w-3.5 text-amber-600" />
+                          </Button>
+                        ) : (
+                          <Button size="sm" variant="ghost" onClick={() => sendToConfirm(a)} title="Enviar a confirmar por el actor">
+                            <Send className="h-3.5 w-3.5 text-blue-600" />
                           </Button>
                         )}
                         <Button size="sm" variant="ghost" onClick={() => removeActor(a.id)}>
