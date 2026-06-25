@@ -22,6 +22,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 import { locationData } from "@/data/locations";
+import PreliminaryImport from "@/components/PreliminaryImport";
+import { Navigation as NavIcon, MapPin as MapPinIcon, Info } from "lucide-react";
 
 type ActorType = Database["public"]["Enums"]["actor_type"];
 type CertLevel = Database["public"]["Enums"]["certification_level"];
@@ -86,6 +88,8 @@ const RegistrationPage = () => {
   const [city, setCity] = useState("");
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
+  const [geoState, setGeoState] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const [preliminary, setPreliminary] = useState<{ url: string; notes: string; file: File | null }>({ url: "", notes: "", file: null });
 
   // Step 3: Categories
   const [selectedOferta, setSelectedOferta] = useState<string[]>([]);
@@ -100,6 +104,21 @@ const RegistrationPage = () => {
   const [methodsByCategory, setMethodsByCategory] = useState<Record<string, string>>({});
   // Verification request
   const [wantsVerification, setWantsVerification] = useState(false);
+
+  /** Whether this actor is an "individual experience" (single point) — used to nudge geolocation. */
+  const isIndividualExperience = (t: ActorType | null) =>
+    t === "producer" || t === "consumer" || t === "restaurant" || t === "retail" ||
+    t === "social_kitchen" || t === "community_garden" || t === "bio_input_supplier";
+
+  const requestDeviceGeolocation = () => {
+    if (!("geolocation" in navigator)) { toast.error("Tu navegador no soporta geolocalización"); return; }
+    setGeoState("loading");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => { setLat(pos.coords.latitude); setLng(pos.coords.longitude); setGeoState("done"); toast.success("Ubicación obtenida del dispositivo"); },
+      (err) => { setGeoState("error"); toast.error(err.message || "No pudimos obtener tu ubicación"); },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  };
 
   const selectedCountry = locationData.countries.find(c => c.code === country);
   const selectedRegion2 = selectedCountry?.regions.find(r => r.code === region);
@@ -185,6 +204,25 @@ const RegistrationPage = () => {
       });
       if (authError) throw authError;
       if (!authData.user) throw new Error("No se pudo crear el usuario");
+
+      // Save preliminary import draft (link/file) for later verification by the user/team.
+      try {
+        const uid = authData.user.id;
+        if (preliminary.url.trim()) {
+          await (supabase as any).from("preliminary_imports").insert({
+            user_id: uid, source_type: "link", url: preliminary.url.trim(), notes: preliminary.notes.trim() || null,
+          });
+        }
+        if (preliminary.file) {
+          const path = `${uid}/preliminary/${Date.now()}_${preliminary.file.name}`;
+          const up = await supabase.storage.from("producer-media").upload(path, preliminary.file, { upsert: false });
+          if (!up.error) {
+            await (supabase as any).from("preliminary_imports").insert({
+              user_id: uid, source_type: "file", file_path: path, notes: preliminary.notes.trim() || null,
+            });
+          }
+        }
+      } catch { /* silent — not critical */ }
 
       // Save custom categories globally
       const allCustomOferta = selectedOferta.filter(c => !ofertaCategories.includes(c));
