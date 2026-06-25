@@ -691,6 +691,11 @@ Gracias.`;
                       </label>
                     </motion.div>
 
+                    {/* Preliminary import (link/file to bootstrap a list of nodes/actors) */}
+                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
+                      <PreliminaryImport draftMode draft={preliminary} onDraftChange={setPreliminary} />
+                    </motion.div>
+
                     <div className="flex gap-3 pt-4">
                       <Button variant="outline" type="button" onClick={() => setStep(2)} className="flex-1">
                         <ArrowLeft className="h-4 w-4 mr-1" /> Volver
