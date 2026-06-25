@@ -304,6 +304,24 @@ const MapPage = () => {
   const [showNetwork, setShowNetwork] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [addPointOpen, setAddPointOpen] = useState(false);
+  const [endorseTarget, setEndorseTarget] = useState<{ id: string; name: string } | null>(null);
+  const [endorsements, setEndorsements] = useState<Map<string, { count: number; last_at: string }>>(new Map());
+  const [endorsementsTick, setEndorsementsTick] = useState(0);
+
+  // Load aggregated endorsement counts (no PII) for every layer actor.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await (supabase as any)
+        .from("actor_endorsement_counts")
+        .select("layer_actor_id, count, last_at");
+      if (cancelled || !data) return;
+      const m = new Map<string, { count: number; last_at: string }>();
+      (data as any[]).forEach((r) => m.set(r.layer_actor_id, { count: r.count, last_at: r.last_at }));
+      setEndorsements(m);
+    })();
+    return () => { cancelled = true; };
+  }, [endorsementsTick]);
 
   // Rutas Sanas is now served from the layer_actors DB table (editable by layer managers).
   const { actors: rutasSanasDb } = useLayerActors("rutas_sanas");
