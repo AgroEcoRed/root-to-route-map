@@ -174,11 +174,23 @@ const Navbar = () => {
              </>
            ) : (
              <>
-               <Button variant="ghost" size="sm" asChild>
-                 <Link to="/registro">{t("nav.register")}</Link>
-               </Button>
-               <Button size="sm" className="bg-gradient-hero text-primary-foreground" asChild>
+               <div className={`h-6 w-px mx-1 ${navbarScrolled ? "bg-border" : "bg-white/30"}`} aria-hidden="true" />
+               <Button
+                 size="default"
+                 variant="outline"
+                 asChild
+                 className={`font-semibold ${navbarScrolled
+                   ? "border-primary text-primary hover:bg-primary/10"
+                   : "border-white/70 bg-white/10 text-white hover:bg-white/20 hover:text-white"}`}
+               >
                  <Link to="/ingresar">{t("nav.login")}</Link>
+               </Button>
+               <Button
+                 size="default"
+                 asChild
+                 className="bg-gradient-hero text-primary-foreground font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition-all"
+               >
+                 <Link to="/registro">{t("nav.register")}</Link>
                </Button>
              </>
            )}
