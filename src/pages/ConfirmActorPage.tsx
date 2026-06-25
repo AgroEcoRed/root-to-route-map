@@ -182,6 +182,13 @@ export default function ConfirmActorPage() {
         </div>
       </main>
       <Footer />
+      <DeclareConnectionDialog
+        open={connectOpen}
+        onOpenChange={setConnectOpen}
+        targetActorId={null}
+        targetActorName=""
+        token={token || null}
+      />
     </div>
   );
 }
