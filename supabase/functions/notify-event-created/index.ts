@@ -27,6 +27,7 @@ Deno.serve(async (req) => {
   const eventId = String(body?.event_id || "");
   if (!UUID_RE.test(eventId)) return bad(400, "Invalid event_id");
   const origin = String(body?.origin || "https://agroeco.red").replace(/\/$/, "");
+  const overrideTo = typeof body?.to_override === "string" ? body.to_override.trim() : "";
 
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
   const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -52,6 +53,10 @@ Deno.serve(async (req) => {
   };
   pushEmails(ev.focal_email);
   pushEmails(ev.contact_email);
+  if (overrideTo && /.+@.+\..+/.test(overrideTo)) {
+    targets.length = 0;
+    targets.push(overrideTo);
+  }
 
   const editLink = `${origin}/eventos/editar/${ev.edit_token}`;
   const mapLink = `${origin}/mapa?event=${ev.id}`;
