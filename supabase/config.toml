@@ -14,3 +14,12 @@ verify_jwt = false
 
 [functions.confirm-actor]
 verify_jwt = false
+
+[functions.edit-event-by-token]
+verify_jwt = false
+
+[functions.notify-event-created]
+verify_jwt = false
+
+[functions.declare-actor-connection]
+verify_jwt = false
