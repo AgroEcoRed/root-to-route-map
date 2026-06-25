@@ -1006,6 +1006,14 @@ const MapPage = () => {
           <EventsSidebar
             events={events}
             onFlyTo={(la, ln) => mapRef.current?.flyTo([la, ln], 14, { duration: 0.8 })}
+            highlightedEventId={focusedEventId}
+            onShare={(id) => {
+              const url = `${window.location.origin}/mapa?event=${id}`;
+              navigator.clipboard?.writeText(url).then(
+                () => toast.success("Link copiado", { description: url }),
+                () => toast.error("No se pudo copiar")
+              );
+            }}
           />
 
           {/* Floating action buttons */}
