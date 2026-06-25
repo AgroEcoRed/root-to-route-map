@@ -36,7 +36,7 @@ export const useUpcomingEvents = () => {
   useEffect(() => {
     load();
     const channel = supabase
-      .channel("events_changes")
+      .channel(`events_changes_${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "events" }, () => load())
       .subscribe();
     return () => { supabase.removeChannel(channel); };
