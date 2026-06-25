@@ -678,14 +678,28 @@ const MapPage = () => {
       const intensity = glowIntensity(ev.starts_at); // 0..1
       const size = 14 + Math.round(intensity * 22);   // 14 → 36 px halo
       const spread = 2 + Math.round(intensity * 10);
-      const speed = (2.6 - intensity * 1.4).toFixed(2);
-      const glowColor = intensity > 0.75 ? "#ec4899" : intensity > 0.45 ? "#d946ef" : "#a855f7";
-      const shadow = intensity > 0.75 ? "rgba(236,72,153,0.75)" : intensity > 0.45 ? "rgba(217,70,239,0.55)" : "rgba(168,85,247,0.4)";
+      const speed = (2.8 - intensity * 1.6).toFixed(2);
+      // Color scale: lejos (azul) → cerca (rojo). Más intensidad = más cálido.
+      const starColor =
+        intensity >= 0.9 ? "#dc2626" :     // < 12h → rojo intenso
+        intensity >= 0.75 ? "#ef4444" :    // < 1 día
+        intensity >= 0.55 ? "#f97316" :    // < 3 días
+        intensity >= 0.35 ? "#a855f7" :    // < 7 días
+        intensity >= 0.25 ? "#7c3aed" :    // < 14 días
+        "#2563eb";                          // lejos → azul
+      const shadow = starColor.replace("#", "");
+      const r = parseInt(shadow.slice(0,2), 16), g = parseInt(shadow.slice(2,4), 16), b = parseInt(shadow.slice(4,6), 16);
+      const shadowRgba = `rgba(${r},${g},${b},${0.45 + intensity * 0.4})`;
+      const starSvg = `
+        <svg viewBox="0 0 24 24" width="34" height="34" style="filter: drop-shadow(0 0 ${spread}px ${shadowRgba}) drop-shadow(0 0 ${size/2}px ${shadowRgba}); overflow: visible;">
+          <polygon points="12,1.5 14.7,8.7 22.5,9.2 16.5,14.2 18.5,21.8 12,17.5 5.5,21.8 7.5,14.2 1.5,9.2 9.3,8.7"
+            fill="${starColor}" stroke="#ffffff" stroke-width="1.2" stroke-linejoin="round"/>
+        </svg>`;
       const icon = L.divIcon({
         className: "",
-        html: `<div class="event-glow" style="--glow-color:${glowColor};--glow-size:${size}px;--glow-spread:${spread}px;--glow-shadow:${shadow};--glow-speed:${speed}s">★</div>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 14],
+        html: `<div class="event-star" style="--star-speed:${speed}s">${starSvg}</div>`,
+        iconSize: [34, 34],
+        iconAnchor: [17, 17],
       });
       const date = new Date(ev.starts_at);
       const dateStr = date.toLocaleString("es-AR", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
