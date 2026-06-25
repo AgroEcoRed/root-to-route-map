@@ -302,6 +302,13 @@ export type Database = {
         Row: {
           actor_type: string | null
           address: string | null
+          confirmation_email: string | null
+          confirmation_phone: string | null
+          confirmation_sent_at: string | null
+          confirmation_status: string
+          confirmation_token: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
           contact: string | null
           created_at: string
           created_by: string | null
@@ -320,6 +327,13 @@ export type Database = {
         Insert: {
           actor_type?: string | null
           address?: string | null
+          confirmation_email?: string | null
+          confirmation_phone?: string | null
+          confirmation_sent_at?: string | null
+          confirmation_status?: string
+          confirmation_token?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
           contact?: string | null
           created_at?: string
           created_by?: string | null
@@ -338,6 +352,13 @@ export type Database = {
         Update: {
           actor_type?: string | null
           address?: string | null
+          confirmation_email?: string | null
+          confirmation_phone?: string | null
+          confirmation_sent_at?: string | null
+          confirmation_status?: string
+          confirmation_token?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
           contact?: string | null
           created_at?: string
           created_by?: string | null
@@ -1022,6 +1043,84 @@ export type Database = {
       can_manage_layer: {
         Args: { _layer_id: string; _user_id: string }
         Returns: boolean
+      }
+      confirm_actor_by_token: {
+        Args: {
+          _address?: string
+          _contact?: string
+          _decision: string
+          _delivery_days?: string[]
+          _description?: string
+          _lat?: number
+          _lng?: number
+          _name?: string
+          _token: string
+        }
+        Returns: {
+          actor_type: string | null
+          address: string | null
+          confirmation_email: string | null
+          confirmation_phone: string | null
+          confirmation_sent_at: string | null
+          confirmation_status: string
+          confirmation_token: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
+          contact: string | null
+          created_at: string
+          created_by: string | null
+          delivery_days: string[] | null
+          description: string | null
+          extra: Json
+          family: string | null
+          id: string
+          lat: number
+          lng: number
+          name: string
+          source_id: string
+          updated_at: string
+          verified_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "layer_actors"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      get_actor_by_token: {
+        Args: { _token: string }
+        Returns: {
+          actor_type: string | null
+          address: string | null
+          confirmation_email: string | null
+          confirmation_phone: string | null
+          confirmation_sent_at: string | null
+          confirmation_status: string
+          confirmation_token: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
+          contact: string | null
+          created_at: string
+          created_by: string | null
+          delivery_days: string[] | null
+          description: string | null
+          extra: Json
+          family: string | null
+          id: string
+          lat: number
+          lng: number
+          name: string
+          source_id: string
+          updated_at: string
+          verified_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "layer_actors"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       has_role: {
         Args: {
