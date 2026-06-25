@@ -109,7 +109,7 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: Deno.env.get("RESEND_FROM") || "AgroEco.Red <no-reply@agroeco.red>",
+        from: Deno.env.get("RESEND_FROM") || "AgroEco.Red <onboarding@resend.dev>",
         to: targets,
         subject,
         html,
