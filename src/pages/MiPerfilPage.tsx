@@ -15,6 +15,7 @@ import LicenseBadge from "@/components/LicenseBadge";
 import { DEFAULT_LICENSE, LicenseCode } from "@/lib/licenses";
 import PreliminaryImport from "@/components/PreliminaryImport";
 import AddMapPointDialog from "@/components/AddMapPointDialog";
+import MyMapContributions from "@/components/MyMapContributions";
 import { Link } from "react-router-dom";
 import { MapPin, Plus, Sparkles } from "lucide-react";
 
@@ -52,6 +53,8 @@ const ProfileQuickActions = () => {
       <div className="h-8" />
 
       <AddMapPointDialog open={addPointOpen} onOpenChange={setAddPointOpen} />
+
+      <MyMapContributions />
     </>
   );
 };
