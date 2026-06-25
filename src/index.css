@@ -341,3 +341,20 @@ main { animation: page-in 0.35s ease-out; }
   border-radius: 50%;
   animation: net-halo 2.2s ease-out infinite;
 }
+
+/* Event glow marker — intensifies as the event date approaches (fuchsia). */
+@keyframes event-glow-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+.event-glow {
+  position: relative;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ff4fc8, var(--glow-color, #d946ef));
+  border: 2px solid #fff;
+  box-shadow: 0 0 calc(var(--glow-size, 12px)) calc(var(--glow-spread, 4px)) var(--glow-shadow, rgba(217, 70, 239, 0.55));
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 14px; font-weight: 800;
+  animation: event-glow-pulse var(--glow-speed, 2.2s) ease-in-out infinite;
+}
