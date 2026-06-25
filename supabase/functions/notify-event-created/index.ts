@@ -36,22 +36,35 @@ Deno.serve(async (req) => {
 
   const { data: ev, error } = await sb
     .from("events")
-    .select("id, title, starts_at, location_name, focal_name, focal_email, contact_email, submitted_by_name, edit_token")
+    .select("id, title, description, starts_at, location_name, focal_name, focal_email, contact_email, submitted_by_name, edit_token, flyer_url")
     .eq("id", eventId)
     .maybeSingle();
   if (error || !ev) return bad(404, "Event not found");
 
+  // focal_email puede ser una lista separada por comas (puntos focales primarios).
   const targets: string[] = [];
-  if (ev.focal_email) targets.push(String(ev.focal_email));
-  if (ev.contact_email && !targets.includes(String(ev.contact_email))) targets.push(String(ev.contact_email));
+  const pushEmails = (raw: unknown) => {
+    String(raw || "")
+      .split(/[,;\s]+/)
+      .map((s) => s.trim())
+      .filter((s) => /.+@.+\..+/.test(s))
+      .forEach((e) => { if (!targets.includes(e)) targets.push(e); });
+  };
+  pushEmails(ev.focal_email);
+  pushEmails(ev.contact_email);
 
   const editLink = `${origin}/eventos/editar/${ev.edit_token}`;
-  const publicLink = `${origin}/mapa`;
+  const mapLink = `${origin}/mapa?event=${ev.id}`;
+  const registerLink = `${origin}/ingresar?next=${encodeURIComponent("/perfil")}`;
 
   const subject = `AgroEco.Red — Confirmá tu actividad: ${ev.title}`;
+  const flyerBlock = (ev as any).flyer_url
+    ? `<p style="margin:14px 0 6px"><img src="${(ev as any).flyer_url}" alt="Flyer" style="max-width:100%;border-radius:8px;border:1px solid #e5e7eb"/></p>`
+    : "";
   const html = `
-    <div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;color:#1f2937;line-height:1.5">
-      <h2 style="color:#15803d">Tu actividad fue publicada en AgroEco.Red</h2>
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#1f2937;line-height:1.55">
+      <h2 style="color:#15803d;margin-bottom:4px">Tu actividad fue publicada en AgroEco.Red</h2>
+      <p style="font-size:13px;color:#6b7280;margin-top:0">Mapa Vivo de los sistemas alimentarios agroecológicos</p>
       <p>Hola${ev.focal_name ? ` <strong>${escapeHtml(ev.focal_name)}</strong>` : ""},</p>
       <p>${ev.submitted_by_name ? escapeHtml(ev.submitted_by_name) + " cargó" : "Se cargó"} la siguiente actividad y te designó como punto focal:</p>
       <p style="background:#f0fdf4;border-left:4px solid #15803d;padding:10px 14px;border-radius:6px">
@@ -59,11 +72,24 @@ Deno.serve(async (req) => {
         ${ev.starts_at ? `📅 ${new Date(ev.starts_at).toLocaleString("es-AR")}<br/>` : ""}
         ${ev.location_name ? `📍 ${escapeHtml(ev.location_name)}` : ""}
       </p>
-      <p>Podés <strong>revisar y modificar</strong> los datos en cualquier momento desde este link privado:</p>
-      <p><a href="${editLink}" style="background:#15803d;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none;display:inline-block">Editar mi actividad</a></p>
-      <p style="font-size:13px;color:#6b7280">O copialo: ${editLink}</p>
-      <hr style="border:none;border-top:1px solid #e5e7eb;margin:18px 0"/>
-      <p style="font-size:13px;color:#6b7280">Ver el mapa público: <a href="${publicLink}">${publicLink}</a></p>
+      ${flyerBlock}
+
+      <h3 style="color:#15803d;font-size:15px;margin:22px 0 6px">1. Confirmá o modificá los datos de la actividad</h3>
+      <p style="margin:0 0 10px">Este link privado te permite editar fecha, lugar, descripción, flyer y datos de contacto:</p>
+      <p style="margin:0"><a href="${editLink}" style="background:#15803d;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none;display:inline-block">Revisar / editar la actividad</a></p>
+      <p style="font-size:12px;color:#6b7280;margin:6px 0 0">O copiá: ${editLink}</p>
+
+      <h3 style="color:#15803d;font-size:15px;margin:24px 0 6px">2. Registrá tu experiencia / colectivo</h3>
+      <p style="margin:0 0 10px">Te invitamos a sumar tu experiencia o la de tu colectivo (por ej. <em>NAT San Martín</em>) al Mapa Vivo. Podés registrarte con el correo que más te represente — institucional, personal o de un colectivo — y desde tu perfil declarar vínculos con otros actores de la red.</p>
+      <p style="margin:0"><a href="${registerLink}" style="background:#0f766e;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none;display:inline-block">Crear mi cuenta en AgroEco.Red</a></p>
+      <p style="font-size:12px;color:#6b7280;margin:6px 0 0">El correo de acceso lo elegís vos en ese paso; no necesita coincidir con este.</p>
+
+      <h3 style="color:#15803d;font-size:15px;margin:24px 0 6px">3. Compartí el mapa con tu red</h3>
+      <p style="margin:0">Tu actividad aparece como una estrella titilante en el mapa público:<br/>
+        <a href="${mapLink}">${mapLink}</a>
+      </p>
+
+      <hr style="border:none;border-top:1px solid #e5e7eb;margin:22px 0"/>
       <p style="font-size:12px;color:#9ca3af">Si no reconocés esta actividad, ignorá este mensaje o escribinos a info@agroeco.red.</p>
     </div>`;
 
