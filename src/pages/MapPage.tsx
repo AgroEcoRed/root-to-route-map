@@ -295,6 +295,7 @@ const MapPage = () => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null);
   const eventsLayerRef = useRef<L.LayerGroup | null>(null);
+  const eventMarkersRef = useRef<Map<string, L.Marker>>(new Map());
   const networkLayerRef = useRef<L.LayerGroup | null>(null);
   const profileIdByCoordsRef = useRef<Map<string, { id: string; lat: number; lng: number; name: string }>>(new Map());
   const [dbActors, setDbActors] = useState<MapActor[]>([]);
@@ -670,6 +671,7 @@ const MapPage = () => {
   useEffect(() => {
     if (!mapRef.current || !eventsLayerRef.current) return;
     eventsLayerRef.current.clearLayers();
+    eventMarkersRef.current.clear();
     if (!isEnabled("eventos")) return;
 
     events.forEach((ev) => {
@@ -718,18 +720,45 @@ const MapPage = () => {
         : "";
       const orgs = ((ev as any).extra_organizer_names || []) as string[];
       const orgsHtml = orgs.length ? `<p style="font-size:11px;color:#444;margin:6px 0 0"><b>Co-organizan:</b> ${orgs.join(", ")}</p>` : "";
-      L.marker([ev.lat, ev.lng], { icon, zIndexOffset: 1000 })
+      const shareHtml = `<p style="margin:8px 0 0;font-size:11px;color:#6b7280">💡 Click derecho sobre la estrella para copiar un link directo a esta actividad.</p>`;
+      const marker = L.marker([ev.lat, ev.lng], { icon, zIndexOffset: 1000 })
         .bindPopup(`
           <div style="min-width:240px;font-family:DM Sans,sans-serif;padding:4px">
             <span style="display:inline-block;background:${typeColor[ev.event_type]};color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:0.4px">${typeLabels[ev.event_type]}</span>
             <h3 style="font-family:Playfair Display,serif;font-size:16px;margin:8px 0 4px;color:#1a1a1a">${ev.title}</h3>
             <p style="font-size:12px;color:#444;margin:0;font-weight:600">🗓️ ${dateStr}</p>
-            ${locHtml}${descHtml}${flyerHtml}${orgsHtml}${contactHtml}${linkHtml}
+            ${locHtml}${descHtml}${flyerHtml}${orgsHtml}${contactHtml}${linkHtml}${shareHtml}
           </div>
         `)
         .addTo(eventsLayerRef.current!);
+      marker.on("contextmenu", (e: any) => {
+        e.originalEvent?.preventDefault?.();
+        const url = `${window.location.origin}/mapa?event=${ev.id}`;
+        navigator.clipboard?.writeText(url).then(
+          () => toast.success("Link de la actividad copiado", { description: url }),
+          () => toast.error("No se pudo copiar el link")
+        );
+      });
+      eventMarkersRef.current.set(ev.id, marker);
     });
   }, [events, isEnabled]);
+
+  // Deep-link: open ?event=<id> centered with its popup, and surface the flyer in the sidebar.
+  const [focusedEventId, setFocusedEventId] = useState<string | null>(null);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("event");
+    if (!id) return;
+    setFocusedEventId(id);
+  }, []);
+  useEffect(() => {
+    if (!focusedEventId || !mapRef.current) return;
+    const ev = events.find((e) => e.id === focusedEventId);
+    if (!ev || ev.lat == null || ev.lng == null) return;
+    mapRef.current.flyTo([ev.lat, ev.lng], 15, { duration: 0.8 });
+    const m = eventMarkersRef.current.get(focusedEventId);
+    if (m) setTimeout(() => m.openPopup(), 700);
+  }, [focusedEventId, events]);
 
   // Render actor network (lines + halos) — declared + inferred (same MTR node coord)
   useEffect(() => {
@@ -977,6 +1006,14 @@ const MapPage = () => {
           <EventsSidebar
             events={events}
             onFlyTo={(la, ln) => mapRef.current?.flyTo([la, ln], 14, { duration: 0.8 })}
+            highlightedEventId={focusedEventId}
+            onShare={(id) => {
+              const url = `${window.location.origin}/mapa?event=${id}`;
+              navigator.clipboard?.writeText(url).then(
+                () => toast.success("Link copiado", { description: url }),
+                () => toast.error("No se pudo copiar")
+              );
+            }}
           />
 
           {/* Floating action buttons */}

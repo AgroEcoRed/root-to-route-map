@@ -1,13 +1,17 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { CalendarDays, MapPin, Sparkles, Phone, Mail, Link as LinkIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarDays, MapPin, Sparkles, Phone, Mail, Link as LinkIcon, ChevronLeft, ChevronRight, Share2 } from "lucide-react";
 import { AgroEventFull, eventBucket } from "@/hooks/useEvents";
 
 interface Props {
   events: AgroEventFull[];
   onFlyTo?: (lat: number, lng: number) => void;
+  /** Highlight a specific event (e.g. when arriving via ?event=<id>) and show its flyer expanded. */
+  highlightedEventId?: string | null;
+  /** Copy a shareable deep-link to the event. */
+  onShare?: (eventId: string) => void;
   /** Embedded inline (desktop) or as a Sheet (mobile). */
   variant?: "inline" | "drawer";
 }
@@ -15,14 +19,30 @@ interface Props {
 const typeLabels: Record<string, string> = { feria: "Feria", intercambio: "Intercambio", formacion: "Formación", otro: "Actividad" };
 const typeColor: Record<string, string> = { feria: "#E94560", intercambio: "#22C55E", formacion: "#3B82F6", otro: "#F5C518" };
 
-const Card = ({ ev, onFlyTo }: { ev: AgroEventFull; onFlyTo?: (lat: number, lng: number) => void }) => {
+const Card = ({
+  ev,
+  onFlyTo,
+  onShare,
+  highlighted,
+}: {
+  ev: AgroEventFull;
+  onFlyTo?: (lat: number, lng: number) => void;
+  onShare?: (id: string) => void;
+  highlighted?: boolean;
+}) => {
   const dt = ev.starts_at ? new Date(ev.starts_at) : null;
   const dateStr = dt
     ? dt.toLocaleString("es-AR", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
     : "Sin fecha";
   const contactLine = ev.contact_email || ev.contact_phone || ev.contact;
+  const flyerUrl = (ev as any).flyer_url as string | null | undefined;
   return (
-    <article className="rounded-xl border border-border bg-card p-3 shadow-sm">
+    <article
+      id={`ev-card-${ev.id}`}
+      className={`rounded-xl border bg-card p-3 shadow-sm transition ${
+        highlighted ? "border-primary ring-2 ring-primary/30" : "border-border"
+      }`}
+    >
       <div className="flex items-center justify-between gap-2 mb-1.5">
         <span
           className="inline-block text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md text-white"
@@ -30,14 +50,25 @@ const Card = ({ ev, onFlyTo }: { ev: AgroEventFull; onFlyTo?: (lat: number, lng:
         >
           {typeLabels[ev.event_type] || ev.event_type}
         </span>
-        {ev.lat != null && ev.lng != null && onFlyTo && (
-          <button
-            className="text-[11px] text-primary hover:underline inline-flex items-center gap-1"
-            onClick={() => onFlyTo(ev.lat!, ev.lng!)}
-          >
-            <MapPin className="h-3 w-3" /> Ver en mapa
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {onShare && (
+            <button
+              className="text-[11px] text-muted-foreground hover:text-primary inline-flex items-center gap-1"
+              onClick={() => onShare(ev.id)}
+              title="Copiar link directo a esta actividad"
+            >
+              <Share2 className="h-3 w-3" /> Compartir
+            </button>
+          )}
+          {ev.lat != null && ev.lng != null && onFlyTo && (
+            <button
+              className="text-[11px] text-primary hover:underline inline-flex items-center gap-1"
+              onClick={() => onFlyTo(ev.lat!, ev.lng!)}
+            >
+              <MapPin className="h-3 w-3" /> Ver en mapa
+            </button>
+          )}
+        </div>
       </div>
       <h4 className="font-display text-sm leading-tight mb-1">{ev.title}</h4>
       <p className="text-xs font-medium text-foreground/80 flex items-center gap-1.5">
@@ -48,7 +79,19 @@ const Card = ({ ev, onFlyTo }: { ev: AgroEventFull; onFlyTo?: (lat: number, lng:
           <MapPin className="h-3 w-3" /> {ev.location_name}
         </p>
       )}
-      {ev.description && <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">{ev.description}</p>}
+      {ev.description && (
+        <p className={`text-xs text-muted-foreground mt-1.5 ${highlighted ? "" : "line-clamp-2"}`}>{ev.description}</p>
+      )}
+      {flyerUrl && (
+        <a href={flyerUrl} target="_blank" rel="noopener noreferrer" className="block mt-2">
+          <img
+            src={flyerUrl}
+            alt={`Flyer de ${ev.title}`}
+            loading="lazy"
+            className={`w-full rounded-lg border border-border ${highlighted ? "" : "max-h-40 object-cover"}`}
+          />
+        </a>
+      )}
       {(ev.extra_organizer_names?.length || ev.co_organizers?.length) && (
         <p className="text-[10px] text-muted-foreground mt-1.5">
           Co-organizan: {ev.extra_organizer_names?.join(", ") || `${ev.co_organizers.length} actores`}
@@ -78,7 +121,17 @@ const Card = ({ ev, onFlyTo }: { ev: AgroEventFull; onFlyTo?: (lat: number, lng:
   );
 };
 
-export const EventsSidebarContent = ({ events, onFlyTo }: { events: AgroEventFull[]; onFlyTo?: (lat: number, lng: number) => void }) => {
+export const EventsSidebarContent = ({
+  events,
+  onFlyTo,
+  onShare,
+  highlightedEventId,
+}: {
+  events: AgroEventFull[];
+  onFlyTo?: (lat: number, lng: number) => void;
+  onShare?: (id: string) => void;
+  highlightedEventId?: string | null;
+}) => {
   const grouped = useMemo(() => {
     const upcoming: AgroEventFull[] = [];
     const undated: AgroEventFull[] = [];
@@ -94,6 +147,26 @@ export const EventsSidebarContent = ({ events, onFlyTo }: { events: AgroEventFul
     return { upcoming, undated, past };
   }, [events]);
 
+  // Auto-scroll the highlighted card into view when it appears.
+  useEffect(() => {
+    if (!highlightedEventId) return;
+    const t = setTimeout(() => {
+      const el = document.getElementById(`ev-card-${highlightedEventId}`);
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 200);
+    return () => clearTimeout(t);
+  }, [highlightedEventId, events]);
+
+  const renderCard = (e: AgroEventFull) => (
+    <Card
+      key={e.id}
+      ev={e}
+      onFlyTo={onFlyTo}
+      onShare={onShare}
+      highlighted={highlightedEventId === e.id}
+    />
+  );
+
   return (
     <Tabs defaultValue="upcoming" className="w-full">
       <TabsList className="grid grid-cols-3 w-full">
@@ -103,23 +176,26 @@ export const EventsSidebarContent = ({ events, onFlyTo }: { events: AgroEventFul
       </TabsList>
       <TabsContent value="upcoming" className="mt-3 space-y-2 max-h-[60vh] lg:max-h-[calc(100vh-260px)] overflow-y-auto pr-1">
         {grouped.upcoming.length === 0 && <p className="text-xs text-muted-foreground py-6 text-center">Sin actividades próximas. ¡Sumá una!</p>}
-        {grouped.upcoming.map((e) => <Card key={e.id} ev={e} onFlyTo={onFlyTo} />)}
+        {grouped.upcoming.map(renderCard)}
       </TabsContent>
       <TabsContent value="undated" className="mt-3 space-y-2 max-h-[60vh] lg:max-h-[calc(100vh-260px)] overflow-y-auto pr-1">
         {grouped.undated.length === 0 && <p className="text-xs text-muted-foreground py-6 text-center">Sin actividades sin fecha o lugar.</p>}
-        {grouped.undated.map((e) => <Card key={e.id} ev={e} onFlyTo={onFlyTo} />)}
+        {grouped.undated.map(renderCard)}
       </TabsContent>
       <TabsContent value="past" className="mt-3 space-y-2 max-h-[60vh] lg:max-h-[calc(100vh-260px)] overflow-y-auto pr-1">
         {grouped.past.length === 0 && <p className="text-xs text-muted-foreground py-6 text-center">Sin actividades pasadas.</p>}
-        {grouped.past.map((e) => <Card key={e.id} ev={e} onFlyTo={onFlyTo} />)}
+        {grouped.past.map(renderCard)}
       </TabsContent>
     </Tabs>
   );
 };
 
 /** Sidebar that collapses (desktop) and turns into a sheet (mobile). */
-export const EventsSidebar = ({ events, onFlyTo }: Props) => {
+export const EventsSidebar = ({ events, onFlyTo, onShare, highlightedEventId }: Props) => {
   const [open, setOpen] = useState(true);
+
+  // Auto-open the panel when arriving via a deep-link.
+  useEffect(() => { if (highlightedEventId) setOpen(true); }, [highlightedEventId]);
 
   return (
     <>
@@ -136,7 +212,7 @@ export const EventsSidebar = ({ events, onFlyTo }: Props) => {
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
-            <EventsSidebarContent events={events} onFlyTo={onFlyTo} />
+            <EventsSidebarContent events={events} onFlyTo={onFlyTo} onShare={onShare} highlightedEventId={highlightedEventId} />
           </div>
         ) : (
           <Button
@@ -163,7 +239,7 @@ export const EventsSidebar = ({ events, onFlyTo }: Props) => {
               <SheetTitle className="font-display">Actividades</SheetTitle>
             </SheetHeader>
             <div className="mt-4">
-              <EventsSidebarContent events={events} onFlyTo={onFlyTo} />
+              <EventsSidebarContent events={events} onFlyTo={onFlyTo} onShare={onShare} highlightedEventId={highlightedEventId} />
             </div>
           </SheetContent>
         </Sheet>
