@@ -36,6 +36,9 @@ const schema = z.object({
   contact_email: z.string().trim().email("Email inválido").optional().or(z.literal("")),
   contact_phone: z.string().trim().max(40).optional(),
   extra_organizer_names: z.string().trim().max(400).optional(),
+  focal_name: z.string().trim().max(200).optional(),
+  focal_email: z.string().trim().email("Email del punto focal inválido").optional().or(z.literal("")),
+  submitted_by_name: z.string().trim().max(200).optional(),
 });
 
 interface Props {
@@ -59,6 +62,7 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
     custom_type: "",
     starts_at: "", ends_at: "", location_name: "", lat: "", lng: "", link: "", contact: "",
     contact_email: "", contact_phone: "", extra_organizer_names: "",
+    focal_name: "", focal_email: "", submitted_by_name: "",
   });
 
   const update = (k: keyof typeof form, v: string) => setForm(f => ({ ...f, [k]: v }));
@@ -166,19 +170,49 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
       source: "user",
       approved: true,
       created_by: user.id,
+      focal_name: parsed.data.focal_name || null,
+      focal_email: parsed.data.focal_email || null,
+      submitted_by_name:
+        parsed.data.submitted_by_name ||
+        (user.user_metadata as any)?.display_name ||
+        user.email ||
+        null,
     };
-    const { error } = await (supabase as any).from("events").insert(payload);
+    const { data: inserted, error } = await (supabase as any)
+      .from("events")
+      .insert(payload)
+      .select("id, edit_token")
+      .single();
     setSubmitting(false);
     if (error) {
       toast.error("No se pudo crear: " + error.message);
       return;
     }
-    toast.success(
-      payload.starts_at && payload.lat && payload.lng
-        ? "¡Actividad publicada! Aparece como punto brillante en el mapa."
-        : "¡Actividad publicada! Aparece en la barra lateral de actividades."
-    );
-    setForm({ title: "", description: "", event_type: "feria", custom_type: "", starts_at: "", ends_at: "", location_name: "", lat: "", lng: "", link: "", contact: "", contact_email: "", contact_phone: "", extra_organizer_names: "" });
+    // Notify focal point (and surface the edit link) — non-blocking.
+    const editLink = inserted?.edit_token
+      ? `${window.location.origin}/eventos/editar/${inserted.edit_token}`
+      : null;
+    if (inserted?.id) {
+      supabase.functions
+        .invoke("notify-event-created", {
+          body: { event_id: inserted.id, origin: window.location.origin },
+        })
+        .catch(() => {});
+    }
+    if (editLink) {
+      toast.success("¡Actividad publicada! Link de edición copiado al portapapeles.", {
+        duration: 8000,
+        action: { label: "Abrir", onClick: () => window.open(editLink, "_blank") },
+      });
+      try { await navigator.clipboard.writeText(editLink); } catch { /* noop */ }
+    } else {
+      toast.success(
+        payload.starts_at && payload.lat && payload.lng
+          ? "¡Actividad publicada! Aparece como punto brillante en el mapa."
+          : "¡Actividad publicada! Aparece en la barra lateral de actividades."
+      );
+    }
+    setForm({ title: "", description: "", event_type: "feria", custom_type: "", starts_at: "", ends_at: "", location_name: "", lat: "", lng: "", link: "", contact: "", contact_email: "", contact_phone: "", extra_organizer_names: "", focal_name: "", focal_email: "", submitted_by_name: "" });
     setFlyerFile(null); setFlyerPreview(null);
     onOpenChange(false);
     onCreated?.();
@@ -289,6 +323,30 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
               placeholder="Ej: NAT San Martín, UTT, Municipio…"
             />
             <p className="text-[10px] text-muted-foreground mt-1">Cada organización mencionada genera una línea en la red de vínculos.</p>
+          </div>
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-3">
+            <p className="text-xs font-semibold text-foreground">Punto focal de la actividad</p>
+            <p className="text-[11px] text-muted-foreground -mt-2">
+              Quien aparezca acá recibirá un mail con el link privado para revisar y modificar los datos.
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs">Nombre del punto focal</Label>
+                <Input value={form.focal_name} onChange={(e) => update("focal_name", e.target.value)} placeholder="Ej: María Pérez" />
+              </div>
+              <div>
+                <Label className="text-xs">Email del punto focal</Label>
+                <Input value={form.focal_email} onChange={(e) => update("focal_email", e.target.value)} placeholder="focal@correo.com" />
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs">Quién carga la actividad</Label>
+              <Input
+                value={form.submitted_by_name}
+                onChange={(e) => update("submitted_by_name", e.target.value)}
+                placeholder={`Tu nombre (default: ${(user?.user_metadata as any)?.display_name || user?.email || "tu cuenta"})`}
+              />
+            </div>
           </div>
           {!quick && (
             <>

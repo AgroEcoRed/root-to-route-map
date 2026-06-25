@@ -22,9 +22,11 @@ export type Database = {
           declared: boolean
           id: string
           note: string | null
-          source_profile_id: string
+          source_layer_actor_id: string | null
+          source_profile_id: string | null
           strength: number
-          target_profile_id: string
+          target_layer_actor_id: string | null
+          target_profile_id: string | null
           updated_at: string
         }
         Insert: {
@@ -34,9 +36,11 @@ export type Database = {
           declared?: boolean
           id?: string
           note?: string | null
-          source_profile_id: string
+          source_layer_actor_id?: string | null
+          source_profile_id?: string | null
           strength?: number
-          target_profile_id: string
+          target_layer_actor_id?: string | null
+          target_profile_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -46,12 +50,21 @@ export type Database = {
           declared?: boolean
           id?: string
           note?: string | null
-          source_profile_id?: string
+          source_layer_actor_id?: string | null
+          source_profile_id?: string | null
           strength?: number
-          target_profile_id?: string
+          target_layer_actor_id?: string | null
+          target_profile_id?: string | null
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "actor_connections_source_layer_actor_id_fkey"
+            columns: ["source_layer_actor_id"]
+            isOneToOne: false
+            referencedRelation: "layer_actors"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "actor_connections_source_profile_id_fkey"
             columns: ["source_profile_id"]
@@ -64,6 +77,13 @@ export type Database = {
             columns: ["source_profile_id"]
             isOneToOne: false
             referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "actor_connections_target_layer_actor_id_fkey"
+            columns: ["target_layer_actor_id"]
+            isOneToOne: false
+            referencedRelation: "layer_actors"
             referencedColumns: ["id"]
           },
           {
@@ -215,10 +235,13 @@ export type Database = {
           created_by: string | null
           custom_type: string | null
           description: string | null
+          edit_token: string
           ends_at: string | null
           event_type: Database["public"]["Enums"]["event_type"]
           extra_organizer_names: string[]
           flyer_url: string | null
+          focal_email: string | null
+          focal_name: string | null
           id: string
           lat: number | null
           link: string | null
@@ -226,6 +249,7 @@ export type Database = {
           location_name: string | null
           source: Database["public"]["Enums"]["event_source"]
           starts_at: string
+          submitted_by_name: string | null
           title: string
           updated_at: string
         }
@@ -239,10 +263,13 @@ export type Database = {
           created_by?: string | null
           custom_type?: string | null
           description?: string | null
+          edit_token?: string
           ends_at?: string | null
           event_type?: Database["public"]["Enums"]["event_type"]
           extra_organizer_names?: string[]
           flyer_url?: string | null
+          focal_email?: string | null
+          focal_name?: string | null
           id?: string
           lat?: number | null
           link?: string | null
@@ -250,6 +277,7 @@ export type Database = {
           location_name?: string | null
           source?: Database["public"]["Enums"]["event_source"]
           starts_at: string
+          submitted_by_name?: string | null
           title: string
           updated_at?: string
         }
@@ -263,10 +291,13 @@ export type Database = {
           created_by?: string | null
           custom_type?: string | null
           description?: string | null
+          edit_token?: string
           ends_at?: string | null
           event_type?: Database["public"]["Enums"]["event_type"]
           extra_organizer_names?: string[]
           flyer_url?: string | null
+          focal_email?: string | null
+          focal_name?: string | null
           id?: string
           lat?: number | null
           link?: string | null
@@ -274,6 +305,7 @@ export type Database = {
           location_name?: string | null
           source?: Database["public"]["Enums"]["event_source"]
           starts_at?: string
+          submitted_by_name?: string | null
           title?: string
           updated_at?: string
         }
@@ -1146,6 +1178,35 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      declare_connection_by_token: {
+        Args: {
+          _connection_type: Database["public"]["Enums"]["connection_type"]
+          _note?: string
+          _strength?: number
+          _target_layer_actor_id: string
+          _token: string
+        }
+        Returns: {
+          connection_type: Database["public"]["Enums"]["connection_type"]
+          created_at: string
+          created_by: string | null
+          declared: boolean
+          id: string
+          note: string | null
+          source_layer_actor_id: string | null
+          source_profile_id: string | null
+          strength: number
+          target_layer_actor_id: string | null
+          target_profile_id: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "actor_connections"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       get_actor_by_token: {
         Args: { _token: string }
         Returns: {
@@ -1181,12 +1242,101 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      get_event_by_edit_token: {
+        Args: { _token: string }
+        Returns: {
+          approved: boolean
+          co_organizers: string[]
+          contact: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          created_by: string | null
+          custom_type: string | null
+          description: string | null
+          edit_token: string
+          ends_at: string | null
+          event_type: Database["public"]["Enums"]["event_type"]
+          extra_organizer_names: string[]
+          flyer_url: string | null
+          focal_email: string | null
+          focal_name: string | null
+          id: string
+          lat: number | null
+          link: string | null
+          lng: number | null
+          location_name: string | null
+          source: Database["public"]["Enums"]["event_source"]
+          starts_at: string
+          submitted_by_name: string | null
+          title: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "events"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      update_event_by_token: {
+        Args: {
+          _contact?: string
+          _contact_email?: string
+          _contact_phone?: string
+          _description?: string
+          _ends_at?: string
+          _focal_email?: string
+          _focal_name?: string
+          _lat?: number
+          _link?: string
+          _lng?: number
+          _location_name?: string
+          _starts_at?: string
+          _title?: string
+          _token: string
+        }
+        Returns: {
+          approved: boolean
+          co_organizers: string[]
+          contact: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          created_by: string | null
+          custom_type: string | null
+          description: string | null
+          edit_token: string
+          ends_at: string | null
+          event_type: Database["public"]["Enums"]["event_type"]
+          extra_organizer_names: string[]
+          flyer_url: string | null
+          focal_email: string | null
+          focal_name: string | null
+          id: string
+          lat: number | null
+          link: string | null
+          lng: number | null
+          location_name: string | null
+          source: Database["public"]["Enums"]["event_source"]
+          starts_at: string
+          submitted_by_name: string | null
+          title: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "events"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
     }
     Enums: {
