@@ -183,7 +183,13 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
       lng: geocodedLng,
       link: parsed.data.link || null,
       contact: parsed.data.contact || null,
-      contact_email: parsed.data.contact_email || null,
+      contact_email: parsed.data.contact_email
+        ? parsed.data.contact_email
+            .split(/[\s,;]+/)
+            .map((s) => s.trim())
+            .filter((s) => /.+@.+\..+/.test(s))
+            .join(", ") || null
+        : null,
       contact_phone: parsed.data.contact_phone || null,
       extra_organizer_names: extraOrgs,
       flyer_url,
