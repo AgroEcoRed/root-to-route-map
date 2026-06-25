@@ -1,100 +1,63 @@
 
-## Parte A — Rediseño de 6 módulos (renombres + IA)
+# Mejoras al registro y a la subida de información
 
-Nueva navegación principal (en este orden), con redirects desde rutas viejas:
+Propongo dividir el trabajo en **4 fases** para entregar valor rápido y validar cada parte antes de seguir. Confirmame si querés que arranque por la Fase 1 o ajustamos el orden.
 
-1. **🌱 Mapa Vivo** (`/mapa`, alias `/actores`) — "Mapa Vivo del Ecosistema Agroecológico". Actores, iniciativas, territorios, relaciones y **saberes georreferenciados** (ver Parte B).
-2. **🧺 Mercado Agroecológico** (`/mercado`, alias `/marketplace`) — Rename global "Marketplace" → "Mercado Agroecológico". Subtítulo: *"Espacio para fortalecer circuitos cortos de comercialización, intercambio y abastecimiento agroecológico"*. Filtros por chips: productos · servicios · semillas · bioinsumos · logística · herramientas · saberes · compras colectivas · ferias · ofertas/demandas.
-3. **🤝 Garantías Participativas** (`/garantias`, alias `/spg`) — "Sistemas Participativos de Garantía". Reframe como procesos sociales (no certificación tipo sello).
-4. **📚 Comunidad y Saberes** (`/comunidad`) — Foro + wiki + eventos + nueva pestaña **Biblioteca / Memoria Agroecológica** (reusa `LibraryPage`). Alias `/biblioteca`.
-5. **🔧 Recursos Compartidos** (`/recursos`, alias `/servicios`) — "Red de Servicios para la Agroecología", con cross-links a Mercado.
-6. **📊 Observatorio Agroecológico** (`/observatorio`, NUEVO) — Tarjetas con datos reales derivados de la DB (actores por capa, distribución geo, % SPG verificado, transiciones registradas).
+---
 
-**Lenguaje "Rutas Sanas"**: aplicaré el tono cuidado/territorial/colectivo que ya usamos en esa propuesta a copies de hero, subtítulos y CTAs de los 6 módulos. (Adjunto aceptado como guía; si querés que cite frases puntuales antes de implementar, decímelo.)
+## Fase 1 — Registro con geolocalización y carga preliminar
 
-**i18n**: nuevas claves ES/EN/FR/PT en `LanguageContext` para los 6 nombres, subtítulos y chips de Mercado.
+**Objetivo:** que desde el primer paso del registro se capture la ubicación y se pueda adjuntar un listado previo de nodos.
 
-## Parte B — Biblioteca georreferenciada (alcance completo)
+- Pedir **geolocalización del dispositivo** en el primer paso del registro (botón "Usar mi ubicación actual" + permiso nativo `navigator.geolocation`). Fallback: ingresar dirección manualmente con autocompletado.
+- Aclaración visible: *"Si tu experiencia tiene varios puntos (ej. varios nodos AE), registrá uno ahora y agregá el resto desde tu panel una vez dentro."*
+- Nuevo paso opcional **"Cargar listado preliminar"**:
+  - Adjuntar archivo (CSV / PDF / imagen) **o** pegar un link.
+  - Queda guardado como "pendiente de verificación" en el perfil para completarlo después.
+- Mismo bloque accesible **dentro de la plataforma** (en `/perfil` → "Importar nodos").
 
-Migración a `library_items`:
-- Agregar `lat double precision`, `lng double precision` (opcionales).
-- Agregar `actor_id uuid` (FK opcional a `profiles` o `layer_actors`) → hereda ubicación si no hay lat/lng propias.
-- Agregar `route_geojson jsonb` (opcional) para recorridos/transiciones territoriales (LineString o FeatureCollection).
-- Índice geoespacial básico sobre lat/lng.
+## Fase 2 — Crear nuevos puntos en el mapa (muy visible)
 
-En el **Mapa Vivo**:
-- Nueva capa "Saberes y experiencias" toggleable (ícono libro/foto/video según `media_type`).
-- Marcadores diferenciados por tipo (📖 texto · 📷 foto · 🎬 video · 🎙️ audio).
-- Recorridos renderizados como polilíneas con color por tipo de transición.
-- Popup: thumbnail + título + autor/actor vinculado + link a `/biblioteca/:id`.
+**Objetivo:** que agregar nodos AE u otros puntos sea evidente para usuarios registrados.
 
-En la **Biblioteca**:
-- Formulario de carga gana: picker de ubicación (mapa) o "usar ubicación de actor X" o "subir track GPX/GeoJSON".
-- Vista de detalle muestra mini-mapa si hay geo.
+- Botón flotante **"+ Agregar punto al mapa"** persistente sobre `/mapa` para usuarios logueados.
+- En el dashboard del usuario: card destacada **"Mis nodos en el mapa"** con CTA primaria para sumar uno nuevo.
+- Formulario corto: tipo de nodo (AE, productor, comedor, etc.), ubicación (mapa + geolocalización), descripción, contacto.
 
-## Parte C — Chatbot AI (3 modos, localStorage, Gemini con switch)
+## Fase 3 — Actividades con flyer y puntos brillantes en el mapa
 
-**Backend**: edge function `chat-asistente` usando AI SDK + Lovable AI Gateway. Modelo default `google/gemini-3-flash-preview`. Variable interna `CHAT_MODEL` en una sola constante para que cambiar a `openai/gpt-5.4` o a Claude (vía ANTHROPIC_API_KEY si se agrega después) sea un edit de una línea.
+**Objetivo:** subir eventos a partir de un flyer y que el mapa los muestre vivos.
 
-**3 modos** (selector en UI):
-- **General**: agroecología, SPG, uso de la plataforma. Tools: `buscar_actores`, `buscar_productos`, `buscar_ferias_eventos`, `buscar_saberes` (nueva, sobre `library_items`).
-- **Onboarding/Registro**: guía conversacional para nuevos productorxs, sugiere categoría/capa, completa campos. Tool: `sugerir_categoria_registro`.
-- **Buscador del Mapa Vivo**: queries tipo "hortalizas a 50km de La Plata con entrega los jueves" → aplica filtros al mapa. Tool: `aplicar_filtros_mapa`.
+- Carga de actividad: adjuntar **flyer (imagen/PDF)**. Intento de **extracción automática** de fecha, dirección y contacto (OCR vía Lovable AI), con campos editables.
+- Si tiene **fecha + lugar** → punto en el mapa con animación **glow fucsia**, intensificándose cuanto más cerca esté la fecha; desaparece automáticamente al pasar.
+- Si **no** tiene fecha o lugar → aparece igual en la **barra lateral de eventos**, marcado como "sin fecha/lugar".
+- **Barra lateral desplegable** junto al mapa con pestañas: *Próximos · Sin fecha · Pasados*.
+- Cada actividad muestra **contacto de confirmación**: el del flyer (mail/tel detectado) y/o el de la persona que la subió.
 
-**UI**: AI Elements (`Conversation`, `Message`, `MessageResponse`, `PromptInput`, `Tool`, `Shimmer`). Botón flotante con ícono agroecológico custom (no Sparkles). `localStorage` key `agrored-chat-history-{modo}`. Botón "Nueva conversación" por modo.
+## Fase 4 — Red de vínculos entre co-organizadores
 
-**Persistencia**: solo navegador (localStorage), una conversación por modo.
+**Objetivo:** visualizar colaboraciones cuando varias organizaciones hacen un evento en conjunto.
+
+- En el formulario de actividad: campo **"Co-organizadores"** (búsqueda de actores ya registrados + opción de añadir externos).
+- Se genera una **arista en la red de vínculos** entre los actores co-organizadores.
+- Capa visible solo al activar el botón **"Ver red de vínculos"** sobre el mapa.
+
+---
 
 ## Detalles técnicos
 
-```text
-Archivos nuevos:
-  supabase/functions/chat-asistente/index.ts
-  supabase/migrations/<ts>_library_geo.sql   (lat/lng/actor_id/route_geojson + grants)
-  src/components/chat/ChatAsistente.tsx
-  src/components/chat/ChatBubble.tsx
-  src/components/chat/modeSelector.tsx
-  src/hooks/useChatHistory.ts
-  src/pages/ObservatorioPage.tsx
-  src/components/map/LibraryLayer.tsx
-  src/components/library/GeoPicker.tsx
-  src/assets/chat-icon.png (generado)
+- **DB (nuevas/actualizadas):**
+  - `profiles`: ya tiene `lat/lng`; agregar `geolocation_source` (`device` | `manual`).
+  - `events`: agregar `flyer_url`, `extracted_contact_email`, `extracted_contact_phone`, `co_organizers uuid[]`, `glow_until` (computado por `event_date`).
+  - Nueva `preliminary_imports` (user_id, source_type `file|link`, url/path, status, notes) con RLS por dueño.
+  - Nueva `actor_connections` ya existe → reutilizar para co-organizadores con `connection_type = 'co_event'`.
+- **Storage:** reutilizar bucket `producer-media` para flyers y adjuntos preliminares.
+- **OCR de flyers:** edge function `parse-flyer` que llama a Lovable AI (modelo con visión) y devuelve `{date, location, contact_email, contact_phone}`.
+- **Mapa (Leaflet):** marcador custom con clase CSS animada; intensidad calculada por `daysUntil(event_date)`; auto-remoción al pasar la fecha.
+- **Barra lateral de eventos:** componente nuevo `EventsSidebar.tsx` con tabs y filtros.
+- **i18n:** todos los textos nuevos en ES/EN/FR/PT vía `LanguageContext`.
+- **Geolocalización:** wrapper `useDeviceLocation()` con manejo de permisos denegados.
 
-Archivos editados:
-  src/App.tsx                  (rutas nuevas + alias/redirects)
-  src/components/Navbar.tsx    (nuevo orden de 6 módulos)
-  src/components/Footer.tsx
-  src/contexts/LanguageContext.tsx  (claves ES/EN/FR/PT)
-  src/pages/MarketplacePage.tsx     (rename + chips)
-  src/pages/ServicesPage.tsx        (rename)
-  src/pages/SPGPage.tsx             (rename)
-  src/pages/CommunityPage.tsx       (tab Biblioteca)
-  src/pages/MapPage.tsx             (capa Saberes + recorridos)
-  src/pages/LibraryPage.tsx         (GeoPicker, vínculo a actor)
-  src/pages/Index.tsx               (narrativa 6 módulos)
-```
+---
 
-**Migración** (solo agregar columnas, no rompe nada existente):
-```sql
-ALTER TABLE public.library_items
-  ADD COLUMN lat double precision,
-  ADD COLUMN lng double precision,
-  ADD COLUMN actor_id uuid,
-  ADD COLUMN route_geojson jsonb;
-CREATE INDEX library_items_geo_idx ON public.library_items (lat, lng);
-```
-(Sin cambios de RLS; las policies existentes siguen aplicando.)
-
-**Sin nuevos secretos**: `LOVABLE_API_KEY` ya existe.
-
-**Orden de implementación**:
-1. Migración `library_geo`.
-2. Renombres + i18n + nuevo Navbar/Footer/Index/App.tsx.
-3. ObservatorioPage con datos reales básicos.
-4. LibraryLayer en mapa + GeoPicker en biblioteca.
-5. Edge function `chat-asistente` + UI del chatbot con 3 modos.
-
-## Lo que NO incluye este plan
-- Editorial fino de cada copy nuevo (puedo pasarte después un diff de textos para que ajustes).
-- Moderación / aprobación previa para saberes geolocalizados (queda abierto si después lo querés).
-- Migrar Claude como modelo real (queda preparado el switch; cuando quieras, sumás `ANTHROPIC_API_KEY` y cambiás la constante).
+¿Empiezo por la **Fase 1** o querés cambiar el orden / alcance de alguna fase?
