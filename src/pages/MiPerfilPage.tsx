@@ -13,6 +13,10 @@ import { Loader2, Upload, Trash2, Image as ImageIcon, Video, FileText, Copy, Sca
 import LicenseSelector from "@/components/LicenseSelector";
 import LicenseBadge from "@/components/LicenseBadge";
 import { DEFAULT_LICENSE, LicenseCode } from "@/lib/licenses";
+import PreliminaryImport from "@/components/PreliminaryImport";
+import AddMapPointDialog from "@/components/AddMapPointDialog";
+import { Link } from "react-router-dom";
+import { MapPin, Plus, Sparkles } from "lucide-react";
 
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB
 const MAX_VIDEO_BYTES = 25 * 1024 * 1024; // 25MB
@@ -202,6 +206,9 @@ const MiPerfilPage = () => {
         <div className="container max-w-5xl">
           <h1 className="font-display text-3xl mb-2">Mi Perfil</h1>
           <p className="text-muted-foreground mb-8">Compartí fotos y videos de tu producción y digitalizá documentos manuscritos.</p>
+
+          {/* Quick actions: add map points / activities */}
+          <ProfileQuickActions />
 
           {/* Profile-level default license */}
           <section className="rounded-2xl border border-border bg-card p-6 mb-8">
