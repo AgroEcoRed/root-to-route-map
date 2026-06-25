@@ -312,6 +312,7 @@ const MapPage = () => {
     if (!rutasSanasDb || rutasSanasDb.length === 0) return fallbackRutasSanasActors;
     return rutasSanasDb.map((p, i) => ({
       id: 1 + i,
+      layerActorId: p.id,
       name: p.name,
       type: (p.actor_type as ActorType) || "consumer_node",
       lat: p.lat,
@@ -321,6 +322,7 @@ const MapPage = () => {
       description: p.description || p.family || "",
       source: "rutas_sanas",
       verified: !!p.verified_at,
+      verifiedByRole: (p.verified_by_role as any) || (p.verified_at ? "layer" : null),
       lastUpdated: p.verified_at || p.updated_at || SOURCE_IMPORT_DATE.rutas_sanas,
       deliveryInfo: (p.delivery_days && p.delivery_days.length > 0)
         ? p.delivery_days.join(", ")
@@ -331,6 +333,7 @@ const MapPage = () => {
   const userPointActors = useMemo<MapActor[]>(() => {
     return (userPointsDb || []).map((p, i) => ({
       id: 90000 + i,
+      layerActorId: p.id,
       name: p.name,
       type: (p.actor_type as ActorType) || "agroecological_node",
       lat: p.lat,
@@ -340,6 +343,7 @@ const MapPage = () => {
       description: p.description || p.address || "",
       source: "user_points",
       verified: !!p.verified_at,
+      verifiedByRole: (p.verified_by_role as any) || (p.verified_at ? "platform" : null),
       lastUpdated: p.verified_at || p.updated_at || null,
       deliveryInfo: (p.delivery_days && p.delivery_days.length > 0) ? p.delivery_days.join(", ") : undefined,
     }));
