@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,18 +10,22 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import { Sparkles, Upload, Loader2, Image as ImageIcon } from "lucide-react";
 
 const schema = z.object({
   title: z.string().trim().min(3, "Mínimo 3 caracteres").max(140),
   description: z.string().trim().max(1000).optional(),
   event_type: z.enum(["feria", "intercambio", "formacion", "otro"]),
-  starts_at: z.string().min(1, "Requerido"),
+  starts_at: z.string().optional(),
   ends_at: z.string().optional(),
   location_name: z.string().trim().max(200).optional(),
   lat: z.string().optional(),
   lng: z.string().optional(),
   link: z.string().trim().max(300).url("URL inválida").optional().or(z.literal("")),
   contact: z.string().trim().max(200).optional(),
+  contact_email: z.string().trim().email("Email inválido").optional().or(z.literal("")),
+  contact_phone: z.string().trim().max(40).optional(),
+  extra_organizer_names: z.string().trim().max(400).optional(),
 });
 
 interface Props {
@@ -34,12 +38,61 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
   const { user } = useAuth();
   const [quick, setQuick] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [parsing, setParsing] = useState(false);
+  const [flyerFile, setFlyerFile] = useState<File | null>(null);
+  const [flyerPreview, setFlyerPreview] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     title: "", description: "", event_type: "feria" as const,
     starts_at: "", ends_at: "", location_name: "", lat: "", lng: "", link: "", contact: "",
+    contact_email: "", contact_phone: "", extra_organizer_names: "",
   });
 
   const update = (k: keyof typeof form, v: string) => setForm(f => ({ ...f, [k]: v }));
+
+  const onPickFlyer = async (file: File) => {
+    setFlyerFile(file);
+    setFlyerPreview(URL.createObjectURL(file));
+    if (!user) { toast.info("Iniciá sesión para auto-completar desde el flyer."); return; }
+    setParsing(true);
+    try {
+      // Convert to base64
+      const buf = await file.arrayBuffer();
+      const bytes = new Uint8Array(buf);
+      let bin = ""; for (let i = 0; i < bytes.byteLength; i++) bin += String.fromCharCode(bytes[i]);
+      const b64 = btoa(bin);
+      const { data, error } = await supabase.functions.invoke("parse-flyer", {
+        body: { imageBase64: b64, mime: file.type || "image/jpeg" },
+      });
+      if (error) throw error;
+      const p = (data || {}) as any;
+      setForm((f) => ({
+        ...f,
+        title: f.title || p.title || "",
+        description: f.description || p.description || "",
+        starts_at: f.starts_at || (p.starts_at ? toLocalInput(p.starts_at) : ""),
+        location_name: f.location_name || p.location_name || "",
+        contact_email: f.contact_email || p.contact_email || "",
+        contact_phone: f.contact_phone || p.contact_phone || "",
+        extra_organizer_names: f.extra_organizer_names || (Array.isArray(p.organizers) ? p.organizers.join(", ") : ""),
+      }));
+      setQuick(false);
+      toast.success("Datos sugeridos a partir del flyer. Revisalos antes de publicar.");
+    } catch (e: any) {
+      toast.error("No pudimos leer el flyer: " + (e?.message || e));
+    } finally {
+      setParsing(false);
+    }
+  };
+
+  const toLocalInput = (iso: string) => {
+    try {
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return "";
+      const pad = (n: number) => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    } catch { return ""; }
+  };
 
   const submit = async () => {
     if (!user) {
@@ -52,17 +105,39 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
       return;
     }
     setSubmitting(true);
+
+    // Upload flyer if present
+    let flyer_url: string | null = null;
+    if (flyerFile) {
+      const path = `${user.id}/${Date.now()}_${flyerFile.name}`;
+      const { error: upErr } = await supabase.storage.from("event-flyers").upload(path, flyerFile, { upsert: false });
+      if (upErr) {
+        setSubmitting(false);
+        toast.error("No se pudo subir el flyer: " + upErr.message);
+        return;
+      }
+      const { data: pub } = supabase.storage.from("event-flyers").getPublicUrl(path);
+      flyer_url = pub.publicUrl;
+    }
+
+    const extraOrgs = (parsed.data.extra_organizer_names || "")
+      .split(/[,;\n]/).map((s) => s.trim()).filter(Boolean);
+
     const payload: any = {
       title: parsed.data.title,
       description: parsed.data.description || null,
       event_type: parsed.data.event_type,
-      starts_at: new Date(parsed.data.starts_at).toISOString(),
+      starts_at: parsed.data.starts_at ? new Date(parsed.data.starts_at).toISOString() : null,
       ends_at: parsed.data.ends_at ? new Date(parsed.data.ends_at).toISOString() : null,
       location_name: parsed.data.location_name || null,
       lat: parsed.data.lat ? Number(parsed.data.lat) : null,
       lng: parsed.data.lng ? Number(parsed.data.lng) : null,
       link: parsed.data.link || null,
       contact: parsed.data.contact || null,
+      contact_email: parsed.data.contact_email || null,
+      contact_phone: parsed.data.contact_phone || null,
+      extra_organizer_names: extraOrgs,
+      flyer_url,
       source: "user",
       approved: true,
       created_by: user.id,
@@ -73,8 +148,13 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
       toast.error("No se pudo crear: " + error.message);
       return;
     }
-    toast.success("¡Actividad publicada! Aparece en el mapa y en la comunidad.");
-    setForm({ title: "", description: "", event_type: "feria", starts_at: "", ends_at: "", location_name: "", lat: "", lng: "", link: "", contact: "" });
+    toast.success(
+      payload.starts_at && payload.lat && payload.lng
+        ? "¡Actividad publicada! Aparece como punto brillante en el mapa."
+        : "¡Actividad publicada! Aparece en la barra lateral de actividades."
+    );
+    setForm({ title: "", description: "", event_type: "feria", starts_at: "", ends_at: "", location_name: "", lat: "", lng: "", link: "", contact: "", contact_email: "", contact_phone: "", extra_organizer_names: "" });
+    setFlyerFile(null); setFlyerPreview(null);
     onOpenChange(false);
     onCreated?.();
   };
@@ -85,9 +165,41 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
         <DialogHeader>
           <DialogTitle className="font-display">Publicar actividad futura</DialogTitle>
           <DialogDescription>
-            Feria, intercambio de semillas/saberes, formación. Aparecerá con un marcador brillante en el mapa.
+            Feria, intercambio de semillas/saberes, formación. Subí el flyer y completamos los datos juntos.
+            Si tiene fecha y lugar, aparecerá como un punto brillante en el mapa que se intensifica al acercarse la fecha.
+            Si no, aparecerá en la barra de actividades.
           </DialogDescription>
         </DialogHeader>
+
+        {/* Flyer upload + AI parse */}
+        <div className="rounded-xl border border-dashed border-primary/40 bg-primary/5 p-3">
+          <div className="flex items-start gap-3">
+            <div className="shrink-0 w-20 h-20 rounded-md bg-white border border-border flex items-center justify-center overflow-hidden">
+              {flyerPreview ? (
+                <img src={flyerPreview} alt="Flyer" className="w-full h-full object-cover" />
+              ) : (
+                <ImageIcon className="h-6 w-6 text-muted-foreground" />
+              )}
+            </div>
+            <div className="flex-1 text-xs">
+              <p className="font-semibold text-foreground flex items-center gap-1.5">
+                <Sparkles className="h-3.5 w-3.5 text-primary" /> Subí un flyer y autocompletamos
+              </p>
+              <p className="text-muted-foreground mb-2">Detectamos título, fecha, lugar, contacto y co-organizadores.</p>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) onPickFlyer(f); }}
+              />
+              <Button type="button" size="sm" variant="outline" onClick={() => fileRef.current?.click()} disabled={parsing}>
+                {parsing ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : <Upload className="h-3.5 w-3.5 mr-1.5" />}
+                {parsing ? "Analizando..." : (flyerFile ? "Cambiar flyer" : "Adjuntar flyer")}
+              </Button>
+            </div>
+          </div>
+        </div>
 
         <div className="flex items-center gap-2 text-xs text-muted-foreground py-1">
           <Switch checked={quick} onCheckedChange={setQuick} id="quick" />
@@ -113,13 +225,32 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
               </Select>
             </div>
             <div>
-              <Label>Cuándo *</Label>
+              <Label>Cuándo</Label>
               <Input type="datetime-local" value={form.starts_at} onChange={(e) => update("starts_at", e.target.value)} />
             </div>
           </div>
           <div>
             <Label>Lugar (texto)</Label>
             <Input value={form.location_name} onChange={(e) => update("location_name", e.target.value)} maxLength={200} placeholder="Ej: Plaza de Florencio Varela" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Contacto email</Label>
+              <Input value={form.contact_email} onChange={(e) => update("contact_email", e.target.value)} placeholder="ej@correo.com" />
+            </div>
+            <div>
+              <Label>Contacto teléfono</Label>
+              <Input value={form.contact_phone} onChange={(e) => update("contact_phone", e.target.value)} placeholder="+54 9 11 ..." />
+            </div>
+          </div>
+          <div>
+            <Label>Co-organizan (separados por coma)</Label>
+            <Input
+              value={form.extra_organizer_names}
+              onChange={(e) => update("extra_organizer_names", e.target.value)}
+              placeholder="Ej: NAT San Martín, UTT, Municipio…"
+            />
+            <p className="text-[10px] text-muted-foreground mt-1">Cada organización mencionada genera una línea en la red de vínculos.</p>
           </div>
           {!quick && (
             <>
@@ -146,13 +277,13 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
                 <Input value={form.link} onChange={(e) => update("link", e.target.value)} placeholder="https://..." />
               </div>
               <div>
-                <Label>Contacto (email/whatsapp)</Label>
+                <Label>Otro contacto (texto libre)</Label>
                 <Input value={form.contact} onChange={(e) => update("contact", e.target.value)} maxLength={200} />
               </div>
             </>
           )}
           <p className="text-[11px] text-muted-foreground">
-            Tip: para que se vea en el mapa, agregá lat/lng (modo completo). Sin coordenadas, aparece solo en la lista de la comunidad.
+            Tip: con fecha + lat/lng el punto brilla cada vez más fuerte al acercarse el día. Sin fecha o lugar, aparece en la barra de actividades.
           </p>
         </div>
 
