@@ -13,6 +13,48 @@ import { Loader2, Upload, Trash2, Image as ImageIcon, Video, FileText, Copy, Sca
 import LicenseSelector from "@/components/LicenseSelector";
 import LicenseBadge from "@/components/LicenseBadge";
 import { DEFAULT_LICENSE, LicenseCode } from "@/lib/licenses";
+import PreliminaryImport from "@/components/PreliminaryImport";
+import AddMapPointDialog from "@/components/AddMapPointDialog";
+import { Link } from "react-router-dom";
+import { MapPin, Plus, Sparkles } from "lucide-react";
+
+/** Visible CTAs to add map points and activities, plus preliminary upload. */
+const ProfileQuickActions = () => {
+  const [addPointOpen, setAddPointOpen] = useState(false);
+  return (
+    <>
+      <section className="rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-wheat/5 p-6 mb-8">
+        <div className="flex items-start justify-between gap-4 flex-wrap mb-4">
+          <div>
+            <h2 className="font-display text-xl mb-1 flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" /> Sumar al mapa vivo
+            </h2>
+            <p className="text-sm text-muted-foreground max-w-2xl">
+              Agregá tantos puntos como necesites (nodos, ferias, huertas, sedes) y publicá actividades.
+              Si tenés varios para sumar de una vez, podés enviarnos un listado preliminar para verificar juntos.
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={() => setAddPointOpen(true)} className="bg-primary text-primary-foreground">
+            <Plus className="h-4 w-4 mr-1.5" /> Agregar punto al mapa
+          </Button>
+          <Button asChild variant="outline">
+            <Link to="/mapa"><MapPin className="h-4 w-4 mr-1.5" /> Ir al Mapa Vivo</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link to="/mapa">+ Publicar actividad (en el mapa)</Link>
+          </Button>
+        </div>
+      </section>
+
+      <PreliminaryImport />
+      <div className="h-8" />
+
+      <AddMapPointDialog open={addPointOpen} onOpenChange={setAddPointOpen} />
+    </>
+  );
+};
 
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB
 const MAX_VIDEO_BYTES = 25 * 1024 * 1024; // 25MB
@@ -202,6 +244,9 @@ const MiPerfilPage = () => {
         <div className="container max-w-5xl">
           <h1 className="font-display text-3xl mb-2">Mi Perfil</h1>
           <p className="text-muted-foreground mb-8">Compartí fotos y videos de tu producción y digitalizá documentos manuscritos.</p>
+
+          {/* Quick actions: add map points / activities */}
+          <ProfileQuickActions />
 
           {/* Profile-level default license */}
           <section className="rounded-2xl border border-border bg-card p-6 mb-8">

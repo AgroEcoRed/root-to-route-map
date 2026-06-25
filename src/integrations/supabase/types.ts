@@ -172,12 +172,17 @@ export type Database = {
       events: {
         Row: {
           approved: boolean
+          co_organizers: string[]
           contact: string | null
+          contact_email: string | null
+          contact_phone: string | null
           created_at: string
           created_by: string | null
           description: string | null
           ends_at: string | null
           event_type: Database["public"]["Enums"]["event_type"]
+          extra_organizer_names: string[]
+          flyer_url: string | null
           id: string
           lat: number | null
           link: string | null
@@ -190,12 +195,17 @@ export type Database = {
         }
         Insert: {
           approved?: boolean
+          co_organizers?: string[]
           contact?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
           ends_at?: string | null
           event_type?: Database["public"]["Enums"]["event_type"]
+          extra_organizer_names?: string[]
+          flyer_url?: string | null
           id?: string
           lat?: number | null
           link?: string | null
@@ -208,12 +218,17 @@ export type Database = {
         }
         Update: {
           approved?: boolean
+          co_organizers?: string[]
           contact?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
           ends_at?: string | null
           event_type?: Database["public"]["Enums"]["event_type"]
+          extra_organizer_names?: string[]
+          flyer_url?: string | null
           id?: string
           lat?: number | null
           link?: string | null
@@ -289,6 +304,7 @@ export type Database = {
           address: string | null
           contact: string | null
           created_at: string
+          created_by: string | null
           delivery_days: string[] | null
           description: string | null
           extra: Json
@@ -306,6 +322,7 @@ export type Database = {
           address?: string | null
           contact?: string | null
           created_at?: string
+          created_by?: string | null
           delivery_days?: string[] | null
           description?: string | null
           extra?: Json
@@ -323,6 +340,7 @@ export type Database = {
           address?: string | null
           contact?: string | null
           created_at?: string
+          created_by?: string | null
           delivery_days?: string[] | null
           description?: string | null
           extra?: Json
@@ -565,6 +583,42 @@ export type Database = {
         }
         Relationships: []
       }
+      preliminary_imports: {
+        Row: {
+          created_at: string
+          file_path: string | null
+          id: string
+          notes: string | null
+          source_type: string
+          status: string
+          updated_at: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_path?: string | null
+          id?: string
+          notes?: string | null
+          source_type: string
+          status?: string
+          updated_at?: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          file_path?: string | null
+          id?: string
+          notes?: string | null
+          source_type?: string
+          status?: string
+          updated_at?: string
+          url?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       producer_media: {
         Row: {
           attribution: string | null
@@ -652,6 +706,7 @@ export type Database = {
           created_at: string
           description: string | null
           display_name: string | null
+          geolocation_source: string | null
           id: string
           lat: number | null
           lng: number | null
@@ -675,6 +730,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           display_name?: string | null
+          geolocation_source?: string | null
           id?: string
           lat?: number | null
           lng?: number | null
@@ -698,6 +754,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           display_name?: string | null
+          geolocation_source?: string | null
           id?: string
           lat?: number | null
           lng?: number | null

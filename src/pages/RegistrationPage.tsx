@@ -22,6 +22,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 import { locationData } from "@/data/locations";
+import PreliminaryImport from "@/components/PreliminaryImport";
+import { Navigation as NavIcon, MapPin as MapPinIcon, Info } from "lucide-react";
 
 type ActorType = Database["public"]["Enums"]["actor_type"];
 type CertLevel = Database["public"]["Enums"]["certification_level"];
@@ -86,6 +88,8 @@ const RegistrationPage = () => {
   const [city, setCity] = useState("");
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
+  const [geoState, setGeoState] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const [preliminary, setPreliminary] = useState<{ url: string; notes: string; file: File | null }>({ url: "", notes: "", file: null });
 
   // Step 3: Categories
   const [selectedOferta, setSelectedOferta] = useState<string[]>([]);
@@ -100,6 +104,21 @@ const RegistrationPage = () => {
   const [methodsByCategory, setMethodsByCategory] = useState<Record<string, string>>({});
   // Verification request
   const [wantsVerification, setWantsVerification] = useState(false);
+
+  /** Whether this actor is an "individual experience" (single point) — used to nudge geolocation. */
+  const isIndividualExperience = (t: ActorType | null) =>
+    t === "producer" || t === "consumer" || t === "restaurant" || t === "retail" ||
+    t === "social_kitchen" || t === "community_garden" || t === "bio_input_supplier";
+
+  const requestDeviceGeolocation = () => {
+    if (!("geolocation" in navigator)) { toast.error("Tu navegador no soporta geolocalización"); return; }
+    setGeoState("loading");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => { setLat(pos.coords.latitude); setLng(pos.coords.longitude); setGeoState("done"); toast.success("Ubicación obtenida del dispositivo"); },
+      (err) => { setGeoState("error"); toast.error(err.message || "No pudimos obtener tu ubicación"); },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  };
 
   const selectedCountry = locationData.countries.find(c => c.code === country);
   const selectedRegion2 = selectedCountry?.regions.find(r => r.code === region);
@@ -185,6 +204,25 @@ const RegistrationPage = () => {
       });
       if (authError) throw authError;
       if (!authData.user) throw new Error("No se pudo crear el usuario");
+
+      // Save preliminary import draft (link/file) for later verification by the user/team.
+      try {
+        const uid = authData.user.id;
+        if (preliminary.url.trim()) {
+          await (supabase as any).from("preliminary_imports").insert({
+            user_id: uid, source_type: "link", url: preliminary.url.trim(), notes: preliminary.notes.trim() || null,
+          });
+        }
+        if (preliminary.file) {
+          const path = `${uid}/preliminary/${Date.now()}_${preliminary.file.name}`;
+          const up = await supabase.storage.from("producer-media").upload(path, preliminary.file, { upsert: false });
+          if (!up.error) {
+            await (supabase as any).from("preliminary_imports").insert({
+              user_id: uid, source_type: "file", file_path: path, notes: preliminary.notes.trim() || null,
+            });
+          }
+        }
+      } catch { /* silent — not critical */ }
 
       // Save custom categories globally
       const allCustomOferta = selectedOferta.filter(c => !ofertaCategories.includes(c));
@@ -406,7 +444,29 @@ Gracias.`;
 
                     {/* Geolocation picker */}
                     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
-                      <Label>Georreferenciación</Label>
+                      <div className="flex items-center justify-between gap-2">
+                        <Label>Georreferenciación</Label>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={requestDeviceGeolocation}
+                          disabled={geoState === "loading"}
+                          className="text-xs h-8"
+                        >
+                          <NavIcon className="h-3.5 w-3.5 mr-1.5" />
+                          {geoState === "loading" ? "Obteniendo..." : geoState === "done" ? "Volver a ubicar" : "Usar mi ubicación"}
+                        </Button>
+                      </div>
+                      {isIndividualExperience(selectedType) && (
+                        <div className="mt-1 mb-2 flex items-start gap-2 rounded-lg bg-primary/5 border border-primary/20 px-3 py-2 text-[11px] text-foreground/80">
+                          <Info className="h-3.5 w-3.5 mt-0.5 text-primary shrink-0" />
+                          <span>
+                            Si tu experiencia es individual, tocá <b>"Usar mi ubicación"</b> para autorizar el GPS de tu dispositivo.
+                            ¿Tenés varios puntos (varios nodos, ferias, etc.)? Registrá uno acá y desde tu perfil podés sumar más con <b>+ Agregar punto</b>.
+                          </span>
+                        </div>
+                      )}
                       <div className="mt-1">
                         <LocationPicker lat={lat} lng={lng} onChange={(newLat, newLng) => { setLat(newLat); setLng(newLng); }} />
                       </div>
@@ -629,6 +689,11 @@ Gracias.`;
                           </p>
                         </div>
                       </label>
+                    </motion.div>
+
+                    {/* Preliminary import (link/file to bootstrap a list of nodes/actors) */}
+                    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
+                      <PreliminaryImport draftMode draft={preliminary} onDraftChange={setPreliminary} />
                     </motion.div>
 
                     <div className="flex gap-3 pt-4">

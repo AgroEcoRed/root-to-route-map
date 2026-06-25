@@ -16,14 +16,16 @@ import Navbar from "@/components/Navbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, X, ArrowUp, ArrowDown, Minus, CalendarPlus, Network, Sparkles } from "lucide-react";
+import { Search, Filter, X, ArrowUp, ArrowDown, Minus, CalendarPlus, Network, Sparkles, Plus } from "lucide-react";
 import { DataSourceToggle } from "@/components/admin/DataSourceToggle";
 import { useDataSources } from "@/hooks/useDataSources";
 import { useLayerActors } from "@/hooks/useLayerActors";
-import { useUpcomingEvents } from "@/hooks/useUpcomingEvents";
+import { useEvents, glowIntensity, eventBucket } from "@/hooks/useEvents";
 import { useActorConnections } from "@/hooks/useActorConnections";
 import { useAuth } from "@/contexts/AuthContext";
 import { EventFormDialog } from "@/components/events/EventFormDialog";
+import { EventsSidebar } from "@/components/events/EventsSidebar";
+import { AddMapPointDialog } from "@/components/AddMapPointDialog";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -72,7 +74,7 @@ interface MapActor {
   products: string[];
   certification: "red" | "yellow" | "green";
   description: string;
-  source: "rutas_sanas" | "mercado_territorial" | "agroeco" | "el_click" | "el_brote" | "utt_nodos";
+  source: "rutas_sanas" | "mercado_territorial" | "agroeco" | "el_click" | "el_brote" | "utt_nodos" | "user_points";
   contentLicense?: string | null;
   /** ISO date of last update of this actor's data. Null = never updated since import (inherited). */
   lastUpdated?: string | null;
@@ -90,6 +92,7 @@ const SOURCE_IMPORT_DATE: Record<MapActor["source"], string> = {
   el_click: "2026-06-19",
   el_brote: "2026-06-19",
   utt_nodos: "2022-05-02",
+  user_points: new Date().toISOString().slice(0, 10),
 };
 
 function formatUpdateDate(iso: string): string {
@@ -288,13 +291,15 @@ const MapPage = () => {
   const [dbProfilesById, setDbProfilesById] = useState<Map<string, { id: string; lat: number; lng: number; name: string }>>(new Map());
   const { isEnabled } = useDataSources();
   const { user } = useAuth();
-  const { events } = useUpcomingEvents();
+  const { events } = useEvents();
   const { connections } = useActorConnections();
   const [showNetwork, setShowNetwork] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
+  const [addPointOpen, setAddPointOpen] = useState(false);
 
   // Rutas Sanas is now served from the layer_actors DB table (editable by layer managers).
   const { actors: rutasSanasDb } = useLayerActors("rutas_sanas");
+  const { actors: userPointsDb } = useLayerActors("user_points");
   const rutasSanasActors = useMemo<MapActor[]>(() => {
     if (!rutasSanasDb || rutasSanasDb.length === 0) return fallbackRutasSanasActors;
     return rutasSanasDb.map((p, i) => ({
@@ -314,6 +319,23 @@ const MapPage = () => {
         : ((p.extra as any) || {}).deliveryInfo,
     }));
   }, [rutasSanasDb]);
+
+  const userPointActors = useMemo<MapActor[]>(() => {
+    return (userPointsDb || []).map((p, i) => ({
+      id: 90000 + i,
+      name: p.name,
+      type: (p.actor_type as ActorType) || "agroecological_node",
+      lat: p.lat,
+      lng: p.lng,
+      products: [],
+      certification: "yellow",
+      description: p.description || p.address || "",
+      source: "user_points",
+      verified: !!p.verified_at,
+      lastUpdated: p.verified_at || p.updated_at || null,
+      deliveryInfo: (p.delivery_days && p.delivery_days.length > 0) ? p.delivery_days.join(", ") : undefined,
+    }));
+  }, [userPointsDb]);
 
   // Fetch real profiles from database
   useEffect(() => {
@@ -360,8 +382,9 @@ const MapPage = () => {
     if (isEnabled("el_click")) out.push(...elClickActors);
     if (isEnabled("el_brote")) out.push(...elBroteActors);
     if (isEnabled("utt_nodos")) out.push(...uttNodesActors);
+    if (isEnabled("user_points")) out.push(...userPointActors);
     return out;
-  }, [dbActors, isEnabled, rutasSanasActors]);
+  }, [dbActors, isEnabled, rutasSanasActors, userPointActors]);
 
   const toggleType = (type: ActorType) => {
     setActiveTypes((prev) => {
@@ -494,6 +517,8 @@ const MapPage = () => {
         ? `<a href="https://elbrotetienda.com/" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#d1fae5;color:#065f46;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #6ee7b7;letter-spacing:0.3px;text-transform:uppercase;text-decoration:none">El Brote</a>`
         : a.source === "utt_nodos"
         ? `<a href="https://uniondetrabajadoresdelatierra.com.ar/comercializacion-2/" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#fef9c3;color:#854d0e;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #fde047;letter-spacing:0.3px;text-transform:uppercase;text-decoration:none">Nodo UTT</a>`
+        : a.source === "user_points"
+        ? `<span style="display:inline-block;background:#fef3c7;color:#92400e;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #fcd34d;letter-spacing:0.3px;text-transform:uppercase">Comunidad</span>`
         : `<span style="display:inline-block;background:#dcfce7;color:#15803d;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #86efac;letter-spacing:0.3px;text-transform:uppercase">AgroEco.Red</span>`;
 
       const state = freshnessState(a.lastUpdated, a.verified);
@@ -575,33 +600,43 @@ const MapPage = () => {
 
     events.forEach((ev) => {
       if (ev.lat == null || ev.lng == null) return;
+      if (eventBucket(ev) !== "upcoming") return; // past or undated → only sidebar
+      const intensity = glowIntensity(ev.starts_at); // 0..1
+      const size = 14 + Math.round(intensity * 22);   // 14 → 36 px halo
+      const spread = 2 + Math.round(intensity * 10);
+      const speed = (2.6 - intensity * 1.4).toFixed(2);
+      const glowColor = intensity > 0.75 ? "#ec4899" : intensity > 0.45 ? "#d946ef" : "#a855f7";
+      const shadow = intensity > 0.75 ? "rgba(236,72,153,0.75)" : intensity > 0.45 ? "rgba(217,70,239,0.55)" : "rgba(168,85,247,0.4)";
       const icon = L.divIcon({
         className: "",
-        html: `<div class="event-marker">
-          <div class="em-ring">
-            <span class="em-dot d1"></span><span class="em-dot d2"></span>
-            <span class="em-dot d3"></span><span class="em-dot d4"></span>
-          </div>
-          <div class="em-core">★</div>
-        </div>`,
-        iconSize: [38, 38],
-        iconAnchor: [19, 19],
+        html: `<div class="event-glow" style="--glow-color:${glowColor};--glow-size:${size}px;--glow-spread:${spread}px;--glow-shadow:${shadow};--glow-speed:${speed}s">★</div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
       });
       const date = new Date(ev.starts_at);
       const dateStr = date.toLocaleString("es-AR", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
       const typeLabels: Record<string, string> = { feria: "Feria", intercambio: "Intercambio", formacion: "Formación", otro: "Actividad" };
       const typeColor: Record<string, string> = { feria: "#E94560", intercambio: "#22C55E", formacion: "#3B82F6", otro: "#F5C518" };
       const linkHtml = ev.link ? `<a href="${ev.link}" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-top:8px;background:#F5C518;color:#1a1a1a;padding:6px 12px;border-radius:8px;text-decoration:none;font-weight:700;font-size:12px">Más info / inscripción →</a>` : "";
-      const contactHtml = ev.contact ? `<p style="font-size:11px;color:#666;margin:6px 0 0">📞 ${ev.contact}</p>` : "";
+      const contactBits: string[] = [];
+      if ((ev as any).contact_email) contactBits.push(`<a href="mailto:${(ev as any).contact_email}" style="color:#0f766e;text-decoration:underline">✉ ${(ev as any).contact_email}</a>`);
+      if ((ev as any).contact_phone) contactBits.push(`<a href="tel:${(ev as any).contact_phone}" style="color:#0f766e;text-decoration:underline">📞 ${(ev as any).contact_phone}</a>`);
+      if (ev.contact && !contactBits.length) contactBits.push(`📞 ${ev.contact}`);
+      const contactHtml = contactBits.length ? `<p style="font-size:11px;color:#444;margin:6px 0 0">Confirmar info: ${contactBits.join(" · ")}</p>` : "";
       const descHtml = ev.description ? `<p style="font-size:12px;color:#444;margin:6px 0">${ev.description}</p>` : "";
       const locHtml = ev.location_name ? `<p style="font-size:11px;color:#666;margin:4px 0">📍 ${ev.location_name}</p>` : "";
+      const flyerHtml = (ev as any).flyer_url
+        ? `<img src="${(ev as any).flyer_url}" alt="Flyer" style="width:100%;border-radius:8px;margin-top:6px;border:1px solid #e5e7eb" />`
+        : "";
+      const orgs = ((ev as any).extra_organizer_names || []) as string[];
+      const orgsHtml = orgs.length ? `<p style="font-size:11px;color:#444;margin:6px 0 0"><b>Co-organizan:</b> ${orgs.join(", ")}</p>` : "";
       L.marker([ev.lat, ev.lng], { icon, zIndexOffset: 1000 })
         .bindPopup(`
           <div style="min-width:240px;font-family:DM Sans,sans-serif;padding:4px">
             <span style="display:inline-block;background:${typeColor[ev.event_type]};color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:0.4px">${typeLabels[ev.event_type]}</span>
             <h3 style="font-family:Playfair Display,serif;font-size:16px;margin:8px 0 4px;color:#1a1a1a">${ev.title}</h3>
             <p style="font-size:12px;color:#444;margin:0;font-weight:600">🗓️ ${dateStr}</p>
-            ${locHtml}${descHtml}${contactHtml}${linkHtml}
+            ${locHtml}${descHtml}${flyerHtml}${orgsHtml}${contactHtml}${linkHtml}
           </div>
         `)
         .addTo(eventsLayerRef.current!);
@@ -672,6 +707,34 @@ const MapPage = () => {
       }).addTo(networkLayerRef.current!);
     });
 
+    // Event co-organization edges: events sharing extra_organizer_names → connect their map points.
+    const orgIndex = new Map<string, { lat: number; lng: number; title: string }[]>();
+    events.forEach((ev: any) => {
+      if (ev.lat == null || ev.lng == null) return;
+      const orgs: string[] = ev.extra_organizer_names || [];
+      orgs.forEach((raw) => {
+        const key = String(raw).trim().toLowerCase();
+        if (!key) return;
+        const arr = orgIndex.get(key) || [];
+        arr.push({ lat: ev.lat, lng: ev.lng, title: ev.title });
+        orgIndex.set(key, arr);
+      });
+    });
+    orgIndex.forEach((nodes) => {
+      if (nodes.length < 2) return;
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          L.polyline([[nodes[i].lat, nodes[i].lng], [nodes[j].lat, nodes[j].lng]], {
+            color: "#ec4899",
+            weight: 2,
+            opacity: 0.55,
+            dashArray: "2 6",
+            interactive: false,
+          }).addTo(networkLayerRef.current!);
+        }
+      }
+    });
+
     // Halos for actors with degree >= 2
     posById.forEach((pos, id) => {
       const d = degree.get(id) || 0;
@@ -685,7 +748,7 @@ const MapPage = () => {
       });
       L.marker(pos, { icon: haloIcon, interactive: false, zIndexOffset: -500 }).addTo(networkLayerRef.current!);
     });
-  }, [showNetwork, connections, dbProfilesById]);
+  }, [showNetwork, connections, dbProfilesById, events]);
 
   // Group actor types by role for filter display
   const ofertaTypes: ActorType[] = ["producer", "cooperative", "processing", "agroecological_node", "seed_bank", "composting_center", "research_center", "solidarity_intermediary", "community_garden", "bio_input_supplier"];
@@ -822,6 +885,12 @@ const MapPage = () => {
         <div className="flex-1 min-h-0 relative flex flex-col">
           <div ref={mapContainerRef} className="w-full z-0 flex-1 min-h-[300px]" />
 
+          {/* Events sidebar (desktop inline + mobile drawer) */}
+          <EventsSidebar
+            events={events}
+            onFlyTo={(la, ln) => mapRef.current?.flyTo([la, ln], 14, { duration: 0.8 })}
+          />
+
           {/* Floating action buttons */}
           <div className="absolute bottom-6 left-6 z-[1000] flex flex-col gap-2">
             <Button
@@ -832,6 +901,21 @@ const MapPage = () => {
             >
               <Network className="h-4 w-4" />
               {showNetwork ? "Ocultar red" : "Ver red de vínculos"}
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                if (!user) {
+                  toast("Necesitás ingresar para agregar un punto", { action: { label: "Ingresar", onClick: () => navigate("/ingresar") } });
+                  return;
+                }
+                setAddPointOpen(true);
+              }}
+              className="rounded-full shadow-elevated gap-2 bg-primary text-primary-foreground hover:opacity-90 ring-4 ring-primary/20"
+              title="Sumar un nodo, huerta o cooperativa al mapa"
+            >
+              <Plus className="h-4 w-4" />
+              + Agregar punto
             </Button>
             <Button
               size="sm"
@@ -853,6 +937,7 @@ const MapPage = () => {
       </div>
       <DataSourceToggle position="bottom-6 right-6" />
       <EventFormDialog open={eventDialogOpen} onOpenChange={setEventDialogOpen} />
+      <AddMapPointDialog open={addPointOpen} onOpenChange={setAddPointOpen} />
     </div>
   );
 };
