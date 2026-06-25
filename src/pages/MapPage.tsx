@@ -633,12 +633,21 @@ const MapPage = () => {
               navigate(`/mercado?producer=${encodeURIComponent(producer)}&search=${encodeURIComponent(product)}`);
             });
           });
+          // Endorse-actor button → open dialog
+          document.querySelectorAll(".map-endorse-btn").forEach((el) => {
+            el.addEventListener("click", (e) => {
+              e.preventDefault();
+              const id = (el as HTMLElement).dataset.actorId || "";
+              const name = decodeURIComponent((el as HTMLElement).dataset.actorName || "");
+              if (id) setEndorseTarget({ id, name });
+            });
+          });
         }, 50);
       });
 
       clusterRef.current!.addLayer(marker);
     });
-  }, [filtered, navigate]);
+  }, [filtered, navigate, endorsements, user]);
 
   // Render upcoming events as confetti markers
   useEffect(() => {
