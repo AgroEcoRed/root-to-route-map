@@ -82,6 +82,41 @@ export type Database = {
           },
         ]
       }
+      actor_endorsements: {
+        Row: {
+          created_at: string
+          endorser_display: string | null
+          endorser_user_id: string
+          id: string
+          layer_actor_id: string
+          note: string | null
+        }
+        Insert: {
+          created_at?: string
+          endorser_display?: string | null
+          endorser_user_id: string
+          id?: string
+          layer_actor_id: string
+          note?: string | null
+        }
+        Update: {
+          created_at?: string
+          endorser_display?: string | null
+          endorser_user_id?: string
+          id?: string
+          layer_actor_id?: string
+          note?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "actor_endorsements_layer_actor_id_fkey"
+            columns: ["layer_actor_id"]
+            isOneToOne: false
+            referencedRelation: "layer_actors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_hints: {
         Row: {
           content: string
@@ -178,6 +213,7 @@ export type Database = {
           contact_phone: string | null
           created_at: string
           created_by: string | null
+          custom_type: string | null
           description: string | null
           ends_at: string | null
           event_type: Database["public"]["Enums"]["event_type"]
@@ -201,6 +237,7 @@ export type Database = {
           contact_phone?: string | null
           created_at?: string
           created_by?: string | null
+          custom_type?: string | null
           description?: string | null
           ends_at?: string | null
           event_type?: Database["public"]["Enums"]["event_type"]
@@ -224,6 +261,7 @@ export type Database = {
           contact_phone?: string | null
           created_at?: string
           created_by?: string | null
+          custom_type?: string | null
           description?: string | null
           ends_at?: string | null
           event_type?: Database["public"]["Enums"]["event_type"]
@@ -323,6 +361,7 @@ export type Database = {
           source_id: string
           updated_at: string
           verified_at: string | null
+          verified_by_role: string | null
         }
         Insert: {
           actor_type?: string | null
@@ -348,6 +387,7 @@ export type Database = {
           source_id: string
           updated_at?: string
           verified_at?: string | null
+          verified_by_role?: string | null
         }
         Update: {
           actor_type?: string | null
@@ -373,6 +413,7 @@ export type Database = {
           source_id?: string
           updated_at?: string
           verified_at?: string | null
+          verified_by_role?: string | null
         }
         Relationships: []
       }
@@ -964,6 +1005,22 @@ export type Database = {
       }
     }
     Views: {
+      actor_endorsement_counts: {
+        Row: {
+          count: number | null
+          last_at: string | null
+          layer_actor_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "actor_endorsements_layer_actor_id_fkey"
+            columns: ["layer_actor_id"]
+            isOneToOne: false
+            referencedRelation: "layer_actors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       public_profiles: {
         Row: {
           actor_type: Database["public"]["Enums"]["actor_type"] | null
@@ -1080,6 +1137,7 @@ export type Database = {
           source_id: string
           updated_at: string
           verified_at: string | null
+          verified_by_role: string | null
         }
         SetofOptions: {
           from: "*"
@@ -1114,6 +1172,7 @@ export type Database = {
           source_id: string
           updated_at: string
           verified_at: string | null
+          verified_by_role: string | null
         }
         SetofOptions: {
           from: "*"
@@ -1169,7 +1228,15 @@ export type Database = {
         | "red"
         | "otro"
       event_source: "user" | "admin" | "community"
-      event_type: "feria" | "intercambio" | "formacion" | "otro"
+      event_type:
+        | "feria"
+        | "intercambio"
+        | "formacion"
+        | "otro"
+        | "conferencia_jornada"
+        | "taller"
+        | "encuentro"
+        | "voluntariado"
       transition_dimension:
         | "agronomic"
         | "ecological"
@@ -1343,7 +1410,16 @@ export const Constants = {
         "otro",
       ],
       event_source: ["user", "admin", "community"],
-      event_type: ["feria", "intercambio", "formacion", "otro"],
+      event_type: [
+        "feria",
+        "intercambio",
+        "formacion",
+        "otro",
+        "conferencia_jornada",
+        "taller",
+        "encuentro",
+        "voluntariado",
+      ],
       transition_dimension: [
         "agronomic",
         "ecological",

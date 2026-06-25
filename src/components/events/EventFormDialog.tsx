@@ -15,7 +15,17 @@ import { Sparkles, Upload, Loader2, Image as ImageIcon } from "lucide-react";
 const schema = z.object({
   title: z.string().trim().min(3, "Mínimo 3 caracteres").max(140),
   description: z.string().trim().max(1000).optional(),
-  event_type: z.enum(["feria", "intercambio", "formacion", "otro"]),
+  event_type: z.enum([
+    "feria",
+    "intercambio",
+    "formacion",
+    "conferencia_jornada",
+    "taller",
+    "encuentro",
+    "voluntariado",
+    "otro",
+  ]),
+  custom_type: z.string().trim().max(60).optional(),
   starts_at: z.string().optional(),
   ends_at: z.string().optional(),
   location_name: z.string().trim().max(200).optional(),
@@ -43,7 +53,10 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
   const [flyerPreview, setFlyerPreview] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
-    title: "", description: "", event_type: "feria" as const,
+    title: "", description: "", event_type: "feria" as
+      | "feria" | "intercambio" | "formacion" | "conferencia_jornada"
+      | "taller" | "encuentro" | "voluntariado" | "otro",
+    custom_type: "",
     starts_at: "", ends_at: "", location_name: "", lat: "", lng: "", link: "", contact: "",
     contact_email: "", contact_phone: "", extra_organizer_names: "",
   });
@@ -71,6 +84,7 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
         title: f.title || p.title || "",
         description: f.description || p.description || "",
         starts_at: f.starts_at || (p.starts_at ? toLocalInput(p.starts_at) : ""),
+        ends_at: f.ends_at || (p.ends_at ? toLocalInput(p.ends_at) : ""),
         location_name: f.location_name || p.location_name || "",
         contact_email: f.contact_email || p.contact_email || "",
         contact_phone: f.contact_phone || p.contact_phone || "",
@@ -104,6 +118,13 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
       toast.error(parsed.error.issues[0]?.message || "Datos inválidos");
       return;
     }
+    // Autocomplete end date with start date if missing — supports single-day events
+    // and lets the map "glow" use a definite end. If the flyer/user provided a real range,
+    // we keep it as-is.
+    const effectiveEnds =
+      parsed.data.ends_at && parsed.data.ends_at.trim().length > 0
+        ? parsed.data.ends_at
+        : parsed.data.starts_at;
     setSubmitting(true);
 
     // Upload flyer if present
@@ -127,8 +148,12 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
       title: parsed.data.title,
       description: parsed.data.description || null,
       event_type: parsed.data.event_type,
+      custom_type:
+        parsed.data.event_type === "otro" && parsed.data.custom_type
+          ? parsed.data.custom_type.trim()
+          : null,
       starts_at: parsed.data.starts_at ? new Date(parsed.data.starts_at).toISOString() : null,
-      ends_at: parsed.data.ends_at ? new Date(parsed.data.ends_at).toISOString() : null,
+      ends_at: effectiveEnds ? new Date(effectiveEnds).toISOString() : null,
       location_name: parsed.data.location_name || null,
       lat: parsed.data.lat ? Number(parsed.data.lat) : null,
       lng: parsed.data.lng ? Number(parsed.data.lng) : null,
@@ -153,7 +178,7 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
         ? "¡Actividad publicada! Aparece como punto brillante en el mapa."
         : "¡Actividad publicada! Aparece en la barra lateral de actividades."
     );
-    setForm({ title: "", description: "", event_type: "feria", starts_at: "", ends_at: "", location_name: "", lat: "", lng: "", link: "", contact: "", contact_email: "", contact_phone: "", extra_organizer_names: "" });
+    setForm({ title: "", description: "", event_type: "feria", custom_type: "", starts_at: "", ends_at: "", location_name: "", lat: "", lng: "", link: "", contact: "", contact_email: "", contact_phone: "", extra_organizer_names: "" });
     setFlyerFile(null); setFlyerPreview(null);
     onOpenChange(false);
     onCreated?.();
@@ -214,15 +239,28 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label>Tipo *</Label>
-              <Select value={form.event_type} onValueChange={(v) => update("event_type", v)}>
+              <Select value={form.event_type} onValueChange={(v) => update("event_type", v as any)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="feria">Feria</SelectItem>
-                  <SelectItem value="intercambio">Intercambio</SelectItem>
-                  <SelectItem value="formacion">Formación</SelectItem>
+                  <SelectItem value="intercambio">Intercambio (semillas, saberes)</SelectItem>
+                  <SelectItem value="formacion">Formación / curso</SelectItem>
+                  <SelectItem value="taller">Taller</SelectItem>
+                  <SelectItem value="conferencia_jornada">Conferencia, charla o jornada</SelectItem>
+                  <SelectItem value="encuentro">Encuentro / asamblea</SelectItem>
+                  <SelectItem value="voluntariado">Voluntariado / trabajo colectivo</SelectItem>
                   <SelectItem value="otro">Otro</SelectItem>
                 </SelectContent>
               </Select>
+              {form.event_type === "otro" && (
+                <Input
+                  className="mt-2"
+                  value={form.custom_type}
+                  onChange={(e) => update("custom_type", e.target.value)}
+                  maxLength={60}
+                  placeholder="Decinos qué tipo (ej: cine debate, festival…)"
+                />
+              )}
             </div>
             <div>
               <Label>Cuándo</Label>

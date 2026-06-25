@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
       ? `data:${mime};base64,${imageBase64}`
       : imageUrl!
 
-    const system = `Sos un asistente que extrae información estructurada de flyers de actividades agroecológicas (ferias, intercambios, talleres). Respondé SOLO con JSON válido siguiendo este esquema: {"title":string,"description":string,"starts_at":string|null (ISO 8601 con zona AR si hay fecha+hora, sólo YYYY-MM-DD si no hay hora, null si no hay fecha),"location_name":string|null,"contact_email":string|null,"contact_phone":string|null,"organizers":string[]}. Si un campo no aparece en el flyer, usá null o string vacío. La hora por defecto si no aparece es 18:00. Asumí zona horaria America/Argentina/Buenos_Aires.`
+    const system = `Sos un asistente que extrae información estructurada de flyers de actividades agroecológicas (ferias, intercambios, talleres, conferencias, jornadas, encuentros, voluntariados). Respondé SOLO con JSON válido siguiendo este esquema: {"title":string,"description":string,"starts_at":string|null (ISO 8601 con zona AR si hay fecha+hora, sólo YYYY-MM-DD si no hay hora, null si no hay fecha),"ends_at":string|null (ISO 8601 con zona AR; SOLO completalo si el flyer indica un rango de fechas como "del 1 al 3 de julio", "viernes y sábado", "todos los sábados de junio". Si la actividad tiene una sola fecha, devolvé null y dejá que la app autocomplete con starts_at),"location_name":string|null,"contact_email":string|null,"contact_phone":string|null,"organizers":string[]}. Si un campo no aparece en el flyer, usá null o string vacío. La hora por defecto si no aparece es 18:00. Asumí zona horaria America/Argentina/Buenos_Aires.`
 
     const resp = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',

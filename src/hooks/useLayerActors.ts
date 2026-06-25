@@ -14,6 +14,7 @@ export interface LayerActor {
   contact: string | null;
   delivery_days: string[] | null;
   verified_at: string | null;
+  verified_by_role: string | null;
   extra: Record<string, unknown> | null;
   created_at: string;
   updated_at: string;

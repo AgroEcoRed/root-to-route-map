@@ -26,6 +26,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { EventFormDialog } from "@/components/events/EventFormDialog";
 import { EventsSidebar } from "@/components/events/EventsSidebar";
 import { AddMapPointDialog } from "@/components/AddMapPointDialog";
+import { EndorseDialog } from "@/components/actors/EndorseDialog";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -82,6 +83,10 @@ interface MapActor {
   verified?: boolean;
   /** Days / schedule when the actor receives, opens, delivers, or runs the feria. */
   deliveryInfo?: string;
+  /** UUID of the layer_actors row (when the actor lives in the DB) — used for endorsements. */
+  layerActorId?: string;
+  /** Who confirmed this actor: 'platform' (AgroEco.Red admin) | 'layer' (layer manager) | null. */
+  verifiedByRole?: "platform" | "layer" | null;
 }
 
 // Approximate import dates for inherited datasets (used until each actor claims their record).
@@ -101,12 +106,16 @@ function formatUpdateDate(iso: string): string {
   return d.toLocaleDateString("es-AR", { month: "short", year: "numeric" });
 }
 
-function freshnessState(iso: string | null | undefined, verified: boolean | undefined): "verified-recent" | "verified-old" | "unverified" {
-  if (!verified) return "unverified";
-  if (!iso) return "verified-old";
-  const months = (Date.now() - new Date(iso).getTime()) / (1000 * 60 * 60 * 24 * 30);
-  return months <= 12 ? "verified-recent" : "verified-old";
-}
+/** Human-readable label of the dataset a layer-verified actor was endorsed by. */
+const sourceShortLabel: Record<MapActor["source"], string> = {
+  rutas_sanas: "Rutas Sanas",
+  mercado_territorial: "Mercado Territorial",
+  agroeco: "AgroEco.Red",
+  el_click: "El Click",
+  el_brote: "El Brote",
+  utt_nodos: "UTT",
+  user_points: "AgroEco.Red",
+};
 
 const actorTypeLabels: Record<ActorType, string> = {
   producer: "Productor/a Agroecológico/a",
@@ -296,6 +305,24 @@ const MapPage = () => {
   const [showNetwork, setShowNetwork] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [addPointOpen, setAddPointOpen] = useState(false);
+  const [endorseTarget, setEndorseTarget] = useState<{ id: string; name: string } | null>(null);
+  const [endorsements, setEndorsements] = useState<Map<string, { count: number; last_at: string }>>(new Map());
+  const [endorsementsTick, setEndorsementsTick] = useState(0);
+
+  // Load aggregated endorsement counts (no PII) for every layer actor.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await (supabase as any)
+        .from("actor_endorsement_counts")
+        .select("layer_actor_id, count, last_at");
+      if (cancelled || !data) return;
+      const m = new Map<string, { count: number; last_at: string }>();
+      (data as any[]).forEach((r) => m.set(r.layer_actor_id, { count: r.count, last_at: r.last_at }));
+      setEndorsements(m);
+    })();
+    return () => { cancelled = true; };
+  }, [endorsementsTick]);
 
   // Rutas Sanas is now served from the layer_actors DB table (editable by layer managers).
   const { actors: rutasSanasDb } = useLayerActors("rutas_sanas");
@@ -304,6 +331,7 @@ const MapPage = () => {
     if (!rutasSanasDb || rutasSanasDb.length === 0) return fallbackRutasSanasActors;
     return rutasSanasDb.map((p, i) => ({
       id: 1 + i,
+      layerActorId: p.id,
       name: p.name,
       type: (p.actor_type as ActorType) || "consumer_node",
       lat: p.lat,
@@ -313,6 +341,7 @@ const MapPage = () => {
       description: p.description || p.family || "",
       source: "rutas_sanas",
       verified: !!p.verified_at,
+      verifiedByRole: (p.verified_by_role as any) || (p.verified_at ? "layer" : null),
       lastUpdated: p.verified_at || p.updated_at || SOURCE_IMPORT_DATE.rutas_sanas,
       deliveryInfo: (p.delivery_days && p.delivery_days.length > 0)
         ? p.delivery_days.join(", ")
@@ -323,6 +352,7 @@ const MapPage = () => {
   const userPointActors = useMemo<MapActor[]>(() => {
     return (userPointsDb || []).map((p, i) => ({
       id: 90000 + i,
+      layerActorId: p.id,
       name: p.name,
       type: (p.actor_type as ActorType) || "agroecological_node",
       lat: p.lat,
@@ -332,6 +362,7 @@ const MapPage = () => {
       description: p.description || p.address || "",
       source: "user_points",
       verified: !!p.verified_at,
+      verifiedByRole: (p.verified_by_role as any) || (p.verified_at ? "platform" : null),
       lastUpdated: p.verified_at || p.updated_at || null,
       deliveryInfo: (p.delivery_days && p.delivery_days.length > 0) ? p.delivery_days.join(", ") : undefined,
     }));
@@ -521,17 +552,34 @@ const MapPage = () => {
         ? `<span style="display:inline-block;background:#fef3c7;color:#92400e;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #fcd34d;letter-spacing:0.3px;text-transform:uppercase">Comunidad</span>`
         : `<span style="display:inline-block;background:#dcfce7;color:#15803d;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #86efac;letter-spacing:0.3px;text-transform:uppercase">AgroEco.Red</span>`;
 
-      const state = freshnessState(a.lastUpdated, a.verified);
+      // Verification tier (highest to lowest):
+      //   1. Platform-verified (AgroEco.Red admin)
+      //   2. Layer-verified (admin of the source layer, e.g. Rutas Sanas)
+      //   3. Network-endorsed (X votos de confianza de miembros)
+      //   4. Imported (just a record from the source, no confirmation yet)
       const dateLabel = a.lastUpdated ? formatUpdateDate(a.lastUpdated) : "";
-      const freshnessBadge = (() => {
-        if (state === "verified-recent") {
-          return `<span title="Información verificada recientemente · Actualizado ${dateLabel}" style="display:inline-flex;align-items:center;gap:3px;background:#e0e7ff;color:#3730a3;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #a5b4fc;letter-spacing:0.2px">✓ Verificado · ${dateLabel}</span>`;
+      const endorseInfo = a.layerActorId ? endorsements.get(a.layerActorId) : undefined;
+      const endorseDateLabel = endorseInfo?.last_at ? formatUpdateDate(endorseInfo.last_at) : "";
+      const verificationBadge = (() => {
+        if (a.verifiedByRole === "platform") {
+          return `<span title="Verificado por el equipo de AgroEco.Red el ${dateLabel}" style="display:inline-flex;align-items:center;gap:3px;background:#dcfce7;color:#14532d;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #4ade80;letter-spacing:0.2px">✓ Verificado por AgroEco.Red · ${dateLabel}</span>`;
         }
-        if (state === "verified-old") {
-          return `<span title="Verificado en algún momento, pero hace más de 12 meses${dateLabel ? ` · Última actualización ${dateLabel}` : ""}" style="display:inline-flex;align-items:center;gap:3px;background:#e2e8f0;color:#475569;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #94a3b8;letter-spacing:0.2px">✓ Verificado · ${dateLabel || "sin fecha"} (antigua)</span>`;
+        if (a.verifiedByRole === "layer") {
+          const label = sourceShortLabel[a.source] || "el equipo de la capa";
+          return `<span title="Verificado por ${label} el ${dateLabel}" style="display:inline-flex;align-items:center;gap:3px;background:#e0e7ff;color:#3730a3;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #a5b4fc;letter-spacing:0.2px">✓ Verificado por ${label} · ${dateLabel}</span>`;
         }
-        return `<span title="Datos heredados de la fuente original, aún no confirmados${dateLabel ? ` · Importado ${dateLabel}` : ""}" style="display:inline-flex;align-items:center;gap:3px;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.2px">⟳ Por verificar${dateLabel ? ` · ${dateLabel}` : ""}</span>`;
+        if (endorseInfo && endorseInfo.count > 0) {
+          const label = endorseInfo.count === 1 ? "1 voto de confianza" : `${endorseInfo.count} votos de confianza`;
+          return `<span title="Miembros de la red dieron su voto de confianza. Último: ${endorseDateLabel}" style="display:inline-flex;align-items:center;gap:3px;background:#fef3c7;color:#854d0e;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #fcd34d;letter-spacing:0.2px">🤝 ${label} · último ${endorseDateLabel}</span>`;
+        }
+        return dateLabel
+          ? `<span title="Registro importado de la fuente original — todavía no verificado por la red." style="display:inline-flex;align-items:center;gap:3px;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.2px">Importado · ${dateLabel}</span>`
+          : "";
       })();
+
+      const endorseButton = (user && a.layerActorId && a.verifiedByRole !== "platform")
+        ? `<button class="map-endorse-btn" data-actor-id="${a.layerActorId}" data-actor-name="${encodeURIComponent(a.name)}" style="margin-top:6px;background:#fef3c7;color:#854d0e;border:1px solid #fcd34d;font-size:10px;font-weight:600;padding:4px 8px;border-radius:6px;cursor:pointer">🤝 Dar voto de confianza</button>`
+        : "";
 
       const deliveryHtml = a.deliveryInfo
         ? `<div style="display:flex;align-items:center;gap:6px;margin:8px 0 4px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:6px 10px">
@@ -546,7 +594,7 @@ const MapPage = () => {
       const marker = L.marker([a.lat, a.lng], { icon })
         .bindPopup(`
           <div style="min-width:240px;font-family:DM Sans,sans-serif;padding:4px">
-            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">${sourceBadge}${freshnessBadge}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">${sourceBadge}${verificationBadge}</div>
             <a href="#" class="map-actor-link" data-producer="${encodeURIComponent(a.name)}" data-source="${a.source}" style="display:block;background:${roleBadgeColor};color:white;font-weight:700;font-size:14px;margin:0 0 8px;padding:8px 12px;border-radius:8px;text-decoration:none;cursor:pointer;text-align:center;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
               ${a.name}
               <span style="display:block;font-size:10px;font-weight:400;opacity:0.85;margin-top:2px">${a.source === 'mercado_territorial' ? 'Ver catálogo Mercado Territorial →' : 'Ver todos sus productos →'}</span>
@@ -557,6 +605,7 @@ const MapPage = () => {
             ${productsHtml}
             ${certHtml}
             ${licenseHtml}
+            ${endorseButton}
           </div>
         `);
 
@@ -585,12 +634,21 @@ const MapPage = () => {
               navigate(`/mercado?producer=${encodeURIComponent(producer)}&search=${encodeURIComponent(product)}`);
             });
           });
+          // Endorse-actor button → open dialog
+          document.querySelectorAll(".map-endorse-btn").forEach((el) => {
+            el.addEventListener("click", (e) => {
+              e.preventDefault();
+              const id = (el as HTMLElement).dataset.actorId || "";
+              const name = decodeURIComponent((el as HTMLElement).dataset.actorName || "");
+              if (id) setEndorseTarget({ id, name });
+            });
+          });
         }, 50);
       });
 
       clusterRef.current!.addLayer(marker);
     });
-  }, [filtered, navigate]);
+  }, [filtered, navigate, endorsements, user]);
 
   // Render upcoming events as confetti markers
   useEffect(() => {
@@ -938,6 +996,13 @@ const MapPage = () => {
       <DataSourceToggle position="bottom-6 right-6" />
       <EventFormDialog open={eventDialogOpen} onOpenChange={setEventDialogOpen} />
       <AddMapPointDialog open={addPointOpen} onOpenChange={setAddPointOpen} />
+      <EndorseDialog
+        open={!!endorseTarget}
+        onOpenChange={(v) => { if (!v) setEndorseTarget(null); }}
+        actorId={endorseTarget?.id || null}
+        actorName={endorseTarget?.name || ""}
+        onSubmitted={() => setEndorsementsTick((x) => x + 1)}
+      />
     </div>
   );
 };
