@@ -444,7 +444,29 @@ Gracias.`;
 
                     {/* Geolocation picker */}
                     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
-                      <Label>Georreferenciación</Label>
+                      <div className="flex items-center justify-between gap-2">
+                        <Label>Georreferenciación</Label>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={requestDeviceGeolocation}
+                          disabled={geoState === "loading"}
+                          className="text-xs h-8"
+                        >
+                          <NavIcon className="h-3.5 w-3.5 mr-1.5" />
+                          {geoState === "loading" ? "Obteniendo..." : geoState === "done" ? "Volver a ubicar" : "Usar mi ubicación"}
+                        </Button>
+                      </div>
+                      {isIndividualExperience(selectedType) && (
+                        <div className="mt-1 mb-2 flex items-start gap-2 rounded-lg bg-primary/5 border border-primary/20 px-3 py-2 text-[11px] text-foreground/80">
+                          <Info className="h-3.5 w-3.5 mt-0.5 text-primary shrink-0" />
+                          <span>
+                            Si tu experiencia es individual, tocá <b>"Usar mi ubicación"</b> para autorizar el GPS de tu dispositivo.
+                            ¿Tenés varios puntos (varios nodos, ferias, etc.)? Registrá uno acá y desde tu perfil podés sumar más con <b>+ Agregar punto</b>.
+                          </span>
+                        </div>
+                      )}
                       <div className="mt-1">
                         <LocationPicker lat={lat} lng={lng} onChange={(newLat, newLng) => { setLat(newLat); setLng(newLng); }} />
                       </div>
