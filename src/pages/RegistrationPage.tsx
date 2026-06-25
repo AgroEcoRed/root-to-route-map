@@ -399,11 +399,11 @@ Gracias.`;
                 <div className="max-w-md mx-auto rounded-2xl border border-border bg-white p-6 shadow-elevated">
                   <div className="space-y-4">
                     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0 }}>
-                      <Label htmlFor="name">Nombre / Organización</Label>
+                      <Label htmlFor="name">Nombre de la experiencia / Organización <span className="text-destructive">*</span></Label>
                       <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ej: Finca La Esperanza" className="mt-1" required />
                     </motion.div>
                     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="email">Email <span className="text-destructive">*</span></Label>
                       <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@email.com" className="mt-1" required />
                     </motion.div>
                     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
@@ -450,7 +450,7 @@ Gracias.`;
                     {/* Geolocation picker */}
                     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
                       <div className="flex items-center justify-between gap-2">
-                        <Label>Georreferenciación</Label>
+                        <Label>Georreferenciación <span className="text-destructive">*</span></Label>
                         <Button
                           type="button"
                           size="sm"
@@ -478,15 +478,16 @@ Gracias.`;
                     </motion.div>
 
                     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-                      <Label htmlFor="phone">Teléfono</Label>
+                      <Label htmlFor="phone">Teléfono / WhatsApp <span className="text-muted-foreground text-xs font-normal">(opcional)</span></Label>
                       <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={selectedCountry ? `${selectedCountry.phoneCode} ej: 11 1234-5678` : "Seleccioná un país primero"} className="mt-1" />
+                      <p className="text-[11px] text-muted-foreground mt-1">Si lo dejás, próximamente vas a poder chatear con Sembra por WhatsApp para subir flyers, novedades y eventos.</p>
                     </motion.div>
 
                     <div className="flex gap-3 pt-4">
                       <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
                         <ArrowLeft className="h-4 w-4 mr-1" /> Volver
                       </Button>
-                      <Button onClick={() => setStep(3)} className="flex-1 bg-gradient-hero text-primary-foreground group" disabled={!email || !password || !name}>
+                      <Button onClick={() => setStep(3)} className="flex-1 bg-gradient-hero text-primary-foreground group" disabled={!email || !password || !name || lat === null || lng === null}>
                         Siguiente <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
                       </Button>
                     </div>
