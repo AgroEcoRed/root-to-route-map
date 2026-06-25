@@ -36,6 +36,9 @@ const schema = z.object({
   contact_email: z.string().trim().email("Email inválido").optional().or(z.literal("")),
   contact_phone: z.string().trim().max(40).optional(),
   extra_organizer_names: z.string().trim().max(400).optional(),
+  focal_name: z.string().trim().max(200).optional(),
+  focal_email: z.string().trim().email("Email del punto focal inválido").optional().or(z.literal("")),
+  submitted_by_name: z.string().trim().max(200).optional(),
 });
 
 interface Props {
@@ -59,6 +62,7 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
     custom_type: "",
     starts_at: "", ends_at: "", location_name: "", lat: "", lng: "", link: "", contact: "",
     contact_email: "", contact_phone: "", extra_organizer_names: "",
+    focal_name: "", focal_email: "", submitted_by_name: "",
   });
 
   const update = (k: keyof typeof form, v: string) => setForm(f => ({ ...f, [k]: v }));
@@ -166,19 +170,49 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
       source: "user",
       approved: true,
       created_by: user.id,
+      focal_name: parsed.data.focal_name || null,
+      focal_email: parsed.data.focal_email || null,
+      submitted_by_name:
+        parsed.data.submitted_by_name ||
+        (user.user_metadata as any)?.display_name ||
+        user.email ||
+        null,
     };
-    const { error } = await (supabase as any).from("events").insert(payload);
+    const { data: inserted, error } = await (supabase as any)
+      .from("events")
+      .insert(payload)
+      .select("id, edit_token")
+      .single();
     setSubmitting(false);
     if (error) {
       toast.error("No se pudo crear: " + error.message);
       return;
     }
-    toast.success(
-      payload.starts_at && payload.lat && payload.lng
-        ? "¡Actividad publicada! Aparece como punto brillante en el mapa."
-        : "¡Actividad publicada! Aparece en la barra lateral de actividades."
-    );
-    setForm({ title: "", description: "", event_type: "feria", custom_type: "", starts_at: "", ends_at: "", location_name: "", lat: "", lng: "", link: "", contact: "", contact_email: "", contact_phone: "", extra_organizer_names: "" });
+    // Notify focal point (and surface the edit link) — non-blocking.
+    const editLink = inserted?.edit_token
+      ? `${window.location.origin}/eventos/editar/${inserted.edit_token}`
+      : null;
+    if (inserted?.id) {
+      supabase.functions
+        .invoke("notify-event-created", {
+          body: { event_id: inserted.id, origin: window.location.origin },
+        })
+        .catch(() => {});
+    }
+    if (editLink) {
+      toast.success("¡Actividad publicada! Link de edición copiado al portapapeles.", {
+        duration: 8000,
+        action: { label: "Abrir", onClick: () => window.open(editLink, "_blank") },
+      });
+      try { await navigator.clipboard.writeText(editLink); } catch { /* noop */ }
+    } else {
+      toast.success(
+        payload.starts_at && payload.lat && payload.lng
+          ? "¡Actividad publicada! Aparece como punto brillante en el mapa."
+          : "¡Actividad publicada! Aparece en la barra lateral de actividades."
+      );
+    }
+    setForm({ title: "", description: "", event_type: "feria", custom_type: "", starts_at: "", ends_at: "", location_name: "", lat: "", lng: "", link: "", contact: "", contact_email: "", contact_phone: "", extra_organizer_names: "", focal_name: "", focal_email: "", submitted_by_name: "" });
     setFlyerFile(null); setFlyerPreview(null);
     onOpenChange(false);
     onCreated?.();
