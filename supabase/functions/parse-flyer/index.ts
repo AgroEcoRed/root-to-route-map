@@ -1,6 +1,9 @@
-import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
-
 // Parses an event flyer image and extracts structured info using Lovable AI (Gemini vision).
+const corsHeaders: Record<string, string> = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+}
 // Input:  { imageBase64: string, mime: string }  OR  { imageUrl: string }
 // Output: { title, description, starts_at (ISO|null), location_name, lat, lng, contact_email, contact_phone, organizers: string[] }
 
