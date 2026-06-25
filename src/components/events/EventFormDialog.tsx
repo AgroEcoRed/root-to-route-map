@@ -122,6 +122,25 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
       toast.error(parsed.error.issues[0]?.message || "Datos inválidos");
       return;
     }
+    // If user gave a location_name but no lat/lng, try to geocode via Nominatim
+    // (free, no key). This is what makes the activity appear as a glowing star
+    // on the map instead of falling into "sin fecha/lugar".
+    let geocodedLat = parsed.data.lat ? Number(parsed.data.lat) : null;
+    let geocodedLng = parsed.data.lng ? Number(parsed.data.lng) : null;
+    if ((geocodedLat == null || geocodedLng == null) && parsed.data.location_name) {
+      try {
+        const q = encodeURIComponent(parsed.data.location_name);
+        const r = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ar&q=${q}`,
+          { headers: { "Accept-Language": "es" } }
+        );
+        const arr = (await r.json()) as Array<{ lat: string; lon: string }>;
+        if (arr?.[0]) {
+          geocodedLat = Number(arr[0].lat);
+          geocodedLng = Number(arr[0].lon);
+        }
+      } catch { /* silent: fallback to undated/unplaced */ }
+    }
     // Autocomplete end date with start date if missing — supports single-day events
     // and lets the map "glow" use a definite end. If the flyer/user provided a real range,
     // we keep it as-is.
@@ -159,8 +178,8 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
       starts_at: parsed.data.starts_at ? new Date(parsed.data.starts_at).toISOString() : null,
       ends_at: effectiveEnds ? new Date(effectiveEnds).toISOString() : null,
       location_name: parsed.data.location_name || null,
-      lat: parsed.data.lat ? Number(parsed.data.lat) : null,
-      lng: parsed.data.lng ? Number(parsed.data.lng) : null,
+      lat: geocodedLat,
+      lng: geocodedLng,
       link: parsed.data.link || null,
       contact: parsed.data.contact || null,
       contact_email: parsed.data.contact_email || null,
