@@ -593,7 +593,7 @@ const MapPage = () => {
       const marker = L.marker([a.lat, a.lng], { icon })
         .bindPopup(`
           <div style="min-width:240px;font-family:DM Sans,sans-serif;padding:4px">
-            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">${sourceBadge}${freshnessBadge}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">${sourceBadge}${verificationBadge}</div>
             <a href="#" class="map-actor-link" data-producer="${encodeURIComponent(a.name)}" data-source="${a.source}" style="display:block;background:${roleBadgeColor};color:white;font-weight:700;font-size:14px;margin:0 0 8px;padding:8px 12px;border-radius:8px;text-decoration:none;cursor:pointer;text-align:center;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
               ${a.name}
               <span style="display:block;font-size:10px;font-weight:400;opacity:0.85;margin-top:2px">${a.source === 'mercado_territorial' ? 'Ver catálogo Mercado Territorial →' : 'Ver todos sus productos →'}</span>
@@ -604,6 +604,7 @@ const MapPage = () => {
             ${productsHtml}
             ${certHtml}
             ${licenseHtml}
+            ${endorseButton}
           </div>
         `);
 
