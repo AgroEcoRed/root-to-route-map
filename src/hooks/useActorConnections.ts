@@ -26,7 +26,7 @@ export const useActorConnections = () => {
   useEffect(() => {
     load();
     const channel = supabase
-      .channel("actor_connections_changes")
+      .channel(`actor_connections_changes_${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "actor_connections" }, () => load())
       .subscribe();
     return () => { supabase.removeChannel(channel); };
