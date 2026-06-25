@@ -82,6 +82,10 @@ interface MapActor {
   verified?: boolean;
   /** Days / schedule when the actor receives, opens, delivers, or runs the feria. */
   deliveryInfo?: string;
+  /** UUID of the layer_actors row (when the actor lives in the DB) — used for endorsements. */
+  layerActorId?: string;
+  /** Who confirmed this actor: 'platform' (AgroEco.Red admin) | 'layer' (layer manager) | null. */
+  verifiedByRole?: "platform" | "layer" | null;
 }
 
 // Approximate import dates for inherited datasets (used until each actor claims their record).
@@ -101,12 +105,16 @@ function formatUpdateDate(iso: string): string {
   return d.toLocaleDateString("es-AR", { month: "short", year: "numeric" });
 }
 
-function freshnessState(iso: string | null | undefined, verified: boolean | undefined): "verified-recent" | "verified-old" | "unverified" {
-  if (!verified) return "unverified";
-  if (!iso) return "verified-old";
-  const months = (Date.now() - new Date(iso).getTime()) / (1000 * 60 * 60 * 24 * 30);
-  return months <= 12 ? "verified-recent" : "verified-old";
-}
+/** Human-readable label of the dataset a layer-verified actor was endorsed by. */
+const sourceShortLabel: Record<MapActor["source"], string> = {
+  rutas_sanas: "Rutas Sanas",
+  mercado_territorial: "Mercado Territorial",
+  agroeco: "AgroEco.Red",
+  el_click: "El Click",
+  el_brote: "El Brote",
+  utt_nodos: "UTT",
+  user_points: "AgroEco.Red",
+};
 
 const actorTypeLabels: Record<ActorType, string> = {
   producer: "Productor/a Agroecológico/a",
