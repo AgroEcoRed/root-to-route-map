@@ -160,6 +160,11 @@ const RegistrationPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedType) return;
+    if (lat === null || lng === null) {
+      toast.error("La georreferenciación es obligatoria. Tocá \"Usar mi ubicación\" o marcá un punto en el mapa.");
+      setStep(2);
+      return;
+    }
     if (!descriptionValid) {
       toast.error(`La descripción debe tener al menos ${minWords} palabras.`);
       return;
