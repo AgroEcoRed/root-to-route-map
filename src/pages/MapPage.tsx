@@ -27,6 +27,7 @@ import { EventFormDialog } from "@/components/events/EventFormDialog";
 import { EventsSidebar } from "@/components/events/EventsSidebar";
 import { AddMapPointDialog } from "@/components/AddMapPointDialog";
 import { EndorseDialog } from "@/components/actors/EndorseDialog";
+import { DeclareConnectionDialog } from "@/components/actors/DeclareConnectionDialog";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -306,6 +307,7 @@ const MapPage = () => {
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [addPointOpen, setAddPointOpen] = useState(false);
   const [endorseTarget, setEndorseTarget] = useState<{ id: string; name: string } | null>(null);
+  const [connectTarget, setConnectTarget] = useState<{ id: string; name: string } | null>(null);
   const [endorsements, setEndorsements] = useState<Map<string, { count: number; last_at: string }>>(new Map());
   const [endorsementsTick, setEndorsementsTick] = useState(0);
 
@@ -581,6 +583,10 @@ const MapPage = () => {
         ? `<button class="map-endorse-btn" data-actor-id="${a.layerActorId}" data-actor-name="${encodeURIComponent(a.name)}" style="margin-top:6px;background:#fef3c7;color:#854d0e;border:1px solid #fcd34d;font-size:10px;font-weight:600;padding:4px 8px;border-radius:6px;cursor:pointer">🤝 Dar voto de confianza</button>`
         : "";
 
+      const connectButton = (user && a.layerActorId)
+        ? `<button class="map-connect-btn" data-actor-id="${a.layerActorId}" data-actor-name="${encodeURIComponent(a.name)}" style="margin-top:6px;margin-left:6px;background:#e0e7ff;color:#3730a3;border:1px solid #a5b4fc;font-size:10px;font-weight:600;padding:4px 8px;border-radius:6px;cursor:pointer">🔗 Declarar vínculo</button>`
+        : "";
+
       const deliveryHtml = a.deliveryInfo
         ? `<div style="display:flex;align-items:center;gap:6px;margin:8px 0 4px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:6px 10px">
               <span style="font-size:14px;line-height:1">🗓️</span>
@@ -606,6 +612,7 @@ const MapPage = () => {
             ${certHtml}
             ${licenseHtml}
             ${endorseButton}
+            ${connectButton}
           </div>
         `);
 
@@ -641,6 +648,15 @@ const MapPage = () => {
               const id = (el as HTMLElement).dataset.actorId || "";
               const name = decodeURIComponent((el as HTMLElement).dataset.actorName || "");
               if (id) setEndorseTarget({ id, name });
+            });
+          });
+          // Declare-connection button → open dialog
+          document.querySelectorAll(".map-connect-btn").forEach((el) => {
+            el.addEventListener("click", (e) => {
+              e.preventDefault();
+              const id = (el as HTMLElement).dataset.actorId || "";
+              const name = decodeURIComponent((el as HTMLElement).dataset.actorName || "");
+              if (id) setConnectTarget({ id, name });
             });
           });
         }, 50);
