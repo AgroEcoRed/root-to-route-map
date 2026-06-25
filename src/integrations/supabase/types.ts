@@ -304,6 +304,7 @@ export type Database = {
           address: string | null
           contact: string | null
           created_at: string
+          created_by: string | null
           delivery_days: string[] | null
           description: string | null
           extra: Json
@@ -321,6 +322,7 @@ export type Database = {
           address?: string | null
           contact?: string | null
           created_at?: string
+          created_by?: string | null
           delivery_days?: string[] | null
           description?: string | null
           extra?: Json
@@ -338,6 +340,7 @@ export type Database = {
           address?: string | null
           contact?: string | null
           created_at?: string
+          created_by?: string | null
           delivery_days?: string[] | null
           description?: string | null
           extra?: Json
