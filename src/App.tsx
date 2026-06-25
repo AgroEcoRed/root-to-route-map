@@ -29,6 +29,7 @@ import AdminPage from "./pages/AdminPage";
 import AdminHintsPage from "./pages/AdminHintsPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
 import ObservatorioPage from "./pages/ObservatorioPage";
+import ConfirmActorPage from "./pages/ConfirmActorPage";
 import ChatAsistente from "./components/chat/ChatAsistente";
 import NotFound from "./pages/NotFound";
 
@@ -75,6 +76,7 @@ const App = () => (
               <Route path="/admin" element={<AdminPage />} />
               <Route path="/admin/hints" element={<AdminHintsPage />} />
               <Route path="/admin/usuarios" element={<AdminUsersPage />} />
+              <Route path="/confirmar/:token" element={<ConfirmActorPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <ChatAsistente />
