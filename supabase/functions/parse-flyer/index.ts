@@ -1,4 +1,6 @@
 // Parses an event flyer image and extracts structured info using Lovable AI (Gemini vision).
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+
 const corsHeaders: Record<string, string> = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -13,10 +15,24 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Auth check
+    // Real JWT validation: verify the bearer token resolves to a valid user.
     const authHeader = req.headers.get('Authorization') ?? ''
-    if (!authHeader.toLowerCase().startsWith('bearer ')) {
-      return new Response(JSON.stringify({ error: 'Missing bearer token' }), {
+    const token = authHeader.toLowerCase().startsWith('bearer ')
+      ? authHeader.slice(7).trim()
+      : ''
+    if (!token) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
+    const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+    })
+    const { data: userData, error: userErr } = await sb.auth.getUser(token)
+    if (userErr || !userData?.user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }

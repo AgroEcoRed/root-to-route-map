@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.chat-asistente]
 verify_jwt = false
+
+[functions.confirm-actor]
+verify_jwt = false

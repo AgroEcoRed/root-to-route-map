@@ -36,13 +36,16 @@ export default function ConfirmActorPage() {
   useEffect(() => {
     (async () => {
       if (!token) return;
-      const { data, error } = await (supabase as any).rpc("get_actor_by_token", { _token: token });
-      if (error || !data) {
+      const { data, error } = await supabase.functions.invoke("confirm-actor", {
+        body: { token, action: "get" },
+      });
+      if (error || !data || (data as any).error) {
         setError("Link inválido o expirado");
       } else {
-        setActor(data as Actor);
-        if (data.confirmation_status === "confirmed" || data.confirmation_status === "rejected") {
-          setDone(data.confirmation_status);
+        const row = data as Actor;
+        setActor(row);
+        if (row.confirmation_status === "confirmed" || row.confirmation_status === "rejected") {
+          setDone(row.confirmation_status as "confirmed" | "rejected");
         }
       }
       setLoading(false);
@@ -52,19 +55,23 @@ export default function ConfirmActorPage() {
   const decide = async (decision: "confirmed" | "rejected") => {
     if (!actor || !token) return;
     setSaving(true);
-    const { error } = await (supabase as any).rpc("confirm_actor_by_token", {
-      _token: token,
-      _decision: decision,
-      _name: actor.name,
-      _description: actor.description,
-      _address: actor.address,
-      _contact: actor.contact,
-      _delivery_days: actor.delivery_days,
-      _lat: actor.lat,
-      _lng: actor.lng,
+    const { data, error } = await supabase.functions.invoke("confirm-actor", {
+      body: {
+        token,
+        action: "confirm",
+        decision,
+        name: actor.name,
+        description: actor.description,
+        address: actor.address,
+        contact: actor.contact,
+        delivery_days: actor.delivery_days,
+        lat: actor.lat,
+        lng: actor.lng,
+      },
     });
     setSaving(false);
-    if (error) return toast.error("No se pudo guardar: " + error.message);
+    const errMsg = error?.message || (data as any)?.error;
+    if (errMsg) return toast.error("No se pudo guardar: " + errMsg);
     setDone(decision);
     toast.success(decision === "confirmed" ? "¡Gracias por confirmar!" : "Registro marcado como incorrecto");
   };
