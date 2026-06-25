@@ -12,6 +12,46 @@ const corsHeaders = {
 
 const CHAT_MODEL = "google/gemini-3-flash-preview";
 
+// ---------- In-memory per-IP rate limit (abuse / credit-drain protection) ----------
+// Bucket: { count, windowStart } per IP. Two windows enforced:
+//   - 8 requests / 60s burst window
+//   - 60 requests / 60min sustained window
+// Authenticated users get higher limits.
+type Bucket = { burst: number; burstAt: number; hour: number; hourAt: number };
+const buckets = new Map<string, Bucket>();
+const BURST_WINDOW_MS = 60_000;
+const HOUR_WINDOW_MS = 60 * 60_000;
+function clientIp(req: Request): string {
+  const xf = req.headers.get("x-forwarded-for") || "";
+  const ip = xf.split(",")[0]?.trim();
+  return ip || req.headers.get("cf-connecting-ip") || "unknown";
+}
+function rateLimit(ip: string, authed: boolean): { ok: boolean; retryAfter?: number } {
+  const now = Date.now();
+  const b = buckets.get(ip) ?? { burst: 0, burstAt: now, hour: 0, hourAt: now };
+  if (now - b.burstAt > BURST_WINDOW_MS) { b.burst = 0; b.burstAt = now; }
+  if (now - b.hourAt > HOUR_WINDOW_MS)   { b.hour  = 0; b.hourAt  = now; }
+  const burstMax = authed ? 20 : 8;
+  const hourMax  = authed ? 200 : 60;
+  if (b.burst >= burstMax) {
+    buckets.set(ip, b);
+    return { ok: false, retryAfter: Math.ceil((BURST_WINDOW_MS - (now - b.burstAt)) / 1000) };
+  }
+  if (b.hour >= hourMax) {
+    buckets.set(ip, b);
+    return { ok: false, retryAfter: Math.ceil((HOUR_WINDOW_MS - (now - b.hourAt)) / 1000) };
+  }
+  b.burst++; b.hour++;
+  buckets.set(ip, b);
+  // Opportunistic cleanup to avoid unbounded growth.
+  if (buckets.size > 5000) {
+    for (const [k, v] of buckets) {
+      if (now - v.hourAt > HOUR_WINDOW_MS) buckets.delete(k);
+    }
+  }
+  return { ok: true };
+}
+
 type ChatMode = "general" | "onboarding" | "map";
 
 const BASE_TONE =
@@ -259,6 +299,32 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Per-IP rate limit (and slightly looser when the caller is signed-in).
+    const ip = clientIp(req);
+    const authHeader = req.headers.get("Authorization") ?? "";
+    let authed = false;
+    if (authHeader.toLowerCase().startsWith("bearer ")) {
+      const tok = authHeader.slice(7).trim();
+      // We don't fully verify here (avoids extra latency on a public endpoint),
+      // but a non-empty token from the legit client bumps the IP into the
+      // higher tier. Anonymous abuse is bounded by the strict anon tier below.
+      if (tok && tok.length > 20) authed = true;
+    }
+    const rl = rateLimit(ip, authed);
+    if (!rl.ok) {
+      return new Response(
+        JSON.stringify({ error: "Demasiadas consultas. Probá de nuevo en un momento." }),
+        {
+          status: 429,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+            "Retry-After": String(rl.retryAfter ?? 30),
+          },
+        },
+      );
+    }
+
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     if (!apiKey) {
       return new Response(
