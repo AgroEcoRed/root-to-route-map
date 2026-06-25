@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2, CheckCircle2, XCircle, MapPin } from "lucide-react";
+import { DeclareConnectionDialog } from "@/components/actors/DeclareConnectionDialog";
+import { Network } from "lucide-react";
 
 interface Actor {
   id: string;
@@ -32,6 +34,7 @@ export default function ConfirmActorPage() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState<"confirmed" | "rejected" | null>(null);
+  const [connectOpen, setConnectOpen] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -109,6 +112,19 @@ export default function ConfirmActorPage() {
                 <Button asChild variant="outline"><Link to="/mapa"><MapPin className="h-4 w-4 mr-1" /> Ver mapa</Link></Button>
                 <Button asChild><Link to="/registro">Registrarme en AgroEco.Red</Link></Button>
               </div>
+              {done === "confirmed" && (
+                <div className="mt-6 pt-6 border-t">
+                  <h2 className="font-display text-lg mb-1 flex items-center justify-center gap-2">
+                    <Network className="h-4 w-4 text-primary" /> Tejé los vínculos de tu red
+                  </h2>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    ¿Con quiénes trabajás? Sumá vínculos hacia otras experiencias del mapa: se dibujarán como líneas en la red de vínculos.
+                  </p>
+                  <Button onClick={() => setConnectOpen(true)} className="bg-gradient-hero text-primary-foreground">
+                    <Network className="h-4 w-4 mr-1" /> Sumar un vínculo
+                  </Button>
+                </div>
+              )}
             </Card>
           ) : actor ? (
             <Card className="p-6">
