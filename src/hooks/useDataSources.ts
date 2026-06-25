@@ -40,7 +40,7 @@ export const useDataSources = () => {
     load();
 
     const channel = supabase
-      .channel("data_source_settings_changes")
+      .channel(`data_source_settings_changes_${Math.random().toString(36).slice(2)}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "data_source_settings" },
