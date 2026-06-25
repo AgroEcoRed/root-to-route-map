@@ -551,17 +551,34 @@ const MapPage = () => {
         ? `<span style="display:inline-block;background:#fef3c7;color:#92400e;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #fcd34d;letter-spacing:0.3px;text-transform:uppercase">Comunidad</span>`
         : `<span style="display:inline-block;background:#dcfce7;color:#15803d;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #86efac;letter-spacing:0.3px;text-transform:uppercase">AgroEco.Red</span>`;
 
-      const state = freshnessState(a.lastUpdated, a.verified);
+      // Verification tier (highest to lowest):
+      //   1. Platform-verified (AgroEco.Red admin)
+      //   2. Layer-verified (admin of the source layer, e.g. Rutas Sanas)
+      //   3. Network-endorsed (X votos de confianza de miembros)
+      //   4. Imported (just a record from the source, no confirmation yet)
       const dateLabel = a.lastUpdated ? formatUpdateDate(a.lastUpdated) : "";
-      const freshnessBadge = (() => {
-        if (state === "verified-recent") {
-          return `<span title="Información verificada recientemente · Actualizado ${dateLabel}" style="display:inline-flex;align-items:center;gap:3px;background:#e0e7ff;color:#3730a3;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #a5b4fc;letter-spacing:0.2px">✓ Verificado · ${dateLabel}</span>`;
+      const endorseInfo = a.layerActorId ? endorsements.get(a.layerActorId) : undefined;
+      const endorseDateLabel = endorseInfo?.last_at ? formatUpdateDate(endorseInfo.last_at) : "";
+      const verificationBadge = (() => {
+        if (a.verifiedByRole === "platform") {
+          return `<span title="Verificado por el equipo de AgroEco.Red el ${dateLabel}" style="display:inline-flex;align-items:center;gap:3px;background:#dcfce7;color:#14532d;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #4ade80;letter-spacing:0.2px">✓ Verificado por AgroEco.Red · ${dateLabel}</span>`;
         }
-        if (state === "verified-old") {
-          return `<span title="Verificado en algún momento, pero hace más de 12 meses${dateLabel ? ` · Última actualización ${dateLabel}` : ""}" style="display:inline-flex;align-items:center;gap:3px;background:#e2e8f0;color:#475569;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #94a3b8;letter-spacing:0.2px">✓ Verificado · ${dateLabel || "sin fecha"} (antigua)</span>`;
+        if (a.verifiedByRole === "layer") {
+          const label = sourceShortLabel[a.source] || "el equipo de la capa";
+          return `<span title="Verificado por ${label} el ${dateLabel}" style="display:inline-flex;align-items:center;gap:3px;background:#e0e7ff;color:#3730a3;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #a5b4fc;letter-spacing:0.2px">✓ Verificado por ${label} · ${dateLabel}</span>`;
         }
-        return `<span title="Datos heredados de la fuente original, aún no confirmados${dateLabel ? ` · Importado ${dateLabel}` : ""}" style="display:inline-flex;align-items:center;gap:3px;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.2px">⟳ Por verificar${dateLabel ? ` · ${dateLabel}` : ""}</span>`;
+        if (endorseInfo && endorseInfo.count > 0) {
+          const label = endorseInfo.count === 1 ? "1 voto de confianza" : `${endorseInfo.count} votos de confianza`;
+          return `<span title="Miembros de la red dieron su voto de confianza. Último: ${endorseDateLabel}" style="display:inline-flex;align-items:center;gap:3px;background:#fef3c7;color:#854d0e;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #fcd34d;letter-spacing:0.2px">🤝 ${label} · último ${endorseDateLabel}</span>`;
+        }
+        return dateLabel
+          ? `<span title="Registro importado de la fuente original — todavía no verificado por la red." style="display:inline-flex;align-items:center;gap:3px;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.2px">Importado · ${dateLabel}</span>`
+          : "";
       })();
+
+      const endorseButton = (user && a.layerActorId && a.verifiedByRole !== "platform")
+        ? `<button class="map-endorse-btn" data-actor-id="${a.layerActorId}" data-actor-name="${encodeURIComponent(a.name)}" style="margin-top:6px;background:#fef3c7;color:#854d0e;border:1px solid #fcd34d;font-size:10px;font-weight:600;padding:4px 8px;border-radius:6px;cursor:pointer">🤝 Dar voto de confianza</button>`
+        : "";
 
       const deliveryHtml = a.deliveryInfo
         ? `<div style="display:flex;align-items:center;gap:6px;margin:8px 0 4px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:6px 10px">
