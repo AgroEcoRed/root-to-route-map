@@ -1019,6 +1019,12 @@ const MapPage = () => {
         actorName={endorseTarget?.name || ""}
         onSubmitted={() => setEndorsementsTick((x) => x + 1)}
       />
+      <DeclareConnectionDialog
+        open={!!connectTarget}
+        onOpenChange={(v) => { if (!v) setConnectTarget(null); }}
+        targetActorId={connectTarget?.id || null}
+        targetActorName={connectTarget?.name || ""}
+      />
     </div>
   );
 };
