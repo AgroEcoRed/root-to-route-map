@@ -21,7 +21,7 @@ interface Props {
  * The note is private (RLS-protected) — only count + last date are public.
  */
 export const EndorseDialog = ({ open, onOpenChange, actorId, actorName, onSubmitted }: Props) => {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -34,7 +34,7 @@ export const EndorseDialog = ({ open, onOpenChange, actorId, actorName, onSubmit
     const { error } = await (supabase as any).from("actor_endorsements").insert({
       layer_actor_id: actorId,
       endorser_user_id: user.id,
-      endorser_display: (profile as any)?.display_name || user.email || null,
+      endorser_display: (user.user_metadata as any)?.display_name || user.email || null,
       note: note.trim() || null,
     });
     setSubmitting(false);
