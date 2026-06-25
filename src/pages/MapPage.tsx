@@ -26,6 +26,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { EventFormDialog } from "@/components/events/EventFormDialog";
 import { EventsSidebar } from "@/components/events/EventsSidebar";
 import { AddMapPointDialog } from "@/components/AddMapPointDialog";
+import { EndorseDialog } from "@/components/actors/EndorseDialog";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -995,6 +996,13 @@ const MapPage = () => {
       <DataSourceToggle position="bottom-6 right-6" />
       <EventFormDialog open={eventDialogOpen} onOpenChange={setEventDialogOpen} />
       <AddMapPointDialog open={addPointOpen} onOpenChange={setAddPointOpen} />
+      <EndorseDialog
+        open={!!endorseTarget}
+        onOpenChange={(v) => { if (!v) setEndorseTarget(null); }}
+        actorId={endorseTarget?.id || null}
+        actorName={endorseTarget?.name || ""}
+        onSubmitted={() => setEndorsementsTick((x) => x + 1)}
+      />
     </div>
   );
 };
