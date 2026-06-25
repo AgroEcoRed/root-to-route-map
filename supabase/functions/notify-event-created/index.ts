@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
       <p>${ev.submitted_by_name ? escapeHtml(ev.submitted_by_name) + " cargó" : "Se cargó"} la siguiente actividad y te designó como punto focal:</p>
       <p style="background:#f0fdf4;border-left:4px solid #15803d;padding:10px 14px;border-radius:6px">
         <strong>${escapeHtml(ev.title)}</strong><br/>
-        ${ev.starts_at ? `📅 ${new Date(ev.starts_at).toLocaleString("es-AR")}<br/>` : ""}
+        ${ev.starts_at ? `📅 ${formatAR(ev.starts_at)}<br/>` : ""}
         ${ev.location_name ? `📍 ${escapeHtml(ev.location_name)}` : ""}
       </p>
       ${flyerBlock}
@@ -145,4 +145,19 @@ function escapeHtml(s: string): string {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+// Formatea una fecha ISO en horario argentino (UTC-3), 24 h. Evita el
+// bug de mostrar 17:00 UTC ("5:00 PM") cuando la actividad es a las 14 h AR.
+function formatAR(iso: string): string {
+  try {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    const fmt = new Intl.DateTimeFormat("es-AR", {
+      timeZone: "America/Argentina/Buenos_Aires",
+      day: "2-digit", month: "2-digit", year: "numeric",
+      hour: "2-digit", minute: "2-digit", hour12: false,
+    });
+    return fmt.format(d) + " h (hora AR)";
+  } catch { return iso; }
 }

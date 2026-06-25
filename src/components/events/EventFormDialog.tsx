@@ -33,7 +33,8 @@ const schema = z.object({
   lng: z.string().optional(),
   link: z.string().trim().max(300).url("URL inválida").optional().or(z.literal("")),
   contact: z.string().trim().max(200).optional(),
-  contact_email: z.string().trim().email("Email inválido").optional().or(z.literal("")),
+  // Otros contactos: lista libre de emails separados por espacios, comas o ;
+  contact_email: z.string().trim().max(600).optional(),
   contact_phone: z.string().trim().max(40).optional(),
   extra_organizer_names: z.string().trim().max(400).optional(),
   focal_name: z.string().trim().max(200).optional(),
@@ -182,7 +183,13 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
       lng: geocodedLng,
       link: parsed.data.link || null,
       contact: parsed.data.contact || null,
-      contact_email: parsed.data.contact_email || null,
+      contact_email: parsed.data.contact_email
+        ? parsed.data.contact_email
+            .split(/[\s,;]+/)
+            .map((s) => s.trim())
+            .filter((s) => /.+@.+\..+/.test(s))
+            .join(", ") || null
+        : null,
       contact_phone: parsed.data.contact_phone || null,
       extra_organizer_names: extraOrgs,
       flyer_url,
@@ -324,15 +331,20 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
             <Label>Lugar (texto)</Label>
             <Input value={form.location_name} onChange={(e) => update("location_name", e.target.value)} maxLength={200} placeholder="Ej: Plaza de Florencio Varela" />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Contacto email</Label>
-              <Input value={form.contact_email} onChange={(e) => update("contact_email", e.target.value)} placeholder="ej@correo.com" />
-            </div>
-            <div>
-              <Label>Contacto teléfono</Label>
-              <Input value={form.contact_phone} onChange={(e) => update("contact_phone", e.target.value)} placeholder="+54 9 11 ..." />
-            </div>
+          <div>
+            <Label>Otros contactos (mails)</Label>
+            <Input
+              value={form.contact_email}
+              onChange={(e) => update("contact_email", e.target.value)}
+              placeholder="otro@correo.com  tercero@correo.com"
+            />
+            <p className="text-[10px] text-muted-foreground mt-1">
+              Separá varios mails con espacios, comas o punto y coma. Todos reciben copia.
+            </p>
+          </div>
+          <div>
+            <Label>Contacto teléfono</Label>
+            <Input value={form.contact_phone} onChange={(e) => update("contact_phone", e.target.value)} placeholder="+54 9 11 ..." />
           </div>
           <div>
             <Label>Co-organizan (separados por coma)</Label>
