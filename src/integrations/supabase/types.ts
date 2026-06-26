@@ -1279,6 +1279,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      get_my_event_edit_token: { Args: { _event_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
