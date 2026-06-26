@@ -20,7 +20,7 @@ import { Search, Filter, X, ArrowUp, ArrowDown, Minus, CalendarPlus, Network, Sp
 import { DataSourceToggle } from "@/components/admin/DataSourceToggle";
 import { useDataSources } from "@/hooks/useDataSources";
 import { useLayerActors } from "@/hooks/useLayerActors";
-import { useEvents, glowIntensity, eventBucket } from "@/hooks/useEvents";
+import { useEvents, glowIntensity, eventBucket, proximityColor } from "@/hooks/useEvents";
 import { useActorConnections } from "@/hooks/useActorConnections";
 import { useAuth } from "@/contexts/AuthContext";
 import { EventFormDialog } from "@/components/events/EventFormDialog";
@@ -681,14 +681,9 @@ const MapPage = () => {
       const size = 14 + Math.round(intensity * 22);   // 14 → 36 px halo
       const spread = 2 + Math.round(intensity * 10);
       const speed = (2.8 - intensity * 1.6).toFixed(2);
-      // Color scale: lejos (azul) → cerca (rojo). Más intensidad = más cálido.
-      const starColor =
-        intensity >= 0.9 ? "#dc2626" :     // < 12h → rojo intenso
-        intensity >= 0.75 ? "#ef4444" :    // < 1 día
-        intensity >= 0.55 ? "#f97316" :    // < 3 días
-        intensity >= 0.35 ? "#a855f7" :    // < 7 días
-        intensity >= 0.25 ? "#7c3aed" :    // < 14 días
-        "#2563eb";                          // lejos → azul
+      // Color scale: lejos (azul frío) → cerca (rojo cálido). Sin violetas
+      // para no chocar con los íconos de actores (que ya usan morados).
+      const starColor = proximityColor(intensity);
       const shadow = starColor.replace("#", "");
       const r = parseInt(shadow.slice(0,2), 16), g = parseInt(shadow.slice(2,4), 16), b = parseInt(shadow.slice(4,6), 16);
       const shadowRgba = `rgba(${r},${g},${b},${0.45 + intensity * 0.4})`;
@@ -715,9 +710,8 @@ const MapPage = () => {
       const contactHtml = contactBits.length ? `<p style="font-size:11px;color:#444;margin:6px 0 0">Confirmar info: ${contactBits.join(" · ")}</p>` : "";
       const descHtml = ev.description ? `<p style="font-size:12px;color:#444;margin:6px 0">${ev.description}</p>` : "";
       const locHtml = ev.location_name ? `<p style="font-size:11px;color:#666;margin:4px 0">📍 ${ev.location_name}</p>` : "";
-      const flyerHtml = (ev as any).flyer_url
-        ? `<img src="${(ev as any).flyer_url}" alt="Flyer" style="width:100%;border-radius:8px;margin-top:6px;border:1px solid #e5e7eb" />`
-        : "";
+      // Flyer NO se muestra en el popup del mapa — vive solo en la barra de la derecha.
+      const flyerHtml = "";
       const orgs = ((ev as any).extra_organizer_names || []) as string[];
       const orgsHtml = orgs.length ? `<p style="font-size:11px;color:#444;margin:6px 0 0"><b>Co-organizan:</b> ${orgs.join(", ")}</p>` : "";
       const shareHtml = `<p style="margin:8px 0 0;font-size:11px;color:#6b7280">💡 Click derecho sobre la estrella para copiar un link directo a esta actividad.</p>`;
