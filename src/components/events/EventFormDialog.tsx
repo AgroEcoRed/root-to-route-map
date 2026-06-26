@@ -129,18 +129,36 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
     let geocodedLat = parsed.data.lat ? Number(parsed.data.lat) : null;
     let geocodedLng = parsed.data.lng ? Number(parsed.data.lng) : null;
     if ((geocodedLat == null || geocodedLng == null) && parsed.data.location_name) {
-      try {
-        const q = encodeURIComponent(parsed.data.location_name);
-        const r = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ar&q=${q}`,
-          { headers: { "Accept-Language": "es" } }
-        );
-        const arr = (await r.json()) as Array<{ lat: string; lon: string }>;
-        if (arr?.[0]) {
-          geocodedLat = Number(arr[0].lat);
-          geocodedLng = Number(arr[0].lon);
-        }
-      } catch { /* silent: fallback to undated/unplaced */ }
+      // Build a list of progressively simpler queries. Helps cases like
+      // "Crámer entre Virrey Avilés y Virrey Olaguer y Feliú" donde la
+      // primera consulta literal falla pero "Cramer y Virrey Avilés" sí
+      // resuelve.
+      const raw = parsed.data.location_name.trim();
+      const queries: string[] = [raw];
+      const m = raw.match(/^([^,]+?)\s+(?:entre|y|esquina|esq\.?|&)\s+([^,]+?)(?:\s+y\s+.+)?(?:,\s*(.+))?$/i);
+      if (m) {
+        const main = m[1].trim();
+        const cross = m[2].trim();
+        const place = (m[3] || "Buenos Aires").trim();
+        queries.push(`${main} y ${cross}, ${place}`);
+        queries.push(`${main} ${cross}, ${place}`);
+        queries.push(`${cross}, ${place}`);
+        queries.push(`${main}, ${place}`);
+      }
+      for (const q of queries) {
+        try {
+          const r = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ar&q=${encodeURIComponent(q)}`,
+            { headers: { "Accept-Language": "es" } }
+          );
+          const arr = (await r.json()) as Array<{ lat: string; lon: string }>;
+          if (arr?.[0]) {
+            geocodedLat = Number(arr[0].lat);
+            geocodedLng = Number(arr[0].lon);
+            break;
+          }
+        } catch { /* try next */ }
+      }
     }
     // Autocomplete end date with start date if missing — supports single-day events
     // and lets the map "glow" use a definite end. If the flyer/user provided a real range,
@@ -331,30 +349,6 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
             <Label>Lugar (texto)</Label>
             <Input value={form.location_name} onChange={(e) => update("location_name", e.target.value)} maxLength={200} placeholder="Ej: Plaza de Florencio Varela" />
           </div>
-          <div>
-            <Label>Otros contactos (mails)</Label>
-            <Input
-              value={form.contact_email}
-              onChange={(e) => update("contact_email", e.target.value)}
-              placeholder="otro@correo.com  tercero@correo.com"
-            />
-            <p className="text-[10px] text-muted-foreground mt-1">
-              Separá varios mails con espacios, comas o punto y coma. Todos reciben copia.
-            </p>
-          </div>
-          <div>
-            <Label>Contacto teléfono</Label>
-            <Input value={form.contact_phone} onChange={(e) => update("contact_phone", e.target.value)} placeholder="+54 9 11 ..." />
-          </div>
-          <div>
-            <Label>Co-organizan (separados por coma)</Label>
-            <Input
-              value={form.extra_organizer_names}
-              onChange={(e) => update("extra_organizer_names", e.target.value)}
-              placeholder="Ej: NAT San Martín, UTT, Municipio…"
-            />
-            <p className="text-[10px] text-muted-foreground mt-1">Cada organización mencionada genera una línea en la red de vínculos.</p>
-          </div>
           <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-3">
             <p className="text-xs font-semibold text-foreground">Punto focal de la actividad</p>
             <p className="text-[11px] text-muted-foreground -mt-2">
@@ -378,6 +372,26 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
                 placeholder={`Tu nombre (default: ${(user?.user_metadata as any)?.display_name || user?.email || "tu cuenta"})`}
               />
             </div>
+          </div>
+          <div>
+            <Label>Co-organizan (separados por coma)</Label>
+            <Input
+              value={form.extra_organizer_names}
+              onChange={(e) => update("extra_organizer_names", e.target.value)}
+              placeholder="Ej: NAT San Martín, UTT, Municipio…"
+            />
+            <p className="text-[10px] text-muted-foreground mt-1">Cada organización mencionada genera una línea en la red de vínculos.</p>
+          </div>
+          <div>
+            <Label>Otros contactos (opcional)</Label>
+            <Input
+              value={form.contact_email}
+              onChange={(e) => update("contact_email", e.target.value)}
+              placeholder="otro@correo.com  tercero@correo.com"
+            />
+            <p className="text-[10px] text-muted-foreground mt-1">
+              Mails adicionales que también recibirán copia. Separalos con espacios, comas o punto y coma.
+            </p>
           </div>
           {!quick && (
             <>
