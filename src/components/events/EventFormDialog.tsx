@@ -129,18 +129,36 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
     let geocodedLat = parsed.data.lat ? Number(parsed.data.lat) : null;
     let geocodedLng = parsed.data.lng ? Number(parsed.data.lng) : null;
     if ((geocodedLat == null || geocodedLng == null) && parsed.data.location_name) {
-      try {
-        const q = encodeURIComponent(parsed.data.location_name);
-        const r = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ar&q=${q}`,
-          { headers: { "Accept-Language": "es" } }
-        );
-        const arr = (await r.json()) as Array<{ lat: string; lon: string }>;
-        if (arr?.[0]) {
-          geocodedLat = Number(arr[0].lat);
-          geocodedLng = Number(arr[0].lon);
-        }
-      } catch { /* silent: fallback to undated/unplaced */ }
+      // Build a list of progressively simpler queries. Helps cases like
+      // "Crámer entre Virrey Avilés y Virrey Olaguer y Feliú" donde la
+      // primera consulta literal falla pero "Cramer y Virrey Avilés" sí
+      // resuelve.
+      const raw = parsed.data.location_name.trim();
+      const queries: string[] = [raw];
+      const m = raw.match(/^([^,]+?)\s+(?:entre|y|esquina|esq\.?|&)\s+([^,]+?)(?:\s+y\s+.+)?(?:,\s*(.+))?$/i);
+      if (m) {
+        const main = m[1].trim();
+        const cross = m[2].trim();
+        const place = (m[3] || "Buenos Aires").trim();
+        queries.push(`${main} y ${cross}, ${place}`);
+        queries.push(`${main} ${cross}, ${place}`);
+        queries.push(`${cross}, ${place}`);
+        queries.push(`${main}, ${place}`);
+      }
+      for (const q of queries) {
+        try {
+          const r = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ar&q=${encodeURIComponent(q)}`,
+            { headers: { "Accept-Language": "es" } }
+          );
+          const arr = (await r.json()) as Array<{ lat: string; lon: string }>;
+          if (arr?.[0]) {
+            geocodedLat = Number(arr[0].lat);
+            geocodedLng = Number(arr[0].lon);
+            break;
+          }
+        } catch { /* try next */ }
+      }
     }
     // Autocomplete end date with start date if missing — supports single-day events
     // and lets the map "glow" use a definite end. If the flyer/user provided a real range,
