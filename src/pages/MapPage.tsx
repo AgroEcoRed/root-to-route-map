@@ -39,6 +39,25 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 
+// ----------------------------------------------------------------------------
+// HTML/URL safety helpers — Leaflet's bindPopup accepts a raw HTML string, so
+// any DB-sourced field interpolated into a popup must be HTML-escaped to avoid
+// stored-XSS. URLs are additionally sanitized to allow only http(s)/mailto/tel.
+// ----------------------------------------------------------------------------
+const escHtml = (v: unknown): string =>
+  String(v ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+const safeUrl = (u: unknown): string | null => {
+  const s = String(u ?? "").trim();
+  if (!s) return null;
+  if (/^(https?:|mailto:|tel:)/i.test(s)) return s.replace(/"/g, "%22");
+  return null;
+};
+
 type ActorType =
   | "producer"
   | "cooperative"
