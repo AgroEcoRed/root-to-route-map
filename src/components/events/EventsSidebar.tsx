@@ -38,7 +38,8 @@ const Card = ({
   const dateStr = dt
     ? dt.toLocaleString("es-AR", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
     : "Sin fecha";
-  const contactLine = ev.contact_email || ev.contact_phone || ev.contact;
+  // Public contact line: no longer expose focal/contact emails publicly.
+  const contactLine = ev.contact_phone || ev.contact;
   const flyerUrl = (ev as any).flyer_url as string | null | undefined;
   // Color de proximidad para la barra lateral izquierda de cada tarjeta.
   const intensity = glowIntensity(ev.starts_at);
@@ -115,17 +116,12 @@ const Card = ({
         </p>
       )}
       <div className="mt-2 flex flex-wrap gap-1.5" onClick={(e) => e.stopPropagation()}>
-        {ev.contact_email && (
-          <a href={`mailto:${ev.contact_email}`} className="text-[11px] inline-flex items-center gap-1 text-primary hover:underline">
-            <Mail className="h-3 w-3" /> {ev.contact_email}
-          </a>
-        )}
         {ev.contact_phone && (
           <a href={`tel:${ev.contact_phone}`} className="text-[11px] inline-flex items-center gap-1 text-primary hover:underline">
             <Phone className="h-3 w-3" /> {ev.contact_phone}
           </a>
         )}
-        {!ev.contact_email && !ev.contact_phone && contactLine && (
+        {!ev.contact_phone && contactLine && (
           <span className="text-[11px] text-muted-foreground">📞 {contactLine}</span>
         )}
         {ev.link && (
