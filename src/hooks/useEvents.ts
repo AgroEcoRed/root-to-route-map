@@ -77,3 +77,17 @@ export function glowIntensity(startsAt: string | null): number {
   if (days < 14) return 0.35;
   return 0.2;
 }
+
+/**
+ * Color scale for upcoming events based on proximity (intensity 0..1).
+ * Cold blue (lejos) → cyan → amarillo → naranja → rojo (inminente).
+ * Evita morados/violetas para no chocar con los íconos de actores en el mapa.
+ */
+export function proximityColor(intensity: number): string {
+  if (intensity >= 0.9) return "#dc2626";  // < 12 h → rojo
+  if (intensity >= 0.75) return "#f97316"; // < 1 día → naranja
+  if (intensity >= 0.55) return "#f59e0b"; // < 3 días → ámbar
+  if (intensity >= 0.35) return "#eab308"; // < 7 días → amarillo
+  if (intensity >= 0.25) return "#0ea5e9"; // < 14 días → celeste
+  return "#2563eb";                          // lejos → azul
+}
