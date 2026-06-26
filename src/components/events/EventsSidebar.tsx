@@ -142,11 +142,13 @@ export const EventsSidebarContent = ({
   events,
   onFlyTo,
   onShare,
+  onOpenEvent,
   highlightedEventId,
 }: {
   events: AgroEventFull[];
   onFlyTo?: (lat: number, lng: number) => void;
   onShare?: (id: string) => void;
+  onOpenEvent?: (id: string) => void;
   highlightedEventId?: string | null;
 }) => {
   const grouped = useMemo(() => {
@@ -180,6 +182,7 @@ export const EventsSidebarContent = ({
       ev={e}
       onFlyTo={onFlyTo}
       onShare={onShare}
+      onOpenEvent={onOpenEvent}
       highlighted={highlightedEventId === e.id}
     />
   );
@@ -208,7 +211,7 @@ export const EventsSidebarContent = ({
 };
 
 /** Sidebar that collapses (desktop) and turns into a sheet (mobile). */
-export const EventsSidebar = ({ events, onFlyTo, onShare, highlightedEventId }: Props) => {
+export const EventsSidebar = ({ events, onFlyTo, onShare, onOpenEvent, highlightedEventId }: Props) => {
   const [open, setOpen] = useState(true);
 
   // Auto-open the panel when arriving via a deep-link.
@@ -229,7 +232,7 @@ export const EventsSidebar = ({ events, onFlyTo, onShare, highlightedEventId }: 
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
-            <EventsSidebarContent events={events} onFlyTo={onFlyTo} onShare={onShare} highlightedEventId={highlightedEventId} />
+            <EventsSidebarContent events={events} onFlyTo={onFlyTo} onShare={onShare} onOpenEvent={onOpenEvent} highlightedEventId={highlightedEventId} />
           </div>
         ) : (
           <Button
@@ -256,7 +259,7 @@ export const EventsSidebar = ({ events, onFlyTo, onShare, highlightedEventId }: 
               <SheetTitle className="font-display">Actividades</SheetTitle>
             </SheetHeader>
             <div className="mt-4">
-              <EventsSidebarContent events={events} onFlyTo={onFlyTo} onShare={onShare} highlightedEventId={highlightedEventId} />
+              <EventsSidebarContent events={events} onFlyTo={onFlyTo} onShare={onShare} onOpenEvent={onOpenEvent} highlightedEventId={highlightedEventId} />
             </div>
           </SheetContent>
         </Sheet>
