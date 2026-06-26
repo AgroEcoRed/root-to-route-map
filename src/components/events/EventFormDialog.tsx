@@ -350,21 +350,6 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
             <Input value={form.location_name} onChange={(e) => update("location_name", e.target.value)} maxLength={200} placeholder="Ej: Plaza de Florencio Varela" />
           </div>
           <div>
-            <Label>Otros contactos (mails)</Label>
-            <Input
-              value={form.contact_email}
-              onChange={(e) => update("contact_email", e.target.value)}
-              placeholder="otro@correo.com  tercero@correo.com"
-            />
-            <p className="text-[10px] text-muted-foreground mt-1">
-              Separá varios mails con espacios, comas o punto y coma. Todos reciben copia.
-            </p>
-          </div>
-          <div>
-            <Label>Contacto teléfono</Label>
-            <Input value={form.contact_phone} onChange={(e) => update("contact_phone", e.target.value)} placeholder="+54 9 11 ..." />
-          </div>
-          <div>
             <Label>Co-organizan (separados por coma)</Label>
             <Input
               value={form.extra_organizer_names}
@@ -396,6 +381,17 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
                 placeholder={`Tu nombre (default: ${(user?.user_metadata as any)?.display_name || user?.email || "tu cuenta"})`}
               />
             </div>
+          </div>
+          <div>
+            <Label>Otros contactos (opcional)</Label>
+            <Input
+              value={form.contact_email}
+              onChange={(e) => update("contact_email", e.target.value)}
+              placeholder="otro@correo.com  tercero@correo.com"
+            />
+            <p className="text-[10px] text-muted-foreground mt-1">
+              Mails adicionales que también recibirán copia. Separalos con espacios, comas o punto y coma.
+            </p>
           </div>
           {!quick && (
             <>
