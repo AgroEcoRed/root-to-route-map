@@ -13,7 +13,6 @@ export interface AgroEventFull {
   lng: number | null;
   link: string | null;
   contact: string | null;
-  contact_email: string | null;
   contact_phone: string | null;
   flyer_url: string | null;
   co_organizers: string[];
@@ -31,7 +30,12 @@ export const useEvents = () => {
   const load = useCallback(async () => {
     const { data } = await (supabase as any)
       .from("events")
-      .select("*")
+      // NEVER select focal_email / contact_email / edit_token from the public
+      // client — those are private (PII + per-event edit credential) and only
+      // reachable through dedicated SECURITY DEFINER paths.
+      .select(
+        "id,title,description,event_type,custom_type,starts_at,ends_at,location_name,lat,lng,link,contact,contact_phone,flyer_url,co_organizers,extra_organizer_names,source,approved,created_by,created_at,updated_at,submitted_by_name,focal_name"
+      )
       .eq("approved", true)
       .order("starts_at", { ascending: false });
     setEvents((data as AgroEventFull[]) || []);

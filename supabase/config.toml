@@ -19,7 +19,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.notify-event-created]
-verify_jwt = false
+verify_jwt = true
 
 [functions.declare-actor-connection]
 verify_jwt = false

@@ -11,6 +11,16 @@ const corsHeaders = {
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+// Allowed origins for the public-facing links embedded in the email body.
+// We never trust a client-supplied `origin`: an attacker calling this
+// function could otherwise turn it into an open relay that emails arbitrary
+// recipients with attacker-controlled links pointing to phishing pages.
+const ALLOWED_ORIGINS = new Set<string>([
+  "https://agroeco.red",
+  "https://www.agroeco.red",
+]);
+const DEFAULT_ORIGIN = "https://agroeco.red";
+
 function bad(status: number, msg: string) {
   return new Response(JSON.stringify({ error: msg }), {
     status, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -21,17 +31,40 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return bad(405, "Method not allowed");
 
+  // ---- AuthN: must be an authenticated Supabase user ---------------------
+  // The function uses the platform's email-sending budget and writes
+  // emails on behalf of AgroEco.Red, so unauthenticated callers are
+  // rejected to prevent abuse / open-relay scenarios.
+  const authHeader = req.headers.get("Authorization") || "";
+  if (!authHeader.toLowerCase().startsWith("bearer ")) {
+    return bad(401, "Missing bearer token");
+  }
+
+  const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+  const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY");
+  if (!SUPABASE_URL || !SERVICE_KEY || !ANON_KEY) return bad(500, "Server not configured");
+
+  const userClient = createClient(SUPABASE_URL, ANON_KEY, {
+    global: { headers: { Authorization: authHeader } },
+    auth: { persistSession: false },
+  });
+  const { data: who, error: whoErr } = await userClient.auth.getUser();
+  if (whoErr || !who?.user) return bad(401, "Invalid bearer token");
+
   let body: any = null;
   try { body = await req.json(); } catch { return bad(400, "Invalid JSON"); }
 
   const eventId = String(body?.event_id || "");
   if (!UUID_RE.test(eventId)) return bad(400, "Invalid event_id");
-  const origin = String(body?.origin || "https://agroeco.red").replace(/\/$/, "");
-  const overrideTo = typeof body?.to_override === "string" ? body.to_override.trim() : "";
-
-  const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
-  const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!SUPABASE_URL || !SERVICE_KEY) return bad(500, "Server not configured");
+  // Origin is validated against an allowlist — never reflect a client value
+  // verbatim into outbound links.
+  const requestedOrigin = String(body?.origin || "").replace(/\/$/, "");
+  const origin = ALLOWED_ORIGINS.has(requestedOrigin) ? requestedOrigin : DEFAULT_ORIGIN;
+  // `to_override` is intentionally removed: previously any caller could
+  // force the email to land in an arbitrary inbox of their choice, which
+  // made this endpoint usable as an open relay. Recipients are now always
+  // derived server-side from the event's own focal/contact fields.
 
   const sb = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
 
@@ -41,6 +74,21 @@ Deno.serve(async (req) => {
     .eq("id", eventId)
     .maybeSingle();
   if (error || !ev) return bad(404, "Event not found");
+
+  // Only the event owner or a platform admin may trigger the notification
+  // for a given event. This keeps a legitimate authenticated user from
+  // spamming focal emails of events they don't own.
+  const callerId = who.user.id;
+  const { data: ownerRow } = await sb
+    .from("events").select("created_by").eq("id", eventId).maybeSingle();
+  const isOwner = ownerRow?.created_by === callerId;
+  let isAdmin = false;
+  if (!isOwner) {
+    const { data: roleRow } = await sb
+      .from("user_roles").select("role").eq("user_id", callerId).eq("role", "admin").maybeSingle();
+    isAdmin = !!roleRow;
+  }
+  if (!isOwner && !isAdmin) return bad(403, "Not allowed for this event");
 
   // focal_email puede ser una lista separada por comas (puntos focales primarios).
   const targets: string[] = [];
@@ -53,10 +101,6 @@ Deno.serve(async (req) => {
   };
   pushEmails(ev.focal_email);
   pushEmails(ev.contact_email);
-  if (overrideTo && /.+@.+\..+/.test(overrideTo)) {
-    targets.length = 0;
-    targets.push(overrideTo);
-  }
 
   const editLink = `${origin}/eventos/editar/${ev.edit_token}`;
   const mapLink = `${origin}/mapa?event=${ev.id}`;
