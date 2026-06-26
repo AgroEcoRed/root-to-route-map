@@ -1001,6 +1001,15 @@ const MapPage = () => {
             events={events}
             onFlyTo={(la, ln) => mapRef.current?.flyTo([la, ln], 14, { duration: 0.8 })}
             highlightedEventId={focusedEventId}
+            onOpenEvent={(id) => {
+              const ev = events.find((e) => e.id === id);
+              if (ev?.lat != null && ev?.lng != null) {
+                mapRef.current?.flyTo([ev.lat, ev.lng], 15, { duration: 0.7 });
+              }
+              setFocusedEventId(id);
+              const m = eventMarkersRef.current.get(id);
+              if (m) setTimeout(() => m.openPopup(), 750);
+            }}
             onShare={(id) => {
               const url = `${window.location.origin}/mapa?event=${id}`;
               navigator.clipboard?.writeText(url).then(
