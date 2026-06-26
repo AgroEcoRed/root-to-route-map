@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { CalendarDays, MapPin, Sparkles, Phone, Mail, Link as LinkIcon, ChevronLeft, ChevronRight, Share2 } from "lucide-react";
-import { AgroEventFull, eventBucket } from "@/hooks/useEvents";
+import { AgroEventFull, eventBucket, glowIntensity, proximityColor } from "@/hooks/useEvents";
 
 interface Props {
   events: AgroEventFull[];
@@ -12,6 +12,8 @@ interface Props {
   highlightedEventId?: string | null;
   /** Copy a shareable deep-link to the event. */
   onShare?: (eventId: string) => void;
+  /** Fly to the event AND open its popup on the map. */
+  onOpenEvent?: (eventId: string) => void;
   /** Embedded inline (desktop) or as a Sheet (mobile). */
   variant?: "inline" | "drawer";
 }
@@ -23,11 +25,13 @@ const Card = ({
   ev,
   onFlyTo,
   onShare,
+  onOpenEvent,
   highlighted,
 }: {
   ev: AgroEventFull;
   onFlyTo?: (lat: number, lng: number) => void;
   onShare?: (id: string) => void;
+  onOpenEvent?: (id: string) => void;
   highlighted?: boolean;
 }) => {
   const dt = ev.starts_at ? new Date(ev.starts_at) : null;
@@ -36,14 +40,21 @@ const Card = ({
     : "Sin fecha";
   const contactLine = ev.contact_email || ev.contact_phone || ev.contact;
   const flyerUrl = (ev as any).flyer_url as string | null | undefined;
+  // Color de proximidad para la barra lateral izquierda de cada tarjeta.
+  const intensity = glowIntensity(ev.starts_at);
+  const isFuture = !!ev.starts_at && new Date(ev.starts_at).getTime() >= Date.now();
+  const accent = isFuture ? proximityColor(intensity) : "#94a3b8";
+  const clickable = !!onOpenEvent && ev.lat != null && ev.lng != null;
   return (
     <article
       id={`ev-card-${ev.id}`}
-      className={`rounded-xl border bg-card p-3 shadow-sm transition ${
+      onClick={clickable ? () => onOpenEvent!(ev.id) : undefined}
+      className={`relative rounded-xl border bg-card p-3 pl-4 shadow-sm transition overflow-hidden ${
         highlighted ? "border-primary ring-2 ring-primary/30" : "border-border"
-      }`}
+      } ${clickable ? "cursor-pointer hover:shadow-md hover:-translate-y-0.5" : ""}`}
+      style={{ boxShadow: isFuture ? `inset 4px 0 0 0 ${accent}` : undefined }}
     >
-      <div className="flex items-center justify-between gap-2 mb-1.5">
+      <div className="flex items-center justify-between gap-2 mb-1.5" onClick={(e) => e.stopPropagation()}>
         <span
           className="inline-block text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md text-white"
           style={{ background: typeColor[ev.event_type] || "#6b7280" }}
@@ -83,12 +94,18 @@ const Card = ({
         <p className={`text-xs text-muted-foreground mt-1.5 ${highlighted ? "" : "line-clamp-2"}`}>{ev.description}</p>
       )}
       {flyerUrl && (
-        <a href={flyerUrl} target="_blank" rel="noopener noreferrer" className="block mt-2">
+        <a
+          href={flyerUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block mt-2"
+          onClick={(e) => e.stopPropagation()}
+        >
           <img
             src={flyerUrl}
             alt={`Flyer de ${ev.title}`}
             loading="lazy"
-            className={`w-full rounded-lg border border-border ${highlighted ? "" : "max-h-40 object-cover"}`}
+            className="w-full rounded-lg border border-border object-contain bg-muted/30"
           />
         </a>
       )}
@@ -97,7 +114,7 @@ const Card = ({
           Co-organizan: {ev.extra_organizer_names?.join(", ") || `${ev.co_organizers.length} actores`}
         </p>
       )}
-      <div className="mt-2 flex flex-wrap gap-1.5">
+      <div className="mt-2 flex flex-wrap gap-1.5" onClick={(e) => e.stopPropagation()}>
         {ev.contact_email && (
           <a href={`mailto:${ev.contact_email}`} className="text-[11px] inline-flex items-center gap-1 text-primary hover:underline">
             <Mail className="h-3 w-3" /> {ev.contact_email}
