@@ -85,7 +85,7 @@ Deno.serve(async (req) => {
       <p style="font-size:12px;color:#6b7280;margin:6px 0 0">O copiá: ${editLink}</p>
 
       <h3 style="color:#15803d;font-size:15px;margin:24px 0 6px">2. Registrá tu experiencia / colectivo</h3>
-      <p style="margin:0 0 10px">Te invitamos a sumar tu experiencia o la de tu colectivo (por ej. <em>NAT San Martín</em>) al Mapa Vivo. Podés registrarte con el correo que más te represente — institucional, personal o de un colectivo — y desde tu perfil declarar vínculos con otros actores de la red.</p>
+      <p style="margin:0 0 10px">Te invitamos a sumar tu experiencia o la de tu colectivo al Mapa Vivo. Podés registrarte con el correo que más te represente — institucional, personal o de un colectivo — y desde tu perfil declarar vínculos con otros actores de la red.</p>
       <p style="margin:0"><a href="${registerLink}" style="background:#0f766e;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none;display:inline-block">Crear mi cuenta en AgroEco.Red</a></p>
       <p style="font-size:12px;color:#6b7280;margin:6px 0 0">El correo de acceso lo elegís vos en ese paso; no necesita coincidir con este.</p>
 
