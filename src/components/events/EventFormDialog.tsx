@@ -349,15 +349,6 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
             <Label>Lugar (texto)</Label>
             <Input value={form.location_name} onChange={(e) => update("location_name", e.target.value)} maxLength={200} placeholder="Ej: Plaza de Florencio Varela" />
           </div>
-          <div>
-            <Label>Co-organizan (separados por coma)</Label>
-            <Input
-              value={form.extra_organizer_names}
-              onChange={(e) => update("extra_organizer_names", e.target.value)}
-              placeholder="Ej: NAT San Martín, UTT, Municipio…"
-            />
-            <p className="text-[10px] text-muted-foreground mt-1">Cada organización mencionada genera una línea en la red de vínculos.</p>
-          </div>
           <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-3">
             <p className="text-xs font-semibold text-foreground">Punto focal de la actividad</p>
             <p className="text-[11px] text-muted-foreground -mt-2">
@@ -381,6 +372,15 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
                 placeholder={`Tu nombre (default: ${(user?.user_metadata as any)?.display_name || user?.email || "tu cuenta"})`}
               />
             </div>
+          </div>
+          <div>
+            <Label>Co-organizan (separados por coma)</Label>
+            <Input
+              value={form.extra_organizer_names}
+              onChange={(e) => update("extra_organizer_names", e.target.value)}
+              placeholder="Ej: NAT San Martín, UTT, Municipio…"
+            />
+            <p className="text-[10px] text-muted-foreground mt-1">Cada organización mencionada genera una línea en la red de vínculos.</p>
           </div>
           <div>
             <Label>Otros contactos (opcional)</Label>
