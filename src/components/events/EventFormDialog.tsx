@@ -225,17 +225,24 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
     const { data: inserted, error } = await (supabase as any)
       .from("events")
       .insert(payload)
-      .select("id, edit_token")
+      .select("id")
       .single();
     setSubmitting(false);
     if (error) {
       toast.error("No se pudo crear: " + error.message);
       return;
     }
-    // Notify focal point (and surface the edit link) — non-blocking.
-    const editLink = inserted?.edit_token
-      ? `${window.location.origin}/eventos/editar/${inserted.edit_token}`
-      : null;
+    // The edit_token is NOT readable from the public Data API anymore
+    // (it's a private credential). Fetch it through the SECURITY DEFINER
+    // RPC `get_my_event_edit_token`, which only returns the token to the
+    // owner / a platform admin.
+    let editLink: string | null = null;
+    if (inserted?.id) {
+      const { data: tok } = await (supabase as any).rpc("get_my_event_edit_token", {
+        _event_id: inserted.id,
+      });
+      if (tok) editLink = `${window.location.origin}/eventos/editar/${tok}`;
+    }
     if (inserted?.id) {
       supabase.functions
         .invoke("notify-event-created", {
