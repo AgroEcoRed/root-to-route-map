@@ -612,7 +612,7 @@ const MapPage = () => {
               <span style="font-size:14px;line-height:1">🗓️</span>
               <div style="font-size:11px;line-height:1.3">
                 <span style="font-weight:600;color:#1e3a8a">Entrega / apertura:</span>
-                <span style="color:#1e40af">&nbsp;${a.deliveryInfo}</span>
+                <span style="color:#1e40af">&nbsp;${escHtml(a.deliveryInfo)}</span>
               </div>
             </div>`
         : "";
@@ -621,12 +621,12 @@ const MapPage = () => {
         .bindPopup(`
           <div style="min-width:240px;font-family:DM Sans,sans-serif;padding:4px">
             <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">${sourceBadge}${verificationBadge}</div>
-            <a href="#" class="map-actor-link" data-producer="${encodeURIComponent(a.name)}" data-source="${a.source}" style="display:block;background:${roleBadgeColor};color:white;font-weight:700;font-size:14px;margin:0 0 8px;padding:8px 12px;border-radius:8px;text-decoration:none;cursor:pointer;text-align:center;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
-              ${a.name}
+            <a href="#" class="map-actor-link" data-producer="${encodeURIComponent(a.name)}" data-source="${escHtml(a.source)}" style="display:block;background:${roleBadgeColor};color:white;font-weight:700;font-size:14px;margin:0 0 8px;padding:8px 12px;border-radius:8px;text-decoration:none;cursor:pointer;text-align:center;transition:opacity 0.2s" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+              ${escHtml(a.name)}
               <span style="display:block;font-size:10px;font-weight:400;opacity:0.85;margin-top:2px">${a.source === 'mercado_territorial' ? 'Ver catálogo Mercado Territorial →' : 'Ver todos sus productos →'}</span>
             </a>
-            <p style="font-size:12px;color:#666;margin:0">${actorTypeLabels[a.type]}</p>
-            <p style="font-size:12px;margin:4px 0">${a.description}</p>
+            <p style="font-size:12px;color:#666;margin:0">${escHtml(actorTypeLabels[a.type] || "")}</p>
+            <p style="font-size:12px;margin:4px 0">${escHtml(a.description)}</p>
             ${deliveryHtml}
             ${productsHtml}
             ${certHtml}
@@ -721,25 +721,32 @@ const MapPage = () => {
       const dateStr = date.toLocaleString("es-AR", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
       const typeLabels: Record<string, string> = { feria: "Feria", intercambio: "Intercambio", formacion: "Formación", otro: "Actividad" };
       const typeColor: Record<string, string> = { feria: "#E94560", intercambio: "#22C55E", formacion: "#3B82F6", otro: "#F5C518" };
-      const linkHtml = ev.link ? `<a href="${ev.link}" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-top:8px;background:#F5C518;color:#1a1a1a;padding:6px 12px;border-radius:8px;text-decoration:none;font-weight:700;font-size:12px">Más info / inscripción →</a>` : "";
+      const safeLink = safeUrl(ev.link);
+      const linkHtml = safeLink
+        ? `<a href="${escHtml(safeLink)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-top:8px;background:#F5C518;color:#1a1a1a;padding:6px 12px;border-radius:8px;text-decoration:none;font-weight:700;font-size:12px">Más info / inscripción →</a>`
+        : "";
       const contactBits: string[] = [];
-      if ((ev as any).contact_email) contactBits.push(`<a href="mailto:${(ev as any).contact_email}" style="color:#0f766e;text-decoration:underline">✉ ${(ev as any).contact_email}</a>`);
-      if ((ev as any).contact_phone) contactBits.push(`<a href="tel:${(ev as any).contact_phone}" style="color:#0f766e;text-decoration:underline">📞 ${(ev as any).contact_phone}</a>`);
-      if (ev.contact && !contactBits.length) contactBits.push(`📞 ${ev.contact}`);
+      // contact_email is no longer fetched on the public client (PII), so it
+      // never leaks into popups. Only show phone / generic contact text.
+      if ((ev as any).contact_phone) {
+        const ph = String((ev as any).contact_phone);
+        contactBits.push(`<a href="tel:${escHtml(ph)}" style="color:#0f766e;text-decoration:underline">📞 ${escHtml(ph)}</a>`);
+      }
+      if (ev.contact && !contactBits.length) contactBits.push(`📞 ${escHtml(ev.contact)}`);
       const contactHtml = contactBits.length ? `<p style="font-size:11px;color:#444;margin:6px 0 0">Confirmar info: ${contactBits.join(" · ")}</p>` : "";
-      const descHtml = ev.description ? `<p style="font-size:12px;color:#444;margin:6px 0">${ev.description}</p>` : "";
-      const locHtml = ev.location_name ? `<p style="font-size:11px;color:#666;margin:4px 0">📍 ${ev.location_name}</p>` : "";
+      const descHtml = ev.description ? `<p style="font-size:12px;color:#444;margin:6px 0">${escHtml(ev.description)}</p>` : "";
+      const locHtml = ev.location_name ? `<p style="font-size:11px;color:#666;margin:4px 0">📍 ${escHtml(ev.location_name)}</p>` : "";
       // Flyer NO se muestra en el popup del mapa — vive solo en la barra de la derecha.
       const flyerHtml = "";
       const orgs = ((ev as any).extra_organizer_names || []) as string[];
-      const orgsHtml = orgs.length ? `<p style="font-size:11px;color:#444;margin:6px 0 0"><b>Co-organizan:</b> ${orgs.join(", ")}</p>` : "";
+      const orgsHtml = orgs.length ? `<p style="font-size:11px;color:#444;margin:6px 0 0"><b>Co-organizan:</b> ${escHtml(orgs.join(", "))}</p>` : "";
       const shareHtml = `<p style="margin:8px 0 0;font-size:11px;color:#6b7280">💡 Click derecho sobre la estrella para copiar un link directo a esta actividad.</p>`;
       const marker = L.marker([ev.lat, ev.lng], { icon, zIndexOffset: 1000 })
         .bindPopup(`
           <div style="min-width:240px;font-family:DM Sans,sans-serif;padding:4px">
             <span style="display:inline-block;background:${typeColor[ev.event_type]};color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:0.4px">${typeLabels[ev.event_type]}</span>
-            <h3 style="font-family:Playfair Display,serif;font-size:16px;margin:8px 0 4px;color:#1a1a1a">${ev.title}</h3>
-            <p style="font-size:12px;color:#444;margin:0;font-weight:600">🗓️ ${dateStr}</p>
+            <h3 style="font-family:Playfair Display,serif;font-size:16px;margin:8px 0 4px;color:#1a1a1a">${escHtml(ev.title)}</h3>
+            <p style="font-size:12px;color:#444;margin:0;font-weight:600">🗓️ ${escHtml(dateStr)}</p>
             ${locHtml}${descHtml}${flyerHtml}${orgsHtml}${contactHtml}${linkHtml}${shareHtml}
           </div>
         `)
