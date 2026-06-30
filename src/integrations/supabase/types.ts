@@ -449,6 +449,39 @@ export type Database = {
         }
         Relationships: []
       }
+      layer_manager_invites: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          email: string
+          id: string
+          invited_by: string | null
+          layer_id: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          invited_by?: string | null
+          layer_id: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          invited_by?: string | null
+          layer_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       layer_managers: {
         Row: {
           created_at: string
@@ -1132,6 +1165,23 @@ export type Database = {
       can_manage_layer: {
         Args: { _layer_id: string; _user_id: string }
         Returns: boolean
+      }
+      claim_layer_manager_invites: {
+        Args: never
+        Returns: {
+          created_at: string
+          granted_by: string | null
+          id: string
+          layer_id: string
+          updated_at: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "layer_managers"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       confirm_actor_by_token: {
         Args: {
