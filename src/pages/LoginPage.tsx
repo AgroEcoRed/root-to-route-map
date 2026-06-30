@@ -10,10 +10,15 @@ import { toast } from "sonner";
 import { Leaf, Mail, Lock, ArrowRight, Sprout, MapPin, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
+import { useAuth } from "@/contexts/AuthContext";
+
+const ALLOWED_ORIGINS = new Set(["https://agroeco.red", "https://www.agroeco.red"]);
+const appOrigin = ALLOWED_ORIGINS.has(window.location.origin) ? window.location.origin : "https://agroeco.red";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { user } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,6 +32,13 @@ const LoginPage = () => {
     if (searchParams.get("signup") === "1") setIsSignUp(true);
   }, [searchParams]);
 
+  useEffect(() => {
+    if (!user) return;
+    supabase.functions.invoke("claim-layer-invites").finally(() => {
+      navigate(nextPath.startsWith("/") ? nextPath : "/", { replace: true });
+    });
+  }, [user, navigate, nextPath]);
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -35,7 +47,7 @@ const LoginPage = () => {
         const { error } = await supabase.auth.signUp({
           email, password,
           options: {
-            emailRedirectTo: `${window.location.origin}/ingresar?next=${encodeURIComponent(nextPath)}`,
+            emailRedirectTo: `${appOrigin}/ingresar?next=${encodeURIComponent(nextPath)}`,
             data: {
               display_name: email.split("@")[0],
               actor_type: "institution",
@@ -63,7 +75,7 @@ const LoginPage = () => {
     setLoading(true);
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: `${window.location.origin}${nextPath.startsWith("/") ? `/ingresar?next=${encodeURIComponent(nextPath)}` : ""}`,
+        redirect_uri: `${appOrigin}${nextPath.startsWith("/") ? `/ingresar?next=${encodeURIComponent(nextPath)}` : ""}`,
       });
       if (result.error) throw result.error;
     } catch (error: any) {
