@@ -12,6 +12,9 @@ import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Sparkles, Upload, Loader2, Image as ImageIcon } from "lucide-react";
 
+const ALLOWED_ORIGINS = new Set(["https://agroeco.red", "https://www.agroeco.red"]);
+const productionOrigin = ALLOWED_ORIGINS.has(window.location.origin) ? window.location.origin : "https://agroeco.red";
+
 const schema = z.object({
   title: z.string().trim().min(3, "Mínimo 3 caracteres").max(140),
   description: z.string().trim().max(1000).optional(),
@@ -232,30 +235,17 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
       toast.error("No se pudo crear: " + error.message);
       return;
     }
-    // The edit_token is NOT readable from the public Data API anymore
-    // (it's a private credential). Fetch it through the SECURITY DEFINER
-    // RPC `get_my_event_edit_token`, which only returns the token to the
-    // owner / a platform admin.
-    let editLink: string | null = null;
-    if (inserted?.id) {
-      const { data: tok } = await (supabase as any).rpc("get_my_event_edit_token", {
-        _event_id: inserted.id,
-      });
-      if (tok) editLink = `${window.location.origin}/eventos/editar/${tok}`;
-    }
     if (inserted?.id) {
       supabase.functions
         .invoke("notify-event-created", {
-          body: { event_id: inserted.id, origin: window.location.origin },
+          body: { event_id: inserted.id, origin: productionOrigin },
         })
         .catch(() => {});
     }
-    if (editLink) {
-      toast.success("¡Actividad publicada! Link de edición copiado al portapapeles.", {
+    if (inserted?.id) {
+      toast.success("¡Actividad publicada! Te enviamos el link de edición por email.", {
         duration: 8000,
-        action: { label: "Abrir", onClick: () => window.open(editLink, "_blank") },
       });
-      try { await navigator.clipboard.writeText(editLink); } catch { /* noop */ }
     } else {
       toast.success(
         payload.starts_at && payload.lat && payload.lng
