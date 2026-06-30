@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
@@ -13,11 +13,19 @@ import Navbar from "@/components/Navbar";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
+  const nextPath = searchParams.get("next") || "/";
+
+  useEffect(() => {
+    const invitedEmail = searchParams.get("email");
+    if (invitedEmail) setEmail(invitedEmail);
+    if (searchParams.get("signup") === "1") setIsSignUp(true);
+  }, [searchParams]);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,15 +34,23 @@ const LoginPage = () => {
       if (isSignUp) {
         const { error } = await supabase.auth.signUp({
           email, password,
-          options: { emailRedirectTo: window.location.origin },
+          options: {
+            emailRedirectTo: `${window.location.origin}/ingresar?next=${encodeURIComponent(nextPath)}`,
+            data: {
+              display_name: email.split("@")[0],
+              actor_type: "institution",
+              registration_completed: true,
+            },
+          },
         });
         if (error) throw error;
         toast.success("¡Cuenta creada! Revisá tu email para confirmar.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        try { await supabase.functions.invoke("claim-layer-invites"); } catch { /* No bloquea el ingreso */ }
         toast.success("¡Bienvenido/a!");
-        navigate("/");
+        navigate(nextPath.startsWith("/") ? nextPath : "/");
       }
     } catch (error: any) {
       toast.error(error.message || "Error de autenticación");

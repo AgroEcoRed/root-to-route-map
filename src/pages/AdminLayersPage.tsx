@@ -15,12 +15,19 @@ import { toast } from "sonner";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDataSources } from "@/hooks/useDataSources";
-import { Layers, Loader2, Trash2, UserPlus, ExternalLink } from "lucide-react";
+import { Layers, Loader2, Trash2, UserPlus, ExternalLink, Mail } from "lucide-react";
 
 interface Assignment {
   id: string;
   user_id: string;
   layer_id: string;
+  created_at: string;
+}
+interface Invite {
+  id: string;
+  email: string;
+  layer_id: string;
+  accepted_at: string | null;
   created_at: string;
 }
 
@@ -30,6 +37,7 @@ export default function AdminLayersPage() {
   const { sources } = useDataSources();
 
   const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [invites, setInvites] = useState<Invite[]>([]);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
   const [layerId, setLayerId] = useState<string>("");
@@ -37,12 +45,20 @@ export default function AdminLayersPage() {
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await (supabase as any)
-      .from("layer_managers")
-      .select("id, user_id, layer_id, created_at")
-      .order("created_at", { ascending: false });
-    if (error) toast.error("No se pudo cargar la lista: " + error.message);
-    setAssignments((data as Assignment[]) || []);
+    const [managerRows, inviteRows] = await Promise.all([
+      (supabase as any)
+        .from("layer_managers")
+        .select("id, user_id, layer_id, created_at")
+        .order("created_at", { ascending: false }),
+      (supabase as any)
+        .from("layer_manager_invites")
+        .select("id, email, layer_id, accepted_at, created_at")
+        .order("created_at", { ascending: false }),
+    ]);
+    if (managerRows.error) toast.error("No se pudo cargar la lista: " + managerRows.error.message);
+    if (inviteRows.error) toast.error("No se pudieron cargar las invitaciones: " + inviteRows.error.message);
+    setAssignments((managerRows.data as Assignment[]) || []);
+    setInvites((inviteRows.data as Invite[]) || []);
     setLoading(false);
   };
 
@@ -64,25 +80,15 @@ export default function AdminLayersPage() {
       return;
     }
     setSubmitting(true);
-    // Look up user_id by email via profiles? We don't store email in profiles.
-    // Use RPC: query auth.users isn't allowed. Use admin route: ask user to paste user UUID instead.
-    // Simpler intermediate: accept UUID directly.
-    const uuid = email.trim();
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uuid);
-    if (!isUuid) {
-      toast.error("Por ahora ingresá el UUID del usuario (lo ves en la tabla user_roles o en su perfil).");
-      setSubmitting(false);
-      return;
-    }
-    const { error } = await (supabase as any)
-      .from("layer_managers")
-      .insert({ user_id: uuid, layer_id: layerId, granted_by: user.id });
+    const { error } = await supabase.functions.invoke("send-layer-invite", {
+      body: { email: email.trim(), layer_id: layerId, origin: window.location.origin },
+    });
     setSubmitting(false);
     if (error) {
       toast.error("No se pudo asignar: " + error.message);
       return;
     }
-    toast.success("Gestor asignado");
+    toast.success("Invitación enviada");
     setEmail("");
     setLayerId("");
     load();
@@ -116,10 +122,11 @@ export default function AdminLayersPage() {
           </h2>
           <div className="grid gap-4 md:grid-cols-[1fr,1fr,auto]">
             <div>
-              <Label htmlFor="uid" className="text-xs">UUID del usuario</Label>
+              <Label htmlFor="uid" className="text-xs">Email del gestor/a</Label>
               <Input
                 id="uid"
-                placeholder="ej: 6b1f...-...-...-...-...."
+                type="email"
+                placeholder="nombre@organizacion.org"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -137,15 +144,45 @@ export default function AdminLayersPage() {
             </div>
             <div className="flex items-end">
               <Button onClick={addManager} disabled={submitting}>
-                {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Asignar"}
+                {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Invitar"}
               </Button>
             </div>
           </div>
           <p className="text-xs text-muted-foreground mt-3">
-            El usuario debe haberse registrado en AgroEco.Red antes de asignarle una capa.
-            Una vez asignado, accede a su panel desde <code className="px-1 bg-muted rounded">/admin/capas/&lt;capa&gt;</code>.
+            La persona recibirá un email para registrarse o ingresar. Al entrar con ese mismo correo,
+            la capa queda asignada automáticamente y puede acceder a <code className="px-1 bg-muted rounded">/admin/capas/&lt;capa&gt;</code>.
           </p>
         </Card>
+
+        <h2 className="font-display text-lg mb-3">Invitaciones enviadas</h2>
+        {loading ? null : invites.length === 0 ? (
+          <Card className="p-6 text-center text-muted-foreground text-sm mb-8">
+            Todavía no hay invitaciones pendientes.
+          </Card>
+        ) : (
+          <div className="space-y-2 mb-8">
+            {invites.map(inv => (
+              <Card key={inv.id} className="p-4 flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Mail className="h-4 w-4 text-primary" />
+                    <span className="text-sm font-medium truncate">{inv.email}</span>
+                    <Badge variant="secondary">{labelFor(inv.layer_id)}</Badge>
+                    <Badge variant={inv.accepted_at ? "default" : "outline"}>
+                      {inv.accepted_at ? "aceptada" : "pendiente"}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Enviada el {new Date(inv.created_at).toLocaleDateString("es-AR")}
+                  </p>
+                </div>
+                <Button asChild size="sm" variant="ghost">
+                  <Link to={`/admin/capas/${inv.layer_id}`}><ExternalLink className="h-4 w-4" /></Link>
+                </Button>
+              </Card>
+            ))}
+          </div>
+        )}
 
         <h2 className="font-display text-lg mb-3">Asignaciones actuales</h2>
         {loading ? (

@@ -18,7 +18,7 @@ import { useLayerActors, type LayerActor } from "@/hooks/useLayerActors";
 import { toast } from "sonner";
 import { Layers, Loader2, ArrowLeft, MapPin, ShoppingBag, Power, Pencil, Plus, Trash2, CheckCircle2, Search, Send, Copy } from "lucide-react";
 
-const EDITABLE_LAYERS: DataSourceId[] = ["rutas_sanas"];
+const EDITABLE_LAYERS: DataSourceId[] = ["rutas_sanas", "nat_san_martin"];
 
 const emptyDraft = (sourceId: string): Partial<LayerActor> => ({
   source_id: sourceId,

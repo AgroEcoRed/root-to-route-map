@@ -34,6 +34,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Runs for both email/password and OAuth (Google) sign-ins.
         if (_event === "SIGNED_IN" && session?.user) {
           setTimeout(async () => {
+            try {
+              await supabase.functions.invoke("claim-layer-invites");
+            } catch { /* No bloquea el ingreso */ }
             const { data: profile } = await supabase
               .from("profiles")
               .select("registration_completed")
@@ -45,7 +48,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 "Esta cuenta no está registrada en AgroEco.Red. Por favor registrate primero para poder ingresar.",
                 { duration: 6000 }
               );
-              window.location.href = "/registrar";
+              window.location.href = "/registro";
             }
           }, 0);
         }

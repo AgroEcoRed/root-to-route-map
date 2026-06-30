@@ -21,5 +21,11 @@ verify_jwt = false
 [functions.notify-event-created]
 verify_jwt = true
 
+[functions.claim-layer-invites]
+verify_jwt = true
+
+[functions.send-layer-invite]
+verify_jwt = true
+
 [functions.declare-actor-connection]
 verify_jwt = false

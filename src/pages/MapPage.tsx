@@ -95,7 +95,7 @@ interface MapActor {
   products: string[];
   certification: "red" | "yellow" | "green";
   description: string;
-  source: "rutas_sanas" | "mercado_territorial" | "agroeco" | "el_click" | "el_brote" | "utt_nodos" | "user_points";
+  source: "rutas_sanas" | "mercado_territorial" | "agroeco" | "el_click" | "el_brote" | "utt_nodos" | "user_points" | "nat_san_martin";
   contentLicense?: string | null;
   /** ISO date of last update of this actor's data. Null = never updated since import (inherited). */
   lastUpdated?: string | null;
@@ -118,6 +118,7 @@ const SOURCE_IMPORT_DATE: Record<MapActor["source"], string> = {
   el_brote: "2026-06-19",
   utt_nodos: "2022-05-02",
   user_points: new Date().toISOString().slice(0, 10),
+  nat_san_martin: new Date().toISOString().slice(0, 10),
 };
 
 function formatUpdateDate(iso: string): string {
@@ -135,6 +136,7 @@ const sourceShortLabel: Record<MapActor["source"], string> = {
   el_brote: "El Brote",
   utt_nodos: "UTT",
   user_points: "AgroEco.Red",
+  nat_san_martin: "NAT San Martín",
 };
 
 const actorTypeLabels: Record<ActorType, string> = {
@@ -349,6 +351,7 @@ const MapPage = () => {
   // Rutas Sanas is now served from the layer_actors DB table (editable by layer managers).
   const { actors: rutasSanasDb } = useLayerActors("rutas_sanas");
   const { actors: userPointsDb } = useLayerActors("user_points");
+  const { actors: natSanMartinDb } = useLayerActors("nat_san_martin");
   const rutasSanasActors = useMemo<MapActor[]>(() => {
     if (!rutasSanasDb || rutasSanasDb.length === 0) return fallbackRutasSanasActors;
     return rutasSanasDb.map((p, i) => ({
@@ -389,6 +392,25 @@ const MapPage = () => {
       deliveryInfo: (p.delivery_days && p.delivery_days.length > 0) ? p.delivery_days.join(", ") : undefined,
     }));
   }, [userPointsDb]);
+
+  const natSanMartinActors = useMemo<MapActor[]>(() => {
+    return (natSanMartinDb || []).map((p, i) => ({
+      id: 95000 + i,
+      layerActorId: p.id,
+      name: p.name,
+      type: (p.actor_type as ActorType) || "research_center",
+      lat: p.lat,
+      lng: p.lng,
+      products: [],
+      certification: "yellow" as const,
+      description: p.description || p.family || p.address || "",
+      source: "nat_san_martin" as const,
+      verified: !!p.verified_at,
+      verifiedByRole: (p.verified_by_role as any) || (p.verified_at ? "layer" : null),
+      lastUpdated: p.verified_at || p.updated_at || SOURCE_IMPORT_DATE.nat_san_martin,
+      deliveryInfo: (p.delivery_days && p.delivery_days.length > 0) ? p.delivery_days.join(", ") : undefined,
+    }));
+  }, [natSanMartinDb]);
 
   // Fetch real profiles from database
   useEffect(() => {
@@ -436,8 +458,9 @@ const MapPage = () => {
     if (isEnabled("el_brote")) out.push(...elBroteActors);
     if (isEnabled("utt_nodos")) out.push(...uttNodesActors);
     if (isEnabled("user_points")) out.push(...userPointActors);
+    if (isEnabled("nat_san_martin")) out.push(...natSanMartinActors);
     return out;
-  }, [dbActors, isEnabled, rutasSanasActors, userPointActors]);
+  }, [dbActors, isEnabled, rutasSanasActors, userPointActors, natSanMartinActors]);
 
   const toggleType = (type: ActorType) => {
     setActiveTypes((prev) => {
@@ -518,6 +541,8 @@ const MapPage = () => {
         ? "border:2px dotted white;opacity:0.9;"
         : a.source === "utt_nodos"
         ? "border:2px solid #fde047;opacity:0.95;"
+        : a.source === "nat_san_martin"
+        ? "border:2px solid #14b8a6;outline:2px solid white;opacity:0.95;"
         : "border:3px solid white;";
 
       const icon = L.divIcon({
@@ -570,6 +595,8 @@ const MapPage = () => {
         ? `<a href="https://elbrotetienda.com/" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#d1fae5;color:#065f46;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #6ee7b7;letter-spacing:0.3px;text-transform:uppercase;text-decoration:none">El Brote</a>`
         : a.source === "utt_nodos"
         ? `<a href="https://uniondetrabajadoresdelatierra.com.ar/comercializacion-2/" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#fef9c3;color:#854d0e;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #fde047;letter-spacing:0.3px;text-transform:uppercase;text-decoration:none">Nodo UTT</a>`
+        : a.source === "nat_san_martin"
+        ? `<span style="display:inline-block;background:#ccfbf1;color:#115e59;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #5eead4;letter-spacing:0.3px;text-transform:uppercase">NAT San Martín</span>`
         : a.source === "user_points"
         ? `<span style="display:inline-block;background:#fef3c7;color:#92400e;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #fcd34d;letter-spacing:0.3px;text-transform:uppercase">Comunidad</span>`
         : `<span style="display:inline-block;background:#dcfce7;color:#15803d;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #86efac;letter-spacing:0.3px;text-transform:uppercase">AgroEco.Red</span>`;
