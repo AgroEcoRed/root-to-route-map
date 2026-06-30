@@ -460,7 +460,7 @@ const MapPage = () => {
     if (isEnabled("user_points")) out.push(...userPointActors);
     if (isEnabled("nat_san_martin")) out.push(...natSanMartinActors);
     return out;
-  }, [dbActors, isEnabled, rutasSanasActors, userPointActors, natSanMartinActors]);
+  }, [dbActors, isEnabled, rutasSanasActors, userPointActors, natSanMartinActors, elClickActors, elBroteActors]);
 
   const toggleType = (type: ActorType) => {
     setActiveTypes((prev) => {

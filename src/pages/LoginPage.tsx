@@ -63,7 +63,7 @@ const LoginPage = () => {
     setLoading(true);
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+        redirect_uri: `${window.location.origin}${nextPath.startsWith("/") ? `/ingresar?next=${encodeURIComponent(nextPath)}` : ""}`,
       });
       if (result.error) throw result.error;
     } catch (error: any) {

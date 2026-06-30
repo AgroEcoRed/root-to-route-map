@@ -80,7 +80,7 @@ export default function AdminLayersPage() {
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.functions.invoke("send-layer-invite", {
+    const { data, error } = await supabase.functions.invoke("send-layer-invite", {
       body: { email: email.trim(), layer_id: layerId, origin: window.location.origin },
     });
     setSubmitting(false);
@@ -88,7 +88,12 @@ export default function AdminLayersPage() {
       toast.error("No se pudo asignar: " + error.message);
       return;
     }
-    toast.success("Invitación enviada");
+    if ((data as any)?.sent === false && (data as any)?.inviteLink) {
+      toast.warning("Invitación creada, pero no se pudo enviar el email automáticamente. Copié el link para enviarlo manualmente.");
+      try { await navigator.clipboard.writeText((data as any).inviteLink); } catch { /* noop */ }
+    } else {
+      toast.success("Invitación enviada");
+    }
     setEmail("");
     setLayerId("");
     load();
