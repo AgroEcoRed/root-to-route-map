@@ -9,11 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { Switch } from "@/components/ui/switch";
+import { Sparkles, Upload, Loader2, Image as ImageIcon } from "lucide-react";
 
 const ALLOWED_ORIGINS = new Set(["https://agroeco.red", "https://www.agroeco.red"]);
 const productionOrigin = ALLOWED_ORIGINS.has(window.location.origin) ? window.location.origin : "https://agroeco.red";
-import { Switch } from "@/components/ui/switch";
-import { Sparkles, Upload, Loader2, Image as ImageIcon } from "lucide-react";
 
 const schema = z.object({
   title: z.string().trim().min(3, "Mínimo 3 caracteres").max(140),
