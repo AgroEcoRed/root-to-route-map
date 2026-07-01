@@ -34,6 +34,9 @@
 ## Nav labels
 - "Red" (not "Red de Actores") in all languages
 
+## Workflow
+- Implement new changes in Spanish first; translate ES/EN/FR/PT later only when explicitly requested.
+
 ## Auth
 - AuthProvider context wraps routes
 - Login page at /ingresar with email + Google
