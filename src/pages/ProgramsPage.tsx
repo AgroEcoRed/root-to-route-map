@@ -28,7 +28,7 @@ const ProgramsPage = () => {
   const [items, setItems] = useState<GovProgram[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
-  const [country, setCountry] = useState<string | null>(null);
+  const [country, setCountry] = useState<string | null>("AR");
 
   useEffect(() => {
     supabase.from("gov_programs").select("*").order("country").then(({ data, error }) => {
@@ -70,13 +70,13 @@ const ProgramsPage = () => {
         <div className="container">
           <motion.div className="text-center max-w-3xl mx-auto" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <span className="inline-block text-sm font-semibold text-secondary uppercase tracking-wider px-4 py-1 rounded-full bg-secondary/10 mb-3">
-              Programas públicos
+              Programas públicos · Argentina
             </span>
             <h1 className="text-3xl sm:text-4xl font-display text-foreground mb-3 flex items-center justify-center gap-3">
-              <Landmark className="h-8 w-8 text-primary" /> Programas gubernamentales
+              <Landmark className="h-8 w-8 text-primary" /> Políticas públicas para la agroecología en Argentina
             </h1>
             <p className="text-muted-foreground">
-              Catálogo curado de programas públicos para la agroecología y agricultura familiar en América Latina. Próximamente: actualización automática vía scraping.
+              Catálogo curado de programas y leyes vigentes a nivel nacional y provincial (con foco inicial en la Provincia de Buenos Aires). A medida que la red crezca en otros países de la región, se irán sumando sus políticas públicas.
             </p>
           </motion.div>
         </div>
