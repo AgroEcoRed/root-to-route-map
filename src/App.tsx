@@ -17,6 +17,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import CommunityPage from "./pages/CommunityPage";
 import ServicesPage from "./pages/ServicesPage";
 import LibraryPage from "./pages/LibraryPage";
+import SPGPage from "./pages/SPGPage";
 import ProgramsPage from "./pages/ProgramsPage";
 import TransitionPage from "./pages/TransitionPage";
 import MiPerfilPage from "./pages/MiPerfilPage";
@@ -54,8 +55,8 @@ const App = () => (
               <Route path="/marketplace" element={<Navigate to="/mercado" replace />} />
               <Route path="/actores" element={<ActorsPage />} />
               <Route path="/comunidad" element={<CommunityPage />} />
-              {/* Garantías Participativas (SPG) — por ahora reusa CommunityPage hasta tener página dedicada */}
-              <Route path="/garantias" element={<CommunityPage />} />
+              {/* Garantías Participativas (SPG) — página dedicada con enlace a Biblioteca */}
+              <Route path="/garantias" element={<SPGPage />} />
               <Route path="/spg" element={<Navigate to="/garantias" replace />} />
               {/* Recursos Compartidos (ex Servicios) */}
               <Route path="/recursos" element={<ServicesPage />} />
