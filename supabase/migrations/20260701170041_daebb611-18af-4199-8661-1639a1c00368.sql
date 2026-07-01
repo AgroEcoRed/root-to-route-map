@@ -1,0 +1,1 @@
+UPDATE public.events SET flyer_url = NULL WHERE flyer_url IS NOT NULL;
