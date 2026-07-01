@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BookOpen, Upload, Download, Search, Tag, FileText, ExternalLink, Loader2, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,11 +47,28 @@ const fetchDoiMeta = async (doi: string) => {
 const LibraryPage = () => {
   const { user } = useAuth();
   const { lang } = useLanguage();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [items, setItems] = useState<LibraryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+
+  // Support deep-link ?tag=participatory-guarantee from SPG page etc.
+  useEffect(() => {
+    const t = searchParams.get("tag");
+    if (t && t !== tagFilter) setTagFilter(t);
+  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Keep URL in sync when the user changes the tag chip.
+  useEffect(() => {
+    const current = searchParams.get("tag");
+    if (tagFilter && current !== tagFilter) {
+      setSearchParams((p) => { const n = new URLSearchParams(p); n.set("tag", tagFilter); return n; }, { replace: true });
+    } else if (!tagFilter && current) {
+      setSearchParams((p) => { const n = new URLSearchParams(p); n.delete("tag"); return n; }, { replace: true });
+    }
+  }, [tagFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const load = async () => {
     setLoading(true);
