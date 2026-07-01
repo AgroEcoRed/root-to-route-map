@@ -4,6 +4,7 @@ export type LicenseCode =
   | "CC-BY-SA-4.0"
   | "CC-BY-NC-4.0"
   | "CC-BY-NC-SA-4.0"
+  | "ODbL-1.0"
   | "all-rights-reserved";
 
 export interface LicenseInfo {
@@ -59,6 +60,15 @@ export const LICENSES: LicenseInfo[] = [
     description:
       "Liberás el contenido al dominio público. Cualquiera puede usarlo para cualquier fin, sin pedir permiso ni dar crédito.",
     url: "https://creativecommons.org/publicdomain/zero/1.0/deed.es",
+    open: true,
+  },
+  {
+    code: "ODbL-1.0",
+    short: "ODbL 1.0",
+    name: "Open Database License",
+    description:
+      "Licencia abierta pensada para bases de datos y capas geográficas. Otros pueden usar, modificar y redistribuir los datos, siempre que den atribución y compartan las obras derivadas bajo la misma licencia. Recomendada para capas del mapa colaborativo.",
+    url: "https://opendatacommons.org/licenses/odbl/1-0/",
     open: true,
   },
   {
