@@ -794,7 +794,7 @@ const MapPage = () => {
       });
       eventMarkersRef.current.set(ev.id, marker);
     });
-  }, [events, isEnabled]);
+  }, [events, isEnabled, mapVersion]);
 
   // Deep-link: open ?event=<id> centered with its popup, and surface the flyer in the sidebar.
   const [focusedEventId, setFocusedEventId] = useState<string | null>(null);
