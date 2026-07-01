@@ -30,6 +30,7 @@ const Navbar = () => {
   const secondaryNav = [
     { to: "/garantias", label: t("nav.spg"), icon: ShieldCheck, showFrom: "xl" as const },
     { to: "/comunidad", label: t("nav.community"), icon: BookOpen, showFrom: "xl" as const },
+    { to: "/biblioteca", label: "Biblioteca", icon: BookOpen, showFrom: "2xl" as const },
     { to: "/recursos", label: t("nav.services"), icon: Sprout, showFrom: "2xl" as const },
     { to: "/observatorio", label: t("nav.observatory"), icon: BarChart3, showFrom: "2xl" as const },
   ];
