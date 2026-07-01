@@ -1292,6 +1292,13 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      get_actor_confirmation_contact: {
+        Args: { _id: string }
+        Returns: {
+          confirmation_email: string
+          confirmation_phone: string
+        }[]
+      }
       get_event_by_edit_token: {
         Args: { _token: string }
         Returns: {
