@@ -318,6 +318,11 @@ const MapPage = () => {
   const eventsLayerRef = useRef<L.LayerGroup | null>(null);
   const eventMarkersRef = useRef<Map<string, L.Marker>>(new Map());
   const networkLayerRef = useRef<L.LayerGroup | null>(null);
+  // Bumped each time the Leaflet map/layer group is (re)created, so effects
+  // that render markers into `eventsLayerRef` re-run against the fresh layer.
+  // Without this, in dev/StrictMode or after any remount the events effect
+  // could add stars to a stale layer that was already removed → mapa vacío.
+  const [mapVersion, setMapVersion] = useState(0);
   const profileIdByCoordsRef = useRef<Map<string, { id: string; lat: number; lng: number; name: string }>>(new Map());
   const [dbActors, setDbActors] = useState<MapActor[]>([]);
   const [dbProfilesById, setDbProfilesById] = useState<Map<string, { id: string; lat: number; lng: number; name: string }>>(new Map());
