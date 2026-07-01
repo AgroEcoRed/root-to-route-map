@@ -111,11 +111,32 @@ const LicensesPage = () => {
           <section className="space-y-3">
             <h2 className="font-display text-2xl">Plataforma y código</h2>
             <p className="text-sm leading-relaxed">
-              El diseño y los textos institucionales de AgroEco.Red se
-              comparten bajo <strong>CC BY-SA 4.0</strong>. Las marcas y
-              logotipos de terceros (organizaciones, redes, instituciones) son
-              propiedad de sus respectivos titulares y se muestran únicamente
-              con fines de identificación.
+              El <strong>código fuente</strong> de AgroEco.Red se publica bajo
+              la licencia <strong>GNU AGPL-3.0</strong>. Los{" "}
+              <strong>datos georreferenciados</strong> del mapa colaborativo se
+              publican bajo <strong>Open Database License (ODbL 1.0)</strong>.
+              Los <strong>contenidos colaborativos</strong> (textos, fotos,
+              documentos) se comparten por defecto bajo{" "}
+              <strong>Creative Commons BY-SA 4.0</strong>, salvo que quien los
+              aportó haya elegido otra licencia.
+            </p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Las marcas y logotipos de terceros (organizaciones, redes,
+              instituciones) son propiedad de sus respectivos titulares y se
+              muestran únicamente con fines de identificación, con la debida
+              autorización cuando corresponde.
+            </p>
+            <p className="text-sm leading-relaxed">
+              Guía técnica para replicar o auto-alojar la plataforma:{" "}
+              <a
+                href="https://codeberg.org/agroecored/agroeco.red/src/branch/main/docs/self-hosting.md"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                docs/self-hosting.md
+              </a>
+              .
             </p>
           </section>
         </div>
