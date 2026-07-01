@@ -515,6 +515,7 @@ const MapPage = () => {
     mapRef.current.addLayer(clusterRef.current);
     eventsLayerRef.current = L.layerGroup().addTo(mapRef.current);
     networkLayerRef.current = L.layerGroup().addTo(mapRef.current);
+    setMapVersion((v) => v + 1);
 
     return () => {
       mapRef.current?.remove();
