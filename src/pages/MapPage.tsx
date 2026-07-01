@@ -326,10 +326,11 @@ const MapPage = () => {
   const profileIdByCoordsRef = useRef<Map<string, { id: string; lat: number; lng: number; name: string }>>(new Map());
   const [dbActors, setDbActors] = useState<MapActor[]>([]);
   const [dbProfilesById, setDbProfilesById] = useState<Map<string, { id: string; lat: number; lng: number; name: string }>>(new Map());
-  const { isEnabled } = useDataSources();
+  const { isEnabled, loading: sourcesLoading } = useDataSources();
   const { user } = useAuth();
   const { events } = useEvents();
   const { connections } = useActorConnections();
+  const showEventsLayer = !sourcesLoading && isEnabled("eventos");
   const [showNetwork, setShowNetwork] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [addPointOpen, setAddPointOpen] = useState(false);
@@ -724,7 +725,7 @@ const MapPage = () => {
     if (!mapRef.current || !eventsLayerRef.current) return;
     eventsLayerRef.current.clearLayers();
     eventMarkersRef.current.clear();
-    if (!isEnabled("eventos")) return;
+    if (!showEventsLayer) return;
 
     events.forEach((ev) => {
       if (ev.lat == null || ev.lng == null) return;
@@ -794,7 +795,7 @@ const MapPage = () => {
       });
       eventMarkersRef.current.set(ev.id, marker);
     });
-  }, [events, isEnabled, mapVersion]);
+  }, [events, showEventsLayer, mapVersion]);
 
   // Deep-link: open ?event=<id> centered with its popup, and surface the flyer in the sidebar.
   const [focusedEventId, setFocusedEventId] = useState<string | null>(null);
@@ -1057,16 +1058,16 @@ const MapPage = () => {
 
           {/* Events sidebar (desktop inline + mobile drawer) */}
           <EventsSidebar
-            events={events}
+            events={showEventsLayer ? events : []}
             onFlyTo={(la, ln) => mapRef.current?.flyTo([la, ln], 14, { duration: 0.8 })}
             highlightedEventId={focusedEventId}
             onOpenEvent={(id) => {
-              const ev = events.find((e) => e.id === id);
+              const ev = showEventsLayer ? events.find((e) => e.id === id) : undefined;
               if (ev?.lat != null && ev?.lng != null) {
                 mapRef.current?.flyTo([ev.lat, ev.lng], 15, { duration: 0.7 });
               }
               setFocusedEventId(id);
-              const m = eventMarkersRef.current.get(id);
+              const m = showEventsLayer ? eventMarkersRef.current.get(id) : undefined;
               if (m) setTimeout(() => m.openPopup(), 750);
             }}
             onShare={(id) => {
