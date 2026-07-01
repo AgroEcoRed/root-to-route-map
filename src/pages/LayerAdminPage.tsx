@@ -133,9 +133,17 @@ export default function LayerAdminPage() {
   };
 
   const sendToConfirm = async (actor: LayerActor) => {
+    // Fetch existing confirmation contact via SECURITY DEFINER RPC — the
+    // columns are no longer exposed through the Data API to protect PII.
+    let existing = "";
+    try {
+      const { data } = await (supabase as any).rpc("get_actor_confirmation_contact", { _id: actor.id });
+      const row = Array.isArray(data) ? data[0] : data;
+      existing = row?.confirmation_email || row?.confirmation_phone || "";
+    } catch { /* ignore, fall back to actor.contact */ }
     const contact = prompt(
       "Email o teléfono del actor a quien enviar la confirmación (se guarda como referencia):",
-      (actor as any).confirmation_email || (actor as any).confirmation_phone || actor.contact || ""
+      existing || actor.contact || ""
     );
     if (contact === null) return;
     const isEmail = /@/.test(contact);
