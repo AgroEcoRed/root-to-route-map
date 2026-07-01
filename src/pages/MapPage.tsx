@@ -318,6 +318,11 @@ const MapPage = () => {
   const eventsLayerRef = useRef<L.LayerGroup | null>(null);
   const eventMarkersRef = useRef<Map<string, L.Marker>>(new Map());
   const networkLayerRef = useRef<L.LayerGroup | null>(null);
+  // Bumped each time the Leaflet map/layer group is (re)created, so effects
+  // that render markers into `eventsLayerRef` re-run against the fresh layer.
+  // Without this, in dev/StrictMode or after any remount the events effect
+  // could add stars to a stale layer that was already removed → mapa vacío.
+  const [mapVersion, setMapVersion] = useState(0);
   const profileIdByCoordsRef = useRef<Map<string, { id: string; lat: number; lng: number; name: string }>>(new Map());
   const [dbActors, setDbActors] = useState<MapActor[]>([]);
   const [dbProfilesById, setDbProfilesById] = useState<Map<string, { id: string; lat: number; lng: number; name: string }>>(new Map());
@@ -510,6 +515,7 @@ const MapPage = () => {
     mapRef.current.addLayer(clusterRef.current);
     eventsLayerRef.current = L.layerGroup().addTo(mapRef.current);
     networkLayerRef.current = L.layerGroup().addTo(mapRef.current);
+    setMapVersion((v) => v + 1);
 
     return () => {
       mapRef.current?.remove();
@@ -788,7 +794,7 @@ const MapPage = () => {
       });
       eventMarkersRef.current.set(ev.id, marker);
     });
-  }, [events, isEnabled]);
+  }, [events, isEnabled, mapVersion]);
 
   // Deep-link: open ?event=<id> centered with its popup, and surface the flyer in the sidebar.
   const [focusedEventId, setFocusedEventId] = useState<string | null>(null);
