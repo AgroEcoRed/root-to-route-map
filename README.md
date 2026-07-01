@@ -1,73 +1,64 @@
-# Welcome to your Lovable project
+# AgroEco.Red
 
-## Project info
+**Plataforma libre y colaborativa para el mapeo, articulación y fortalecimiento de sistemas alimentarios agroecológicos.**
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Sitio: https://agroeco.red
 
-## How can I edit this code?
+AgroEco.Red es una infraestructura pública de investigación-acción que integra:
 
-There are several ways of editing your application.
+- Un **mapa colaborativo** de actores agroecológicos (productorxs, nodos, ferias, redes, iniciativas).
+- Un **mercado agroecológico** con pedidos directos entre consumidorxs y productorxs.
+- Una **biblioteca abierta** de conocimientos sobre agroecología y Sistemas Participativos de Garantía (SPG).
+- Un **sistema de verificación comunitaria** y de votos de confianza entre actores de la red.
 
-**Use Lovable**
+La plataforma se desarrolla con la vocación de sostener la **soberanía tecnológica y alimentaria**, y de alojar sus datos en servidores en territorio argentino.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## Licencias
 
-**Use your preferred IDE**
+AgroEco.Red distingue tres capas y aplica una licencia libre a cada una:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+| Capa | Licencia | Alcance |
+|------|----------|---------|
+| Código fuente | **[GNU AGPL-3.0](./LICENSE)** | Todo el software del repositorio. |
+| Datos georreferenciados (mapa, actores, eventos) | **[Open Database License (ODbL) 1.0](./DATA-LICENSE.md)** | Base de datos del mapa y sus extractos. |
+| Contenidos colaborativos (biblioteca, textos, imágenes) | **[Creative Commons Atribución-CompartirIgual 4.0 (CC BY-SA 4.0)](./CONTENT-LICENSE.md)** | Documentos, artículos y materiales cargados por la comunidad. |
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Cualquier reutilización debe conservar la atribución a **AgroEco.Red** y a lxs autorxs originales de cada dato o contenido, y redistribuirse bajo la misma licencia.
 
-Follow these steps:
+---
+
+## Cómo contribuir
+
+Leé la guía de contribución en [`CONTRIBUTING.md`](./CONTRIBUTING.md) y el [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md).
+
+---
+
+## Desarrollo local
+
+Requisitos: Node.js 20+ y `npm` o `bun`.
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+git clone https://codeberg.org/agroecored/agroeco-red.git
+cd agroeco-red
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+El backend (base de datos, auth, funciones, storage) está desplegado en Lovable Cloud (Supabase). Para levantar una instancia propia consultar [`docs/self-hosting.md`](./docs/self-hosting.md) (en preparación).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## Stack técnico
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- Vite + React 18 + TypeScript
+- Tailwind CSS + shadcn/ui
+- Leaflet para el mapa
+- Supabase (Postgres, Auth, Edge Functions, Storage)
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## Contacto
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+contacto@agroeco.red
