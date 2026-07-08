@@ -16,6 +16,7 @@ import { DEFAULT_LICENSE, LicenseCode } from "@/lib/licenses";
 import PreliminaryImport from "@/components/PreliminaryImport";
 import AddMapPointDialog from "@/components/AddMapPointDialog";
 import MyMapContributions from "@/components/MyMapContributions";
+import InviteOthersSection from "@/components/InviteOthersSection";
 import { Link } from "react-router-dom";
 import { MapPin, Plus, Sparkles } from "lucide-react";
 
@@ -51,6 +52,8 @@ const ProfileQuickActions = () => {
 
       <PreliminaryImport />
       <div className="h-8" />
+
+      <InviteOthersSection />
 
       <AddMapPointDialog open={addPointOpen} onOpenChange={setAddPointOpen} />
 

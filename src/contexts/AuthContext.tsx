@@ -37,6 +37,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             try {
               await supabase.functions.invoke("claim-layer-invites");
             } catch { /* No bloquea el ingreso */ }
+            // Claim referral link if one was stored during signup
+            try {
+              const refToken = localStorage.getItem("agrored-referral-token");
+              if (refToken) {
+                await (supabase as any).rpc("claim_referral", { _token: refToken });
+                localStorage.removeItem("agrored-referral-token");
+              }
+            } catch { /* silent */ }
             const { data: profile } = await supabase
               .from("profiles")
               .select("registration_completed")

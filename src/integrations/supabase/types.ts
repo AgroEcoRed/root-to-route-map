@@ -904,6 +904,51 @@ export type Database = {
           },
         ]
       }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          invited_user_id: string | null
+          invitee_contact: string
+          invitee_contact_type: string
+          invitee_name: string
+          joined_at: string | null
+          personal_message: string | null
+          referrer_user_id: string
+          status: string
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invited_user_id?: string | null
+          invitee_contact: string
+          invitee_contact_type: string
+          invitee_name: string
+          joined_at?: string | null
+          personal_message?: string | null
+          referrer_user_id: string
+          status?: string
+          token?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invited_user_id?: string | null
+          invitee_contact?: string
+          invitee_contact_type?: string
+          invitee_name?: string
+          joined_at?: string | null
+          personal_message?: string | null
+          referrer_user_id?: string
+          status?: string
+          token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       seller_reviews: {
         Row: {
           comment: string | null
@@ -1183,6 +1228,29 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      claim_referral: {
+        Args: { _token: string }
+        Returns: {
+          created_at: string
+          id: string
+          invited_user_id: string | null
+          invitee_contact: string
+          invitee_contact_type: string
+          invitee_name: string
+          joined_at: string | null
+          personal_message: string | null
+          referrer_user_id: string
+          status: string
+          token: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "referrals"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       confirm_actor_by_token: {
         Args: {
           _address?: string
@@ -1337,6 +1405,13 @@ export type Database = {
         }
       }
       get_my_event_edit_token: { Args: { _event_id: string }; Returns: string }
+      get_referral_by_token: {
+        Args: { _token: string }
+        Returns: {
+          invitee_name: string
+          referrer_name: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
