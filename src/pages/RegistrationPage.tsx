@@ -75,7 +75,22 @@ const isProducerType = (type: ActorType | null) =>
 
 const RegistrationPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);
+  const [refInfo, setRefInfo] = useState<{ referrer_name: string; invitee_name: string } | null>(null);
+
+  // Capture ?ref=<token>: save it so AuthContext claims it on sign-in, and
+  // fetch the referrer's name to show a friendly welcome banner.
+  useEffect(() => {
+    const token = searchParams.get("ref");
+    if (!token) return;
+    try { localStorage.setItem("agrored-referral-token", token); } catch { /* noop */ }
+    (async () => {
+      const { data } = await (supabase as any).rpc("get_referral_by_token", { _token: token });
+      const row = Array.isArray(data) ? data[0] : data;
+      if (row?.referrer_name) setRefInfo(row);
+    })();
+  }, [searchParams]);
   const [selectedType, setSelectedType] = useState<ActorType | null>(null);
   const [loading, setLoading] = useState(false);
 
