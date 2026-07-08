@@ -318,6 +318,21 @@ Gracias.`;
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-wheat/5 rounded-full blur-3xl" />
 
         <div className="container max-w-3xl py-12 relative">
+          {refInfo && (
+            <div className="mb-6 rounded-xl border-2 border-wheat/50 bg-gradient-to-r from-wheat/10 to-primary/5 p-4 flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0">
+                <Sparkles className="h-5 w-5 text-primary" />
+              </div>
+              <div className="text-sm">
+                <p className="font-semibold text-foreground">
+                  Te invita <span className="text-primary">{refInfo.referrer_name}</span> a sumarte a AgroEco.Red
+                </p>
+                <p className="text-muted-foreground">
+                  Cuando termines tu registro, tu experiencia queda vinculada a la de quien te invitó.
+                </p>
+              </div>
+            </div>
+          )}
           {/* Progress bar */}
           <div className="flex items-center justify-center gap-2 mb-12">
             {[1, 2, 3].map((s) => (
