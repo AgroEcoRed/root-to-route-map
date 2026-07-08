@@ -73,7 +73,7 @@ export default function EditEventPage() {
       title: ev.title,
       description: ev.description,
       starts_at: starts ? new Date(starts).toISOString() : null,
-      ends_at: ends ? new Date(ends).toISOString() : (starts ? new Date(starts).toISOString() : null),
+      ends_at: ends ? new Date(ends).toISOString() : null,
       location_name: ev.location_name,
       lat: ev.lat,
       lng: ev.lng,
