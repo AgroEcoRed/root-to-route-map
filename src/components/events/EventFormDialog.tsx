@@ -163,13 +163,13 @@ export const EventFormDialog = ({ open, onOpenChange, onCreated }: Props) => {
         } catch { /* try next */ }
       }
     }
-    // Autocomplete end date with start date if missing — supports single-day events
-    // and lets the map "glow" use a definite end. If the flyer/user provided a real range,
-    // we keep it as-is.
+    // Do NOT autocomplete ends_at from starts_at: si el flyer no indica horario
+    // de fin, dejamos el campo vacío para que la persona lo complete de forma
+    // opcional.
     const effectiveEnds =
       parsed.data.ends_at && parsed.data.ends_at.trim().length > 0
         ? parsed.data.ends_at
-        : parsed.data.starts_at;
+        : null;
     setSubmitting(true);
 
     // Upload flyer if present
