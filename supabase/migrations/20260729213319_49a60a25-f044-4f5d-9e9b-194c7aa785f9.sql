@@ -1,0 +1,1 @@
+UPDATE public.data_source_settings SET enabled = true, label = 'Actividades (próximas y pasadas)', updated_at = now() WHERE source_id = 'eventos';
