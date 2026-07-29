@@ -729,27 +729,33 @@ const MapPage = () => {
 
     events.forEach((ev) => {
       if (ev.lat == null || ev.lng == null) return;
-      if (eventBucket(ev) !== "upcoming") return; // past or undated → only sidebar
+      const bucket = eventBucket(ev);
+      if (bucket === "undated_or_unplaced") return; // sin fecha/lugar → solo barra lateral
+      const isPast = bucket === "past";
       const intensity = glowIntensity(ev.starts_at); // 0..1
       const size = 14 + Math.round(intensity * 22);   // 14 → 36 px halo
       const spread = 2 + Math.round(intensity * 10);
       const speed = (2.8 - intensity * 1.6).toFixed(2);
       // Color scale: lejos (azul frío) → cerca (rojo cálido). Sin violetas
       // para no chocar con los íconos de actores (que ya usan morados).
-      const starColor = proximityColor(intensity);
+      const starColor = isPast ? "#94a3b8" : proximityColor(intensity);
       const shadow = starColor.replace("#", "");
       const r = parseInt(shadow.slice(0,2), 16), g = parseInt(shadow.slice(2,4), 16), b = parseInt(shadow.slice(4,6), 16);
       const shadowRgba = `rgba(${r},${g},${b},${0.45 + intensity * 0.4})`;
-      const starSvg = `
+      const starSvg = isPast ? `
+        <svg viewBox="0 0 24 24" width="22" height="22" style="opacity:0.55; overflow: visible;">
+          <polygon points="12,1.5 14.7,8.7 22.5,9.2 16.5,14.2 18.5,21.8 12,17.5 5.5,21.8 7.5,14.2 1.5,9.2 9.3,8.7"
+            fill="${starColor}" stroke="#ffffff" stroke-width="1.2" stroke-linejoin="round"/>
+        </svg>` : `
         <svg viewBox="0 0 24 24" width="34" height="34" style="filter: drop-shadow(0 0 ${spread}px ${shadowRgba}) drop-shadow(0 0 ${size/2}px ${shadowRgba}); overflow: visible;">
           <polygon points="12,1.5 14.7,8.7 22.5,9.2 16.5,14.2 18.5,21.8 12,17.5 5.5,21.8 7.5,14.2 1.5,9.2 9.3,8.7"
             fill="${starColor}" stroke="#ffffff" stroke-width="1.2" stroke-linejoin="round"/>
         </svg>`;
       const icon = L.divIcon({
         className: "",
-        html: `<div class="event-star" style="--star-speed:${speed}s">${starSvg}</div>`,
-        iconSize: [34, 34],
-        iconAnchor: [17, 17],
+        html: isPast ? `<div>${starSvg}</div>` : `<div class="event-star" style="--star-speed:${speed}s">${starSvg}</div>`,
+        iconSize: isPast ? [22, 22] : [34, 34],
+        iconAnchor: isPast ? [11, 11] : [17, 17],
       });
       const date = new Date(ev.starts_at);
       const dateStr = date.toLocaleString("es-AR", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
@@ -776,10 +782,11 @@ const MapPage = () => {
       const orgsHtml = orgs.length ? `<p style="font-size:11px;color:#444;margin:6px 0 0"><b>Co-organizan:</b> ${escHtml(orgs.join(", "))}</p>` : "";
       const shareHtml = `<p style="margin:8px 0 0;font-size:11px;color:#6b7280">💡 Click derecho sobre la estrella para copiar un link directo a esta actividad.</p>`;
       const eventLicenseHtml = `<p style="margin:6px 0 0;font-size:10px;color:#94a3b8">📄 Datos: <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener noreferrer" style="color:#64748b;text-decoration:underline">ODbL 1.0</a> · Textos: <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es" target="_blank" rel="noopener noreferrer" style="color:#64748b;text-decoration:underline">CC BY-SA 4.0</a></p>`;
-      const marker = L.marker([ev.lat, ev.lng], { icon, zIndexOffset: 1000 })
+      const marker = L.marker([ev.lat, ev.lng], { icon, zIndexOffset: isPast ? 400 : 1000, opacity: isPast ? 0.85 : 1 })
         .bindPopup(`
           <div style="min-width:240px;font-family:DM Sans,sans-serif;padding:4px">
             <span style="display:inline-block;background:${typeColor[ev.event_type]};color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:0.4px">${typeLabels[ev.event_type]}</span>
+            ${isPast ? `<span style="display:inline-block;margin-left:6px;background:#e2e8f0;color:#475569;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:0.4px">Ya sucedió</span>` : ""}
             <h3 style="font-family:Playfair Display,serif;font-size:16px;margin:8px 0 4px;color:#1a1a1a">${escHtml(ev.title)}</h3>
             <p style="font-size:12px;color:#444;margin:0;font-weight:600">🗓️ ${escHtml(dateStr)}</p>
             ${locHtml}${descHtml}${flyerHtml}${orgsHtml}${contactHtml}${linkHtml}${shareHtml}${eventLicenseHtml}
