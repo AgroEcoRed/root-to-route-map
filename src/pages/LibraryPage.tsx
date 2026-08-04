@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { BookOpen, Upload, Download, Search, Tag, FileText, ExternalLink, Loader2, Plus } from "lucide-react";
+import { BookOpen, Upload, Download, Search, Tag, FileText, ExternalLink, Loader2, Plus, FolderPlus, Folder, Sparkles, Library } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -12,10 +12,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
-import type { LibraryItem } from "@/types/library";
+import type { LibraryItem, LibraryCollection } from "@/types/library";
 import { toBibtex, toCsv, downloadFile } from "@/lib/bibtex";
+import { parseBibFile } from "@/lib/bibimport";
 import { TAG_LABELS, CURATED_TAG_SLUGS, tagLabel } from "@/lib/libraryTags";
 import LicenseSelector from "@/components/LicenseSelector";
 import LicenseBadge from "@/components/LicenseBadge";
@@ -44,15 +45,26 @@ const fetchDoiMeta = async (doi: string) => {
   }
 };
 
+const fileToBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(",")[1] ?? "");
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+
 const LibraryPage = () => {
   const { user } = useAuth();
   const { lang } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const [items, setItems] = useState<LibraryItem[]>([]);
+  const [collections, setCollections] = useState<LibraryCollection[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [tagFilter, setTagFilter] = useState<string | null>(null);
+  const [collectionFilter, setCollectionFilter] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
   // Support deep-link ?tag=participatory-guarantee from SPG page etc.
   useEffect(() => {
@@ -70,6 +82,14 @@ const LibraryPage = () => {
     }
   }, [tagFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const loadCollections = async () => {
+    const { data } = await supabase
+      .from("library_collections")
+      .select("*")
+      .order("name", { ascending: true });
+    setCollections((data ?? []) as LibraryCollection[]);
+  };
+
   const load = async () => {
     setLoading(true);
     const { data, error } = await supabase
@@ -81,11 +101,12 @@ const LibraryPage = () => {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); loadCollections(); }, []);
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase();
     return items.filter((it) => {
+      if (collectionFilter && it.collection_id !== collectionFilter) return false;
       if (tagFilter && !it.tags?.includes(tagFilter)) return false;
       if (!q) return true;
       return (
@@ -95,7 +116,13 @@ const LibraryPage = () => {
         it.tags?.some((t) => t.toLowerCase().includes(q))
       );
     });
-  }, [items, query, tagFilter]);
+  }, [items, query, tagFilter, collectionFilter]);
+
+  const countByCollection = useMemo(() => {
+    const m = new Map<string, number>();
+    items.forEach((it) => { if (it.collection_id) m.set(it.collection_id, (m.get(it.collection_id) ?? 0) + 1); });
+    return m;
+  }, [items]);
 
   const allTags = useMemo(() => {
     const counts = new Map<string, number>();
@@ -108,6 +135,21 @@ const LibraryPage = () => {
       .filter((s) => counts.has(s))
       .sort((a, b) => tagLabel(a, lang).localeCompare(tagLabel(b, lang)));
   }, [items, lang]);
+
+  const createCollection = async () => {
+    if (!user) return;
+    const name = window.prompt("Nombre de la carpeta");
+    if (!name?.trim()) return;
+    const { data, error } = await supabase
+      .from("library_collections")
+      .insert({ name: name.trim(), created_by: user.id })
+      .select()
+      .single();
+    if (error) return toast.error(error.message);
+    toast.success("Carpeta creada");
+    await loadCollections();
+    setCollectionFilter((data as LibraryCollection).id);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -153,14 +195,58 @@ const LibraryPage = () => {
               <Download className="h-4 w-4 mr-1" /> CSV
             </Button>
             {user ? (
-              <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger asChild>
-                  <Button><Plus className="h-4 w-4 mr-1" /> Sumar referencia</Button>
-                </DialogTrigger>
-                <UploadDialog onClose={() => { setOpen(false); load(); }} />
-              </Dialog>
+              <>
+                <Dialog open={importOpen} onOpenChange={setImportOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline"><Library className="h-4 w-4 mr-1" /> Importar de Zotero</Button>
+                  </DialogTrigger>
+                  <ImportDialog
+                    collections={collections}
+                    defaultCollection={collectionFilter}
+                    onClose={() => { setImportOpen(false); load(); }}
+                  />
+                </Dialog>
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <DialogTrigger asChild>
+                    <Button><Plus className="h-4 w-4 mr-1" /> Sumar referencia</Button>
+                  </DialogTrigger>
+                  <UploadDialog
+                    collections={collections}
+                    defaultCollection={collectionFilter}
+                    onClose={() => { setOpen(false); load(); }}
+                  />
+                </Dialog>
+              </>
             ) : (
               <Button asChild><Link to="/ingresar"><Upload className="h-4 w-4 mr-1" /> Ingresá para subir</Link></Button>
+            )}
+          </div>
+
+          {/* Folders */}
+          <div className="flex flex-wrap gap-2 mb-4 items-center">
+            <button
+              onClick={() => setCollectionFilter(null)}
+              className={`text-xs px-3 py-1.5 rounded-full border flex items-center gap-1 ${!collectionFilter ? "bg-secondary text-secondary-foreground border-secondary" : "border-border text-muted-foreground hover:border-secondary"}`}
+            >
+              <Folder className="h-3 w-3" /> Toda la biblioteca ({items.length})
+            </button>
+            {collections.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => setCollectionFilter(c.id === collectionFilter ? null : c.id)}
+                className={`text-xs px-3 py-1.5 rounded-full border flex items-center gap-1 ${c.id === collectionFilter ? "bg-secondary text-secondary-foreground border-secondary" : "border-border text-muted-foreground hover:border-secondary"}`}
+                title={c.description ?? undefined}
+              >
+                <Folder className="h-3 w-3" /> {c.name} ({countByCollection.get(c.id) ?? 0})
+              </button>
+            ))}
+            {user && (
+              <button
+                onClick={createCollection}
+                className="text-xs px-3 py-1.5 rounded-full border border-dashed border-border text-muted-foreground hover:border-primary flex items-center gap-1"
+              >
+                <FolderPlus className="h-3 w-3" /> Nueva carpeta
+              </button>
             )}
           </div>
 
@@ -194,7 +280,13 @@ const LibraryPage = () => {
           ) : (
             <div className="space-y-3">
               {filtered.map((it) => (
-                <ItemCard key={it.id} item={it} />
+                <ItemCard
+                  key={it.id}
+                  item={it}
+                  collections={collections}
+                  canEdit={!!user && it.uploaded_by === user.id}
+                  onMoved={load}
+                />
               ))}
             </div>
           )}
@@ -206,7 +298,9 @@ const LibraryPage = () => {
   );
 };
 
-const ItemCard = ({ item }: { item: LibraryItem }) => {
+const ItemCard = ({
+  item, collections, canEdit, onMoved,
+}: { item: LibraryItem; collections: LibraryCollection[]; canEdit: boolean; onMoved: () => void }) => {
   const { lang } = useLanguage();
   const openFile = async () => {
     if (!item.file_path) return;
@@ -218,6 +312,12 @@ const ItemCard = ({ item }: { item: LibraryItem }) => {
       return;
     }
     window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  };
+  const move = async (collection_id: string | null) => {
+    const { error } = await supabase.from("library_items").update({ collection_id }).eq("id", item.id);
+    if (error) return toast.error(error.message);
+    toast.success("Referencia movida");
+    onMoved();
   };
   return (
     <motion.div
@@ -242,8 +342,24 @@ const ItemCard = ({ item }: { item: LibraryItem }) => {
               ))}
             </div>
           )}
-          <div className="mt-2">
+          <div className="mt-2 flex flex-wrap items-center gap-2">
             <LicenseBadge code={item.license} attribution={item.attribution} />
+            {item.collection_id && !canEdit && (
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-secondary/10 text-secondary flex items-center gap-1">
+                <Folder className="h-3 w-3" />
+                {collections.find((c) => c.id === item.collection_id)?.name ?? "Carpeta"}
+              </span>
+            )}
+            {canEdit && (
+              <select
+                className="text-[11px] rounded-full border border-border bg-background px-2 py-0.5 text-muted-foreground"
+                value={item.collection_id ?? ""}
+                onChange={(e) => move(e.target.value || null)}
+              >
+                <option value="">Sin carpeta</option>
+                {collections.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            )}
           </div>
         </div>
         <div className="flex flex-col gap-2 shrink-0">
@@ -268,7 +384,9 @@ const ItemCard = ({ item }: { item: LibraryItem }) => {
   );
 };
 
-const UploadDialog = ({ onClose }: { onClose: () => void }) => {
+const UploadDialog = ({
+  collections, defaultCollection, onClose,
+}: { collections: LibraryCollection[]; defaultCollection: string | null; onClose: () => void }) => {
   const { user } = useAuth();
   const [doi, setDoi] = useState("");
   const [title, setTitle] = useState("");
@@ -277,12 +395,55 @@ const UploadDialog = ({ onClose }: { onClose: () => void }) => {
   const [itemType, setItemType] = useState("article");
   const [url, setUrl] = useState("");
   const [journal, setJournal] = useState("");
+  const [publisher, setPublisher] = useState("");
   const [abstract, setAbstract] = useState("");
   const [tags, setTags] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
+  const [reading, setReading] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [collectionId, setCollectionId] = useState<string>(defaultCollection ?? "");
   const [license, setLicense] = useState<LicenseCode>(DEFAULT_LICENSE);
   const [attribution, setAttribution] = useState("");
+  const dropRef = useRef<HTMLDivElement>(null);
+
+  const autoRead = async (f: File) => {
+    if (f.size > 20 * 1024 * 1024) {
+      toast.error("El archivo supera los 20 MB; completá la ficha a mano");
+      return;
+    }
+    setReading(true);
+    try {
+      const fileBase64 = await fileToBase64(f);
+      const { data, error } = await supabase.functions.invoke("parse-bibliography", {
+        body: { fileBase64, mime: f.type || "application/pdf", filename: f.name },
+      });
+      if (error) throw error;
+      const meta = data as any;
+      if (!meta || meta.error) throw new Error(meta?.error ?? "Sin datos");
+      if (meta.title) setTitle((p) => p || meta.title);
+      if (meta.authors?.length) setAuthors((p) => p || meta.authors.join(", "));
+      if (meta.year) setYear((p) => p || String(meta.year));
+      if (meta.item_type) setItemType(meta.item_type);
+      if (meta.doi) setDoi((p) => p || meta.doi);
+      if (meta.journal) setJournal((p) => p || meta.journal);
+      if (meta.publisher) setPublisher((p) => p || meta.publisher);
+      if (meta.abstract) setAbstract((p) => p || meta.abstract);
+      if (meta.tags?.length) setTags((p) => p || meta.tags.join(", "));
+      toast.success("Ficha completada automáticamente. Revisá y corregí si hace falta.");
+    } catch (e: any) {
+      toast.error("No se pudo leer el archivo automáticamente. Completá la ficha a mano.");
+    } finally {
+      setReading(false);
+    }
+  };
+
+  const handleFiles = (files: FileList | null) => {
+    const f = files?.[0];
+    if (!f) return;
+    setFile(f);
+    autoRead(f);
+  };
 
   const lookup = async () => {
     if (!doi.trim()) return;
@@ -294,6 +455,7 @@ const UploadDialog = ({ onClose }: { onClose: () => void }) => {
     setAuthors(meta.authors.join(", "));
     setYear(meta.year ? String(meta.year) : "");
     setJournal(meta.journal);
+    setPublisher(meta.publisher);
     setUrl(meta.url);
     setAbstract(meta.abstract);
     setItemType(meta.item_type);
@@ -320,10 +482,12 @@ const UploadDialog = ({ onClose }: { onClose: () => void }) => {
       doi: doi.trim() || null,
       url: url.trim() || null,
       journal: journal.trim() || null,
+      publisher: publisher.trim() || null,
       abstract: abstract.trim() || null,
       tags: tags.split(",").map((t) => t.trim()).filter(Boolean),
       file_path: filePath,
       uploaded_by: user.id,
+      collection_id: collectionId || null,
       license,
       attribution: attribution.trim() || null,
     });
@@ -337,8 +501,43 @@ const UploadDialog = ({ onClose }: { onClose: () => void }) => {
     <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
       <DialogHeader>
         <DialogTitle>Sumar referencia a la biblioteca</DialogTitle>
+        <DialogDescription>
+          Arrastrá el PDF acá abajo: leemos el documento y completamos la ficha automáticamente.
+        </DialogDescription>
       </DialogHeader>
       <div className="space-y-3">
+        {/* Dropzone */}
+        <div
+          ref={dropRef}
+          onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(e) => { e.preventDefault(); setDragging(false); handleFiles(e.dataTransfer.files); }}
+          className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors ${dragging ? "border-primary bg-primary/5" : "border-border"}`}
+        >
+          <input
+            type="file"
+            id="bibfile"
+            className="hidden"
+            accept=".pdf,.epub"
+            onChange={(e) => handleFiles(e.target.files)}
+          />
+          <label htmlFor="bibfile" className="cursor-pointer flex flex-col items-center gap-2 text-sm text-muted-foreground">
+            {reading ? (
+              <><Loader2 className="h-6 w-6 animate-spin text-primary" /> Leyendo el documento…</>
+            ) : (
+              <>
+                <Upload className="h-6 w-6 text-primary" />
+                <span className="font-medium text-foreground">{file ? file.name : "Arrastrá el PDF/EPUB acá o hacé clic para elegirlo"}</span>
+                <span className="text-xs flex items-center gap-1"><Sparkles className="h-3 w-3" /> La ficha se completa sola a partir del archivo</span>
+              </>
+            )}
+          </label>
+        </div>
+        {file && !reading && (
+          <Button variant="ghost" size="sm" onClick={() => autoRead(file)}>
+            <Sparkles className="h-4 w-4 mr-1" /> Volver a leer el archivo
+          </Button>
+        )}
         <div className="flex gap-2">
           <Input placeholder="DOI (opcional, autocompleta)" value={doi} onChange={(e) => setDoi(e.target.value)} />
           <Button variant="outline" onClick={lookup} disabled={busy}>Buscar DOI</Button>
@@ -351,15 +550,21 @@ const UploadDialog = ({ onClose }: { onClose: () => void }) => {
             {ITEM_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
         </div>
-        <Input placeholder="Revista / Editorial" value={journal} onChange={(e) => setJournal(e.target.value)} />
+        <Input placeholder="Revista" value={journal} onChange={(e) => setJournal(e.target.value)} />
+        <Input placeholder="Editorial" value={publisher} onChange={(e) => setPublisher(e.target.value)} />
         <Input placeholder="URL" value={url} onChange={(e) => setUrl(e.target.value)} />
         <Textarea placeholder="Resumen / abstract" value={abstract} onChange={(e) => setAbstract(e.target.value)} rows={3} />
         <Input placeholder="Etiquetas (separadas por coma)" value={tags} onChange={(e) => setTags(e.target.value)} />
-        <div className="border-2 border-dashed border-border rounded-lg p-4 text-center">
-          <input type="file" id="bibfile" className="hidden" accept=".pdf,.epub" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
-          <label htmlFor="bibfile" className="cursor-pointer text-sm text-muted-foreground flex items-center justify-center gap-2">
-            <Upload className="h-4 w-4" /> {file ? file.name : "Adjuntar PDF/EPUB (opcional)"}
-          </label>
+        <div>
+          <label className="text-xs text-muted-foreground mb-1 block">Carpeta</label>
+          <select
+            className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+            value={collectionId}
+            onChange={(e) => setCollectionId(e.target.value)}
+          >
+            <option value="">Sin carpeta</option>
+            {collections.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
         </div>
         <LicenseSelector
           value={license}
@@ -370,7 +575,111 @@ const UploadDialog = ({ onClose }: { onClose: () => void }) => {
       </div>
       <DialogFooter>
         <Button variant="ghost" onClick={onClose}>Cancelar</Button>
-        <Button onClick={submit} disabled={busy}>{busy && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}Publicar</Button>
+        <Button onClick={submit} disabled={busy || reading}>{busy && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}Publicar</Button>
+      </DialogFooter>
+    </DialogContent>
+  );
+};
+
+const ImportDialog = ({
+  collections, defaultCollection, onClose,
+}: { collections: LibraryCollection[]; defaultCollection: string | null; onClose: () => void }) => {
+  const { user } = useAuth();
+  const [refs, setRefs] = useState<ReturnType<typeof parseBibFile>>([]);
+  const [collectionId, setCollectionId] = useState<string>(defaultCollection ?? "");
+  const [busy, setBusy] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [license, setLicense] = useState<LicenseCode>(DEFAULT_LICENSE);
+
+  const handleFiles = async (files: FileList | null) => {
+    const f = files?.[0];
+    if (!f) return;
+    const text = await f.text();
+    const parsed = parseBibFile(f.name, text);
+    if (parsed.length === 0) return toast.error("No se reconocieron referencias en el archivo");
+    setRefs(parsed);
+    toast.success(`${parsed.length} referencias detectadas`);
+  };
+
+  const importAll = async () => {
+    if (!user || refs.length === 0) return;
+    setBusy(true);
+    const rows = refs.map((r) => ({
+      title: r.title,
+      authors: r.authors,
+      year: r.year,
+      item_type: r.item_type,
+      doi: r.doi,
+      url: r.url,
+      journal: r.journal,
+      publisher: r.publisher,
+      abstract: r.abstract,
+      tags: r.tags,
+      uploaded_by: user.id,
+      collection_id: collectionId || null,
+      license,
+    }));
+    const { error } = await supabase.from("library_items").insert(rows);
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success(`${rows.length} referencias importadas`);
+    onClose();
+  };
+
+  return (
+    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle>Importar biblioteca desde Zotero</DialogTitle>
+        <DialogDescription>
+          En Zotero: clic derecho sobre la colección → «Exportar colección…» → formato <strong>BibTeX</strong>, <strong>RIS</strong> o CSV.
+          Después arrastrá el archivo acá.
+        </DialogDescription>
+      </DialogHeader>
+      <div className="space-y-3">
+        <div
+          onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(e) => { e.preventDefault(); setDragging(false); handleFiles(e.dataTransfer.files); }}
+          className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors ${dragging ? "border-primary bg-primary/5" : "border-border"}`}
+        >
+          <input type="file" id="zoterofile" className="hidden" accept=".bib,.ris,.csv,.txt" onChange={(e) => handleFiles(e.target.files)} />
+          <label htmlFor="zoterofile" className="cursor-pointer flex flex-col items-center gap-2 text-sm text-muted-foreground">
+            <Upload className="h-6 w-6 text-primary" />
+            <span className="font-medium text-foreground">Arrastrá el .bib / .ris / .csv acá o hacé clic</span>
+          </label>
+        </div>
+
+        {refs.length > 0 && (
+          <div className="border border-border rounded-lg max-h-64 overflow-y-auto divide-y divide-border">
+            {refs.map((r, i) => (
+              <div key={i} className="p-2 text-sm">
+                <p className="font-medium text-foreground line-clamp-1">{r.title}</p>
+                <p className="text-xs text-muted-foreground line-clamp-1">
+                  {r.authors.join(", ")}{r.year ? ` · ${r.year}` : ""}{r.journal ? ` · ${r.journal}` : ""}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div>
+          <label className="text-xs text-muted-foreground mb-1 block">Carpeta destino</label>
+          <select
+            className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+            value={collectionId}
+            onChange={(e) => setCollectionId(e.target.value)}
+          >
+            <option value="">Sin carpeta</option>
+            {collections.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+        </div>
+        <LicenseSelector value={license} onChange={setLicense} />
+      </div>
+      <DialogFooter>
+        <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+        <Button onClick={importAll} disabled={busy || refs.length === 0}>
+          {busy && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}Importar {refs.length || ""}
+        </Button>
       </DialogFooter>
     </DialogContent>
   );
