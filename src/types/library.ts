@@ -12,7 +12,16 @@ export interface LibraryItem {
   publisher: string | null;
   journal: string | null;
   uploaded_by: string;
+  collection_id?: string | null;
   created_at: string;
   license?: string | null;
   attribution?: string | null;
+}
+
+export interface LibraryCollection {
+  id: string;
+  name: string;
+  description: string | null;
+  created_by: string;
+  created_at: string;
 }
