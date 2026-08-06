@@ -1367,6 +1367,7 @@ export type Database = {
           confirmation_phone: string
         }[]
       }
+      get_actor_confirmation_token: { Args: { _id: string }; Returns: string }
       get_event_by_edit_token: {
         Args: { _token: string }
         Returns: {
