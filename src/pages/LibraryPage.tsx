@@ -610,8 +610,8 @@ const ImportDialog = ({
     if (!user || refs.length === 0) return;
     setBusy(true);
     const rows = refs.map((r) => ({
-      title: r.title,
-      authors: r.authors,
+      title: normalizeTitle(r.title),
+      authors: r.authors.map((a) => normalizePersonName(a)),
       year: r.year,
       item_type: r.item_type,
       doi: r.doi,
