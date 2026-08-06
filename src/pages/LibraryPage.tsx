@@ -410,8 +410,8 @@ const UploadDialog = ({
       if (error) throw error;
       const meta = data as any;
       if (!meta || meta.error) throw new Error(meta?.error ?? "Sin datos");
-      if (meta.title) setTitle((p) => p || meta.title);
-      if (meta.authors?.length) setAuthors((p) => p || meta.authors.join(", "));
+      if (meta.title) setTitle((p) => p || normalizeTitle(meta.title));
+      if (meta.authors?.length) setAuthors((p) => p || meta.authors.map((a: string) => normalizePersonName(a)).join(", "));
       if (meta.year) setYear((p) => p || String(meta.year));
       if (meta.item_type) setItemType(meta.item_type);
       if (meta.doi) setDoi((p) => p || meta.doi);
@@ -435,20 +435,24 @@ const UploadDialog = ({
   };
 
   const lookup = async () => {
-    if (!doi.trim()) return;
+    const input = doi.trim();
+    if (!input) return;
     setBusy(true);
-    const meta = await fetchDoiMeta(doi.trim());
+    const meta = await fetchCitationMeta(input);
     setBusy(false);
-    if (!meta) return toast.error("No se encontraron metadatos para ese DOI");
-    setTitle(meta.title);
-    setAuthors(meta.authors.join(", "));
+    if (!meta) return toast.error("No se pudieron reconocer los metadatos de ese DOI o link");
+    if (meta.title) setTitle(normalizeTitle(meta.title));
+    if (meta.authors?.length) setAuthors(meta.authors.map((a: string) => normalizePersonName(a)).join(", "));
     setYear(meta.year ? String(meta.year) : "");
-    setJournal(meta.journal);
-    setPublisher(meta.publisher);
-    setUrl(meta.url);
-    setAbstract(meta.abstract);
-    setItemType(meta.item_type);
-    toast.success("Metadatos importados");
+    setJournal(meta.journal ?? "");
+    setPublisher(meta.publisher ?? "");
+    setUrl(meta.url ?? (/^https?:\/\//i.test(input) ? input : ""));
+    setAbstract(meta.abstract ?? "");
+    if (meta.item_type) setItemType(meta.item_type);
+    if (meta.doi) setDoi(meta.doi);
+    else if (/^https?:\/\//i.test(input)) setDoi("");
+    if (meta.tags?.length) setTags((p) => p || meta.tags.join(", "));
+    toast.success("Metadatos reconocidos. Revisá la ficha antes de guardar.");
   };
 
   const submit = async () => {
@@ -464,8 +468,8 @@ const UploadDialog = ({
       filePath = path;
     }
     const { error } = await supabase.from("library_items").insert({
-      title: title.trim(),
-      authors: authors.split(",").map((a) => a.trim()).filter(Boolean),
+      title: normalizeTitle(title.trim()),
+      authors: authors.split(",").map((a) => normalizePersonName(a.trim())).filter(Boolean),
       year: year ? Number(year) : null,
       item_type: itemType,
       doi: doi.trim() || null,
@@ -527,9 +531,21 @@ const UploadDialog = ({
             <Sparkles className="h-4 w-4 mr-1" /> Volver a leer el archivo
           </Button>
         )}
-        <div className="flex gap-2">
-          <Input placeholder="DOI (opcional, autocompleta)" value={doi} onChange={(e) => setDoi(e.target.value)} />
-          <Button variant="outline" onClick={lookup} disabled={busy}>Buscar DOI</Button>
+        <div className="space-y-1">
+          <div className="flex gap-2">
+            <Input
+              placeholder="DOI o link del artículo (ej. https://ojs.ceil-conicet.gov.ar/...)"
+              value={doi}
+              onChange={(e) => setDoi(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); lookup(); } }}
+            />
+            <Button variant="outline" onClick={lookup} disabled={busy}>
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Reconocer"}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Pegá un DOI o el link de la publicación (OJS, SciELO, repositorios) y completamos la ficha automáticamente.
+          </p>
         </div>
         <Input placeholder="Título *" value={title} onChange={(e) => setTitle(e.target.value)} />
         <Input placeholder="Autores (separados por coma)" value={authors} onChange={(e) => setAuthors(e.target.value)} />
