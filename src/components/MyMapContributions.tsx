@@ -23,7 +23,6 @@ interface Row {
   delivery_days: string[] | null;
   source_id: string;
   confirmation_status: string | null;
-  confirmation_token: string | null;
 }
 
 export default function MyMapContributions() {
@@ -38,7 +37,7 @@ export default function MyMapContributions() {
     setLoading(true);
     const { data } = await (supabase as any)
       .from("layer_actors")
-      .select("id,name,lat,lng,actor_type,description,address,contact,delivery_days,source_id,confirmation_status,confirmation_token")
+      .select("id,name,lat,lng,actor_type,description,address,contact,delivery_days,source_id,confirmation_status")
       .eq("created_by", user.id)
       .order("updated_at", { ascending: false });
     setRows((data as Row[]) || []);

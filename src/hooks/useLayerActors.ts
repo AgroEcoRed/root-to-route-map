@@ -33,7 +33,7 @@ export const useLayerActors = (sourceId: string | undefined) => {
     const { data } = await (supabase as any)
       .from("layer_actors")
       .select(
-        "id,source_id,name,lat,lng,actor_type,family,description,address,contact,delivery_days,verified_at,verified_by_role,extra,created_at,updated_at,created_by,confirmation_status,confirmation_token,confirmation_sent_at,confirmed_at,confirmed_by"
+        "id,source_id,name,lat,lng,actor_type,family,description,address,contact,delivery_days,verified_at,verified_by_role,extra,created_at,updated_at,created_by,confirmation_status,confirmation_sent_at,confirmed_at,confirmed_by"
       )
       .eq("source_id", sourceId)
       .order("name");
