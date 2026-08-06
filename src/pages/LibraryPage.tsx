@@ -21,28 +21,17 @@ import { TAG_LABELS, CURATED_TAG_SLUGS, tagLabel } from "@/lib/libraryTags";
 import LicenseSelector from "@/components/LicenseSelector";
 import LicenseBadge from "@/components/LicenseBadge";
 import { DEFAULT_LICENSE, LicenseCode } from "@/lib/licenses";
+import { normalizeTitle, normalizePersonName } from "@/lib/titleCase";
 
 const ITEM_TYPES = ["article", "book", "thesis", "report", "chapter", "web"];
 
-const fetchDoiMeta = async (doi: string) => {
-  try {
-    const r = await fetch(`https://api.crossref.org/works/${encodeURIComponent(doi)}`);
-    if (!r.ok) return null;
-    const j = await r.json();
-    const m = j.message;
-    return {
-      title: m.title?.[0] ?? "",
-      authors: (m.author ?? []).map((a: any) => `${a.given ?? ""} ${a.family ?? ""}`.trim()),
-      year: m.issued?.["date-parts"]?.[0]?.[0] ?? null,
-      journal: m["container-title"]?.[0] ?? "",
-      publisher: m.publisher ?? "",
-      abstract: m.abstract?.replace(/<[^>]+>/g, "") ?? "",
-      url: m.URL ?? "",
-      item_type: m.type?.includes("book") ? "book" : "article",
-    };
-  } catch {
-    return null;
-  }
+// Reconoce metadatos a partir de un DOI o de un link (OJS, DSpace, SciELO, etc.)
+const fetchCitationMeta = async (input: string) => {
+  const { data, error } = await supabase.functions.invoke("fetch-citation", { body: { input } });
+  if (error) return null;
+  const meta = data as any;
+  if (!meta || meta.error) return null;
+  return meta;
 };
 
 const fileToBase64 = (file: File): Promise<string> =>
