@@ -86,7 +86,7 @@ const RegistrationPage = () => {
     if (!token) return;
     try { localStorage.setItem("agrored-referral-token", token); } catch { /* noop */ }
     (async () => {
-      const { data } = await (supabase as any).rpc("get_referral_by_token", { _token: token });
+      const { data } = await supabase.functions.invoke("get-referral", { body: { token } });
       const row = Array.isArray(data) ? data[0] : data;
       if (row?.referrer_name) setRefInfo(row);
     })();
