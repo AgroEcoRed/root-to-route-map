@@ -31,10 +31,10 @@ const counterVariants = {
 };
 
 const heroPhotos = [
-  { src: comarca1, alt: "Chacra agroecológica de montaña en la Comarca Andina" },
-  { src: trigo, alt: "Trigo agroecológico al atardecer" },
-  { src: ganaderia, alt: "Ganadería sobre pastizal manejado agroecológicamente" },
-  { src: papas, alt: "Variedades de papas nativas sobre la tierra" },
+  { src: comarca1, alt: "Chacra agroecológica de montaña en la Comarca Andina", position: "50% 78%" },
+  { src: trigo, alt: "Trigo agroecológico al atardecer", position: "50% 60%" },
+  { src: ganaderia, alt: "Ganadería sobre pastizal manejado agroecológicamente", position: "50% 55%" },
+  { src: papas, alt: "Variedades de papas nativas sobre la tierra", position: "50% 50%" },
 ];
 
 const HeroSection = () => {
@@ -67,6 +67,7 @@ const HeroSection = () => {
               src={p.src}
               alt={p.alt}
               className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: p.position }}
               initial={false}
               animate={{ opacity: i === photoIndex ? 1 : 0, scale: i === photoIndex ? 1.04 : 1 }}
               transition={{ opacity: { duration: 1.6 }, scale: { duration: 8, ease: "linear" } }}
