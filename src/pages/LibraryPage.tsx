@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { BookOpen, Upload, Download, Search, Tag, FileText, ExternalLink, Loader2, Plus, FolderPlus, Folder, Sparkles, Library } from "lucide-react";
+import { BookOpen, Upload, Download, Search, Tag, FileText, ExternalLink, Loader2, Plus, FolderPlus, Folder, Sparkles, Library, Quote, Copy, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -22,6 +22,7 @@ import LicenseSelector from "@/components/LicenseSelector";
 import LicenseBadge from "@/components/LicenseBadge";
 import { DEFAULT_LICENSE, LicenseCode } from "@/lib/licenses";
 import { normalizeTitle, normalizePersonName } from "@/lib/titleCase";
+import { CITATION_STYLES, CitationStyle, formatCitation, formatBibliography } from "@/lib/citations";
 
 const ITEM_TYPES = ["article", "book", "thesis", "report", "chapter", "web"];
 
