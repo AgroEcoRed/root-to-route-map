@@ -190,9 +190,15 @@ const LibraryPage = () => {
             </Button>
             {user ? (
               <>
+                <Dialog open={zoteroOpen} onOpenChange={setZoteroOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline"><RefreshCw className="h-4 w-4 mr-1" /> Conectar Zotero</Button>
+                  </DialogTrigger>
+                  <ZoteroDialog onClose={() => { setZoteroOpen(false); load(); }} />
+                </Dialog>
                 <Dialog open={importOpen} onOpenChange={setImportOpen}>
                   <DialogTrigger asChild>
-                    <Button variant="outline"><Library className="h-4 w-4 mr-1" /> Importar de Zotero</Button>
+                    <Button variant="outline"><Library className="h-4 w-4 mr-1" /> Importar archivo</Button>
                   </DialogTrigger>
                   <ImportDialog
                     collections={collections}
@@ -214,6 +220,29 @@ const LibraryPage = () => {
             ) : (
               <Button asChild><Link to="/ingresar"><Upload className="h-4 w-4 mr-1" /> Ingresá para subir</Link></Button>
             )}
+          </div>
+
+          {/* Citas */}
+          <div className="flex flex-wrap items-center gap-2 mb-6 text-sm">
+            <Quote className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">Estilo de cita</span>
+            <select
+              className="h-8 rounded-md border border-input bg-background px-2 text-xs"
+              value={style}
+              onChange={(e) => { setStyle(e.target.value as CitationStyle); localStorage.setItem("agrored-citation-style", e.target.value); }}
+            >
+              {CITATION_STYLES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+            </select>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                navigator.clipboard.writeText(formatBibliography(filtered, style));
+                toast.success(`Bibliografía de ${filtered.length} referencias copiada`);
+              }}
+            >
+              <Copy className="h-3.5 w-3.5 mr-1" /> Copiar bibliografía
+            </Button>
           </div>
 
           {/* Folders */}
