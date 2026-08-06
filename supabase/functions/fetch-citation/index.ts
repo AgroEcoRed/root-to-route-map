@@ -129,20 +129,36 @@ Deno.serve(async (req) => {
 
     if (!/^https?:\/\//i.test(input)) return json({ error: 'Ingresá un DOI válido o un link completo' }, 400)
 
-    const res = await fetch(input, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AgroEcoRedBot/1.0)', Accept: 'text/html,application/xhtml+xml' },
-      redirect: 'follow',
-    })
-    if (!res.ok) return json({ error: `No se pudo leer la página (${res.status})` }, 502)
-    const html = await res.text()
+    const get = async (u: string) => {
+      const r = await fetch(u, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AgroEcoRedBot/1.0)', Accept: 'text/html,application/xhtml+xml' },
+        redirect: 'follow',
+      })
+      return r.ok ? { url: r.url || u, html: await r.text() } : null
+    }
 
-    let meta = fromHtml(html, res.url || input)
+    // En OJS, /article/view/<id>/<galerada> muestra el PDF; la ficha completa está en /article/view/<id>
+    const candidates = [input]
+    const ojs = input.match(/^(.*\/article\/view\/\d+)\/\d+\/?$/)
+    if (ojs) candidates.unshift(ojs[1])
+
+    let page: { url: string; html: string } | null = null
+    let meta: Meta = empty()
+    for (const c of candidates) {
+      const p = await get(c).catch(() => null)
+      if (!p) continue
+      const m = fromHtml(p.html, p.url)
+      if (m.title && (m.authors.length || !page)) { page = p; meta = m }
+      if (m.title && m.authors.length) break
+    }
+    if (!page) return json({ error: 'No se pudo leer la página' }, 502)
+    const html = page.html
     if (meta.doi && (!meta.authors.length || !meta.title)) {
       const cr = await crossref(meta.doi).catch(() => null)
       if (cr) meta = { ...cr, url: meta.url ?? cr.url, tags: meta.tags.length ? meta.tags : cr.tags }
     }
     if (!meta.title || !meta.authors.length) {
-      const ai = await aiFallback(html, res.url || input)
+      const ai = await aiFallback(html, page.url)
       if (ai) {
         meta = {
           ...meta,
