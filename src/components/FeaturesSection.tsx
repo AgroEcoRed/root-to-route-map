@@ -25,9 +25,9 @@ const FeaturesSection = () => {
 
   const features = [
     { icon: MapPin, titleKey: "features.map", descKey: "features.map_desc", color: "bg-primary text-primary-foreground", link: "/mapa", photo: fotoComarca1 },
-    { icon: ShoppingBasket, titleKey: "features.marketplace", descKey: "features.marketplace_desc", color: "bg-secondary text-secondary-foreground", link: "/mercado", photo: fotoVerduras },
+    { icon: ShoppingBasket, titleKey: "features.marketplace", descKey: "features.marketplace_desc", color: "bg-secondary text-secondary-foreground", link: "/mercado", photo: fotoPapas },
     { icon: ShieldCheck, titleKey: "features.cert", descKey: "features.cert_desc", color: "bg-wheat text-wheat-foreground", link: "/actores", photo: fotoProductor },
-    { icon: Sprout, titleKey: "features.services", descKey: "features.services_desc", color: "bg-earth text-earth-foreground", link: "/servicios", photo: fotoPapas },
+    { icon: Sprout, titleKey: "features.services", descKey: "features.services_desc", color: "bg-earth text-earth-foreground", link: "/servicios", photo: fotoVerduras },
     { icon: Truck, titleKey: "features.logistics", descKey: "features.logistics_desc", color: "bg-soil text-soil-foreground", link: "/mapa", photo: fotoGanaderia },
     { icon: MessageCircle, titleKey: "features.comm", descKey: "features.comm_desc", color: "bg-forest text-forest-foreground", link: "/comunidad", photo: fotoJornada },
     { icon: BarChart3, titleKey: "features.dashboard", descKey: "features.dashboard_desc", color: "bg-primary text-primary-foreground", link: null, photo: fotoTrigo },
@@ -53,8 +53,8 @@ const FeaturesSection = () => {
               onClick={() => f.link && navigate(f.link)}
               className={`group relative overflow-hidden rounded-xl border border-border bg-card p-6 hover:shadow-elevated hover:border-primary/20 transition-all duration-300 ${f.link ? "cursor-pointer" : "cursor-default"}`}>
               <img src={f.photo} alt="" aria-hidden="true" loading="lazy"
-                className="absolute inset-0 w-full h-full object-cover opacity-25 group-hover:opacity-40 group-hover:scale-105 transition-all duration-700" />
-              <div className="absolute inset-0 bg-gradient-to-t from-card via-card/90 to-card/60" />
+                className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-75 group-hover:scale-105 transition-all duration-700" />
+              <div className="absolute inset-0 bg-gradient-to-t from-card via-card/85 to-card/45" />
               <div className="relative">
               <motion.div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${f.color} mb-4`}
                 whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }} transition={{ duration: 0.5 }}>
