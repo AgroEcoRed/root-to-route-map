@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { BookOpen, Upload, Download, Search, Tag, FileText, ExternalLink, Loader2, Plus, FolderPlus, Folder, Sparkles, Library } from "lucide-react";
+import { BookOpen, Upload, Download, Search, Tag, FileText, ExternalLink, Loader2, Plus, FolderPlus, Folder, Sparkles, Library, Quote, Copy, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -22,6 +22,7 @@ import LicenseSelector from "@/components/LicenseSelector";
 import LicenseBadge from "@/components/LicenseBadge";
 import { DEFAULT_LICENSE, LicenseCode } from "@/lib/licenses";
 import { normalizeTitle, normalizePersonName } from "@/lib/titleCase";
+import { CITATION_STYLES, CitationStyle, formatCitation, formatBibliography } from "@/lib/citations";
 
 const ITEM_TYPES = ["article", "book", "thesis", "report", "chapter", "web"];
 
@@ -54,6 +55,10 @@ const LibraryPage = () => {
   const [collectionFilter, setCollectionFilter] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [zoteroOpen, setZoteroOpen] = useState(false);
+  const [style, setStyle] = useState<CitationStyle>(
+    (localStorage.getItem("agrored-citation-style") as CitationStyle) ?? "apa"
+  );
 
   // Support deep-link ?tag=participatory-guarantee from SPG page etc.
   useEffect(() => {
@@ -185,9 +190,15 @@ const LibraryPage = () => {
             </Button>
             {user ? (
               <>
+                <Dialog open={zoteroOpen} onOpenChange={setZoteroOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline"><RefreshCw className="h-4 w-4 mr-1" /> Conectar Zotero</Button>
+                  </DialogTrigger>
+                  <ZoteroDialog onClose={() => { setZoteroOpen(false); load(); }} />
+                </Dialog>
                 <Dialog open={importOpen} onOpenChange={setImportOpen}>
                   <DialogTrigger asChild>
-                    <Button variant="outline"><Library className="h-4 w-4 mr-1" /> Importar de Zotero</Button>
+                    <Button variant="outline"><Library className="h-4 w-4 mr-1" /> Importar archivo</Button>
                   </DialogTrigger>
                   <ImportDialog
                     collections={collections}
@@ -209,6 +220,29 @@ const LibraryPage = () => {
             ) : (
               <Button asChild><Link to="/ingresar"><Upload className="h-4 w-4 mr-1" /> Ingresá para subir</Link></Button>
             )}
+          </div>
+
+          {/* Citas */}
+          <div className="flex flex-wrap items-center gap-2 mb-6 text-sm">
+            <Quote className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">Estilo de cita</span>
+            <select
+              className="h-8 rounded-md border border-input bg-background px-2 text-xs"
+              value={style}
+              onChange={(e) => { setStyle(e.target.value as CitationStyle); localStorage.setItem("agrored-citation-style", e.target.value); }}
+            >
+              {CITATION_STYLES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+            </select>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                navigator.clipboard.writeText(formatBibliography(filtered, style));
+                toast.success(`Bibliografía de ${filtered.length} referencias copiada`);
+              }}
+            >
+              <Copy className="h-3.5 w-3.5 mr-1" /> Copiar bibliografía
+            </Button>
           </div>
 
           {/* Folders */}
@@ -273,6 +307,7 @@ const LibraryPage = () => {
                   key={it.id}
                   item={it}
                   collections={collections}
+                  style={style}
                   canEdit={!!user && it.uploaded_by === user.id}
                   onMoved={load}
                 />
@@ -288,8 +323,8 @@ const LibraryPage = () => {
 };
 
 const ItemCard = ({
-  item, collections, canEdit, onMoved,
-}: { item: LibraryItem; collections: LibraryCollection[]; canEdit: boolean; onMoved: () => void }) => {
+  item, collections, canEdit, onMoved, style,
+}: { item: LibraryItem; collections: LibraryCollection[]; canEdit: boolean; onMoved: () => void; style: CitationStyle }) => {
   const { lang } = useLanguage();
   const openFile = async () => {
     if (!item.file_path) return;
@@ -352,6 +387,13 @@ const ItemCard = ({
           </div>
         </div>
         <div className="flex flex-col gap-2 shrink-0">
+          <button
+            onClick={() => { navigator.clipboard.writeText(formatCitation(item, style)); toast.success("Cita copiada"); }}
+            className="text-xs flex items-center gap-1 text-primary hover:underline"
+            title={formatCitation(item, style)}
+          >
+            <Quote className="h-3.5 w-3.5" /> Copiar cita
+          </button>
           {item.file_path && (
             <button onClick={openFile} className="text-xs flex items-center gap-1 text-primary hover:underline">
               <FileText className="h-3.5 w-3.5" /> PDF
@@ -684,6 +726,98 @@ const ImportDialog = ({
         <Button variant="ghost" onClick={onClose}>Cancelar</Button>
         <Button onClick={importAll} disabled={busy || refs.length === 0}>
           {busy && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}Importar {refs.length || ""}
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  );
+};
+
+type ZLib = { type: "user" | "group"; id: string; name: string };
+
+const ZoteroDialog = ({ onClose }: { onClose: () => void }) => {
+  const [apiKey, setApiKey] = useState("");
+  const [libs, setLibs] = useState<ZLib[]>([]);
+  const [selected, setSelected] = useState("");
+  const [onlyOpen, setOnlyOpen] = useState(true);
+  const [busy, setBusy] = useState(false);
+
+  const call = async (payload: Record<string, unknown>) => {
+    const { data, error } = await supabase.functions.invoke("zotero-sync", { body: { apiKey, ...payload } });
+    if (error) throw new Error((await (error as any).context?.text?.()) || error.message);
+    if ((data as any)?.error) throw new Error((data as any).error);
+    return data as any;
+  };
+
+  const listLibraries = async () => {
+    if (!apiKey.trim()) return toast.error("Pegá tu API key de Zotero");
+    setBusy(true);
+    try {
+      const d = await call({ action: "libraries" });
+      setLibs(d.libraries ?? []);
+      setSelected(d.libraries?.[0] ? `${d.libraries[0].type}:${d.libraries[0].id}` : "");
+      if (!d.libraries?.length) toast.error("La API key no da acceso a ninguna biblioteca");
+    } catch (e) { toast.error((e as Error).message); }
+    setBusy(false);
+  };
+
+  const runImport = async () => {
+    if (!selected) return;
+    const [libraryType, libraryId] = selected.split(":");
+    setBusy(true);
+    try {
+      const d = await call({ action: "import", libraryType, libraryId, onlyOpenAccess: onlyOpen });
+      toast.success(`${d.inserted} referencias importadas en ${d.collections} carpetas`);
+      onClose();
+    } catch (e) { toast.error((e as Error).message); }
+    setBusy(false);
+  };
+
+  return (
+    <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle>Conectar tu Zotero</DialogTitle>
+        <DialogDescription>
+          Traé tus colecciones y referencias directamente desde Zotero. Creá una API key de solo lectura en{" "}
+          <a href="https://www.zotero.org/settings/keys/new" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+            zotero.org/settings/keys
+          </a>{" "}
+          (marcá «Allow library access» y, si querés traer un grupo, «Read Only» en group libraries). La clave no se guarda: se usa solo para esta importación.
+        </DialogDescription>
+      </DialogHeader>
+      <div className="space-y-3">
+        <div className="flex gap-2">
+          <Input value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="API key de Zotero" type="password" />
+          <Button variant="outline" onClick={listLibraries} disabled={busy}>
+            {busy && libs.length === 0 ? <Loader2 className="h-4 w-4 animate-spin" /> : "Buscar"}
+          </Button>
+        </div>
+
+        {libs.length > 0 && (
+          <>
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">Biblioteca a importar</label>
+              <select
+                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                value={selected}
+                onChange={(e) => setSelected(e.target.value)}
+              >
+                {libs.map((l) => <option key={`${l.type}:${l.id}`} value={`${l.type}:${l.id}`}>{l.name}</option>)}
+              </select>
+            </div>
+            <label className="flex items-start gap-2 text-sm text-muted-foreground">
+              <input type="checkbox" className="mt-1" checked={onlyOpen} onChange={(e) => setOnlyOpen(e.target.checked)} />
+              Traer solo referencias con DOI o enlace público (acceso abierto)
+            </label>
+            <p className="text-xs text-muted-foreground">
+              Se importan únicamente metadatos (sin archivos adjuntos). Las subcarpetas de Zotero se recrean como carpetas temáticas y se omiten las referencias ya cargadas.
+            </p>
+          </>
+        )}
+      </div>
+      <DialogFooter>
+        <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+        <Button onClick={runImport} disabled={busy || !selected}>
+          {busy && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}Importar
         </Button>
       </DialogFooter>
     </DialogContent>
