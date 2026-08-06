@@ -1,18 +1,18 @@
 import { motion } from "framer-motion";
-import comarca1 from "@/assets/foto-comarca-1.jpg.asset.json";
-import verduras from "@/assets/foto-verduras.jpg.asset.json";
-import girasoles from "@/assets/foto-girasoles.jpg.asset.json";
-import papas from "@/assets/foto-papas.jpg.asset.json";
-import ganaderia from "@/assets/foto-ganaderia.jpg.asset.json";
-import productor from "@/assets/foto-productor.jpg.asset.json";
+import comarca1 from "@/assets/foto-comarca-1.jpg";
+import verduras from "@/assets/foto-verduras.jpg";
+import girasoles from "@/assets/foto-girasoles.jpg";
+import papas from "@/assets/foto-papas.jpg";
+import ganaderia from "@/assets/foto-ganaderia.jpg";
+import productor from "@/assets/foto-productor.jpg";
 
 const photos = [
-  { src: comarca1.url, alt: "Chacra agroecológica en la Comarca Andina", caption: "Comarca Andina", place: "Chubut / Río Negro", span: "sm:col-span-2 sm:row-span-2" },
-  { src: verduras.url, alt: "Manos cosechando rabanitos y zanahorias agroecológicas", caption: "Cosecha diversificada", place: "Misiones", span: "" },
-  { src: girasoles.url, alt: "Jornada a campo entre girasoles", caption: "Jornadas a campo", place: "Buenos Aires", span: "" },
-  { src: papas.url, alt: "Variedades de papas nativas sobre la tierra", caption: "Semillas y variedades nativas", place: "Agrobiodiversidad", span: "sm:col-span-2" },
-  { src: ganaderia.url, alt: "Ganadería sobre pastizal manejado agroecológicamente", caption: "Ganadería en pastizal", place: "Red RENAMA", span: "" },
-  { src: productor.url, alt: "Productor compartiendo su experiencia en un lote de trigo", caption: "Saberes que circulan", place: "Encuentros territoriales", span: "" },
+  { src: comarca1, alt: "Chacra agroecológica en la Comarca Andina", caption: "Comarca Andina", place: "Chubut / Río Negro", span: "sm:col-span-2 sm:row-span-2" },
+  { src: verduras, alt: "Manos cosechando rabanitos y zanahorias agroecológicas", caption: "Cosecha diversificada", place: "Misiones", span: "" },
+  { src: girasoles, alt: "Jornada a campo entre girasoles", caption: "Jornadas a campo", place: "Buenos Aires", span: "" },
+  { src: papas, alt: "Variedades de papas nativas sobre la tierra", caption: "Semillas y variedades nativas", place: "Agrobiodiversidad", span: "sm:col-span-2" },
+  { src: ganaderia, alt: "Ganadería sobre pastizal manejado agroecológicamente", caption: "Ganadería en pastizal", place: "Red RENAMA", span: "" },
+  { src: productor, alt: "Productor compartiendo su experiencia en un lote de trigo", caption: "Saberes que circulan", place: "Encuentros territoriales", span: "" },
 ];
 
 const TerritoriesGallery = () => (

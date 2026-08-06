@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import ctaPhoto from "@/assets/foto-girasoles.jpg.asset.json";
+import ctaPhoto from "@/assets/foto-girasoles.jpg";
 
 const CTASection = () => {
   const { t } = useLanguage();
@@ -13,7 +13,7 @@ const CTASection = () => {
       <div className="container">
         <motion.div className="relative rounded-3xl overflow-hidden bg-gradient-hero p-12 sm:p-16 text-center"
           initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, type: "spring" }}>
-          <img src={ctaPhoto.url} alt="Encuentro de productorxs en un lote de girasoles" loading="lazy"
+          <img src={ctaPhoto} alt="Encuentro de productorxs en un lote de girasoles" loading="lazy"
             className="absolute inset-0 w-full h-full object-cover opacity-30" />
           <div className="absolute inset-0 bg-gradient-to-br from-forest/85 via-forest/70 to-primary/70" />
           <motion.div className="absolute top-0 left-0 w-96 h-96 bg-wheat/15 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"
