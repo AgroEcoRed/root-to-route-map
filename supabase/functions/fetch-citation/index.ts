@@ -59,6 +59,8 @@ const fromHtml = (html: string, url: string): Meta => {
   meta.url = url
   meta.title = first(html, 'citation_title', 'DC.Title', 'dc.title', 'og:title')
     ?? decode(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] ?? '')
+  // OJS titula las páginas de galerada como "Vista de <título>"
+  meta.title = meta.title.replace(/^\s*(Vista de|View of|Visualizar|Voir de)\s+/i, '').trim()
   const authors = [
     ...metaValues(html, 'citation_author'),
     ...metaValues(html, 'DC.Creator'),
