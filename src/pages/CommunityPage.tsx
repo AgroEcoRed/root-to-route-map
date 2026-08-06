@@ -18,6 +18,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useUpcomingEvents } from "@/hooks/useUpcomingEvents";
 import { EventFormDialog } from "@/components/events/EventFormDialog";
+import fotoComarca2 from "@/assets/foto-comarca-2.jpg";
 
 interface ForumPost {
   id: number;
@@ -121,10 +122,13 @@ const CommunityPage = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <main className="flex-1 pt-16">
-        <div className="bg-gradient-earth py-12">
-          <div className="container">
+        <div className="relative overflow-hidden py-16">
+          <img src={fotoComarca2} alt="Jornada colectiva en una huerta de montaña de la Comarca Andina"
+            className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-forest/85 via-forest/65 to-forest/30" />
+          <div className="container relative">
             <h1 className="text-3xl sm:text-4xl font-display text-white mb-2">{t("community.title")}</h1>
-            <p className="text-white/70 max-w-xl">{t("community.subtitle")}</p>
+            <p className="text-white/80 max-w-xl">{t("community.subtitle")}</p>
           </div>
         </div>
 

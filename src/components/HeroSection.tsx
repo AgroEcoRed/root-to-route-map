@@ -2,10 +2,10 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, MapPin, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import comarca2 from "@/assets/foto-comarca-2.jpg";
 import comarca1 from "@/assets/foto-comarca-1.jpg";
-import jornada from "@/assets/foto-jornada-campo.jpg";
 import trigo from "@/assets/foto-trigo-atardecer.jpg";
+import ganaderia from "@/assets/foto-ganaderia.jpg";
+import papas from "@/assets/foto-papas.jpg";
 import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 // Logos institucionales ocultos temporalmente hasta obtener autorización
@@ -31,10 +31,10 @@ const counterVariants = {
 };
 
 const heroPhotos = [
-  { src: comarca2, alt: "Huerta agroecológica en la Comarca Andina con jornada de intercambio" },
   { src: comarca1, alt: "Chacra agroecológica de montaña en la Comarca Andina" },
-  { src: jornada, alt: "Jornada a campo de productorxs agroecológicxs" },
   { src: trigo, alt: "Trigo agroecológico al atardecer" },
+  { src: ganaderia, alt: "Ganadería sobre pastizal manejado agroecológicamente" },
+  { src: papas, alt: "Variedades de papas nativas sobre la tierra" },
 ];
 
 const HeroSection = () => {
