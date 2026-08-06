@@ -75,6 +75,23 @@ const sentenceCase = (text: string, preserveCaps: boolean) => {
     .join("");
 };
 
+
+// Nombres propios frecuentes en bibliografía agroecológica: se recapitalizan
+// aunque el título original venga en mayúsculas sostenidas.
+const PROPER_NOUNS = [
+  "Argentina","Brasil","Brazil","Chile","Uruguay","Paraguay","Bolivia","Perú","Peru","Colombia","Ecuador","Venezuela","México","Mexico","Cuba","España","Spain","Francia","France","Portugal","Europa","Europe","América Latina","Latin America","Latinoamérica","Buenos Aires","La Plata","Rosario","Córdoba","Santa Fe","Misiones","Mendoza","Patagonia","Pampa","Pampeana","Cono Sur","Andes","Amazonía","Amazonia","Caribe","África","Africa","Asia","Estados Unidos","Reino Unido","Italia","Italy","Alemania","Cataluña","Andalucía","Galicia",
+  "INTA","INTI","CONICET","UNSAM","UBA","FAO","ONU","UNESCO","CEPAL","IPES","IPBES","IPCC","MERCOSUR","UTT","SPG","PGS","AKIS","EMBRAPA","Embrapa","CSIC","IFOAM","MAELA","CLACSO","OMS","WHO","UE","EU","ODS","SDG",
+];
+
+const restoreProperNouns = (text: string) => {
+  let out = text;
+  for (const noun of PROPER_NOUNS) {
+    const re = new RegExp(`(^|[^\\p{L}])${noun.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?=$|[^\\p{L}])`, "giu");
+    out = out.replace(re, (m, pre) => `${pre}${noun}`);
+  }
+  return out;
+};
+
 const isMostlyUpper = (text: string) => {
   const letters = text.replace(/[^\p{L}]/gu, "");
   if (letters.length < 4) return false;
@@ -95,7 +112,7 @@ export const normalizeTitle = (raw: string, force = false): string => {
   // Si el título entero viene en mayúsculas, no hay siglas reales que preservar.
   const preserveCaps = !isMostlyUpper(text);
   const segments = text.split(/([.:;?!]\s+)/);
-  return segments
+  const result = segments
     .map((seg, i) => {
       if (i % 2 === 1) return seg; // separador
       if (!seg.trim()) return seg;
@@ -103,6 +120,7 @@ export const normalizeTitle = (raw: string, force = false): string => {
     })
     .join("")
     .trim();
+  return restoreProperNouns(result);
 };
 
 /** Normaliza nombres propios de personas en mayúsculas sostenidas. */
