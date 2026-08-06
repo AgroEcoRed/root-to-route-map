@@ -323,8 +323,8 @@ const LibraryPage = () => {
 };
 
 const ItemCard = ({
-  item, collections, canEdit, onMoved,
-}: { item: LibraryItem; collections: LibraryCollection[]; canEdit: boolean; onMoved: () => void }) => {
+  item, collections, canEdit, onMoved, style,
+}: { item: LibraryItem; collections: LibraryCollection[]; canEdit: boolean; onMoved: () => void; style: CitationStyle }) => {
   const { lang } = useLanguage();
   const openFile = async () => {
     if (!item.file_path) return;
@@ -387,6 +387,13 @@ const ItemCard = ({
           </div>
         </div>
         <div className="flex flex-col gap-2 shrink-0">
+          <button
+            onClick={() => { navigator.clipboard.writeText(formatCitation(item, style)); toast.success("Cita copiada"); }}
+            className="text-xs flex items-center gap-1 text-primary hover:underline"
+            title={formatCitation(item, style)}
+          >
+            <Quote className="h-3.5 w-3.5" /> Copiar cita
+          </button>
           {item.file_path && (
             <button onClick={openFile} className="text-xs flex items-center gap-1 text-primary hover:underline">
               <FileText className="h-3.5 w-3.5" /> PDF
