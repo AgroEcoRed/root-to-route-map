@@ -25,7 +25,10 @@ export const useUpcomingEvents = () => {
   const load = useCallback(async () => {
     const { data } = await (supabase as any)
       .from("events")
-      .select("*")
+      .select(
+        // Sin columnas privadas (contact_email/contact_phone/focal_email/edit_token)
+        "id,title,description,event_type,custom_type,starts_at,ends_at,location_name,lat,lng,link,contact,flyer_url,co_organizers,extra_organizer_names,source,approved,created_by,created_at,updated_at,submitted_by_name,focal_name"
+      )
       .gte("starts_at", new Date().toISOString())
       .eq("approved", true)
       .order("starts_at", { ascending: true });
