@@ -307,6 +307,7 @@ const LibraryPage = () => {
                   key={it.id}
                   item={it}
                   collections={collections}
+                  style={style}
                   canEdit={!!user && it.uploaded_by === user.id}
                   onMoved={load}
                 />
