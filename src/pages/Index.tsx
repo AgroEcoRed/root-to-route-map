@@ -3,6 +3,7 @@ import HeroSection from "@/components/HeroSection";
 import UpcomingActivitiesSection from "@/components/UpcomingActivitiesSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import ActorTypesSection from "@/components/ActorTypesSection";
+import TerritoriesGallery from "@/components/TerritoriesGallery";
 import PartnersSection from "@/components/PartnersSection";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
@@ -15,6 +16,7 @@ const Index = () => {
       <UpcomingActivitiesSection />
       <FeaturesSection />
       <ActorTypesSection />
+      <TerritoriesGallery />
       <PartnersSection />
       <CTASection />
       <Footer />
