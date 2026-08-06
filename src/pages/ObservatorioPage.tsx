@@ -34,7 +34,7 @@ const ObservatorioPage = () => {
       try {
         const [profiles, layers, products, library, green, yellow, red] = await Promise.all([
           supabase.from("profiles").select("*", { count: "exact", head: true }),
-          supabase.from("layer_actors").select("*", { count: "exact", head: true }),
+          supabase.from("layer_actors").select("id", { count: "exact", head: true }),
           supabase.from("mtr_products").select("*", { count: "exact", head: true }),
           supabase.from("library_items").select("*", { count: "exact", head: true }),
           supabase.from("profiles").select("*", { count: "exact", head: true }).eq("certification", "green"),

@@ -165,7 +165,10 @@ export default function LayerAdminPage() {
     reload();
   };
 
-  const copyConfirmLink = async (token: string) => {
+  const copyConfirmLink = async (actorId: string) => {
+    // El token ya no se expone por la Data API: se pide con una función segura.
+    const { data: token, error } = await (supabase as any).rpc("get_actor_confirmation_token", { _id: actorId });
+    if (error || !token) return toast.error("No se pudo obtener el link de confirmación");
     const url = `${window.location.origin}/confirmar/${token}`;
     try { await navigator.clipboard.writeText(url); toast.success("Link copiado"); }
     catch { toast.error("No se pudo copiar"); }
@@ -296,8 +299,8 @@ export default function LayerAdminPage() {
                             <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
                           </Button>
                         )}
-                        {(a as any).confirmation_token && (a as any).confirmation_status === "pending" ? (
-                          <Button size="sm" variant="ghost" onClick={() => copyConfirmLink((a as any).confirmation_token)} title="Copiar link de confirmación">
+                        {(a as any).confirmation_status === "pending" ? (
+                          <Button size="sm" variant="ghost" onClick={() => copyConfirmLink(a.id)} title="Copiar link de confirmación">
                             <Copy className="h-3.5 w-3.5 text-amber-600" />
                           </Button>
                         ) : (

@@ -32,5 +32,8 @@ verify_jwt = false
 [functions.fetch-citation]
 verify_jwt = false
 
+[functions.get-referral]
+verify_jwt = false
+
 [functions.zotero-sync]
 verify_jwt = false
