@@ -38,6 +38,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
+import fotoComarcaToolbar from "@/assets/foto-comarca-1.jpg";
 
 // ----------------------------------------------------------------------------
 // HTML/URL safety helpers — Leaflet's bindPopup accepts a raw HTML string, so
