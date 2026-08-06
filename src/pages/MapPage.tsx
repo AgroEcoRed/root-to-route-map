@@ -38,6 +38,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
+import fotoComarcaToolbar from "@/assets/foto-comarca-1.jpg";
 
 // ----------------------------------------------------------------------------
 // HTML/URL safety helpers — Leaflet's bindPopup accepts a raw HTML string, so
@@ -939,8 +940,15 @@ const MapPage = () => {
       <Navbar />
       <div className="flex-1 min-h-0 pt-16 flex flex-col">
         {/* Top toolbar: search + filters toggle */}
-        <div className="px-4 sm:px-6 pt-4 pb-3 bg-gradient-to-b from-card/80 to-background border-b border-border">
-          <div className="max-w-5xl mx-auto space-y-3">
+        <div className="relative px-4 sm:px-6 pt-4 pb-3 border-b border-border overflow-hidden">
+          <img
+            src={fotoComarcaToolbar}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover object-bottom opacity-20"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-card/80 via-background/85 to-background" />
+          <div className="relative max-w-5xl mx-auto space-y-3">
                 <div className="relative group">
                   <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-6 w-6 text-primary/70 group-focus-within:text-primary transition-colors" />
                   <Input
