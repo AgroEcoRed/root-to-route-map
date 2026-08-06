@@ -21,28 +21,17 @@ import { TAG_LABELS, CURATED_TAG_SLUGS, tagLabel } from "@/lib/libraryTags";
 import LicenseSelector from "@/components/LicenseSelector";
 import LicenseBadge from "@/components/LicenseBadge";
 import { DEFAULT_LICENSE, LicenseCode } from "@/lib/licenses";
+import { normalizeTitle, normalizePersonName } from "@/lib/titleCase";
 
 const ITEM_TYPES = ["article", "book", "thesis", "report", "chapter", "web"];
 
-const fetchDoiMeta = async (doi: string) => {
-  try {
-    const r = await fetch(`https://api.crossref.org/works/${encodeURIComponent(doi)}`);
-    if (!r.ok) return null;
-    const j = await r.json();
-    const m = j.message;
-    return {
-      title: m.title?.[0] ?? "",
-      authors: (m.author ?? []).map((a: any) => `${a.given ?? ""} ${a.family ?? ""}`.trim()),
-      year: m.issued?.["date-parts"]?.[0]?.[0] ?? null,
-      journal: m["container-title"]?.[0] ?? "",
-      publisher: m.publisher ?? "",
-      abstract: m.abstract?.replace(/<[^>]+>/g, "") ?? "",
-      url: m.URL ?? "",
-      item_type: m.type?.includes("book") ? "book" : "article",
-    };
-  } catch {
-    return null;
-  }
+// Reconoce metadatos a partir de un DOI o de un link (OJS, DSpace, SciELO, etc.)
+const fetchCitationMeta = async (input: string) => {
+  const { data, error } = await supabase.functions.invoke("fetch-citation", { body: { input } });
+  if (error) return null;
+  const meta = data as any;
+  if (!meta || meta.error) return null;
+  return meta;
 };
 
 const fileToBase64 = (file: File): Promise<string> =>
@@ -421,8 +410,8 @@ const UploadDialog = ({
       if (error) throw error;
       const meta = data as any;
       if (!meta || meta.error) throw new Error(meta?.error ?? "Sin datos");
-      if (meta.title) setTitle((p) => p || meta.title);
-      if (meta.authors?.length) setAuthors((p) => p || meta.authors.join(", "));
+      if (meta.title) setTitle((p) => p || normalizeTitle(meta.title));
+      if (meta.authors?.length) setAuthors((p) => p || meta.authors.map((a: string) => normalizePersonName(a)).join(", "));
       if (meta.year) setYear((p) => p || String(meta.year));
       if (meta.item_type) setItemType(meta.item_type);
       if (meta.doi) setDoi((p) => p || meta.doi);
@@ -446,20 +435,24 @@ const UploadDialog = ({
   };
 
   const lookup = async () => {
-    if (!doi.trim()) return;
+    const input = doi.trim();
+    if (!input) return;
     setBusy(true);
-    const meta = await fetchDoiMeta(doi.trim());
+    const meta = await fetchCitationMeta(input);
     setBusy(false);
-    if (!meta) return toast.error("No se encontraron metadatos para ese DOI");
-    setTitle(meta.title);
-    setAuthors(meta.authors.join(", "));
+    if (!meta) return toast.error("No se pudieron reconocer los metadatos de ese DOI o link");
+    if (meta.title) setTitle(normalizeTitle(meta.title));
+    if (meta.authors?.length) setAuthors(meta.authors.map((a: string) => normalizePersonName(a)).join(", "));
     setYear(meta.year ? String(meta.year) : "");
-    setJournal(meta.journal);
-    setPublisher(meta.publisher);
-    setUrl(meta.url);
-    setAbstract(meta.abstract);
-    setItemType(meta.item_type);
-    toast.success("Metadatos importados");
+    setJournal(meta.journal ?? "");
+    setPublisher(meta.publisher ?? "");
+    setUrl(meta.url ?? (/^https?:\/\//i.test(input) ? input : ""));
+    setAbstract(meta.abstract ?? "");
+    if (meta.item_type) setItemType(meta.item_type);
+    if (meta.doi) setDoi(meta.doi);
+    else if (/^https?:\/\//i.test(input)) setDoi("");
+    if (meta.tags?.length) setTags((p) => p || meta.tags.join(", "));
+    toast.success("Metadatos reconocidos. Revisá la ficha antes de guardar.");
   };
 
   const submit = async () => {
@@ -475,8 +468,8 @@ const UploadDialog = ({
       filePath = path;
     }
     const { error } = await supabase.from("library_items").insert({
-      title: title.trim(),
-      authors: authors.split(",").map((a) => a.trim()).filter(Boolean),
+      title: normalizeTitle(title.trim()),
+      authors: authors.split(",").map((a) => normalizePersonName(a.trim())).filter(Boolean),
       year: year ? Number(year) : null,
       item_type: itemType,
       doi: doi.trim() || null,
@@ -538,9 +531,21 @@ const UploadDialog = ({
             <Sparkles className="h-4 w-4 mr-1" /> Volver a leer el archivo
           </Button>
         )}
-        <div className="flex gap-2">
-          <Input placeholder="DOI (opcional, autocompleta)" value={doi} onChange={(e) => setDoi(e.target.value)} />
-          <Button variant="outline" onClick={lookup} disabled={busy}>Buscar DOI</Button>
+        <div className="space-y-1">
+          <div className="flex gap-2">
+            <Input
+              placeholder="DOI o link del artículo (ej. https://ojs.ceil-conicet.gov.ar/...)"
+              value={doi}
+              onChange={(e) => setDoi(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); lookup(); } }}
+            />
+            <Button variant="outline" onClick={lookup} disabled={busy}>
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Reconocer"}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Pegá un DOI o el link de la publicación (OJS, SciELO, repositorios) y completamos la ficha automáticamente.
+          </p>
         </div>
         <Input placeholder="Título *" value={title} onChange={(e) => setTitle(e.target.value)} />
         <Input placeholder="Autores (separados por coma)" value={authors} onChange={(e) => setAuthors(e.target.value)} />
@@ -605,8 +610,8 @@ const ImportDialog = ({
     if (!user || refs.length === 0) return;
     setBusy(true);
     const rows = refs.map((r) => ({
-      title: r.title,
-      authors: r.authors,
+      title: normalizeTitle(r.title),
+      authors: r.authors.map((a) => normalizePersonName(a)),
       year: r.year,
       item_type: r.item_type,
       doi: r.doi,
