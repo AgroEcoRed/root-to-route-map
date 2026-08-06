@@ -2,8 +2,11 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, MapPin, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import heroImage from "@/assets/hero-farm.jpg";
-import { useRef } from "react";
+import comarca2 from "@/assets/foto-comarca-2.jpg";
+import comarca1 from "@/assets/foto-comarca-1.jpg";
+import jornada from "@/assets/foto-jornada-campo.jpg";
+import trigo from "@/assets/foto-trigo-atardecer.jpg";
+import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 // Logos institucionales ocultos temporalmente hasta obtener autorización
 // import conicetLogo from "@/assets/logo-conicet.png";
@@ -27,12 +30,25 @@ const counterVariants = {
   }),
 };
 
+const heroPhotos = [
+  { src: comarca2, alt: "Huerta agroecológica en la Comarca Andina con jornada de intercambio" },
+  { src: comarca1, alt: "Chacra agroecológica de montaña en la Comarca Andina" },
+  { src: jornada, alt: "Jornada a campo de productorxs agroecológicxs" },
+  { src: trigo, alt: "Trigo agroecológico al atardecer" },
+];
+
 const HeroSection = () => {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const textY = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
   const { t } = useLanguage();
+  const [photoIndex, setPhotoIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setPhotoIndex((i) => (i + 1) % heroPhotos.length), 7000);
+    return () => clearInterval(id);
+  }, []);
 
   const stats = [
     { num: "1,200+", label: t("hero.stat_producers") },
@@ -44,9 +60,22 @@ const HeroSection = () => {
   return (
     <section ref={ref} className="relative min-h-screen flex items-center overflow-hidden grain-overlay">
       <motion.div className="absolute inset-0" style={{ y: bgY }}>
-        <img src={heroImage} alt="Campo agroecológico" className="w-full h-[120%] object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-r from-forest/95 via-forest/80 to-forest/30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-forest/60 via-transparent to-transparent" />
+        <div className="relative w-full h-[120%]">
+          {heroPhotos.map((p, i) => (
+            <motion.img
+              key={p.src}
+              src={p.src}
+              alt={p.alt}
+              className="absolute inset-0 w-full h-full object-cover"
+              initial={false}
+              animate={{ opacity: i === photoIndex ? 1 : 0, scale: i === photoIndex ? 1.04 : 1 }}
+              transition={{ opacity: { duration: 1.6 }, scale: { duration: 8, ease: "linear" } }}
+              loading={i === 0 ? "eager" : "lazy"}
+            />
+          ))}
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-forest/85 via-forest/55 to-forest/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-forest/75 via-transparent to-forest/25" />
       </motion.div>
 
       {[...Array(5)].map((_, i) => (
