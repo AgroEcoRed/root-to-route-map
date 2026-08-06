@@ -299,8 +299,8 @@ export default function LayerAdminPage() {
                             <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
                           </Button>
                         )}
-                        {(a as any).confirmation_token && (a as any).confirmation_status === "pending" ? (
-                          <Button size="sm" variant="ghost" onClick={() => copyConfirmLink((a as any).confirmation_token)} title="Copiar link de confirmación">
+                        {(a as any).confirmation_status === "pending" ? (
+                          <Button size="sm" variant="ghost" onClick={() => copyConfirmLink(a.id)} title="Copiar link de confirmación">
                             <Copy className="h-3.5 w-3.5 text-amber-600" />
                           </Button>
                         ) : (
