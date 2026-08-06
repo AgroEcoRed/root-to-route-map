@@ -40,14 +40,14 @@ const normalizeWord = (raw: string, keepAcronyms: boolean) => {
   return raw.toLowerCase();
 };
 
-const titleCaseEn = (text: string) => {
+const titleCaseEn = (text: string, preserveCaps: boolean) => {
   const parts = text.split(/(\s+)/);
   let firstWordSeen = false;
   return parts
     .map((p) => {
       if (/^\s+$/.test(p)) return p;
       const core = p.replace(/[^\p{L}\p{N}]/gu, "");
-      if (isRoman(core) || isAcronym(core)) return p;
+      if (preserveCaps && (isRoman(core) || isAcronym(core))) return p;
       const lower = p.toLowerCase();
       const bare = lower.replace(/[^\p{L}\p{N}]/gu, "");
       const isFirst = !firstWordSeen;
@@ -59,13 +59,13 @@ const titleCaseEn = (text: string) => {
     .join("");
 };
 
-const sentenceCase = (text: string) => {
+const sentenceCase = (text: string, preserveCaps: boolean) => {
   const parts = text.split(/(\s+)/);
   let firstAlpha = true;
   return parts
     .map((p) => {
       if (/^\s+$/.test(p)) return p;
-      const out = normalizeWord(p, true);
+      const out = normalizeWord(p, preserveCaps);
       if (firstAlpha && /\p{L}/u.test(out)) {
         firstAlpha = false;
         return out.replace(/\p{L}/u, (c) => c.toUpperCase());
@@ -92,12 +92,14 @@ export const normalizeTitle = (raw: string, force = false): string => {
   if (!text) return text;
   if (!force && !isMostlyUpper(text)) return text;
   const lang = detectTitleLang(text);
+  // Si el título entero viene en mayúsculas, no hay siglas reales que preservar.
+  const preserveCaps = !isMostlyUpper(text);
   const segments = text.split(/([.:;?!]\s+)/);
   return segments
     .map((seg, i) => {
       if (i % 2 === 1) return seg; // separador
       if (!seg.trim()) return seg;
-      return lang === "en" ? titleCaseEn(seg) : sentenceCase(seg);
+      return lang === "en" ? titleCaseEn(seg, preserveCaps) : sentenceCase(seg, preserveCaps);
     })
     .join("")
     .trim();
