@@ -732,4 +732,96 @@ const ImportDialog = ({
   );
 };
 
+type ZLib = { type: "user" | "group"; id: string; name: string };
+
+const ZoteroDialog = ({ onClose }: { onClose: () => void }) => {
+  const [apiKey, setApiKey] = useState("");
+  const [libs, setLibs] = useState<ZLib[]>([]);
+  const [selected, setSelected] = useState("");
+  const [onlyOpen, setOnlyOpen] = useState(true);
+  const [busy, setBusy] = useState(false);
+
+  const call = async (payload: Record<string, unknown>) => {
+    const { data, error } = await supabase.functions.invoke("zotero-sync", { body: { apiKey, ...payload } });
+    if (error) throw new Error((await (error as any).context?.text?.()) || error.message);
+    if ((data as any)?.error) throw new Error((data as any).error);
+    return data as any;
+  };
+
+  const listLibraries = async () => {
+    if (!apiKey.trim()) return toast.error("Pegá tu API key de Zotero");
+    setBusy(true);
+    try {
+      const d = await call({ action: "libraries" });
+      setLibs(d.libraries ?? []);
+      setSelected(d.libraries?.[0] ? `${d.libraries[0].type}:${d.libraries[0].id}` : "");
+      if (!d.libraries?.length) toast.error("La API key no da acceso a ninguna biblioteca");
+    } catch (e) { toast.error((e as Error).message); }
+    setBusy(false);
+  };
+
+  const runImport = async () => {
+    if (!selected) return;
+    const [libraryType, libraryId] = selected.split(":");
+    setBusy(true);
+    try {
+      const d = await call({ action: "import", libraryType, libraryId, onlyOpenAccess: onlyOpen });
+      toast.success(`${d.inserted} referencias importadas en ${d.collections} carpetas`);
+      onClose();
+    } catch (e) { toast.error((e as Error).message); }
+    setBusy(false);
+  };
+
+  return (
+    <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle>Conectar tu Zotero</DialogTitle>
+        <DialogDescription>
+          Traé tus colecciones y referencias directamente desde Zotero. Creá una API key de solo lectura en{" "}
+          <a href="https://www.zotero.org/settings/keys/new" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+            zotero.org/settings/keys
+          </a>{" "}
+          (marcá «Allow library access» y, si querés traer un grupo, «Read Only» en group libraries). La clave no se guarda: se usa solo para esta importación.
+        </DialogDescription>
+      </DialogHeader>
+      <div className="space-y-3">
+        <div className="flex gap-2">
+          <Input value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="API key de Zotero" type="password" />
+          <Button variant="outline" onClick={listLibraries} disabled={busy}>
+            {busy && libs.length === 0 ? <Loader2 className="h-4 w-4 animate-spin" /> : "Buscar"}
+          </Button>
+        </div>
+
+        {libs.length > 0 && (
+          <>
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">Biblioteca a importar</label>
+              <select
+                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                value={selected}
+                onChange={(e) => setSelected(e.target.value)}
+              >
+                {libs.map((l) => <option key={`${l.type}:${l.id}`} value={`${l.type}:${l.id}`}>{l.name}</option>)}
+              </select>
+            </div>
+            <label className="flex items-start gap-2 text-sm text-muted-foreground">
+              <input type="checkbox" className="mt-1" checked={onlyOpen} onChange={(e) => setOnlyOpen(e.target.checked)} />
+              Traer solo referencias con DOI o enlace público (acceso abierto)
+            </label>
+            <p className="text-xs text-muted-foreground">
+              Se importan únicamente metadatos (sin archivos adjuntos). Las subcarpetas de Zotero se recrean como carpetas temáticas y se omiten las referencias ya cargadas.
+            </p>
+          </>
+        )}
+      </div>
+      <DialogFooter>
+        <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+        <Button onClick={runImport} disabled={busy || !selected}>
+          {busy && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}Importar
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  );
+};
+
 export default LibraryPage;
