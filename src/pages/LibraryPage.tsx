@@ -55,6 +55,10 @@ const LibraryPage = () => {
   const [collectionFilter, setCollectionFilter] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [zoteroOpen, setZoteroOpen] = useState(false);
+  const [style, setStyle] = useState<CitationStyle>(
+    (localStorage.getItem("agrored-citation-style") as CitationStyle) ?? "apa"
+  );
 
   // Support deep-link ?tag=participatory-guarantee from SPG page etc.
   useEffect(() => {
