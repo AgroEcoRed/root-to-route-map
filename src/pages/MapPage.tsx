@@ -201,9 +201,9 @@ const roleLabels: Record<ActorRole, string> = {
 };
 
 const roleColors: Record<ActorRole, string> = {
-  oferta: "#2563eb",
-  demanda: "#9333ea",
-  servicio: "#ea580c",
+  oferta: "#7c3aed",   // violeta
+  demanda: "#2563eb",  // azul
+  servicio: "#0f766e", // verde teal (servicios de apoyo)
 };
 
 const roleBgClasses: Record<ActorRole, string> = {
@@ -536,36 +536,42 @@ const MapPage = () => {
     filtered.forEach((a) => {
       const role = actorRole[a.type];
       const color = roleColors[role];
-      const arrowIcon = role === "oferta" ? "▲" : role === "demanda" ? "▼" : "●";
+      // Forma orgánica tipo "semilla/hoja": oferta apunta hacia arriba,
+      // demanda hacia abajo, servicio es una gota redonda.
       const shape = role === "oferta"
-        ? `border-radius:4px 4px 50% 50%;`
+        ? `border-radius:60% 60% 55% 55% / 70% 70% 45% 45%;`
         : role === "demanda"
-        ? `border-radius:50% 50% 4px 4px;`
-        : `border-radius:50%;`;
+        ? `border-radius:55% 55% 60% 60% / 45% 45% 70% 70%;`
+        : `border-radius:50% 50% 50% 12%;transform:rotate(45deg);`;
 
       const borderStyle = a.source === "rutas_sanas"
-        ? "border:2px dashed white;opacity:0.85;"
+        ? "border:2px dashed rgba(255,255,255,0.95);"
         : a.source === "mercado_territorial"
-        ? "border:2px dotted white;opacity:0.9;"
+        ? "border:2px dotted rgba(255,255,255,0.95);"
         : a.source === "utt_nodos"
-        ? "border:2px solid #fde047;opacity:0.95;"
+        ? "border:2px solid #fde047;"
         : a.source === "nat_san_martin"
-        ? "border:2px solid #14b8a6;outline:2px solid white;opacity:0.95;"
-        : "border:3px solid white;";
+        ? "border:2px solid #5eead4;"
+        : "border:2.5px solid rgba(255,255,255,0.95);";
+
+      const glyph = actorGlyphSvg(a.type, 16);
+      const inner = role === "servicio"
+        ? `<div style="transform:rotate(-45deg);display:flex">${glyph}</div>`
+        : glyph;
 
       const icon = L.divIcon({
         className: "custom-marker",
-        html: `<div style="background:${color};width:30px;height:30px;${shape}${borderStyle}box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">
-          <span style="color:white;font-size:12px;font-weight:bold;line-height:1">${arrowIcon}</span>
+        html: `<div style="background:linear-gradient(160deg, ${color}, ${color}cc);width:30px;height:30px;${shape}${borderStyle}box-shadow:0 3px 8px rgba(28,45,20,0.35);display:flex;align-items:center;justify-content:center;">
+          ${inner}
         </div>`,
         iconSize: [30, 30],
         iconAnchor: [15, 15],
       });
 
       const certColor = a.certification === "green" ? "#2d6a4f" : a.certification === "yellow" ? "#d4a017" : "#dc2626";
-      const productLabel = role === "oferta" ? "🟢 Ofrece" : role === "demanda" ? "🔴 Demanda" : "Servicio";
-      const productBg = role === "oferta" ? "#dbeafe" : "#f3e8ff";
-      const productColor = role === "oferta" ? "#2563eb" : "#9333ea";
+      const productLabel = role === "oferta" ? "🟣 Ofrece" : role === "demanda" ? "🔵 Demanda" : "Servicio";
+      const productBg = role === "oferta" ? "#f3e8ff" : "#dbeafe";
+      const productColor = roleColors[role];
 
       const productsHtml = a.products.length > 0
         ? `<div style="margin-top:8px">
@@ -591,7 +597,7 @@ const MapPage = () => {
           })()
         : "";
 
-      const roleBadgeColor = role === "oferta" ? "#2563eb" : role === "demanda" ? "#9333ea" : "#ea580c";
+      const roleBadgeColor = roleColors[role];
 
       const sourceBadge = a.source === "rutas_sanas"
         ? `<span style="display:inline-block;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.3px;text-transform:uppercase">Rutas Sanas</span>`
