@@ -91,10 +91,11 @@ export function glowIntensity(startsAt: string | null): number {
  * Evita morados/violetas para no chocar con los íconos de actores en el mapa.
  */
 export function proximityColor(intensity: number): string {
-  if (intensity >= 0.9) return "#dc2626";  // < 12 h → rojo
-  if (intensity >= 0.75) return "#f97316"; // < 1 día → naranja
-  if (intensity >= 0.55) return "#f59e0b"; // < 3 días → ámbar
+  // Maduración de un tomate: verde → amarillo → naranja → rojo
+  if (intensity >= 0.9) return "#dc2626";  // < 12 h → rojo maduro
+  if (intensity >= 0.75) return "#ea580c"; // < 1 día → rojo anaranjado
+  if (intensity >= 0.55) return "#f59e0b"; // < 3 días → naranja
   if (intensity >= 0.35) return "#eab308"; // < 7 días → amarillo
-  if (intensity >= 0.25) return "#0ea5e9"; // < 14 días → celeste
-  return "#2563eb";                          // lejos → azul
+  if (intensity >= 0.25) return "#84cc16"; // < 14 días → verde claro
+  return "#15803d";                        // lejos → verde
 }
