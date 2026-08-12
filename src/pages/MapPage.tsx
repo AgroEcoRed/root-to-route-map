@@ -20,6 +20,7 @@ import { Search, Filter, X, ArrowUp, ArrowDown, Minus, CalendarPlus, Network, Sp
 import { DataSourceToggle } from "@/components/admin/DataSourceToggle";
 import { useDataSources } from "@/hooks/useDataSources";
 import { useLayerActors } from "@/hooks/useLayerActors";
+import { actorGlyphSvg } from "@/lib/mapGlyphs";
 import { useEvents, glowIntensity, eventBucket, proximityColor } from "@/hooks/useEvents";
 import { useActorConnections } from "@/hooks/useActorConnections";
 import { useAuth } from "@/contexts/AuthContext";
