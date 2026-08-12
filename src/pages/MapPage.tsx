@@ -744,8 +744,7 @@ const MapPage = () => {
       const size = 14 + Math.round(intensity * 22);   // 14 → 36 px halo
       const spread = 2 + Math.round(intensity * 10);
       const speed = (2.8 - intensity * 1.6).toFixed(2);
-      // Color scale: lejos (azul frío) → cerca (rojo cálido). Sin violetas
-      // para no chocar con los íconos de actores (que ya usan morados).
+      // Escala de maduración de tomate: verde (lejos) → amarillo → rojo (inminente).
       const starColor = isPast ? "#94a3b8" : proximityColor(intensity);
       const shadow = starColor.replace("#", "");
       const r = parseInt(shadow.slice(0,2), 16), g = parseInt(shadow.slice(2,4), 16), b = parseInt(shadow.slice(4,6), 16);
