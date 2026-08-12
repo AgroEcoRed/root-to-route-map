@@ -1065,9 +1065,16 @@ const MapPage = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <div className="ml-auto flex flex-wrap items-center gap-1.5">
-                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-map-oferta/15 text-map-oferta text-[10px] font-medium">▲ Oferta</span>
-                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-map-demanda/15 text-map-demanda text-[10px] font-medium">▼ Demanda</span>
-                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-map-servicio/15 text-map-servicio text-[10px] font-medium">● Servicio</span>
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-map-oferta/15 text-map-oferta text-[10px] font-medium">
+                    <span className="inline-block w-2.5 h-2.5 bg-map-oferta" style={{ borderRadius: "60% 60% 55% 55% / 70% 70% 45% 45%" }} /> Oferta
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-map-demanda/15 text-map-demanda text-[10px] font-medium">
+                    <span className="inline-block w-2.5 h-2.5 bg-map-demanda" style={{ borderRadius: "55% 55% 60% 60% / 45% 45% 70% 70%" }} /> Demanda
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-map-servicio/15 text-map-servicio text-[10px] font-medium">
+                    <span className="inline-block w-2.5 h-2.5 bg-map-servicio" style={{ borderRadius: "50% 50% 50% 12%", transform: "rotate(45deg)" }} /> Servicio
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">Cada símbolo indica el tipo de actor</span>
                 </div>
               </div>
             )}
