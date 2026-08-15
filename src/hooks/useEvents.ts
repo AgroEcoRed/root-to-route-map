@@ -87,7 +87,7 @@ export function glowIntensity(startsAt: string | null): number {
 
 /**
  * Color scale for upcoming events based on proximity (intensity 0..1).
- * Cold blue (lejos) → cyan → amarillo → naranja → rojo (inminente).
+ * Verde (lejos) → amarillo → naranja → rojo (inminente), como la maduración de un tomate.
  * Evita morados/violetas para no chocar con los íconos de actores en el mapa.
  */
 export function proximityColor(intensity: number): string {

@@ -1143,7 +1143,7 @@ const MapPage = () => {
                 }
                 setEventDialogOpen(true);
               }}
-              className="rounded-full shadow-elevated gap-2 bg-gradient-to-r from-[#E94560] via-[#F5C518] to-[#3B82F6] text-white border-2 border-white/40 hover:opacity-90"
+              className="rounded-full shadow-elevated gap-2 bg-gradient-to-r from-[#E94560] via-[#F5C518] to-[#15803d] text-white border-2 border-white/40 hover:opacity-90"
               title="Publicar feria, intercambio o formación"
             >
               <Sparkles className="h-4 w-4" />
