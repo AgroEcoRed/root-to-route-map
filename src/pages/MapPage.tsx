@@ -26,6 +26,7 @@ import { useActorConnections } from "@/hooks/useActorConnections";
 import { useAuth } from "@/contexts/AuthContext";
 import { EventFormDialog } from "@/components/events/EventFormDialog";
 import { EventsSidebar } from "@/components/events/EventsSidebar";
+import EventsFilterBar, { applyEventFilters, EventsFilters } from "@/components/events/EventsFilterBar";
 import { AddMapPointDialog } from "@/components/AddMapPointDialog";
 import { EndorseDialog } from "@/components/actors/EndorseDialog";
 import { DeclareConnectionDialog } from "@/components/actors/DeclareConnectionDialog";
@@ -331,6 +332,8 @@ const MapPage = () => {
   const { isEnabled, loading: sourcesLoading } = useDataSources();
   const { user } = useAuth();
   const { events } = useEvents();
+  const [eventFilters, setEventFilters] = useState<EventsFilters>({ province: null, months: [] });
+  const visibleEvents = useMemo(() => applyEventFilters(events, eventFilters), [events, eventFilters]);
   const { connections } = useActorConnections();
   const showEventsLayer = !sourcesLoading && isEnabled("eventos");
   const [showNetwork, setShowNetwork] = useState(false);
@@ -735,7 +738,7 @@ const MapPage = () => {
     eventMarkersRef.current.clear();
     if (!showEventsLayer) return;
 
-    events.forEach((ev) => {
+    visibleEvents.forEach((ev) => {
       if (ev.lat == null || ev.lng == null) return;
       const bucket = eventBucket(ev);
       if (bucket === "undated_or_unplaced") return; // sin fecha/lugar → solo barra lateral
@@ -810,7 +813,7 @@ const MapPage = () => {
       });
       eventMarkersRef.current.set(ev.id, marker);
     });
-  }, [events, showEventsLayer, mapVersion]);
+  }, [visibleEvents, showEventsLayer, mapVersion]);
 
   // Deep-link: open ?event=<id> centered with its popup, and surface the flyer in the sidebar.
   const [focusedEventId, setFocusedEventId] = useState<string | null>(null);
@@ -989,6 +992,15 @@ const MapPage = () => {
               </Button>
             </div>
 
+            {showFilters && showEventsLayer && events.length > 0 && (
+              <div className="rounded-xl border border-border bg-card/70 p-2">
+                <p className="text-[11px] font-semibold text-muted-foreground mb-1.5 px-1">
+                  Actividades: filtrá por provincia y mes
+                </p>
+                <EventsFilterBar events={events} value={eventFilters} onChange={setEventFilters} />
+              </div>
+            )}
+
             {showFilters && (
               <div className="flex flex-wrap items-center gap-2">
                 {([
@@ -1087,11 +1099,11 @@ const MapPage = () => {
 
           {/* Events sidebar (desktop inline + mobile drawer) */}
           <EventsSidebar
-            events={showEventsLayer ? events : []}
+            events={showEventsLayer ? visibleEvents : []}
             onFlyTo={(la, ln) => mapRef.current?.flyTo([la, ln], 14, { duration: 0.8 })}
             highlightedEventId={focusedEventId}
             onOpenEvent={(id) => {
-              const ev = showEventsLayer ? events.find((e) => e.id === id) : undefined;
+              const ev = showEventsLayer ? visibleEvents.find((e) => e.id === id) : undefined;
               if (ev?.lat != null && ev?.lng != null) {
                 mapRef.current?.flyTo([ev.lat, ev.lng], 15, { duration: 0.7 });
               }
