@@ -26,6 +26,7 @@ import { useActorConnections } from "@/hooks/useActorConnections";
 import { useAuth } from "@/contexts/AuthContext";
 import { EventFormDialog } from "@/components/events/EventFormDialog";
 import { EventsSidebar } from "@/components/events/EventsSidebar";
+import EventsFilterBar, { applyEventFilters, EventsFilters } from "@/components/events/EventsFilterBar";
 import { AddMapPointDialog } from "@/components/AddMapPointDialog";
 import { EndorseDialog } from "@/components/actors/EndorseDialog";
 import { DeclareConnectionDialog } from "@/components/actors/DeclareConnectionDialog";
@@ -331,6 +332,8 @@ const MapPage = () => {
   const { isEnabled, loading: sourcesLoading } = useDataSources();
   const { user } = useAuth();
   const { events } = useEvents();
+  const [eventFilters, setEventFilters] = useState<EventsFilters>({ province: null, months: [] });
+  const visibleEvents = useMemo(() => applyEventFilters(events, eventFilters), [events, eventFilters]);
   const { connections } = useActorConnections();
   const showEventsLayer = !sourcesLoading && isEnabled("eventos");
   const [showNetwork, setShowNetwork] = useState(false);
