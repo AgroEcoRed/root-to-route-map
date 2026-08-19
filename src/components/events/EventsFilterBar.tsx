@@ -13,7 +13,7 @@ let cityIndex: Map<string, string> | null = null;
 const getCityIndex = () => {
   if (cityIndex) return cityIndex;
   cityIndex = new Map();
-  (argentinaRegions as { name: string; cities: string[] }[]).forEach((r) => {
+  (argentinaRegions as unknown as { name: string; cities: string[] }[]).forEach((r) => {
     r.cities?.forEach((c) => {
       const k = norm(c);
       if (!cityIndex!.has(k)) cityIndex!.set(k, r.name);
@@ -26,7 +26,7 @@ const getCityIndex = () => {
 export function eventProvince(ev: AgroEventFull): string | null {
   const loc = norm(ev.location_name || "");
   if (!loc) return null;
-  const regions = argentinaRegions as { name: string; cities: string[] }[];
+  const regions = argentinaRegions as unknown as { name: string; cities: string[] }[];
   const byRegion = regions.find((r) => loc.includes(norm(r.name)));
   if (byRegion) return byRegion.name;
   const idx = getCityIndex();
