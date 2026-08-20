@@ -1,0 +1,1 @@
+REVOKE SELECT (focal_name, submitted_by_name) ON public.events FROM anon;
