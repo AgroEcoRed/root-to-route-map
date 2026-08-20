@@ -394,7 +394,7 @@ const MapPage = () => {
       source: "rutas_sanas",
       verified: !!p.verified_at,
       verifiedByRole: (p.verified_by_role as any) || (p.verified_at ? "layer" : null),
-      lastUpdated: p.verified_at || p.updated_at || SOURCE_IMPORT_DATE.rutas_sanas,
+      lastUpdated: p.verified_at || SOURCE_IMPORT_DATE.rutas_sanas,
       deliveryInfo: (p.delivery_days && p.delivery_days.length > 0)
         ? p.delivery_days.join(", ")
         : ((p.extra as any) || {}).deliveryInfo,
@@ -690,7 +690,7 @@ const MapPage = () => {
           return `<span title="Miembros de la red dieron su voto de confianza. Último: ${endorseDateLabel}" style="display:inline-flex;align-items:center;gap:3px;background:#fef3c7;color:#854d0e;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #fcd34d;letter-spacing:0.2px">🤝 ${label} · último ${endorseDateLabel}</span>`;
         }
         return dateLabel
-          ? `<span title="Última revisión de la información de la fuente original." style="display:inline-flex;align-items:center;gap:3px;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.2px">${a.source === "rutas_sanas" ? "Último chequeo · ago 2024" : `Importado · ${dateLabel}`}</span>`
+          ? `<span title="Última revisión de la información de la fuente original." style="display:inline-flex;align-items:center;gap:3px;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.2px">${a.source === "rutas_sanas" ? "Último chequeo, ago 2024" : `Importado · ${dateLabel}`}</span>`
           : "";
       })();
 
