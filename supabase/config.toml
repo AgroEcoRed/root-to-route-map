@@ -37,3 +37,6 @@ verify_jwt = false
 
 [functions.zotero-sync]
 verify_jwt = false
+
+[functions.send-soliverde-invite]
+verify_jwt = false
