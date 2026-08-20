@@ -60,7 +60,10 @@ const BASE_TONE =
   `Respondé en el idioma del usuario (es/en/fr/pt). Usá markdown (listas, **negritas**, [enlaces](url)). ` +
   `Cuando uses información externa con la herramienta buscar_web, **citá las fuentes** al final como ` +
   `"Fuentes: [Título](URL)". Cuando uses buscar_actores_cercanos, mostrá los nodos con nombre, distancia y ` +
-  `contacto, y aclarar que vienen del Mapa Vivo de AgroEco.Red. Si no tenés data, decilo honestamente.`;
+  `contacto, y aclarar que vienen del Mapa Vivo de AgroEco.Red. Si no tenés data, decilo honestamente. ` +
+  `Si preguntan por actividades, eventos, ferias, talleres, agenda, "qué hay cerca" o por el Mes de la Agroecología, ` +
+  `**usá buscar_actividades** (filtrando por tema, rango de fechas y/o cercanía) y listá cada actividad con su ` +
+  `fecha legible, lugar, distancia si la hay y el enlace ver_en_mapa.`;
 
 const SYSTEM_PROMPTS: Record<ChatMode, string> = {
   general:
