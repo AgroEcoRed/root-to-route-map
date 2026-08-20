@@ -876,6 +876,21 @@ const MapPage = () => {
     });
   }, [visibleEvents, showEventsLayer, mapVersion]);
 
+  // En modo "sólo Mes de la Agroecología" encuadramos el mapa sobre las
+  // actividades de la capa para que las estrellas se vean apenas se entra.
+  const fittedMesRef = useRef(false);
+  useEffect(() => {
+    if (!onlyMes) { fittedMesRef.current = false; return; }
+    if (fittedMesRef.current || !mapRef.current) return;
+    const pts = visibleEvents
+      .filter((e) => e.lat != null && e.lng != null)
+      .map((e) => [e.lat as number, e.lng as number] as [number, number]);
+    if (pts.length === 0) return;
+    fittedMesRef.current = true;
+    mapRef.current.fitBounds(L.latLngBounds(pts), { padding: [60, 60], maxZoom: 11 });
+  }, [onlyMes, visibleEvents, mapVersion]);
+
+
   // Deep-link: open ?event=<id> centered with its popup, and surface the flyer in the sidebar.
   const [focusedEventId, setFocusedEventId] = useState<string | null>(null);
   useEffect(() => {
