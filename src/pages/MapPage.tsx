@@ -358,7 +358,11 @@ const MapPage = () => {
     (eventFilters.months.length ? 1 : 0) +
     (eventFilters.onlyMes ? 1 : 0);
   const { connections } = useActorConnections();
-  const showEventsLayer = !sourcesLoading && isEnabled("eventos");
+  // Las actividades son contenido público principal del mapa y deben verse
+  // siempre, también en móviles y en el acceso directo a la capa del Mes.
+  // No dependemos del ajuste administrativo de fuentes para evitar que una
+  // preferencia global deje el mapa público sin estrellas.
+  const showEventsLayer = true;
   const [showNetwork, setShowNetwork] = useState(false);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [addPointOpen, setAddPointOpen] = useState(false);
@@ -559,6 +563,23 @@ const MapPage = () => {
     const t = setTimeout(() => mapRef.current?.invalidateSize(), 100);
     return () => clearTimeout(t);
   }, [showFilters]);
+
+  // Safari/Chrome móvil cambian el alto útil al ocultar sus barras y al rotar.
+  // Observar el contenedor mantiene Leaflet sincronizado con el tamaño real.
+  useEffect(() => {
+    const container = mapContainerRef.current;
+    if (!container || typeof ResizeObserver === "undefined") return;
+    let frame = 0;
+    const observer = new ResizeObserver(() => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => mapRef.current?.invalidateSize({ pan: false }));
+    });
+    observer.observe(container);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, []);
 
   // Initialize map
   useEffect(() => {
@@ -831,7 +852,7 @@ const MapPage = () => {
           ${starPoly(1.2)}${emblem}
         </svg>`;
       const icon = L.divIcon({
-        className: "",
+        className: isMes ? "mes-event-marker" : "event-marker",
         html: isPast ? `<div>${starSvg}</div>` : `<div class="event-star" style="--star-speed:${speed}s">${starSvg}</div>`,
         iconSize: isPast ? [28, 28] : [34, 34],
         iconAnchor: isPast ? [14, 14] : [17, 17],
@@ -1032,7 +1053,7 @@ const MapPage = () => {
   const servicioTypes: ActorType[] = ["logistics", "network"];
 
   return (
-    <div className="h-screen overflow-hidden bg-background flex flex-col">
+    <div className="h-screen min-h-[100dvh] overflow-hidden bg-background flex flex-col">
       <Navbar />
       <div className="flex-1 min-h-0 pt-16 flex flex-col">
         {/* Top toolbar: search + filters toggle */}
@@ -1083,6 +1104,19 @@ const MapPage = () => {
                   </span>
                 )}
               </Button>
+              {new Date() <= new Date("2026-12-31T23:59:59") && (
+                <Button
+                  variant={onlyMes ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setOnlyMes(!onlyMes)}
+                  className="lg:hidden rounded-full h-10 shrink-0 px-3"
+                  aria-pressed={onlyMes}
+                  title={onlyMes ? "Volver al mapa general" : "Ver sólo el Mes de la Agroecología"}
+                >
+                  <span aria-hidden="true">🌱</span>
+                  <span className="hidden min-[420px]:inline ml-1.5">{onlyMes ? "Mapa general" : "Mes"}</span>
+                </Button>
+              )}
               <span className="hidden md:inline text-xs text-muted-foreground shrink-0">
                 <span className="font-semibold text-foreground">{filtered.length}</span> actores
                 {showEventsLayer && <> · <span className="font-semibold text-foreground">{visibleEvents.length}</span> actividades</>}
