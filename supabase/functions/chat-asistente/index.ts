@@ -60,7 +60,10 @@ const BASE_TONE =
   `Respondé en el idioma del usuario (es/en/fr/pt). Usá markdown (listas, **negritas**, [enlaces](url)). ` +
   `Cuando uses información externa con la herramienta buscar_web, **citá las fuentes** al final como ` +
   `"Fuentes: [Título](URL)". Cuando uses buscar_actores_cercanos, mostrá los nodos con nombre, distancia y ` +
-  `contacto, y aclarar que vienen del Mapa Vivo de AgroEco.Red. Si no tenés data, decilo honestamente.`;
+  `contacto, y aclarar que vienen del Mapa Vivo de AgroEco.Red. Si no tenés data, decilo honestamente. ` +
+  `Si preguntan por actividades, eventos, ferias, talleres, agenda, "qué hay cerca" o por el Mes de la Agroecología, ` +
+  `**usá buscar_actividades** (filtrando por tema, rango de fechas y/o cercanía) y listá cada actividad con su ` +
+  `fecha legible, lugar, distancia si la hay y el enlace ver_en_mapa.`;
 
 const SYSTEM_PROMPTS: Record<ChatMode, string> = {
   general:
@@ -130,6 +133,32 @@ const TOOLS = [
             description: "Palabras clave de productos: hortalizas, miel, semillas, lácteos, bioinsumos, etc.",
           },
           limit: { type: "number", description: "Máx resultados. Default 6." },
+        },
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "buscar_actividades",
+      description:
+        "Busca actividades y eventos agroecológicos publicados en AgroEco.Red (ferias, talleres, formaciones, " +
+        "encuentros, intercambios, jornadas, voluntariados), incluidas las del Mes de la Agroecología. " +
+        "Permite filtrar por tema o palabra clave, por rango de fechas y por cercanía a una zona.",
+      parameters: {
+        type: "object",
+        properties: {
+          tema: { type: "string", description: "Palabra clave o tema: semillas, compostaje, pesticidas, huerta, feria, etc." },
+          tipo: { type: "string", description: "Tipo: feria, taller, formacion, encuentro, intercambio, conferencia_jornada, voluntariado, otro." },
+          desde: { type: "string", description: "Fecha inicial ISO (YYYY-MM-DD). Default: hoy si se piden próximas." },
+          hasta: { type: "string", description: "Fecha final ISO (YYYY-MM-DD)." },
+          incluir_pasadas: { type: "boolean", description: "true para incluir actividades ya realizadas. Default false." },
+          zona: { type: "string", description: "Localidad o provincia para ordenar por cercanía (ej: 'La Plata')." },
+          lat: { type: "number", description: "Latitud de referencia (opcional)." },
+          lng: { type: "number", description: "Longitud de referencia (opcional)." },
+          radio_km: { type: "number", description: "Radio máximo en km cuando hay zona/lat/lng. Default 80." },
+          solo_mes_agroecologia: { type: "boolean", description: "true para limitar a la capa del Mes de la Agroecología." },
+          limit: { type: "number", description: "Máx resultados. Default 8." },
         },
       },
     },
@@ -284,8 +313,83 @@ async function toolBuscarWeb(args: Record<string, unknown>) {
   }
 }
 
+
+async function toolBuscarActividades(args: Record<string, unknown>) {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const sb = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
+
+  const tema = typeof args.tema === "string" ? args.tema.toLowerCase().trim() : "";
+  const tipo = typeof args.tipo === "string" ? args.tipo.trim() : "";
+  const incluirPasadas = args.incluir_pasadas === true;
+  const soloMes = args.solo_mes_agroecologia === true;
+  const limit = typeof args.limit === "number" ? Math.min(args.limit, 20) : 8;
+  const radio = typeof args.radio_km === "number" ? args.radio_km : 80;
+
+  let lat = typeof args.lat === "number" ? args.lat : null;
+  let lng = typeof args.lng === "number" ? args.lng : null;
+  const zona = typeof args.zona === "string" ? args.zona : null;
+  if ((lat === null || lng === null) && zona) {
+    const g = await geocode(zona);
+    if (g) { lat = g.lat; lng = g.lng; }
+  }
+
+  let q = sb
+    .from("events")
+    .select("id,title,description,event_type,custom_type,starts_at,ends_at,location_name,lat,lng,link,layer_id")
+    .eq("approved", true);
+  if (soloMes) q = q.eq("layer_id", "mes_agroecologia");
+  if (tipo) q = q.eq("event_type", tipo);
+  if (typeof args.desde === "string") q = q.gte("starts_at", args.desde);
+  else if (!incluirPasadas) q = q.gte("starts_at", new Date().toISOString());
+  if (typeof args.hasta === "string") q = q.lte("starts_at", `${args.hasta}T23:59:59`);
+
+  const { data, error } = await q.order("starts_at", { ascending: true }).limit(400);
+  if (error) return { error: error.message };
+
+  let rows = (data ?? []) as any[];
+  if (tema) {
+    const words = tema.split(/\s+/).filter((w) => w.length > 2);
+    rows = rows.filter((r) => {
+      const blob = `${r.title ?? ""} ${r.description ?? ""} ${r.location_name ?? ""} ${r.custom_type ?? ""}`.toLowerCase();
+      return words.length === 0 ? true : words.some((w) => blob.includes(w));
+    });
+  }
+
+  let ranked = rows.map((r) => ({
+    id: r.id,
+    titulo: r.title,
+    tipo: r.custom_type || r.event_type,
+    fecha: r.starts_at,
+    fin: r.ends_at,
+    lugar: r.location_name,
+    link: r.link,
+    capa: r.layer_id,
+    ubicacion_precisa: r.lat != null && r.lng != null,
+    ver_en_mapa: `https://agroeco.red/mapa?event=${r.id}`,
+    distancia_km:
+      lat !== null && lng !== null && r.lat != null && r.lng != null
+        ? Math.round(haversine({ lat, lng }, { lat: r.lat, lng: r.lng }) * 10) / 10
+        : null,
+  }));
+
+  if (lat !== null && lng !== null) {
+    const conDist = ranked.filter((r) => r.distancia_km !== null && r.distancia_km <= radio);
+    conDist.sort((a, b) => (a.distancia_km! - b.distancia_km!));
+    ranked = conDist;
+  }
+
+  return {
+    total_encontrados: ranked.length,
+    centro: lat !== null && lng !== null ? { lat, lng, zona } : null,
+    actividades: ranked.slice(0, limit),
+    nota: "Actividades publicadas en AgroEco.Red. Compartí el enlace 'ver_en_mapa' para abrir cada una en el Mapa Vivo.",
+  };
+}
+
 async function execTool(name: string, args: Record<string, unknown>) {
   if (name === "buscar_actores_cercanos") return await toolBuscarActores(args);
+  if (name === "buscar_actividades") return await toolBuscarActividades(args);
   if (name === "buscar_web") return await toolBuscarWeb(args);
   return { error: `unknown tool ${name}` };
 }
