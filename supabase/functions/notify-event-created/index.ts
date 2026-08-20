@@ -107,9 +107,23 @@ Deno.serve(async (req) => {
   const registerLink = `${origin}/ingresar?next=${encodeURIComponent("/perfil")}`;
 
   const subject = `AgroEco.Red — Confirmá tu actividad: ${ev.title}`;
-  const flyerBlock = (ev as any).flyer_url
-    ? `<p style="margin:14px 0 6px"><img src="${(ev as any).flyer_url}" alt="Flyer" style="max-width:100%;border-radius:8px;border:1px solid #e5e7eb"/></p>`
+  const safeFlyerUrl = (raw: unknown): string | null => {
+    if (typeof raw !== "string" || raw.length > 2000) return null;
+    let u: URL;
+    try { u = new URL(raw.trim()); } catch { return null; }
+    if (u.protocol !== "https:") return null;
+    // Only images served from this project's own storage domain are embedded.
+    let projectHost = "";
+    try { projectHost = new URL(Deno.env.get("SUPABASE_URL") ?? "").host; } catch { /* noop */ }
+    if (!projectHost || u.host !== projectHost) return null;
+    if (!u.pathname.startsWith("/storage/v1/")) return null;
+    return u.toString();
+  };
+  const flyer = safeFlyerUrl((ev as any).flyer_url);
+  const flyerBlock = flyer
+    ? `<p style="margin:14px 0 6px"><img src="${escapeHtml(flyer)}" alt="Flyer" style="max-width:100%;border-radius:8px;border:1px solid #e5e7eb"/></p>`
     : "";
+
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;color:#1f2937;line-height:1.55">
       <h2 style="color:#15803d;margin-bottom:4px">Tu actividad fue publicada en AgroEco.Red</h2>
