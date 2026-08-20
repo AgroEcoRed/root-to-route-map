@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage, Lang } from "@/contexts/LanguageContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useLayerManager } from "@/hooks/useLayerManager";
 import { motion, AnimatePresence } from "framer-motion";
 import AnimatedLogo from "@/components/AnimatedLogo";
 
@@ -17,6 +18,9 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
+  // Gestoras de capa (no admin global): acceso directo a su panel.
+  const { layers: managedLayers } = useLayerManager();
+  const myLayer = !isAdmin && managedLayers.length > 0 ? managedLayers[0] : null;
   const { t, lang, setLang, langs } = useLanguage();
   const { totalItems, setIsOpen: setCartOpen } = useCart();
 
@@ -199,6 +203,16 @@ const Navbar = () => {
                    <ShieldCheck className="h-5 w-5" />
                  </Link>
                )}
+               {myLayer && (
+                 <Link
+                   to={`/admin/capas/${myLayer}`}
+                   aria-label="Panel de mi capa"
+                   className={`hidden sm:inline-flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${navbarScrolled ? "text-primary bg-primary/10 hover:bg-primary/20" : "text-white bg-white/15 hover:bg-white/25"}`}
+                   title="Panel de mi capa"
+                 >
+                   <ShieldCheck className="h-5 w-5" />
+                 </Link>
+               )}
                <Button variant="outline" size="sm" onClick={handleSignOut} className="hidden md:inline-flex group text-foreground">
                  <LogOut className="h-4 w-4 mr-1 transition-transform group-hover:-translate-x-0.5" />
                  {t("nav.logout")}
@@ -299,6 +313,13 @@ const Navbar = () => {
                       <Button variant="outline" size="sm" className="flex-1" asChild>
                         <Link to="/admin" onClick={() => setOpen(false)}>
                           <ShieldCheck className="h-4 w-4 mr-1" /> Admin
+                        </Link>
+                      </Button>
+                    )}
+                    {myLayer && (
+                      <Button variant="outline" size="sm" className="flex-1" asChild>
+                        <Link to={`/admin/capas/${myLayer}`} onClick={() => setOpen(false)}>
+                          <ShieldCheck className="h-4 w-4 mr-1" /> Mi capa
                         </Link>
                       </Button>
                     )}

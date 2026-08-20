@@ -813,8 +813,8 @@ const MapPage = () => {
         `<polygon points="12,1.5 14.7,8.7 22.5,9.2 16.5,14.2 18.5,21.8 12,17.5 5.5,21.8 7.5,14.2 1.5,9.2 9.3,8.7"
             fill="${starColor}" stroke="#ffffff" stroke-width="${sw}"${dashAttr} stroke-linejoin="round"/>`;
       const starSvg = isPast ? `
-        <svg viewBox="0 0 24 24" width="24" height="24" style="opacity:0.7; overflow: visible;">
-          ${starPoly(1.2)}${emblem}
+        <svg viewBox="0 0 24 24" width="28" height="28" style="filter: drop-shadow(0 1px 2px rgba(15,23,42,0.35)); overflow: visible;">
+          ${starPoly(1.4)}${emblem}
         </svg>` : `
         <svg viewBox="0 0 24 24" width="34" height="34" style="filter: drop-shadow(0 0 ${spread}px ${shadowRgba}) drop-shadow(0 0 ${size/2}px ${shadowRgba}); overflow: visible;">
           ${starPoly(1.2)}${emblem}
@@ -822,8 +822,8 @@ const MapPage = () => {
       const icon = L.divIcon({
         className: "",
         html: isPast ? `<div>${starSvg}</div>` : `<div class="event-star" style="--star-speed:${speed}s">${starSvg}</div>`,
-        iconSize: isPast ? [24, 24] : [34, 34],
-        iconAnchor: isPast ? [12, 12] : [17, 17],
+        iconSize: isPast ? [28, 28] : [34, 34],
+        iconAnchor: isPast ? [14, 14] : [17, 17],
       });
 
       const date = new Date(ev.starts_at);
@@ -851,7 +851,7 @@ const MapPage = () => {
       const orgsHtml = orgs.length ? `<p style="font-size:11px;color:#444;margin:6px 0 0"><b>Co-organizan:</b> ${escHtml(orgs.join(", "))}</p>` : "";
       const shareHtml = `<p style="margin:8px 0 0;font-size:11px;color:#6b7280">💡 Click derecho sobre la estrella para copiar un link directo a esta actividad.</p>`;
       const eventLicenseHtml = `<p style="margin:6px 0 0;font-size:10px;color:#94a3b8">📄 Datos: <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener noreferrer" style="color:#64748b;text-decoration:underline">ODbL 1.0</a> · Textos: <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es" target="_blank" rel="noopener noreferrer" style="color:#64748b;text-decoration:underline">CC BY-SA 4.0</a></p>`;
-      const marker = L.marker([ev.lat, ev.lng], { icon, zIndexOffset: isPast ? 400 : 1000, opacity: isPast ? 0.85 : 1 })
+      const marker = L.marker([ev.lat, ev.lng], { icon, zIndexOffset: isPast ? 400 : 1000, opacity: 1 })
         .bindPopup(`
           <div style="min-width:240px;font-family:DM Sans,sans-serif;padding:4px">
             <span style="display:inline-block;background:${typeColor[ev.event_type]};color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:0.4px">${typeLabels[ev.event_type]}</span>
@@ -875,6 +875,21 @@ const MapPage = () => {
       eventMarkersRef.current.set(ev.id, marker);
     });
   }, [visibleEvents, showEventsLayer, mapVersion]);
+
+  // En modo "sólo Mes de la Agroecología" encuadramos el mapa sobre las
+  // actividades de la capa para que las estrellas se vean apenas se entra.
+  const fittedMesRef = useRef(false);
+  useEffect(() => {
+    if (!onlyMes) { fittedMesRef.current = false; return; }
+    if (fittedMesRef.current || !mapRef.current) return;
+    const pts = visibleEvents
+      .filter((e) => e.lat != null && e.lng != null)
+      .map((e) => [e.lat as number, e.lng as number] as [number, number]);
+    if (pts.length === 0) return;
+    fittedMesRef.current = true;
+    mapRef.current.fitBounds(L.latLngBounds(pts), { padding: [60, 60], maxZoom: 11 });
+  }, [onlyMes, visibleEvents, mapVersion]);
+
 
   // Deep-link: open ?event=<id> centered with its popup, and surface the flyer in the sidebar.
   const [focusedEventId, setFocusedEventId] = useState<string | null>(null);

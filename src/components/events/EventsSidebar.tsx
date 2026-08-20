@@ -110,7 +110,7 @@ const Card = ({
           />
         </a>
       )}
-      {(ev.extra_organizer_names?.length || ev.co_organizers?.length) && (
+      {!!(ev.extra_organizer_names?.length || ev.co_organizers?.length) && (
         <p className="text-[10px] text-muted-foreground mt-1.5">
           Co-organizan: {ev.extra_organizer_names?.join(", ") || `${ev.co_organizers.length} actores`}
         </p>

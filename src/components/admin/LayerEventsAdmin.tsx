@@ -28,11 +28,14 @@ const fmt = (iso: string) =>
     day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
   });
 
+type Tab = "all" | "upcoming" | "past" | "unplaced";
+
 export default function LayerEventsAdmin({ layerId }: { layerId: string }) {
   const [events, setEvents] = useState<LayerEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [prov, setProv] = useState<string>("");
+  const [tab, setTab] = useState<Tab>("all");
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 20;
 
@@ -58,9 +61,20 @@ export default function LayerEventsAdmin({ layerId }: { layerId: string }) {
     return Array.from(set).sort();
   }, [events]);
 
+  const isPast = (e: LayerEvent) => new Date(e.starts_at).getTime() < Date.now();
+  const counts = useMemo(() => ({
+    all: events.length,
+    upcoming: events.filter((e) => !isPast(e)).length,
+    past: events.filter(isPast).length,
+    unplaced: events.filter((e) => e.lat == null || e.lng == null).length,
+  }), [events]);
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return events.filter((e) => {
+      if (tab === "upcoming" && isPast(e)) return false;
+      if (tab === "past" && !isPast(e)) return false;
+      if (tab === "unplaced" && e.lat != null && e.lng != null) return false;
       const p = (e.location_name || "").split(",").pop()?.trim() || "";
       if (prov && p !== prov) return false;
       if (!q) return true;
@@ -70,7 +84,7 @@ export default function LayerEventsAdmin({ layerId }: { layerId: string }) {
         (e.focal_name || "").toLowerCase().includes(q)
       );
     });
-  }, [events, search, prov]);
+  }, [events, search, prov, tab]);
 
   const pageRows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -108,13 +122,14 @@ export default function LayerEventsAdmin({ layerId }: { layerId: string }) {
           <Badge variant="outline">{events.length}</Badge>
         </h2>
         <Button asChild size="sm" variant="outline">
-          <Link to="/mapa"><MapPin className="h-4 w-4 mr-1" /> Ver en el mapa</Link>
+          <Link to={`/mapa?capa=${layerId}`}><MapPin className="h-4 w-4 mr-1" /> Ver en el mapa</Link>
         </Button>
       </div>
 
-      <div className="grid grid-cols-3 gap-2 mb-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
         {[
           ["Total", events.length],
+          ["Próximas", counts.upcoming],
           ["Publicadas", published],
           ["Con ubicación", located],
         ].map(([k, v]) => (
@@ -124,6 +139,26 @@ export default function LayerEventsAdmin({ layerId }: { layerId: string }) {
           </div>
         ))}
       </div>
+
+      <div className="flex gap-2 mb-3 flex-wrap">
+        {([
+          ["all", "Todas"],
+          ["upcoming", "Próximas"],
+          ["past", "Pasadas"],
+          ["unplaced", "Sin ubicación"],
+        ] as [Tab, string][]).map(([k, label]) => (
+          <button
+            key={k}
+            onClick={() => { setTab(k); setPage(1); }}
+            className={`rounded-full border px-3 h-8 text-xs transition ${
+              tab === k ? "border-primary bg-primary/10 text-primary font-semibold" : "border-border bg-card hover:border-primary/40"
+            }`}
+          >
+            {label} <span className="ml-1 text-[10px] text-muted-foreground">{counts[k]}</span>
+          </button>
+        ))}
+      </div>
+
 
       <div className="flex gap-2 mb-3 flex-wrap">
         <div className="relative flex-1 min-w-[200px]">
