@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export type DataSourceId = "rutas_sanas" | "mercado_territorial" | "agroeco" | "eventos" | "el_click" | "el_brote" | "utt_nodos" | "user_points" | "nat_san_martin";
+export type DataSourceId = "rutas_sanas" | "mercado_territorial" | "agroeco" | "eventos" | "el_click" | "el_brote" | "utt_nodos" | "user_points" | "nat_san_martin" | "soliverde";
 
 export interface DataSourceSetting {
   source_id: DataSourceId;
@@ -19,6 +19,7 @@ const DEFAULTS: DataSourceSetting[] = [
   { source_id: "utt_nodos", label: "Nodos UTT (Unión de Trabajadores de la Tierra)", enabled: true },
   { source_id: "user_points", label: "Puntos agregados por la comunidad", enabled: true },
   { source_id: "nat_san_martin", label: "NAT San Martín", enabled: true },
+  { source_id: "soliverde", label: "Soliverde — Solidaires (iniciativas ecológicas francófonas)", enabled: true },
 ];
 
 export const useDataSources = () => {

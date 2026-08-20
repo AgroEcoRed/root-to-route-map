@@ -101,6 +101,10 @@ export default function LayerBulkImport({ layerId, onImported }: Props) {
         if (mode === "actores") {
           if (lat == null || lng == null) { skipped++; lines.push(`Sin ubicación: ${name}`); continue; }
           const dias = pick(r, ["dias_entrega", "dias", "entrega", "apertura", "horario", "dia_de_entrega"]);
+          // Columna opcional "publico" / "visible": no / non / false ⇒ el punto queda
+          // sólo visible para quienes administran la capa (no sale al mapa público).
+          const pub = (pick(r, ["publico", "público", "public", "visible", "publique", "mapa_publico"]) || "").toLowerCase();
+          const publicVisible = pub === "" ? true : !["no", "non", "false", "0", "oculto", "interno", "privado"].includes(pub);
           const { error } = await (supabase as any).from("layer_actors").insert({
             source_id: layerId,
             name,
@@ -111,6 +115,7 @@ export default function LayerBulkImport({ layerId, onImported }: Props) {
             address: address || locality || null,
             contact: pick(r, ["contacto", "contact", "telefono", "email", "whatsapp"]) || null,
             delivery_days: dias ? dias.split(/[,;/]/).map(s => s.trim()).filter(Boolean) : null,
+            public_visible: publicVisible,
             created_by: user.id,
           });
           if (error) { skipped++; lines.push(`${name}: ${error.message}`); } else ok++;

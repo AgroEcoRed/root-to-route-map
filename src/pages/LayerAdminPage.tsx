@@ -18,7 +18,7 @@ import { useLayerActors, type LayerActor } from "@/hooks/useLayerActors";
 import LayerBulkImport from "@/components/admin/LayerBulkImport";
 import LayerEventsAdmin from "@/components/admin/LayerEventsAdmin";
 import { toast } from "sonner";
-import { Layers, Loader2, ArrowLeft, MapPin, ShoppingBag, Power, Pencil, Plus, Trash2, CheckCircle2, Search, Send, Copy } from "lucide-react";
+import { Layers, Loader2, ArrowLeft, MapPin, ShoppingBag, Power, Pencil, Plus, Trash2, CheckCircle2, Search, Send, Copy, Eye, EyeOff } from "lucide-react";
 
 const emptyDraft = (sourceId: string): Partial<LayerActor> => ({
   source_id: sourceId,
@@ -31,6 +31,7 @@ const emptyDraft = (sourceId: string): Partial<LayerActor> => ({
   address: "",
   contact: "",
   delivery_days: [],
+  public_visible: true,
 });
 
 export default function LayerAdminPage() {
@@ -101,6 +102,7 @@ export default function LayerAdminPage() {
       address: editing.address || null,
       contact: editing.contact || null,
       delivery_days: editing.delivery_days || null,
+      public_visible: editing.public_visible !== false,
     };
     let error;
     if (editing.id) {
@@ -112,6 +114,17 @@ export default function LayerAdminPage() {
     if (error) return toast.error("No se pudo guardar: " + error.message);
     toast.success("Guardado");
     setEditing(null);
+    reload();
+  };
+
+  const togglePublic = async (actor: LayerActor) => {
+    const next = !(actor.public_visible !== false);
+    const { error } = await (supabase as any)
+      .from("layer_actors")
+      .update({ public_visible: next })
+      .eq("id", actor.id);
+    if (error) return toast.error("No se pudo cambiar la visibilidad: " + error.message);
+    toast.success(next ? "Visible en el mapa público" : "Solo visible para esta capa");
     reload();
   };
 
@@ -271,6 +284,9 @@ export default function LayerAdminPage() {
                           ) : (
                             <Badge variant="secondary" className="text-[10px]">Sin verificar</Badge>
                           )}
+                          {a.public_visible === false && (
+                            <Badge variant="outline" className="text-[10px] border-amber-500 text-amber-700">Solo interna</Badge>
+                          )}
                           {a.delivery_days && a.delivery_days.length > 0 && (
                             <Badge variant="outline" className="text-[10px]">
                               {a.delivery_days.join(", ")}
@@ -302,6 +318,16 @@ export default function LayerAdminPage() {
                             <Send className="h-3.5 w-3.5 text-blue-600" />
                           </Button>
                         )}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => togglePublic(a)}
+                          title={a.public_visible === false ? "Publicar en el mapa público" : "Ocultar del mapa público (solo esta capa)"}
+                        >
+                          {a.public_visible === false
+                            ? <EyeOff className="h-3.5 w-3.5 text-amber-600" />
+                            : <Eye className="h-3.5 w-3.5 text-emerald-600" />}
+                        </Button>
                         <Button size="sm" variant="ghost" onClick={() => removeActor(a.id)}>
                           <Trash2 className="h-3.5 w-3.5 text-destructive" />
                         </Button>
@@ -376,6 +402,18 @@ export default function LayerAdminPage() {
                     value={(editing.delivery_days || []).join(", ")}
                     onChange={(e) => setEditing({ ...editing, delivery_days: e.target.value.split(",").map(s => s.trim()).filter(Boolean) })}
                     placeholder="Martes, Jueves"
+                  />
+                </div>
+                <div className="flex items-center justify-between rounded-lg border p-3">
+                  <div>
+                    <Label className="text-xs">Visible en el mapa público</Label>
+                    <p className="text-[11px] text-muted-foreground">
+                      Si lo desactivás, el registro queda visible solo para quienes administran esta capa.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={editing.public_visible !== false}
+                    onCheckedChange={(v) => setEditing({ ...editing, public_visible: v })}
                   />
                 </div>
                 <div>

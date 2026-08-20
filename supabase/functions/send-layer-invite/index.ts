@@ -79,14 +79,14 @@ Deno.serve(async (req) => {
       <h2 style="color:#15803d;margin-bottom:4px">Invitación a gestionar una capa del Mapa Vivo</h2>
       <p style="font-size:13px;color:#6b7280;margin-top:0">AgroEco.Red · sistemas alimentarios agroecológicos</p>
       <p>Hola,</p>
-      <p>Desde AgroEco.Red queremos invitar al <strong>NAT San Martín</strong> a administrar una capa autónoma del mapeo: <strong>${escapeHtml(source.label)}</strong>.</p>
-      <p>La idea es que puedan cargar, revisar, actualizar y verificar los puntos vinculados a su trabajo territorial, sin modificar otras capas de la plataforma.</p>
+      <p>Desde AgroEco.Red queremos invitarles a administrar una capa autónoma del mapeo: <strong>${escapeHtml(source.label)}</strong>.</p>
+      <p>La idea es que puedan cargar, revisar, actualizar y verificar los puntos vinculados a su trabajo territorial, sin modificar otras capas de la plataforma. Cada registro puede marcarse como público (visible en el mapa general) o interno (visible sólo para quienes administran la capa).</p>
       <div style="background:#f0fdf4;border-left:4px solid #15803d;padding:12px 14px;border-radius:6px;margin:16px 0">
         <p style="margin:0 0 8px"><strong>Para aceptar la invitación:</strong></p>
         <ol style="margin:0;padding-left:18px">
           <li>Crear una cuenta o ingresar con este correo: <strong>${escapeHtml(email)}</strong>.</li>
           <li>Confirmar el correo si la plataforma lo solicita.</li>
-          <li>Entrar al panel de gestión de la capa NAT San Martín.</li>
+          <li>Entrar al panel de gestión de la capa.</li>
         </ol>
       </div>
       <p style="margin:18px 0 8px"><a href="${inviteLink}" style="background:#15803d;color:#fff;padding:11px 16px;border-radius:6px;text-decoration:none;display:inline-block;font-weight:700">Registrarse y gestionar la capa</a></p>
@@ -103,7 +103,9 @@ Deno.serve(async (req) => {
     method: "POST",
     headers: { "Authorization": `Bearer ${RESEND_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      from: Deno.env.get("RESEND_FROM") || "AgroEco.Red <onboarding@resend.dev>",
+      // Los correos institucionales de AgroEco.Red siempre salen desde info@agroeco.red.
+      from: "AgroEco.Red <info@agroeco.red>",
+      reply_to: "info@agroeco.red",
       to: [email],
       subject,
       html,
