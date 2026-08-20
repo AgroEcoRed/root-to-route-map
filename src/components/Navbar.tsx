@@ -67,7 +67,8 @@ const Navbar = () => {
 
   // Detectar si estamos en páginas de autenticación para mantener navbar oscuro
   const isAuthPage = ["/ingresar", "/registro", "/reset-password"].includes(location.pathname);
-  const navbarScrolled = scrolled || isAuthPage;
+  const isMapPage = location.pathname === "/mapa";
+  const navbarScrolled = scrolled || isAuthPage || isMapPage;
 
   return (
     <motion.nav
@@ -85,13 +86,13 @@ const Navbar = () => {
           <div className="transition-transform group-hover:scale-110">
             <AnimatedLogo size={32} />
           </div>
-          <span className={`font-display text-base sm:text-xl whitespace-nowrap ${navbarScrolled ? "text-foreground" : "text-white"}`}>
+          <span className={`font-display text-base sm:text-xl whitespace-nowrap ${isMapPage ? "hidden sm:inline" : ""} ${navbarScrolled ? "text-foreground" : "text-white"}`}>
             AgroEco<span className="text-wheat">.Red</span>
           </span>
         </Link>
 
         {/* Esenciales: SIEMPRE visibles (logo, mapa, mercado) */}
-        <div className="flex items-center gap-0.5 sm:gap-1 flex-1 justify-center md:justify-start md:ml-2">
+        <div className={`${isMapPage ? "hidden sm:flex" : "flex"} items-center gap-0.5 sm:gap-1 flex-1 justify-center md:justify-start md:ml-2`}>
           {essentialNav.map((item) => {
             const active = location.pathname === item.to;
             return (
@@ -221,20 +222,20 @@ const Navbar = () => {
            ) : (
              <>
                <div className={`hidden sm:block h-6 w-px mx-1 ${navbarScrolled ? "bg-border" : "bg-white/30"}`} aria-hidden="true" />
-               <Button
+                <Button
                  size="sm"
                  variant="outline"
                  asChild
-                 className={`h-9 px-2.5 sm:px-4 font-semibold ${navbarScrolled
+                  className={`${isMapPage ? "hidden sm:inline-flex" : "inline-flex"} h-9 px-2.5 sm:px-4 font-semibold ${navbarScrolled
                    ? "border-primary text-primary hover:bg-primary/10"
                    : "border-white/70 bg-white/10 text-white hover:bg-white/20 hover:text-white"}`}
                >
                  <Link to="/ingresar">{t("nav.login")}</Link>
                </Button>
-               <Button
+                <Button
                  size="sm"
                  asChild
-                 className="h-9 px-2.5 sm:px-4 bg-gradient-hero text-primary-foreground font-semibold shadow-md hover:shadow-lg transition-all"
+                  className={`${isMapPage ? "hidden sm:inline-flex" : "inline-flex"} h-9 px-2.5 sm:px-4 bg-gradient-hero text-primary-foreground font-semibold shadow-md hover:shadow-lg transition-all`}
                >
                  <Link to="/registro">{t("nav.register")}</Link>
                </Button>
