@@ -6,6 +6,7 @@ import comarca1 from "@/assets/foto-comarca-1.jpg";
 import trigo from "@/assets/foto-trigo-atardecer.jpg";
 import ganaderia from "@/assets/foto-ganaderia.jpg";
 import papas from "@/assets/foto-papas.jpg";
+import rutasSanasLogo from "@/assets/rutas-sanas-logo.jpeg.asset.json";
 import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 // Logos institucionales ocultos temporalmente hasta obtener autorización
@@ -87,6 +88,23 @@ const HeroSection = () => {
       ))}
 
       <motion.div className="container relative z-10 pt-28 pb-20" style={{ y: textY }}>
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.25 }}
+          className="absolute top-24 right-4 sm:right-8 flex items-center gap-3 rounded-lg border border-white/30 bg-background/85 p-2.5 pr-4 shadow-lg backdrop-blur-md"
+          aria-label="Red integrada: Rutas Sanas del Alimento"
+        >
+          <img
+            src={rutasSanasLogo.url}
+            alt="Logo de la Red Interregional de Nodos de Consumo Agroecológico Las Rutas Sanas del Alimento"
+            className="h-14 w-14 rounded-full object-cover sm:h-16 sm:w-16"
+          />
+          <div className="hidden max-w-40 sm:block">
+            <p className="text-xs font-semibold leading-tight text-foreground">Rutas Sanas del Alimento</p>
+            <p className="mt-1 text-[10px] leading-tight text-muted-foreground">Red integrada al mapa</p>
+          </div>
+        </motion.div>
         {/* Logos institucionales ocultos temporalmente hasta obtener autorización
         <motion.div
           initial={{ opacity: 0, y: -10 }}
