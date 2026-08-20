@@ -16,6 +16,7 @@ import { useLayerManager } from "@/hooks/useLayerManager";
 import { useDataSources, type DataSourceId } from "@/hooks/useDataSources";
 import { useLayerActors, type LayerActor } from "@/hooks/useLayerActors";
 import LayerBulkImport from "@/components/admin/LayerBulkImport";
+import LayerEventsAdmin from "@/components/admin/LayerEventsAdmin";
 import { toast } from "sonner";
 import { Layers, Loader2, ArrowLeft, MapPin, ShoppingBag, Power, Pencil, Plus, Trash2, CheckCircle2, Search, Send, Copy } from "lucide-react";
 
@@ -325,6 +326,8 @@ export default function LayerAdminPage() {
             </>
           )}
         </Card>
+
+        <LayerEventsAdmin layerId={layerId} />
 
         <LayerBulkImport layerId={layerId} onImported={reload} />
 
