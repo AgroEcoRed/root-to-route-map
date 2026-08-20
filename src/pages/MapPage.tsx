@@ -26,7 +26,7 @@ import { useActorConnections } from "@/hooks/useActorConnections";
 import { useAuth } from "@/contexts/AuthContext";
 import { EventFormDialog } from "@/components/events/EventFormDialog";
 import { EventsSidebar } from "@/components/events/EventsSidebar";
-import EventsFilterBar, { applyEventFilters, EventsFilters } from "@/components/events/EventsFilterBar";
+import EventsFilterBar, { applyEventFilters, EventsFilters, MES_LAYER_ID } from "@/components/events/EventsFilterBar";
 import { AddMapPointDialog } from "@/components/AddMapPointDialog";
 import { EndorseDialog } from "@/components/actors/EndorseDialog";
 import { DeclareConnectionDialog } from "@/components/actors/DeclareConnectionDialog";
@@ -335,7 +335,19 @@ const MapPage = () => {
   const { isEnabled, loading: sourcesLoading } = useDataSources();
   const { user } = useAuth();
   const { events } = useEvents();
-  const [eventFilters, setEventFilters] = useState<EventsFilters>({ province: null, months: [] });
+  const [eventFilters, setEventFilters] = useState<EventsFilters>(() => ({
+    province: null,
+    months: [],
+    // Acceso directo público: /mapa?capa=mes_agroecologia muestra sólo el Mes.
+    onlyMes: new URLSearchParams(window.location.search).get("capa") === MES_LAYER_ID,
+  }));
+  const onlyMes = !!eventFilters.onlyMes;
+  const setOnlyMes = (v: boolean) => {
+    setEventFilters((f) => ({ ...f, onlyMes: v, province: null, months: [] }));
+    const url = new URL(window.location.href);
+    if (v) url.searchParams.set("capa", MES_LAYER_ID); else url.searchParams.delete("capa");
+    window.history.replaceState({}, "", url.toString());
+  };
   const visibleEvents = useMemo(() => applyEventFilters(events, eventFilters), [events, eventFilters]);
   const { connections } = useActorConnections();
   const showEventsLayer = !sourcesLoading && isEnabled("eventos");
@@ -525,13 +537,14 @@ const MapPage = () => {
   };
 
   const filtered = useMemo(() => {
+    if (eventFilters.onlyMes) return [];
     return allActors.filter((a) => {
       if (!activeTypes.has(a.type)) return false;
       if (!activeCerts.has(a.certification)) return false;
       if (search && !a.name.toLowerCase().includes(search.toLowerCase()) && !a.products.some((p) => p.toLowerCase().includes(search.toLowerCase()))) return false;
       return true;
     });
-  }, [activeTypes, activeCerts, search, allActors]);
+  }, [activeTypes, activeCerts, search, allActors, eventFilters.onlyMes]);
 
   // Recalculate map size when surrounding layout changes
   useEffect(() => {
