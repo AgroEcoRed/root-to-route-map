@@ -15,6 +15,7 @@ export interface LayerActor {
   delivery_days: string[] | null;
   verified_at: string | null;
   verified_by_role: string | null;
+  public_visible?: boolean;
   extra: Record<string, unknown> | null;
   created_at: string;
   updated_at: string;
@@ -33,7 +34,7 @@ export const useLayerActors = (sourceId: string | undefined) => {
     const { data } = await (supabase as any)
       .from("layer_actors")
       .select(
-        "id,source_id,name,lat,lng,actor_type,family,description,address,contact,delivery_days,verified_at,verified_by_role,extra,created_at,updated_at,created_by,confirmation_status,confirmation_sent_at,confirmed_at,confirmed_by"
+        "id,source_id,name,lat,lng,actor_type,family,description,address,contact,delivery_days,verified_at,verified_by_role,public_visible,extra,created_at,updated_at,created_by,confirmation_status,confirmation_sent_at,confirmed_at,confirmed_by"
       )
       .eq("source_id", sourceId)
       .order("name");
