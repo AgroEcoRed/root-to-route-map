@@ -1,9 +1,12 @@
 // Reconoce metadatos bibliográficos a partir de un DOI o de un link (OJS, DSpace, SciELO, etc.)
+import { assertSafeUrl, requireUser } from "../_shared/safeUrl.ts";
+
 const corsHeaders: Record<string, string> = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
+
 
 type Meta = {
   title: string; authors: string[]; year: number | null; item_type: string;
