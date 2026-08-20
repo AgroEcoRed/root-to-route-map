@@ -32,6 +32,7 @@ const TYPES: { value: string; label: string }[] = [
   { value: "agroecological_store", label: "Almacén Agroecológico" },
   { value: "composting_center", label: "Centro de Compostaje" },
   { value: "community_org", label: "Organización Comunitaria" },
+  { value: "network", label: "Red / Articulación entre actores" },
 ];
 
 interface Props {

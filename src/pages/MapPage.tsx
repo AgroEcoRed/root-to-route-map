@@ -85,7 +85,8 @@ type ActorType =
   | "agroecological_store"
   | "agroecological_fair"
   | "agroecological_market"
-  | "bio_input_supplier";
+  | "bio_input_supplier"
+  | "network";
 
 type ActorRole = "oferta" | "demanda" | "servicio";
 
@@ -98,7 +99,7 @@ interface MapActor {
   products: string[];
   certification: "red" | "yellow" | "green";
   description: string;
-  source: "rutas_sanas" | "mercado_territorial" | "agroeco" | "el_click" | "el_brote" | "utt_nodos" | "user_points" | "nat_san_martin";
+  source: string;
   contentLicense?: string | null;
   /** ISO date of last update of this actor's data. Null = never updated since import (inherited). */
   lastUpdated?: string | null;
@@ -113,7 +114,7 @@ interface MapActor {
 }
 
 // Approximate import dates for inherited datasets (used until each actor claims their record).
-const SOURCE_IMPORT_DATE: Record<MapActor["source"], string> = {
+const SOURCE_IMPORT_DATE: Record<string, string> = {
   rutas_sanas: "2023-06-01",
   mercado_territorial: "2024-09-01",
   agroeco: new Date().toISOString().slice(0, 10),
@@ -131,7 +132,7 @@ function formatUpdateDate(iso: string): string {
 }
 
 /** Human-readable label of the dataset a layer-verified actor was endorsed by. */
-const sourceShortLabel: Record<MapActor["source"], string> = {
+const sourceShortLabel: Record<string, string> = {
   rutas_sanas: "Rutas Sanas",
   mercado_territorial: "Mercado Territorial",
   agroeco: "AgroEco.Red",
@@ -167,6 +168,7 @@ const actorTypeLabels: Record<ActorType, string> = {
   agroecological_fair: "Feria Agroecológica",
   agroecological_market: "Mercado Agroecológico",
   bio_input_supplier: "Proveedor/a de Bio-insumos",
+  network: "Red / Articulación",
 };
 
 const actorRole: Record<ActorType, ActorRole> = {
@@ -194,6 +196,7 @@ const actorRole: Record<ActorType, ActorRole> = {
   agroecological_market: "demanda",
   logistics: "servicio",
   bio_input_supplier: "oferta",
+  network: "servicio",
 };
 
 const roleLabels: Record<ActorRole, string> = {
@@ -423,6 +426,35 @@ const MapPage = () => {
     }));
   }, [natSanMartinDb]);
 
+  // Cualquier otra capa cargada en la base (incluidas las que se suben por Excel)
+  const [extraLayerActors, setExtraLayerActors] = useState<MapActor[]>([]);
+  useEffect(() => {
+    (async () => {
+      const known = ["rutas_sanas", "user_points", "nat_san_martin"];
+      const { data } = await (supabase as any)
+        .from("layer_actors")
+        .select("id,source_id,name,lat,lng,actor_type,family,description,address,delivery_days,verified_at,verified_by_role,updated_at")
+        .not("source_id", "in", `(${known.join(",")})`);
+      const rows = (data as any[]) || [];
+      setExtraLayerActors(rows.map((p, i) => ({
+        id: 120000 + i,
+        layerActorId: p.id,
+        name: p.name,
+        type: (p.actor_type as ActorType) || "agroecological_node",
+        lat: p.lat,
+        lng: p.lng,
+        products: [],
+        certification: "yellow" as const,
+        description: p.description || p.family || p.address || "",
+        source: p.source_id,
+        verified: !!p.verified_at,
+        verifiedByRole: (p.verified_by_role as any) || (p.verified_at ? "layer" : null),
+        lastUpdated: p.verified_at || p.updated_at || null,
+        deliveryInfo: (p.delivery_days && p.delivery_days.length > 0) ? p.delivery_days.join(", ") : undefined,
+      })));
+    })();
+  }, [mapVersion]);
+
   // Fetch real profiles from database
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -470,8 +502,9 @@ const MapPage = () => {
     if (isEnabled("utt_nodos")) out.push(...uttNodesActors);
     if (isEnabled("user_points")) out.push(...userPointActors);
     if (isEnabled("nat_san_martin")) out.push(...natSanMartinActors);
+    out.push(...extraLayerActors.filter(a => isEnabled(a.source as any)));
     return out;
-  }, [dbActors, isEnabled, rutasSanasActors, userPointActors, natSanMartinActors, elClickActors, elBroteActors]);
+  }, [dbActors, isEnabled, rutasSanasActors, userPointActors, natSanMartinActors, elClickActors, elBroteActors, extraLayerActors]);
 
   const toggleType = (type: ActorType) => {
     setActiveTypes((prev) => {
@@ -942,7 +975,7 @@ const MapPage = () => {
   // Group actor types by role for filter display
   const ofertaTypes: ActorType[] = ["producer", "cooperative", "processing", "agroecological_node", "seed_bank", "composting_center", "research_center", "solidarity_intermediary", "community_garden", "bio_input_supplier"];
   const demandaTypes: ActorType[] = ["restaurant", "social_kitchen", "institution", "retail", "consumer_node", "individual_consumer", "food_bank", "consumer_cooperative", "community_org", "health_food_store", "agroecological_store", "agroecological_fair", "agroecological_market"];
-  const servicioTypes: ActorType[] = ["logistics"];
+  const servicioTypes: ActorType[] = ["logistics", "network"];
 
   return (
     <div className="h-screen overflow-hidden bg-background flex flex-col">

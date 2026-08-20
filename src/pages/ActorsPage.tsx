@@ -27,7 +27,7 @@ type ActorType =
   | "solidarity_intermediary" | "community_garden" | "consumer_node"
   | "individual_consumer" | "food_bank" | "consumer_cooperative" | "community_org"
   | "health_food_store" | "agroecological_store" | "agroecological_fair"
-  | "agroecological_market" | "bio_input_supplier";
+  | "agroecological_market" | "bio_input_supplier" | "network";
 type CertLevel = "red" | "yellow" | "green" | "none_spg";
 
 interface Actor {
@@ -136,6 +136,7 @@ const ActorsPage = () => {
     agroecological_fair: { label: "Feria Agroecológica", icon: ShoppingBasket },
     agroecological_market: { label: "Mercado Agroecológico", icon: ShoppingBasket },
     bio_input_supplier: { label: "Bio-insumos", icon: Carrot },
+    network: { label: "Red / Articulación", icon: Network },
   };
 
   const certConfig: Record<CertLevel, { label: string; classes: string }> = {

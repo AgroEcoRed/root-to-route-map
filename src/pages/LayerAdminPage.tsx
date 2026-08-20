@@ -15,10 +15,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLayerManager } from "@/hooks/useLayerManager";
 import { useDataSources, type DataSourceId } from "@/hooks/useDataSources";
 import { useLayerActors, type LayerActor } from "@/hooks/useLayerActors";
+import LayerBulkImport from "@/components/admin/LayerBulkImport";
 import { toast } from "sonner";
 import { Layers, Loader2, ArrowLeft, MapPin, ShoppingBag, Power, Pencil, Plus, Trash2, CheckCircle2, Search, Send, Copy } from "lucide-react";
-
-const EDITABLE_LAYERS: DataSourceId[] = ["rutas_sanas", "nat_san_martin"];
 
 const emptyDraft = (sourceId: string): Partial<LayerActor> => ({
   source_id: sourceId,
@@ -39,7 +38,8 @@ export default function LayerAdminPage() {
   const { canManage, isAdmin, loading: lmLoading } = useLayerManager();
   const { sources, toggle } = useDataSources();
   const [pending, setPending] = useState(false);
-  const editable = !!layerId && EDITABLE_LAYERS.includes(layerId);
+  // Todas las capas se pueden editar y alimentar desde la base de datos.
+  const editable = !!layerId;
   const { actors, loading: actorsLoading, reload } = useLayerActors(editable ? layerId : undefined);
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<Partial<LayerActor> | null>(null);
@@ -244,13 +244,6 @@ export default function LayerAdminPage() {
             )}
           </div>
 
-          {!editable && (
-            <p className="text-sm text-muted-foreground">
-              Esta capa todavía se sirve desde archivos versionados. Pedile al equipo de AgroEco.Red
-              que la migre a la base para editarla desde acá.
-            </p>
-          )}
-
           {editable && (
             <>
               <div className="relative mb-3">
@@ -332,6 +325,8 @@ export default function LayerAdminPage() {
             </>
           )}
         </Card>
+
+        <LayerBulkImport layerId={layerId} onImported={reload} />
 
         <Dialog open={!!editing} onOpenChange={(o) => { if (!o) setEditing(null); }}>
           <DialogContent className="max-w-lg">

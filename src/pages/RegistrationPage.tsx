@@ -33,6 +33,7 @@ const ofertaCategories = [
   "Verduras", "Frutas", "Lácteos", "Huevos", "Carnes",
   "Almacén", "Panificados", "Bebidas", "Cosmética Natural",
   "Plantines y Semillas", "Salud Natural",
+  "Vínculos entre actores",
 ];
 
 const demandaCategories = [
@@ -45,6 +46,7 @@ const demandaCategories = [
 const servicioCategories = [
   "Transporte", "Distribución", "Almacenamiento", "Procesamiento",
   "Capacitación", "Certificación", "Asesoramiento técnico",
+  "Vínculos entre actores",
 ];
 
 const certOptions: { value: CertLevel; label: string; color: string; desc: string }[] = [
@@ -66,6 +68,7 @@ const actorTypes: { key: ActorType; label: string; icon: typeof Sprout; desc: st
   { key: "processing", label: "Planta de Procesamiento", icon: Factory, desc: "Molino, frigorífico, acopio o biofábrica", color: "from-wheat to-leaf" },
   { key: "bio_input_supplier", label: "Proveedor/a de Bio-insumos", icon: Sprout, desc: "Compost, biopreparados, controladores biológicos, lombricompuesto", color: "from-leaf to-primary" },
   { key: "seed_bank", label: "Banco de Semillas", icon: Sprout, desc: "Conservación e intercambio de semillas criollas y nativas", color: "from-wheat to-primary" },
+  { key: "network", label: "Red / Articulación", icon: Users, desc: "Red, mesa o espacio de articulación que teje vínculos entre actores", color: "from-primary to-earth" },
   { key: "composting_center", label: "Centro de Compostaje", icon: Sprout, desc: "Procesamiento de orgánicos y producción de compost / humus", color: "from-soil to-leaf" },
 ];
 
