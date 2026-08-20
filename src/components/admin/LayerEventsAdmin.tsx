@@ -28,11 +28,14 @@ const fmt = (iso: string) =>
     day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
   });
 
+type Tab = "all" | "upcoming" | "past" | "unplaced";
+
 export default function LayerEventsAdmin({ layerId }: { layerId: string }) {
   const [events, setEvents] = useState<LayerEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [prov, setProv] = useState<string>("");
+  const [tab, setTab] = useState<Tab>("all");
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 20;
 
