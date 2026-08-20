@@ -393,6 +393,7 @@ export type Database = {
           lat: number
           lng: number
           name: string
+          public_visible: boolean
           source_id: string
           updated_at: string
           verified_at: string | null
@@ -419,6 +420,7 @@ export type Database = {
           lat: number
           lng: number
           name: string
+          public_visible?: boolean
           source_id: string
           updated_at?: string
           verified_at?: string | null
@@ -445,6 +447,7 @@ export type Database = {
           lat?: number
           lng?: number
           name?: string
+          public_visible?: boolean
           source_id?: string
           updated_at?: string
           verified_at?: string | null
@@ -1287,6 +1290,7 @@ export type Database = {
           lat: number
           lng: number
           name: string
+          public_visible: boolean
           source_id: string
           updated_at: string
           verified_at: string | null
@@ -1351,6 +1355,7 @@ export type Database = {
           lat: number
           lng: number
           name: string
+          public_visible: boolean
           source_id: string
           updated_at: string
           verified_at: string | null
