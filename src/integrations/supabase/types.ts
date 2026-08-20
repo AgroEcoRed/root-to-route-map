@@ -1500,6 +1500,7 @@ export type Database = {
         | "agroecological_fair"
         | "agroecological_market"
         | "bio_input_supplier"
+        | "network"
       ai_hint_scope: "registration" | "chatbot" | "both"
       app_role: "admin" | "moderator" | "user"
       certification_level: "red" | "yellow" | "green" | "none_spg"
@@ -1680,6 +1681,7 @@ export const Constants = {
         "agroecological_fair",
         "agroecological_market",
         "bio_input_supplier",
+        "network",
       ],
       ai_hint_scope: ["registration", "chatbot", "both"],
       app_role: ["admin", "moderator", "user"],
