@@ -122,13 +122,14 @@ export default function LayerEventsAdmin({ layerId }: { layerId: string }) {
           <Badge variant="outline">{events.length}</Badge>
         </h2>
         <Button asChild size="sm" variant="outline">
-          <Link to="/mapa"><MapPin className="h-4 w-4 mr-1" /> Ver en el mapa</Link>
+          <Link to={`/mapa?capa=${layerId}`}><MapPin className="h-4 w-4 mr-1" /> Ver en el mapa</Link>
         </Button>
       </div>
 
-      <div className="grid grid-cols-3 gap-2 mb-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
         {[
           ["Total", events.length],
+          ["Próximas", counts.upcoming],
           ["Publicadas", published],
           ["Con ubicación", located],
         ].map(([k, v]) => (
@@ -138,6 +139,26 @@ export default function LayerEventsAdmin({ layerId }: { layerId: string }) {
           </div>
         ))}
       </div>
+
+      <div className="flex gap-2 mb-3 flex-wrap">
+        {([
+          ["all", "Todas"],
+          ["upcoming", "Próximas"],
+          ["past", "Pasadas"],
+          ["unplaced", "Sin ubicación"],
+        ] as [Tab, string][]).map(([k, label]) => (
+          <button
+            key={k}
+            onClick={() => { setTab(k); setPage(1); }}
+            className={`rounded-full border px-3 h-8 text-xs transition ${
+              tab === k ? "border-primary bg-primary/10 text-primary font-semibold" : "border-border bg-card hover:border-primary/40"
+            }`}
+          >
+            {label} <span className="ml-1 text-[10px] text-muted-foreground">{counts[k]}</span>
+          </button>
+        ))}
+      </div>
+
 
       <div className="flex gap-2 mb-3 flex-wrap">
         <div className="relative flex-1 min-w-[200px]">
