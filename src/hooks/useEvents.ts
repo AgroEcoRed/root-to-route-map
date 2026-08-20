@@ -20,6 +20,7 @@ export interface AgroEventFull {
   source: string;
   approved: boolean;
   created_by: string | null;
+  layer_id?: string | null;
 }
 
 /** Loads ALL events (past, future, undated) so we can power the sidebar. */
@@ -37,7 +38,7 @@ export const useEvents = () => {
         // NEVER select PII columns (contact_email / contact_phone / focal_email)
         // or edit_token from the public client. Owners access them through the
         // edit-event-by-token edge function.
-        "id,title,description,event_type,custom_type,starts_at,ends_at,location_name,lat,lng,link,contact,flyer_url,co_organizers,extra_organizer_names,source,approved,created_by,created_at,updated_at"
+        "id,title,description,event_type,custom_type,starts_at,ends_at,location_name,lat,lng,link,contact,flyer_url,co_organizers,extra_organizer_names,source,approved,created_by,created_at,updated_at,layer_id"
       )
       .eq("approved", true)
       .order("starts_at", { ascending: false });
