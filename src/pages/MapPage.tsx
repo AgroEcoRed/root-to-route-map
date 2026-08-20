@@ -843,6 +843,8 @@ const MapPage = () => {
           <div style="min-width:240px;font-family:DM Sans,sans-serif;padding:4px">
             <span style="display:inline-block;background:${typeColor[ev.event_type]};color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:0.4px">${typeLabels[ev.event_type]}</span>
             ${isPast ? `<span style="display:inline-block;margin-left:6px;background:#e2e8f0;color:#475569;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:0.4px">Ya sucedió</span>` : ""}
+            ${isMes ? `<span style="display:inline-block;margin-left:6px;background:#166534;color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:0.3px">🌱 Mes de la Agroecología</span>` : ""}
+            ${!isPrecise ? `<span style="display:inline-block;margin-left:6px;background:#fef3c7;color:#92400e;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:0.3px">Ubicación aproximada</span>` : ""}
             <h3 style="font-family:Playfair Display,serif;font-size:16px;margin:8px 0 4px;color:#1a1a1a">${escHtml(ev.title)}</h3>
             <p style="font-size:12px;color:#444;margin:0;font-weight:600">🗓️ ${escHtml(dateStr)}</p>
             ${locHtml}${descHtml}${flyerHtml}${orgsHtml}${contactHtml}${linkHtml}${shareHtml}${eventLicenseHtml}
