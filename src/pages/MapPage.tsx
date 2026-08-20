@@ -813,8 +813,8 @@ const MapPage = () => {
         `<polygon points="12,1.5 14.7,8.7 22.5,9.2 16.5,14.2 18.5,21.8 12,17.5 5.5,21.8 7.5,14.2 1.5,9.2 9.3,8.7"
             fill="${starColor}" stroke="#ffffff" stroke-width="${sw}"${dashAttr} stroke-linejoin="round"/>`;
       const starSvg = isPast ? `
-        <svg viewBox="0 0 24 24" width="24" height="24" style="opacity:0.7; overflow: visible;">
-          ${starPoly(1.2)}${emblem}
+        <svg viewBox="0 0 24 24" width="28" height="28" style="filter: drop-shadow(0 1px 2px rgba(15,23,42,0.35)); overflow: visible;">
+          ${starPoly(1.4)}${emblem}
         </svg>` : `
         <svg viewBox="0 0 24 24" width="34" height="34" style="filter: drop-shadow(0 0 ${spread}px ${shadowRgba}) drop-shadow(0 0 ${size/2}px ${shadowRgba}); overflow: visible;">
           ${starPoly(1.2)}${emblem}
@@ -822,8 +822,8 @@ const MapPage = () => {
       const icon = L.divIcon({
         className: "",
         html: isPast ? `<div>${starSvg}</div>` : `<div class="event-star" style="--star-speed:${speed}s">${starSvg}</div>`,
-        iconSize: isPast ? [24, 24] : [34, 34],
-        iconAnchor: isPast ? [12, 12] : [17, 17],
+        iconSize: isPast ? [28, 28] : [34, 34],
+        iconAnchor: isPast ? [14, 14] : [17, 17],
       });
 
       const date = new Date(ev.starts_at);
