@@ -26,7 +26,7 @@ import { useActorConnections } from "@/hooks/useActorConnections";
 import { useAuth } from "@/contexts/AuthContext";
 import { EventFormDialog } from "@/components/events/EventFormDialog";
 import { EventsSidebar } from "@/components/events/EventsSidebar";
-import EventsFilterBar, { applyEventFilters, EventsFilters } from "@/components/events/EventsFilterBar";
+import EventsFilterBar, { applyEventFilters, EventsFilters, MES_LAYER_ID } from "@/components/events/EventsFilterBar";
 import { AddMapPointDialog } from "@/components/AddMapPointDialog";
 import { EndorseDialog } from "@/components/actors/EndorseDialog";
 import { DeclareConnectionDialog } from "@/components/actors/DeclareConnectionDialog";
@@ -335,7 +335,19 @@ const MapPage = () => {
   const { isEnabled, loading: sourcesLoading } = useDataSources();
   const { user } = useAuth();
   const { events } = useEvents();
-  const [eventFilters, setEventFilters] = useState<EventsFilters>({ province: null, months: [] });
+  const [eventFilters, setEventFilters] = useState<EventsFilters>(() => ({
+    province: null,
+    months: [],
+    // Acceso directo público: /mapa?capa=mes_agroecologia muestra sólo el Mes.
+    onlyMes: new URLSearchParams(window.location.search).get("capa") === MES_LAYER_ID,
+  }));
+  const onlyMes = !!eventFilters.onlyMes;
+  const setOnlyMes = (v: boolean) => {
+    setEventFilters((f) => ({ ...f, onlyMes: v, province: null, months: [] }));
+    const url = new URL(window.location.href);
+    if (v) url.searchParams.set("capa", MES_LAYER_ID); else url.searchParams.delete("capa");
+    window.history.replaceState({}, "", url.toString());
+  };
   const visibleEvents = useMemo(() => applyEventFilters(events, eventFilters), [events, eventFilters]);
   const { connections } = useActorConnections();
   const showEventsLayer = !sourcesLoading && isEnabled("eventos");
@@ -525,13 +537,14 @@ const MapPage = () => {
   };
 
   const filtered = useMemo(() => {
+    if (eventFilters.onlyMes) return [];
     return allActors.filter((a) => {
       if (!activeTypes.has(a.type)) return false;
       if (!activeCerts.has(a.certification)) return false;
       if (search && !a.name.toLowerCase().includes(search.toLowerCase()) && !a.products.some((p) => p.toLowerCase().includes(search.toLowerCase()))) return false;
       return true;
     });
-  }, [activeTypes, activeCerts, search, allActors]);
+  }, [activeTypes, activeCerts, search, allActors, eventFilters.onlyMes]);
 
   // Recalculate map size when surrounding layout changes
   useEffect(() => {
@@ -1006,6 +1019,27 @@ const MapPage = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-card/80 via-background/85 to-background" />
           <div className="relative max-w-5xl mx-auto space-y-3">
+            {new Date() <= new Date("2026-12-31T23:59:59") && (
+              <div className={`rounded-2xl border-2 p-3 flex items-center gap-3 flex-wrap ${onlyMes ? "border-primary bg-primary/10" : "border-border bg-card/80"}`}>
+                <span className="text-2xl" aria-hidden="true">🌱</span>
+                <div className="flex-1 min-w-[200px]">
+                  <p className="font-semibold text-sm text-foreground">Mes de la Agroecología</p>
+                  <p className="text-xs text-muted-foreground">
+                    {onlyMes
+                      ? "Estás viendo sólo las actividades del Mes de la Agroecología."
+                      : "Ver el mapa con las actividades del Mes de la Agroecología, sin registrarte."}
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  variant={onlyMes ? "default" : "outline"}
+                  className="rounded-full"
+                  onClick={() => setOnlyMes(!onlyMes)}
+                >
+                  {onlyMes ? "Ver todo el mapa" : "Ver sólo el Mes de la Agroecología"}
+                </Button>
+              </div>
+            )}
                 <div className="relative group">
                   <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-6 w-6 text-primary/70 group-focus-within:text-primary transition-colors" />
                   <Input
@@ -1043,9 +1077,9 @@ const MapPage = () => {
             {showFilters && showEventsLayer && events.length > 0 && (
               <div className="rounded-xl border border-border bg-card/70 p-2">
                 <p className="text-[11px] font-semibold text-muted-foreground mb-1.5 px-1">
-                  Actividades: filtrá por provincia y mes
+                  {onlyMes ? "Mes de la Agroecología: filtrá por provincia y mes" : "Actividades: filtrá por provincia y mes"}
                 </p>
-                <EventsFilterBar events={events} value={eventFilters} onChange={setEventFilters} />
+                <EventsFilterBar events={onlyMes ? events.filter((e) => (e as any).layer_id === MES_LAYER_ID) : events} value={eventFilters} onChange={setEventFilters} />
               </div>
             )}
 

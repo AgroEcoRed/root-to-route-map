@@ -53,9 +53,13 @@ const monthLabel = (key: string) => {
   return `${name.charAt(0).toUpperCase()}${name.slice(1)} ${String(y).slice(2)}`;
 };
 
+export const MES_LAYER_ID = "mes_agroecologia";
+
 export interface EventsFilters {
   province: string | null;
   months: string[];
+  /** Solo actividades de la capa "Mes de la Agroecología". */
+  onlyMes?: boolean;
 }
 
 interface Props {
@@ -68,6 +72,7 @@ interface Props {
 /** Aplica los filtros de provincia y mes a una lista de actividades. */
 export function applyEventFilters(events: AgroEventFull[], f: EventsFilters) {
   return events.filter((e) => {
+    if (f.onlyMes && (e as any).layer_id !== MES_LAYER_ID) return false;
     if (f.province && eventProvince(e) !== f.province) return false;
     if (f.months.length && !f.months.includes(monthKey(e.starts_at))) return false;
     return true;
