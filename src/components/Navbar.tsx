@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage, Lang } from "@/contexts/LanguageContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useLayerManager } from "@/hooks/useLayerManager";
 import { motion, AnimatePresence } from "framer-motion";
 import AnimatedLogo from "@/components/AnimatedLogo";
 
