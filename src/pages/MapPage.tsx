@@ -1029,7 +1029,8 @@ const MapPage = () => {
       <Navbar />
       <div className="flex-1 min-h-0 pt-16 flex flex-col">
         {/* Top toolbar: search + filters toggle */}
-        <div className="relative px-4 sm:px-6 pt-4 pb-3 border-b border-border overflow-hidden">
+        {/* Top toolbar: compact search + collapsible filters */}
+        <div className="relative px-3 sm:px-6 py-2 border-b border-border overflow-hidden shrink-0">
           <img
             src={fotoComarcaToolbar}
             alt=""
@@ -1037,73 +1038,79 @@ const MapPage = () => {
             className="absolute inset-0 w-full h-full object-cover object-bottom opacity-20"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-card/80 via-background/85 to-background" />
-          <div className="relative max-w-5xl mx-auto space-y-3">
-            {new Date() <= new Date("2026-12-31T23:59:59") && (
-              <div className={`rounded-2xl border-2 p-3 flex items-center gap-3 flex-wrap ${onlyMes ? "border-primary bg-primary/10" : "border-border bg-card/80"}`}>
-                <span className="text-2xl" aria-hidden="true">🌱</span>
-                <div className="flex-1 min-w-[200px]">
-                  <p className="font-semibold text-sm text-foreground">Mes de la Agroecología</p>
-                  <p className="text-xs text-muted-foreground">
-                    {onlyMes
-                      ? "Estás viendo sólo las actividades del Mes de la Agroecología."
-                      : "Ver el mapa con las actividades del Mes de la Agroecología, sin registrarte."}
-                  </p>
-                </div>
-                <Button
-                  size="sm"
-                  variant={onlyMes ? "default" : "outline"}
-                  className="rounded-full"
-                  onClick={() => setOnlyMes(!onlyMes)}
-                >
-                  {onlyMes ? "Ver todo el mapa" : "Ver sólo el Mes de la Agroecología"}
-                </Button>
+          <div className="relative max-w-5xl mx-auto">
+            {/* Fila única: búsqueda + botón de filtros + contador */}
+            <div className="flex items-center gap-2">
+              <div className="relative group flex-1 min-w-0">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/70 group-focus-within:text-primary transition-colors" />
+                <Input
+                  placeholder="Buscar producto, productor/a, cooperativa..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-9 pr-9 h-10 text-sm rounded-full border border-border bg-card shadow-sm focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
+                />
+                {search && (
+                  <button
+                    onClick={() => setSearch("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
+                    aria-label="Limpiar búsqueda"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
               </div>
-            )}
-                <div className="relative group">
-                  <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-6 w-6 text-primary/70 group-focus-within:text-primary transition-colors" />
-                  <Input
-                    placeholder="Buscar producto, productor/a, cooperativa, banco de semillas..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="pl-14 pr-12 h-14 text-base rounded-2xl border-2 border-border bg-card shadow-md focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary placeholder:text-muted-foreground/70"
-                  />
-                  {search && (
-                    <button
-                      onClick={() => setSearch("")}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
-                      aria-label="Limpiar búsqueda"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
-            <div className="flex items-center justify-between gap-3 flex-wrap">
-              <p className="text-xs text-muted-foreground">
-                <span className="font-semibold text-foreground">{filtered.length}</span> actores encontrados
-                {search && <> para "<span className="italic">{search}</span>"</>}
-              </p>
               <Button
-                variant="outline"
+                variant={showFilters ? "default" : "outline"}
                 size="sm"
-                onClick={() => setShowFilters(s => !s)}
-                className="rounded-full"
+                onClick={() => setShowFilters((s) => !s)}
+                className="rounded-full h-10 shrink-0"
+                aria-expanded={showFilters}
               >
-                <Filter className="h-4 w-4 mr-1.5" />
-                {showFilters ? "Ocultar filtros" : "Mostrar filtros"}
+                <Filter className="h-4 w-4 sm:mr-1.5" />
+                <span className="hidden sm:inline">Filtros</span>
+                {activeFilterCount > 0 && (
+                  <span className="ml-1.5 rounded-full bg-primary/20 text-[10px] px-1.5 py-0.5 font-semibold">
+                    {activeFilterCount}
+                  </span>
+                )}
               </Button>
+              <span className="hidden md:inline text-xs text-muted-foreground shrink-0">
+                <span className="font-semibold text-foreground">{filtered.length}</span> actores
+                {showEventsLayer && <> · <span className="font-semibold text-foreground">{visibleEvents.length}</span> actividades</>}
+              </span>
             </div>
 
-            {showFilters && showEventsLayer && events.length > 0 && (
-              <div className="rounded-xl border border-border bg-card/70 p-2">
-                <p className="text-[11px] font-semibold text-muted-foreground mb-1.5 px-1">
-                  {onlyMes ? "Mes de la Agroecología: filtrá por provincia y mes" : "Actividades: filtrá por provincia y mes"}
-                </p>
-                <EventsFilterBar events={onlyMes ? events.filter((e) => (e as any).layer_id === MES_LAYER_ID) : events} value={eventFilters} onChange={setEventFilters} />
-              </div>
-            )}
-
+            {/* Panel de filtros desplegable (flotante, no empuja el mapa) */}
             {showFilters && (
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="absolute left-0 right-0 top-full mt-2 z-[1200] rounded-2xl border border-border bg-card/95 backdrop-blur shadow-elevated p-3 space-y-3 max-h-[60vh] overflow-y-auto">
+                {new Date() <= new Date("2026-12-31T23:59:59") && (
+                  <div className={`rounded-xl border p-2 flex items-center gap-2 flex-wrap ${onlyMes ? "border-primary bg-primary/10" : "border-border"}`}>
+                    <span className="text-lg" aria-hidden="true">🌱</span>
+                    <p className="flex-1 min-w-[160px] text-xs">
+                      <span className="font-semibold">Mes de la Agroecología</span>
+                      <span className="text-muted-foreground"> — {onlyMes ? "viendo sólo esta capa" : "ver sólo sus actividades"}</span>
+                    </p>
+                    <Button
+                      size="sm"
+                      variant={onlyMes ? "default" : "outline"}
+                      className="rounded-full h-7 text-xs"
+                      onClick={() => setOnlyMes(!onlyMes)}
+                    >
+                      {onlyMes ? "Ver todo el mapa" : "Ver sólo el Mes"}
+                    </Button>
+                  </div>
+                )}
+
+                {showEventsLayer && events.length > 0 && (
+                  <div>
+                    <p className="text-[11px] font-semibold text-muted-foreground mb-1.5">
+                      Actividades: provincia y mes
+                    </p>
+                    <EventsFilterBar events={onlyMes ? events.filter((e) => (e as any).layer_id === MES_LAYER_ID) : events} value={eventFilters} onChange={setEventFilters} />
+                  </div>
+                )}
+
+                <div className="flex flex-wrap items-center gap-2">
                 {([
                   { role: "oferta" as ActorRole, label: "Oferta", icon: <ArrowUp className="h-3 w-3" />, types: ofertaTypes, color: "map-oferta" },
                   { role: "demanda" as ActorRole, label: "Demanda", icon: <ArrowDown className="h-3 w-3" />, types: demandaTypes, color: "map-demanda" },
@@ -1120,7 +1127,7 @@ const MapPage = () => {
                           <ChevronDown className="h-3 w-3 ml-1 opacity-60" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="max-h-80 overflow-y-auto w-64 bg-popover z-[1000]">
+                      <DropdownMenuContent align="start" className="max-h-80 overflow-y-auto w-64 bg-popover z-[1400]">
                         <DropdownMenuLabel className="text-xs flex items-center justify-between">
                           <span>{label}</span>
                           <button
@@ -1162,7 +1169,7 @@ const MapPage = () => {
                       <ChevronDown className="h-3 w-3 ml-1 opacity-60" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="bg-popover z-[1000]">
+                  <DropdownMenuContent align="start" className="bg-popover z-[1400]">
                     {(["green", "yellow", "red"] as const).map((c) => (
                       <DropdownMenuCheckboxItem
                         key={c}
@@ -1187,7 +1194,13 @@ const MapPage = () => {
                   <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-map-servicio/15 text-map-servicio text-[10px] font-medium">
                     <span className="inline-block w-2.5 h-2.5 bg-map-servicio" style={{ borderRadius: "50% 50% 50% 12%", transform: "rotate(45deg)" }} /> Servicio
                   </span>
-                  <span className="text-[10px] text-muted-foreground">Cada símbolo indica el tipo de actor</span>
+                </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <Button variant="ghost" size="sm" className="h-7 text-xs rounded-full" onClick={() => setShowFilters(false)}>
+                    Cerrar filtros
+                  </Button>
                 </div>
               </div>
             )}
