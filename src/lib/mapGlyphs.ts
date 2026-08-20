@@ -45,6 +45,9 @@ const glyphs: Record<string, string> = {
   agroecological_fair: `<path ${S} d="M3 10.5h18L19 6H5l-2 4.5z"/><path ${S} d="M5 10.5V20m14-9.5V20M3.5 20h17"/><path ${S} d="M9 20v-5h6v5"/>`,
   agroecological_market: `<path ${S} d="M4 11h16l-1.2 9H5.2L4 11z"/><path ${S} d="M3 11l2-5h14l2 5"/><path ${S} d="M9 15h6"/>`,
 
+  // Red / articulación: nodos conectados
+  network: `<circle ${S} cx="12" cy="5.5" r="2.2"/><circle ${S} cx="5.5" cy="16" r="2.2"/><circle ${S} cx="18.5" cy="16" r="2.2"/><path ${S} d="M10.4 7.3L7.1 14m6.5-6.7l3.3 6.7M7.7 16h8.6"/>`,
+
   // ---- Servicio ----
   logistics: `<path ${S} d="M2.5 7.5h11v9h-11z"/><path ${S} d="M13.5 11h4l3 3v2.5h-7z"/><circle ${S} cx="7" cy="18" r="1.8"/><circle ${S} cx="17.5" cy="18" r="1.8"/>`,
 };

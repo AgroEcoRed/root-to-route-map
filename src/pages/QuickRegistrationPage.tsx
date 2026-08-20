@@ -41,6 +41,7 @@ const actorTypeLabels: Record<string, string> = {
   agroecological_fair: "Feria Agroecológica",
   agroecological_market: "Mercado Agroecológico",
   bio_input_supplier: "Proveedor/a de Bio-insumos",
+  network: "Red / Articulación entre actores",
 };
 
 type Stage = "input" | "extracting" | "preview" | "sent";

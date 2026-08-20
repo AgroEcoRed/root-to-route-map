@@ -85,7 +85,8 @@ type ActorType =
   | "agroecological_store"
   | "agroecological_fair"
   | "agroecological_market"
-  | "bio_input_supplier";
+  | "bio_input_supplier"
+  | "network";
 
 type ActorRole = "oferta" | "demanda" | "servicio";
 
@@ -167,6 +168,7 @@ const actorTypeLabels: Record<ActorType, string> = {
   agroecological_fair: "Feria Agroecológica",
   agroecological_market: "Mercado Agroecológico",
   bio_input_supplier: "Proveedor/a de Bio-insumos",
+  network: "Red / Articulación",
 };
 
 const actorRole: Record<ActorType, ActorRole> = {
@@ -194,6 +196,7 @@ const actorRole: Record<ActorType, ActorRole> = {
   agroecological_market: "demanda",
   logistics: "servicio",
   bio_input_supplier: "oferta",
+  network: "servicio",
 };
 
 const roleLabels: Record<ActorRole, string> = {
@@ -942,7 +945,7 @@ const MapPage = () => {
   // Group actor types by role for filter display
   const ofertaTypes: ActorType[] = ["producer", "cooperative", "processing", "agroecological_node", "seed_bank", "composting_center", "research_center", "solidarity_intermediary", "community_garden", "bio_input_supplier"];
   const demandaTypes: ActorType[] = ["restaurant", "social_kitchen", "institution", "retail", "consumer_node", "individual_consumer", "food_bank", "consumer_cooperative", "community_org", "health_food_store", "agroecological_store", "agroecological_fair", "agroecological_market"];
-  const servicioTypes: ActorType[] = ["logistics"];
+  const servicioTypes: ActorType[] = ["logistics", "network"];
 
   return (
     <div className="h-screen overflow-hidden bg-background flex flex-col">
