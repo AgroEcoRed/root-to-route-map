@@ -1069,12 +1069,12 @@ const MapPage = () => {
             <div className="absolute inset-0 bg-gradient-to-b from-card/80 via-background/85 to-background" />
           </div>
           <div className="relative max-w-5xl mx-auto">
-            {/* Fila única: búsqueda + botón de filtros + contador */}
+            {/* En móvil priorizamos el mapa y sus capas; la búsqueda queda disponible en pantallas amplias. */}
             <div className="flex items-center gap-2">
-              <div className="relative group flex-1 min-w-0">
+              <div className="relative group hidden sm:block flex-1 min-w-0">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/70 group-focus-within:text-primary transition-colors" />
                 <Input
-                  placeholder="Buscar producto, productor/a, cooperativa..."
+                  placeholder="Buscar actores, redes o lugares..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="pl-9 pr-9 h-10 text-sm rounded-full border border-border bg-card shadow-sm focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
@@ -1109,12 +1109,12 @@ const MapPage = () => {
                   variant={onlyMes ? "default" : "outline"}
                   size="sm"
                   onClick={() => setOnlyMes(!onlyMes)}
-                  className="lg:hidden rounded-full h-10 shrink-0 px-3"
+                  className="lg:hidden rounded-full h-10 shrink-0 px-4 flex-1"
                   aria-pressed={onlyMes}
                   title={onlyMes ? "Volver al mapa general" : "Ver sólo el Mes de la Agroecología"}
                 >
                   <span aria-hidden="true">🌱</span>
-                  <span className="hidden min-[420px]:inline ml-1.5">{onlyMes ? "Mapa general" : "Mes"}</span>
+                  <span className="ml-1.5">{onlyMes ? "Volver al mapa general" : "Mapa del Mes"}</span>
                 </Button>
               )}
               <span className="hidden md:inline text-xs text-muted-foreground shrink-0">
