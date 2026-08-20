@@ -61,9 +61,20 @@ export default function LayerEventsAdmin({ layerId }: { layerId: string }) {
     return Array.from(set).sort();
   }, [events]);
 
+  const isPast = (e: LayerEvent) => new Date(e.starts_at).getTime() < Date.now();
+  const counts = useMemo(() => ({
+    all: events.length,
+    upcoming: events.filter((e) => !isPast(e)).length,
+    past: events.filter(isPast).length,
+    unplaced: events.filter((e) => e.lat == null || e.lng == null).length,
+  }), [events]);
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return events.filter((e) => {
+      if (tab === "upcoming" && isPast(e)) return false;
+      if (tab === "past" && !isPast(e)) return false;
+      if (tab === "unplaced" && e.lat != null && e.lng != null) return false;
       const p = (e.location_name || "").split(",").pop()?.trim() || "";
       if (prov && p !== prov) return false;
       if (!q) return true;
@@ -73,7 +84,7 @@ export default function LayerEventsAdmin({ layerId }: { layerId: string }) {
         (e.focal_name || "").toLowerCase().includes(q)
       );
     });
-  }, [events, search, prov]);
+  }, [events, search, prov, tab]);
 
   const pageRows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
