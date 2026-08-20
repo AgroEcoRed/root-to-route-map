@@ -1,0 +1,1 @@
+GRANT SELECT (layer_id) ON public.events TO anon, authenticated;
