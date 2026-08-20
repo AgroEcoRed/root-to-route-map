@@ -132,6 +132,7 @@ export default function LayerBulkImport({ layerId, onImported }: Props) {
             contact: pick(r, ["contacto", "contact", "telefono", "whatsapp"]) || null,
             source: "community",
             approved: true,
+            layer_id: layerId,
             created_by: user.id,
           });
           if (error) { skipped++; lines.push(`${name}: ${error.message}`); } else ok++;
