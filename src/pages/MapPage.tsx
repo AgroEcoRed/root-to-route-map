@@ -1019,6 +1019,27 @@ const MapPage = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-card/80 via-background/85 to-background" />
           <div className="relative max-w-5xl mx-auto space-y-3">
+            {new Date() <= new Date("2026-12-31T23:59:59") && (
+              <div className={`rounded-2xl border-2 p-3 flex items-center gap-3 flex-wrap ${onlyMes ? "border-primary bg-primary/10" : "border-border bg-card/80"}`}>
+                <span className="text-2xl" aria-hidden="true">🌱</span>
+                <div className="flex-1 min-w-[200px]">
+                  <p className="font-semibold text-sm text-foreground">Mes de la Agroecología</p>
+                  <p className="text-xs text-muted-foreground">
+                    {onlyMes
+                      ? "Estás viendo sólo las actividades del Mes de la Agroecología."
+                      : "Ver el mapa con las actividades del Mes de la Agroecología, sin registrarte."}
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  variant={onlyMes ? "default" : "outline"}
+                  className="rounded-full"
+                  onClick={() => setOnlyMes(!onlyMes)}
+                >
+                  {onlyMes ? "Ver todo el mapa" : "Ver sólo el Mes de la Agroecología"}
+                </Button>
+              </div>
+            )}
                 <div className="relative group">
                   <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-6 w-6 text-primary/70 group-focus-within:text-primary transition-colors" />
                   <Input
