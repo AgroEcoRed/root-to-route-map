@@ -119,8 +119,14 @@ Deno.serve(async (req) => {
     new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
   try {
+    try {
+      await requireUser(req)
+    } catch {
+      return json({ error: 'Necesitás iniciar sesión para usar el buscador de citas.' }, 401)
+    }
+
     const body = await req.json().catch(() => ({}))
-    const input = typeof body.input === 'string' ? body.input.trim() : ''
+    const input = typeof body.input === 'string' ? body.input.trim().slice(0, 2000) : ''
     if (!input) return json({ error: 'Falta el DOI o el link' }, 400)
 
     const doiMatch = input.replace(/^https?:\/\/(dx\.)?doi\.org\//i, '').match(/^10\.\d{4,9}\/\S+$/)
@@ -132,13 +138,27 @@ Deno.serve(async (req) => {
 
     if (!/^https?:\/\//i.test(input)) return json({ error: 'Ingresá un DOI válido o un link completo' }, 400)
 
+    // Fetch following redirects manually, re-validating every hop against the
+    // private-IP/hostname blocklist to prevent SSRF.
     const get = async (u: string) => {
-      const r = await fetch(u, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AgroEcoRedBot/1.0)', Accept: 'text/html,application/xhtml+xml' },
-        redirect: 'follow',
-      })
-      return r.ok ? { url: r.url || u, html: await r.text() } : null
+      let current = u
+      for (let hop = 0; hop < 5; hop++) {
+        await assertSafeUrl(current)
+        const r = await fetch(current, {
+          headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AgroEcoRedBot/1.0)', Accept: 'text/html,application/xhtml+xml' },
+          redirect: 'manual',
+        })
+        if (r.status >= 300 && r.status < 400) {
+          const loc = r.headers.get('location')
+          if (!loc) return null
+          current = new URL(loc, current).toString()
+          continue
+        }
+        return r.ok ? { url: current, html: await r.text() } : null
+      }
+      return null
     }
+
 
     // En OJS, /article/view/<id>/<galerada> muestra el PDF; la ficha completa está en /article/view/<id>
     const candidates = [input]
