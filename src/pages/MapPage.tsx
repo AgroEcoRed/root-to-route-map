@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import fotoComarcaToolbar from "@/assets/foto-comarca-1.jpg";
+import rutasSanasLogo from "@/assets/rutas-sanas-logo.jpeg.asset.json";
 
 // ----------------------------------------------------------------------------
 // HTML/URL safety helpers — Leaflet's bindPopup accepts a raw HTML string, so
@@ -115,7 +116,7 @@ interface MapActor {
 
 // Approximate import dates for inherited datasets (used until each actor claims their record).
 const SOURCE_IMPORT_DATE: Record<string, string> = {
-  rutas_sanas: "2023-06-01",
+  rutas_sanas: "2024-08-01",
   mercado_territorial: "2024-09-01",
   agroeco: new Date().toISOString().slice(0, 10),
   el_click: "2026-06-19",
@@ -605,7 +606,10 @@ const MapPage = () => {
         : "border:2.5px solid rgba(255,255,255,0.95);";
 
       const glyph = actorGlyphSvg(a.type, 16);
-      const inner = role === "servicio"
+      const rutasLogo = `<img src="${rutasSanasLogo.url}" alt="" style="width:20px;height:20px;border-radius:50%;object-fit:cover;background:white;padding:1px" />`;
+      const inner = a.source === "rutas_sanas"
+        ? rutasLogo
+        : role === "servicio"
         ? `<div style="transform:rotate(-45deg);display:flex">${glyph}</div>`
         : glyph;
 
@@ -686,7 +690,7 @@ const MapPage = () => {
           return `<span title="Miembros de la red dieron su voto de confianza. Último: ${endorseDateLabel}" style="display:inline-flex;align-items:center;gap:3px;background:#fef3c7;color:#854d0e;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px solid #fcd34d;letter-spacing:0.2px">🤝 ${label} · último ${endorseDateLabel}</span>`;
         }
         return dateLabel
-          ? `<span title="Registro importado de la fuente original — todavía no verificado por la red." style="display:inline-flex;align-items:center;gap:3px;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.2px">Importado · ${dateLabel}</span>`
+          ? `<span title="Última revisión de la información de la fuente original." style="display:inline-flex;align-items:center;gap:3px;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.2px">${a.source === "rutas_sanas" ? "Último chequeo · ago 2024" : `Importado · ${dateLabel}`}</span>`
           : "";
       })();
 
