@@ -18,6 +18,9 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
+  // Gestoras de capa (no admin global): acceso directo a su panel.
+  const { layers: managedLayers } = useLayerManager();
+  const myLayer = !isAdmin && managedLayers.length > 0 ? managedLayers[0] : null;
   const { t, lang, setLang, langs } = useLanguage();
   const { totalItems, setIsOpen: setCartOpen } = useCart();
 
