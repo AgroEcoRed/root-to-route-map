@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import UpcomingActivitiesSection from "@/components/UpcomingActivitiesSection";
+import MesAgroecologiaBanner from "@/components/MesAgroecologiaBanner";
 import FeaturesSection from "@/components/FeaturesSection";
 import ActorTypesSection from "@/components/ActorTypesSection";
 import TerritoriesGallery from "@/components/TerritoriesGallery";
@@ -13,6 +14,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <HeroSection />
+      <MesAgroecologiaBanner />
       <UpcomingActivitiesSection />
       <FeaturesSection />
       <ActorTypesSection />

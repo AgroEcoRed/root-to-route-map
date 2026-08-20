@@ -1077,9 +1077,9 @@ const MapPage = () => {
             {showFilters && showEventsLayer && events.length > 0 && (
               <div className="rounded-xl border border-border bg-card/70 p-2">
                 <p className="text-[11px] font-semibold text-muted-foreground mb-1.5 px-1">
-                  Actividades: filtrá por provincia y mes
+                  {onlyMes ? "Mes de la Agroecología: filtrá por provincia y mes" : "Actividades: filtrá por provincia y mes"}
                 </p>
-                <EventsFilterBar events={events} value={eventFilters} onChange={setEventFilters} />
+                <EventsFilterBar events={onlyMes ? events.filter((e) => (e as any).layer_id === MES_LAYER_ID) : events} value={eventFilters} onChange={setEventFilters} />
               </div>
             )}
 
