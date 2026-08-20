@@ -785,21 +785,34 @@ const MapPage = () => {
       const shadow = starColor.replace("#", "");
       const r = parseInt(shadow.slice(0,2), 16), g = parseInt(shadow.slice(2,4), 16), b = parseInt(shadow.slice(4,6), 16);
       const shadowRgba = `rgba(${r},${g},${b},${0.45 + intensity * 0.4})`;
+      // Precisión de la ubicación: dirección con altura/calle → estrella de línea
+      // cerrada; sólo localidad (o sin dirección) → estrella punteada (aproximada).
+      const locStr = (ev.location_name || "").trim();
+      const isPrecise = /\d/.test(locStr) && locStr.length > 6;
+      const dashAttr = isPrecise ? "" : ` stroke-dasharray="2.6 2.2"`;
+      // Emblema interior: hoja/semilla para las actividades del Mes de la Agroecología.
+      const isMes = (ev as any).layer_id === "mes_agroecologia";
+      const emblem = isMes
+        ? `<path d="M12 8.4c2.6 0 4.2 1.5 4.2 3.4 0 2-1.9 3.6-4.2 3.6-2.3 0-4.2-1.6-4.2-3.6 0-1.9 1.6-3.4 4.2-3.4Z" fill="#ffffff" opacity="0.92"/>
+           <path d="M12 8.6v6.6" stroke="${starColor}" stroke-width="0.9" stroke-linecap="round"/>`
+        : `<circle cx="12" cy="11.6" r="2.1" fill="#ffffff" opacity="0.85"/>`;
+      const starPoly = (sw: number) =>
+        `<polygon points="12,1.5 14.7,8.7 22.5,9.2 16.5,14.2 18.5,21.8 12,17.5 5.5,21.8 7.5,14.2 1.5,9.2 9.3,8.7"
+            fill="${starColor}" stroke="#ffffff" stroke-width="${sw}"${dashAttr} stroke-linejoin="round"/>`;
       const starSvg = isPast ? `
-        <svg viewBox="0 0 24 24" width="22" height="22" style="opacity:0.55; overflow: visible;">
-          <polygon points="12,1.5 14.7,8.7 22.5,9.2 16.5,14.2 18.5,21.8 12,17.5 5.5,21.8 7.5,14.2 1.5,9.2 9.3,8.7"
-            fill="${starColor}" stroke="#ffffff" stroke-width="1.2" stroke-linejoin="round"/>
+        <svg viewBox="0 0 24 24" width="24" height="24" style="opacity:0.7; overflow: visible;">
+          ${starPoly(1.2)}${emblem}
         </svg>` : `
         <svg viewBox="0 0 24 24" width="34" height="34" style="filter: drop-shadow(0 0 ${spread}px ${shadowRgba}) drop-shadow(0 0 ${size/2}px ${shadowRgba}); overflow: visible;">
-          <polygon points="12,1.5 14.7,8.7 22.5,9.2 16.5,14.2 18.5,21.8 12,17.5 5.5,21.8 7.5,14.2 1.5,9.2 9.3,8.7"
-            fill="${starColor}" stroke="#ffffff" stroke-width="1.2" stroke-linejoin="round"/>
+          ${starPoly(1.2)}${emblem}
         </svg>`;
       const icon = L.divIcon({
         className: "",
         html: isPast ? `<div>${starSvg}</div>` : `<div class="event-star" style="--star-speed:${speed}s">${starSvg}</div>`,
-        iconSize: isPast ? [22, 22] : [34, 34],
-        iconAnchor: isPast ? [11, 11] : [17, 17],
+        iconSize: isPast ? [24, 24] : [34, 34],
+        iconAnchor: isPast ? [12, 12] : [17, 17],
       });
+
       const date = new Date(ev.starts_at);
       const dateStr = date.toLocaleString("es-AR", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
       const typeLabels: Record<string, string> = { feria: "Feria", intercambio: "Intercambio", formacion: "Formación", otro: "Actividad" };
