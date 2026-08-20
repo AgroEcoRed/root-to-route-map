@@ -1037,14 +1037,16 @@ const MapPage = () => {
       <div className="flex-1 min-h-0 pt-16 flex flex-col">
         {/* Top toolbar: search + filters toggle */}
         {/* Top toolbar: compact search + collapsible filters */}
-        <div className="relative px-3 sm:px-6 py-2 border-b border-border overflow-hidden shrink-0">
-          <img
-            src={fotoComarcaToolbar}
-            alt=""
-            aria-hidden="true"
-            className="absolute inset-0 w-full h-full object-cover object-bottom opacity-20"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-card/80 via-background/85 to-background" />
+        <div className="relative px-3 sm:px-6 py-2 border-b border-border shrink-0 z-[1200]">
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <img
+              src={fotoComarcaToolbar}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover object-bottom opacity-20"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-card/80 via-background/85 to-background" />
+          </div>
           <div className="relative max-w-5xl mx-auto">
             {/* Fila única: búsqueda + botón de filtros + contador */}
             <div className="flex items-center gap-2">
