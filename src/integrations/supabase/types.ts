@@ -244,6 +244,7 @@ export type Database = {
           focal_name: string | null
           id: string
           lat: number | null
+          layer_id: string | null
           link: string | null
           lng: number | null
           location_name: string | null
@@ -272,6 +273,7 @@ export type Database = {
           focal_name?: string | null
           id?: string
           lat?: number | null
+          layer_id?: string | null
           link?: string | null
           lng?: number | null
           location_name?: string | null
@@ -300,6 +302,7 @@ export type Database = {
           focal_name?: string | null
           id?: string
           lat?: number | null
+          layer_id?: string | null
           link?: string | null
           lng?: number | null
           location_name?: string | null
@@ -1389,6 +1392,7 @@ export type Database = {
           focal_name: string | null
           id: string
           lat: number | null
+          layer_id: string | null
           link: string | null
           lng: number | null
           location_name: string | null
@@ -1456,6 +1460,7 @@ export type Database = {
           focal_name: string | null
           id: string
           lat: number | null
+          layer_id: string | null
           link: string | null
           lng: number | null
           location_name: string | null
