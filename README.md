@@ -54,7 +54,7 @@ Leé la guía de contribución en [`CONTRIBUTING.md`](./CONTRIBUTING.md) y el [`
 Requisitos: Node.js 20+ y `npm` o `bun`.
 
 ```sh
-git clone https://codeberg.org/agroecored/agroeco-red.git
+git clone https://codeberg.org/AgroEcoRed/agroeco-red.git
 cd agroeco-red
 npm install
 npm run dev
@@ -75,4 +75,4 @@ El backend (base de datos, auth, funciones, storage) está desplegado en Lovable
 
 ## Contacto
 
-contacto@agroeco.red
+info@agroeco.red
