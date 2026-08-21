@@ -29,9 +29,16 @@ Cualquier reutilización debe conservar la atribución a **AgroEco.Red** y a lxs
 
 ---
 
+## Equipo
+
+El desarrollo técnico se apoya en herramientas automatizadas (por eso muchos commits figuran a nombre de un bot de despliegue), pero las decisiones sobre qué se mapea, cómo se verifica y bajo qué licencias se comparte las toma un equipo de personas y organizaciones territoriales. El listado está en [`CONTRIBUTORS.md`](./CONTRIBUTORS.md).
+
+Cada capa del mapa la administra de forma autónoma la red que la sostiene. Si tu organización quiere gestionar su propia capa e integrar el equipo, escribinos a **info@agroeco.red**.
+
 ## Cómo contribuir
 
 Leé la guía de contribución en [`CONTRIBUTING.md`](./CONTRIBUTING.md) y el [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md).
+
 
 ---
 
