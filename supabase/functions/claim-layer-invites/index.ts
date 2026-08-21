@@ -49,11 +49,20 @@ Deno.serve(async (req) => {
   }
 
   if (claimed.length > 0) {
-    await sb
+    const { error: acceptErr } = await sb
       .from("layer_manager_invites")
       .update({ accepted_by: who.user.id, accepted_at: new Date().toISOString() })
       .eq("email", email)
       .in("layer_id", claimed);
+    if (acceptErr) return json({ error: acceptErr.message }, 500);
+
+    // Una invitación institucional aceptada completa el alta necesaria para
+    // gestionar una capa; no corresponde pedir el registro territorial general.
+    const { error: profileErr } = await sb
+      .from("profiles")
+      .update({ registration_completed: true })
+      .eq("user_id", who.user.id);
+    if (profileErr) return json({ error: profileErr.message }, 500);
   }
 
   return json({ ok: true, claimed });

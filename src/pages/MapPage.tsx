@@ -852,7 +852,9 @@ const MapPage = () => {
           ${starPoly(1.2)}${emblem}
         </svg>`;
       const icon = L.divIcon({
-        className: isMes ? "mes-event-marker" : "event-marker",
+        // Mantener siempre la clase base: fija dimensiones y centrado del
+        // contenedor Leaflet, especialmente necesarios en Safari móvil.
+        className: `event-marker${isMes ? " mes-event-marker" : ""}`,
         html: isPast ? `<div>${starSvg}</div>` : `<div class="event-star" style="--star-speed:${speed}s">${starSvg}</div>`,
         iconSize: isPast ? [28, 28] : [34, 34],
         iconAnchor: isPast ? [14, 14] : [17, 17],
