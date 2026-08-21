@@ -12,36 +12,68 @@ Herramienta de desarrollo asistido
         │  (push automático)
         ▼
 GitHub: AgroEcoRed/root-to-route-map   ← repositorio vivo (upstream)
-        │  (pull mirror cada hora)
+        │  (GitHub Action en cada commit a main)
         ▼
-Codeberg: AgroEcoRed/agroeco-red       ← espejo publicado + issues + PRs
+Codeberg: AgroEcoRed/agroeco-red       ← repo normal: issues + pull requests
 ```
 
 - El código se escribe en el upstream de GitHub.
-- Codeberg replica automáticamente y es el espacio comunitario de referencia.
-- Los aportes de la comunidad entran por Codeberg y se aplican en el upstream.
+- Una **GitHub Action** (`.github/workflows/mirror-to-codeberg.yml`) empuja a
+  Codeberg en cada commit a `main`. El cómputo lo pone GitHub, no Codeberg.
+- Codeberg queda como repositorio normal, con *issues* y *pull requests*
+  habilitados: es el espacio comunitario de referencia.
 
 ---
 
-## 2. Configurar la réplica automática (pull mirror)
+## 2. Por qué no usamos pull mirror
 
-En Codeberg, sobre el repositorio `AgroEcoRed/agroeco-red`:
+Codeberg corre Forgejo, y Forgejo **no permite convertir un repositorio
+existente en pull mirror**: el modo espejo solo se define al crear el
+repositorio con *New Migration*, marcando "This repository will be a mirror".
+En un repo ya creado, `Settings → Repository → Mirror Settings` solo ofrece
+**push mirrors**, que empujan desde Codeberg hacia afuera — lo contrario de lo
+que necesitamos.
 
-1. Entrar en **Settings → Repository → Mirror Settings**.
-2. Elegir **Pull mirror** (Codeberg trae los cambios; no hace falta dar acceso
-   de escritura a nadie).
-3. Completar:
-   - **Clone From URL**: `https://github.com/AgroEcoRed/root-to-route-map.git`
-   - **Authorization**: vacío si el repo de GitHub es público.
-   - **Mirror Interval**: `1h` (o `8h` si se prefiere menos ruido).
-   - Marcar **Sync when new commits are pushed** si aparece la opción.
-4. Guardar y pulsar **Synchronize Now** para la primera copia.
+Ver <https://forgejo.org/docs/latest/user/repo-mirror/>.
 
-> Si el repositorio de Codeberg ya tiene historia propia divergente, conviene
-> renombrarlo (por ejemplo `agroeco-red-archivo`) y crear uno nuevo vacío como
-> espejo. Un pull mirror sobrescribe la historia local del espejo.
+Recrear el repositorio de Codeberg como espejo tampoco sirve acá: **los repos
+espejo no aceptan pull requests**, y `CONTRIBUTING.md` invita justamente a
+mandar PRs a Codeberg.
 
-### Alternativa: réplica manual desde una terminal
+Por eso el espejo se hace **empujando desde GitHub**.
+
+---
+
+## 3. Puesta en marcha (una sola vez)
+
+1. **Token en Codeberg.** Foto de perfil → *Settings* → *Applications* →
+   *Manage Access Tokens* → *Generate New Token*. Nombre sugerido:
+   `github-mirror`. Permisos: `repository` en modo **Read and Write**. Copiar
+   el token: se muestra una sola vez.
+2. **Secret en GitHub.** En `AgroEcoRed/root-to-route-map`: *Settings* →
+   *Secrets and variables* → *Actions* → *New repository secret*.
+   Name: `CODEBERG_TOKEN`. Secret: el token de Codeberg.
+3. **Workflows habilitados.** En GitHub → *Settings* → *Actions* → *General*,
+   verificar que los workflows estén habilitados con permisos de lectura.
+4. **Primera sincronización a mano.** Pestaña *Actions* → "Espejo a Codeberg"
+   → *Run workflow*.
+
+---
+
+## 4. Qué pasa cuando alguien contribuye en Codeberg
+
+1. El *pull request* se revisa y discute en Codeberg.
+2. Quien mantiene el proyecto aplica el cambio sobre el upstream de GitHub
+   conservando la autoría del commit (`git cherry-pick` o `git am`).
+3. El push siguiente lo refleja en ambos lados.
+
+El workflow empuja **sin `--force`** a propósito. Si las historias divergen
+(por ejemplo, porque se mergeó algo directamente en Codeberg), el workflow
+**falla y avisa** en vez de borrar el aporte de la comunidad. Ante ese fallo:
+integrar primero el cambio en el upstream y volver a correr el workflow.
+Nunca forzar el push.
+
+### Plan B: sincronización manual desde una terminal
 
 ```bash
 git clone --mirror https://github.com/AgroEcoRed/root-to-route-map.git
@@ -53,15 +85,18 @@ git push --mirror codeberg
 Repetir `git fetch --prune origin && git push --mirror codeberg` cuando se
 quiera sincronizar.
 
+> `--mirror` **sí sobrescribe** la historia del destino. Usarlo solo si el
+> repositorio de Codeberg no tiene aportes propios sin integrar.
+
 ---
 
-## 3. Cumplir las guidelines de Codeberg sobre contenido generado con IA
+## 5. Cumplir las guidelines de Codeberg sobre contenido generado con IA
 
 Codeberg no prohíbe el uso de asistentes; pide que el proyecto sea un bien
 común real y no consuma recursos de la comunidad sin contrapartida. Para eso:
 
-- **No activar Woodpecker CI en Codeberg.** El build y el despliegue ocurren
-  fuera de la infraestructura de Codeberg.
+- **No activar Woodpecker CI en Codeberg.** El build, el despliegue y el
+  espejo ocurren fuera de la infraestructura de Codeberg.
 - **Mantenedoras humanas identificables**: `CONTRIBUTORS.md` lista la
   coordinación general y a lxs administradorxs de capa.
 - **Revisión humana explícita**: documentada en `CONTRIBUTING.md`.
@@ -71,7 +106,7 @@ común real y no consuma recursos de la comunidad sin contrapartida. Para eso:
 
 ---
 
-## 4. Descripción del proyecto para Codeberg
+## 6. Descripción del proyecto para Codeberg
 
 **Descripción corta** (campo *Description* del repositorio, máx. ~200 car.):
 
@@ -102,8 +137,9 @@ común real y no consuma recursos de la comunidad sin contrapartida. Para eso:
 > publica sin revisión humana** y las decisiones de diseño, contenido y
 > gobernanza de datos las toman personas.
 >
-> El desarrollo diario ocurre en el upstream de GitHub y se replica acá. Este
-> es el espacio preferido para *issues*, discusiones y *pull requests*.
+> El desarrollo diario ocurre en el upstream de GitHub y se replica acá
+> automáticamente en cada commit. Este es el espacio preferido para *issues*,
+> discusiones y *pull requests*.
 >
 > Licencias: código AGPL-3.0, datos georreferenciados ODbL 1.0, contenidos
 > CC BY-SA 4.0.
@@ -112,14 +148,15 @@ común real y no consuma recursos de la comunidad sin contrapartida. Para eso:
 
 ---
 
-## 5. Aviso al inicio del README (opcional pero recomendado)
+## 7. Aviso al inicio del README (ya incluido)
 
 ```markdown
-> **Espejo.** El desarrollo ocurre en
-> <https://github.com/AgroEcoRed/root-to-route-map> y se replica acá cada hora.
-> Abrí *issues* y *pull requests* en Codeberg: quien mantiene el proyecto los
-> aplica en el upstream y la sincronización siguiente los refleja en ambos
-> lados, conservando la autoría del commit.
+> **Espejo.** El desarrollo diario ocurre en
+> <https://github.com/AgroEcoRed/root-to-route-map> y se replica automáticamente acá
+> en cada commit. Abrí *issues* y *pull requests* en
+> <https://codeberg.org/AgroEcoRed/agroeco-red>: quien mantiene el proyecto los aplica
+> en el upstream y la sincronización siguiente los refleja en ambos lados,
+> conservando la autoría del commit.
 ```
 
 ---

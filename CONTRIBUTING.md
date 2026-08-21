@@ -71,4 +71,4 @@ Toda participación se rige por el [Código de Conducta](./CODE_OF_CONDUCT.md). 
 
 ## Contacto
 
-contacto@agroeco.red
+info@agroeco.red

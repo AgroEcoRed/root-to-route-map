@@ -53,8 +53,8 @@ Para una instancia con ~2.000 actores mapeados y tráfico regional:
 ### 3.1 Clonar el repositorio
 
 ```bash
-git clone https://codeberg.org/agroecored/agroeco.red.git
-cd agroeco.red
+git clone https://codeberg.org/AgroEcoRed/agroeco-red.git
+cd agroeco-red
 ```
 
 ### 3.2 Levantar el backend con Supabase self-hosted

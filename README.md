@@ -4,6 +4,13 @@
 
 Sitio: https://agroeco.red
 
+> **Espejo.** El desarrollo diario ocurre en
+> <https://github.com/AgroEcoRed/root-to-route-map> y se replica automáticamente acá
+> en cada commit. Abrí *issues* y *pull requests* en
+> <https://codeberg.org/AgroEcoRed/agroeco-red>: quien mantiene el proyecto los aplica
+> en el upstream y la sincronización siguiente los refleja en ambos lados,
+> conservando la autoría del commit.
+
 AgroEco.Red es una infraestructura pública de investigación-acción que integra:
 
 - Un **mapa colaborativo** de actores agroecológicos (productorxs, nodos, ferias, redes, iniciativas).
@@ -47,7 +54,7 @@ Leé la guía de contribución en [`CONTRIBUTING.md`](./CONTRIBUTING.md) y el [`
 Requisitos: Node.js 20+ y `npm` o `bun`.
 
 ```sh
-git clone https://codeberg.org/agroecored/agroeco-red.git
+git clone https://codeberg.org/AgroEcoRed/agroeco-red.git
 cd agroeco-red
 npm install
 npm run dev
@@ -68,4 +75,4 @@ El backend (base de datos, auth, funciones, storage) está desplegado en Lovable
 
 ## Contacto
 
-contacto@agroeco.red
+info@agroeco.red
