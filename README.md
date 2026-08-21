@@ -4,6 +4,13 @@
 
 Sitio: https://agroeco.red
 
+> **Espejo.** El desarrollo diario ocurre en
+> <https://github.com/AgroEcoRed/root-to-route-map> y se replica automáticamente acá
+> en cada commit. Abrí *issues* y *pull requests* en
+> <https://codeberg.org/AgroEcoRed/agroeco-red>: quien mantiene el proyecto los aplica
+> en el upstream y la sincronización siguiente los refleja en ambos lados,
+> conservando la autoría del commit.
+
 AgroEco.Red es una infraestructura pública de investigación-acción que integra:
 
 - Un **mapa colaborativo** de actores agroecológicos (productorxs, nodos, ferias, redes, iniciativas).

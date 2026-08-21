@@ -1,0 +1,26 @@
+name: Espejo a Codeberg
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar historia completa
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # El push va SIN --force a propósito: si alguien mergeó algo en Codeberg
+      # y las historias divergen, el workflow falla y avisa, en vez de borrar
+      # el aporte de la comunidad en silencio. Ante un fallo, integrar primero
+      # ese cambio en el upstream de GitHub y volver a correr el workflow.
+      - name: Empujar a Codeberg
+        env:
+          CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }}
+        run: |
+          git push "https://AgroEcoRed:${CODEBERG_TOKEN}@codeberg.org/AgroEcoRed/agroeco-red.git" HEAD:main
+          git push --tags "https://AgroEcoRed:${CODEBERG_TOKEN}@codeberg.org/AgroEcoRed/agroeco-red.git"
