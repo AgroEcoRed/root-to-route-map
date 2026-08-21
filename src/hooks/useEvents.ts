@@ -29,7 +29,7 @@ export const useEvents = () => {
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    const { data } = await (supabase as any)
+    const { data, error } = await (supabase as any)
       .from("events")
       // NEVER select focal_email / contact_email / edit_token from the public
       // client — those are private (PII + per-event edit credential) and only
@@ -42,7 +42,12 @@ export const useEvents = () => {
       )
       .eq("approved", true)
       .order("starts_at", { ascending: false });
-    setEvents((data as AgroEventFull[]) || []);
+    // En conexiones móviles puede haber un 401 o corte breve mientras se
+    // restaura/refresca la sesión. Conservar los últimos datos evita que todas
+    // las estrellas desaparezcan por una única solicitud fallida.
+    if (!error && Array.isArray(data)) {
+      setEvents(data as AgroEventFull[]);
+    }
     setLoading(false);
   }, []);
 
@@ -52,7 +57,17 @@ export const useEvents = () => {
       .channel(`events_full_changes_${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "events" }, () => load())
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    // Volver a cargar cuando termina de hidratarse, renovarse o cerrarse una
+    // sesión: la consulta pública no debe quedar atada a un token móvil vencido.
+    const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "TOKEN_REFRESHED") {
+        window.setTimeout(load, 0);
+      }
+    });
+    return () => {
+      supabase.removeChannel(ch);
+      authListener.subscription.unsubscribe();
+    };
   }, [load]);
 
   return { events, loading, refresh: load };

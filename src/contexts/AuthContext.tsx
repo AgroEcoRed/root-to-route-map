@@ -45,12 +45,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 localStorage.removeItem("agrored-referral-token");
               }
             } catch { /* silent */ }
-            const { data: profile } = await supabase
-              .from("profiles")
-              .select("registration_completed")
-              .eq("user_id", session.user.id)
-              .maybeSingle();
-            if (profile && profile.registration_completed === false) {
+            const [{ data: profile }, { data: managedLayers }] = await Promise.all([
+              supabase
+                .from("profiles")
+                .select("registration_completed")
+                .eq("user_id", session.user.id)
+                .maybeSingle(),
+              (supabase as any)
+                .from("layer_managers")
+                .select("id")
+                .eq("user_id", session.user.id)
+                .limit(1),
+            ]);
+            // Una invitación aceptada para gestionar una capa ya constituye un
+            // alta válida. No obligamos a esas cuentas institucionales a repetir
+            // el registro general cada vez que ingresan con Google.
+            const isLayerManager = Array.isArray(managedLayers) && managedLayers.length > 0;
+            if (profile && profile.registration_completed === false && !isLayerManager) {
               await supabase.auth.signOut();
               toast.error(
                 "Esta cuenta no está registrada en AgroEco.Red. Por favor registrate primero para poder ingresar.",
