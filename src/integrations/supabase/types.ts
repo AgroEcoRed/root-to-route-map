@@ -66,6 +66,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "actor_connections_source_layer_actor_id_fkey"
+            columns: ["source_layer_actor_id"]
+            isOneToOne: false
+            referencedRelation: "public_layer_actors"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "actor_connections_source_profile_id_fkey"
             columns: ["source_profile_id"]
             isOneToOne: false
@@ -84,6 +91,13 @@ export type Database = {
             columns: ["target_layer_actor_id"]
             isOneToOne: false
             referencedRelation: "layer_actors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "actor_connections_target_layer_actor_id_fkey"
+            columns: ["target_layer_actor_id"]
+            isOneToOne: false
+            referencedRelation: "public_layer_actors"
             referencedColumns: ["id"]
           },
           {
@@ -133,6 +147,13 @@ export type Database = {
             columns: ["layer_actor_id"]
             isOneToOne: false
             referencedRelation: "layer_actors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "actor_endorsements_layer_actor_id_fkey"
+            columns: ["layer_actor_id"]
+            isOneToOne: false
+            referencedRelation: "public_layer_actors"
             referencedColumns: ["id"]
           },
         ]
@@ -1135,7 +1156,161 @@ export type Database = {
             referencedRelation: "layer_actors"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "actor_endorsements_layer_actor_id_fkey"
+            columns: ["layer_actor_id"]
+            isOneToOne: false
+            referencedRelation: "public_layer_actors"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      public_events: {
+        Row: {
+          approved: boolean | null
+          co_organizers: string[] | null
+          contact: string | null
+          created_at: string | null
+          created_by: string | null
+          custom_type: string | null
+          description: string | null
+          ends_at: string | null
+          event_type: Database["public"]["Enums"]["event_type"] | null
+          extra_organizer_names: string[] | null
+          flyer_url: string | null
+          id: string | null
+          lat: number | null
+          layer_id: string | null
+          link: string | null
+          lng: number | null
+          location_name: string | null
+          source: Database["public"]["Enums"]["event_source"] | null
+          starts_at: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          approved?: boolean | null
+          co_organizers?: string[] | null
+          contact?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_type?: string | null
+          description?: string | null
+          ends_at?: string | null
+          event_type?: Database["public"]["Enums"]["event_type"] | null
+          extra_organizer_names?: string[] | null
+          flyer_url?: string | null
+          id?: string | null
+          lat?: number | null
+          layer_id?: string | null
+          link?: string | null
+          lng?: number | null
+          location_name?: string | null
+          source?: Database["public"]["Enums"]["event_source"] | null
+          starts_at?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          approved?: boolean | null
+          co_organizers?: string[] | null
+          contact?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          custom_type?: string | null
+          description?: string | null
+          ends_at?: string | null
+          event_type?: Database["public"]["Enums"]["event_type"] | null
+          extra_organizer_names?: string[] | null
+          flyer_url?: string | null
+          id?: string | null
+          lat?: number | null
+          layer_id?: string | null
+          link?: string | null
+          lng?: number | null
+          location_name?: string | null
+          source?: Database["public"]["Enums"]["event_source"] | null
+          starts_at?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      public_layer_actors: {
+        Row: {
+          actor_type: string | null
+          address: string | null
+          confirmation_sent_at: string | null
+          confirmation_status: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
+          contact: string | null
+          created_at: string | null
+          created_by: string | null
+          delivery_days: string[] | null
+          description: string | null
+          extra: Json | null
+          family: string | null
+          id: string | null
+          lat: number | null
+          lng: number | null
+          name: string | null
+          public_visible: boolean | null
+          source_id: string | null
+          updated_at: string | null
+          verified_at: string | null
+          verified_by_role: string | null
+        }
+        Insert: {
+          actor_type?: string | null
+          address?: string | null
+          confirmation_sent_at?: string | null
+          confirmation_status?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          contact?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          delivery_days?: string[] | null
+          description?: string | null
+          extra?: Json | null
+          family?: string | null
+          id?: string | null
+          lat?: number | null
+          lng?: number | null
+          name?: string | null
+          public_visible?: boolean | null
+          source_id?: string | null
+          updated_at?: string | null
+          verified_at?: string | null
+          verified_by_role?: string | null
+        }
+        Update: {
+          actor_type?: string | null
+          address?: string | null
+          confirmation_sent_at?: string | null
+          confirmation_status?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          contact?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          delivery_days?: string[] | null
+          description?: string | null
+          extra?: Json | null
+          family?: string | null
+          id?: string | null
+          lat?: number | null
+          lng?: number | null
+          name?: string | null
+          public_visible?: boolean | null
+          source_id?: string | null
+          updated_at?: string | null
+          verified_at?: string | null
+          verified_by_role?: string | null
+        }
+        Relationships: []
       }
       public_profiles: {
         Row: {
