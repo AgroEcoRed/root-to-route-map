@@ -596,7 +596,20 @@ const MapPage = () => {
     mapRef.current.addLayer(clusterRef.current);
     eventsLayerRef.current = L.layerGroup().addTo(mapRef.current);
     networkLayerRef.current = L.layerGroup().addTo(mapRef.current);
+    // Las estrellas de actividades acompañan el zoom: al alejarse se achican
+    // (evita el amontonamiento) y al acercarse vuelven a su tamaño natural.
+    const applyStarScale = () => {
+      const map = mapRef.current;
+      const el = mapContainerRef.current;
+      if (!map || !el) return;
+      const z = map.getZoom();
+      const scale = Math.min(1.15, Math.max(0.4, 0.5 + (z - 5) * 0.085));
+      el.style.setProperty("--star-zoom-scale", scale.toFixed(3));
+    };
+    applyStarScale();
+    mapRef.current.on("zoom zoomend", applyStarScale);
     setMapVersion((v) => v + 1);
+
 
     return () => {
       mapRef.current?.remove();

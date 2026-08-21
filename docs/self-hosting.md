@@ -152,8 +152,19 @@ las modificaciones que hagas.
 
 ## 7. Soporte y contacto
 
-- Repositorio principal: <https://codeberg.org/agroecored/agroeco.red>
-- Espejo (mirror): <https://github.com/agroecored/agroeco.red>
-- Contacto: `contacto@agroeco.red`
+- **Repositorio de desarrollo (upstream, siempre al día):**
+  <https://github.com/AgroEcoRed/root-to-route-map> — es el repositorio conectado
+  a la herramienta de desarrollo asistido que usa el equipo, por lo que recibe
+  los commits primero.
+- **Repositorio comunitario en Codeberg (espejo publicado):**
+  <https://codeberg.org/AgroEcoRed/agroeco-red> — se sincroniza periódicamente
+  desde el upstream. Es el lugar preferido para *issues*, discusiones y
+  *pull requests* de la comunidad.
+- **Cómo contribuir sin desincronizarse:** abrí el *issue* o el PR en Codeberg.
+  Quien mantiene el proyecto aplica el cambio sobre el upstream de GitHub y en
+  la siguiente sincronización queda reflejado en Codeberg. No trabajes sobre un
+  fork de Codeberg durante mucho tiempo sin avisar: pedí primero que se
+  sincronice el espejo para partir de la última versión.
+- Contacto: `info@agroeco.red`
 
-*Última actualización: Julio 2026.*
+*Última actualización: Agosto 2026.*

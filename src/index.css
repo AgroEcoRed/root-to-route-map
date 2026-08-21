@@ -358,9 +358,22 @@ main { animation: page-in 0.35s ease-out; }
   color: #fff; font-size: 14px; font-weight: 800;
   animation: event-glow-pulse var(--glow-speed, 2.2s) ease-in-out infinite;
 }
+/* Las estrellas de actividades escalan junto con el zoom del mapa: al alejarse
+   se achican y al acercarse recuperan su tamaño. El zoom aplica `transform`
+   sobre el div interno y la animación de latido usa la propiedad `scale`,
+   así ambos efectos se combinan sin pisarse. */
+.event-marker > div {
+  transform: scale(var(--star-zoom-scale, 1));
+  transform-origin: center center;
+}
+@keyframes event-star-pulse {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.08; }
+}
 .event-star {
   display: flex; align-items: center; justify-content: center;
   width: 34px; height: 34px;
-  animation: event-glow-pulse var(--star-speed, 2.2s) ease-in-out infinite;
+  animation: event-star-pulse var(--star-speed, 2.2s) ease-in-out infinite;
   transform-origin: center;
 }
+
