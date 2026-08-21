@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface AgroEventFull {
@@ -27,6 +27,7 @@ export interface AgroEventFull {
 export const useEvents = () => {
   const [events, setEvents] = useState<AgroEventFull[]>([]);
   const [loading, setLoading] = useState(true);
+  const retryCountRef = useRef(0);
 
   const load = useCallback(async () => {
     const { data, error } = await (supabase as any)
@@ -47,6 +48,10 @@ export const useEvents = () => {
     // las estrellas desaparezcan por una única solicitud fallida.
     if (!error && Array.isArray(data)) {
       setEvents(data as AgroEventFull[]);
+      retryCountRef.current = 0;
+    } else if (retryCountRef.current < 2) {
+      retryCountRef.current += 1;
+      window.setTimeout(load, 800 * retryCountRef.current);
     }
     setLoading(false);
   }, []);
