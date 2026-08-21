@@ -165,6 +165,8 @@ las modificaciones que hagas.
   la siguiente sincronización queda reflejado en Codeberg. No trabajes sobre un
   fork de Codeberg durante mucho tiempo sin avisar: pedí primero que se
   sincronice el espejo para partir de la última versión.
+- **Cómo se mantiene el espejo:** ver [`docs/codeberg-espejo.md`](./codeberg-espejo.md).
 - Contacto: `info@agroeco.red`
+
 
 *Última actualización: Agosto 2026.*
