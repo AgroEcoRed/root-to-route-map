@@ -17,6 +17,7 @@ import PreliminaryImport from "@/components/PreliminaryImport";
 import AddMapPointDialog from "@/components/AddMapPointDialog";
 import MyMapContributions from "@/components/MyMapContributions";
 import InviteOthersSection from "@/components/InviteOthersSection";
+import LayerManagerPanelCard from "@/components/LayerManagerPanelCard";
 import { Link } from "react-router-dom";
 import { MapPin, Plus, Sparkles } from "lucide-react";
 
