@@ -17,6 +17,7 @@ import PreliminaryImport from "@/components/PreliminaryImport";
 import AddMapPointDialog from "@/components/AddMapPointDialog";
 import MyMapContributions from "@/components/MyMapContributions";
 import InviteOthersSection from "@/components/InviteOthersSection";
+import LayerManagerPanelCard from "@/components/LayerManagerPanelCard";
 import { Link } from "react-router-dom";
 import { MapPin, Plus, Sparkles } from "lucide-react";
 
@@ -250,6 +251,9 @@ const MiPerfilPage = () => {
         <div className="container max-w-5xl">
           <h1 className="font-display text-3xl mb-2">Mi Perfil</h1>
           <p className="text-muted-foreground mb-8">Compartí fotos y videos de tu producción y digitalizá documentos manuscritos.</p>
+
+          {/* Panel de administración para gestoras de capa */}
+          <LayerManagerPanelCard />
 
           {/* Quick actions: add map points / activities */}
           <ProfileQuickActions />
