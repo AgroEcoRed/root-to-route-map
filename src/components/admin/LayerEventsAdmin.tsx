@@ -41,12 +41,19 @@ export default function LayerEventsAdmin({ layerId }: { layerId: string }) {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data } = await (supabase as any)
-      .from("events")
-      .select("id,title,description,event_type,custom_type,starts_at,location_name,lat,lng,approved,focal_name")
-      .eq("layer_id", layerId)
-      .order("starts_at", { ascending: true });
-    setEvents((data as LayerEvent[]) || []);
+    // focal_name es PII: no se puede leer por la Data API. Se pide con una
+    // función segura que valida que la persona administre esta capa.
+    const { data, error } = await (supabase as any).rpc("get_layer_events", { _layer_id: layerId });
+    if (error) {
+      const { data: fallback } = await (supabase as any)
+        .from("events")
+        .select("id,title,description,event_type,custom_type,starts_at,location_name,lat,lng,approved")
+        .eq("layer_id", layerId)
+        .order("starts_at", { ascending: true });
+      setEvents((fallback as LayerEvent[]) || []);
+    } else {
+      setEvents((data as LayerEvent[]) || []);
+    }
     setLoading(false);
   }, [layerId]);
 
