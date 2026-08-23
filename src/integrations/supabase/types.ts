@@ -1589,6 +1589,25 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      get_layer_events: {
+        Args: { _layer_id: string }
+        Returns: {
+          approved: boolean
+          contact: string
+          custom_type: string
+          description: string
+          ends_at: string
+          event_type: Database["public"]["Enums"]["event_type"]
+          focal_name: string
+          id: string
+          lat: number
+          link: string
+          lng: number
+          location_name: string
+          starts_at: string
+          title: string
+        }[]
+      }
       get_my_event_edit_token: { Args: { _event_id: string }; Returns: string }
       get_referral_by_token: {
         Args: { _token: string }
