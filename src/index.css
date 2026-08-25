@@ -306,7 +306,12 @@ main { animation: page-in 0.35s ease-out; }
   50% { box-shadow: 0 0 0 8px rgba(245, 197, 24, 0), 0 0 28px 10px rgba(59, 130, 246, 0.35); }
 }
 .event-marker {
-  position: relative;
+  /* NUNCA declarar `position` acá: Leaflet posiciona el ícono con
+     `position:absolute` + translate3d (clase .leaflet-marker-icon, misma
+     especificidad). Si esta regla pisa a `relative`, las estrellas entran en
+     flujo normal y cada una empuja a la siguiente hacia abajo, desplazándolas
+     kilómetros al sur de su ubicación real. El contenedor ya queda posicionado
+     por Leaflet, así que los hijos absolutos (.em-ring) funcionan igual. */
   width: 38px; height: 38px;
   display: flex; align-items: center; justify-content: center;
 }
