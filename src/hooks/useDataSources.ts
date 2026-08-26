@@ -20,6 +20,7 @@ const DEFAULTS: DataSourceSetting[] = [
   { source_id: "user_points", label: "Puntos agregados por la comunidad", enabled: true },
   { source_id: "nat_san_martin", label: "NAT San Martín", enabled: true },
   { source_id: "soliverde", label: "Soliverde — Solidaires (iniciativas ecológicas francófonas)", enabled: true },
+  { source_id: "spg_inta", label: "SPG de Argentina (INTA/SENASA/INAFCI) — capa interna", enabled: false },
 ];
 
 export const useDataSources = () => {
