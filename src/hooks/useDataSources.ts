@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export type DataSourceId = "rutas_sanas" | "mercado_territorial" | "agroeco" | "eventos" | "el_click" | "el_brote" | "utt_nodos" | "user_points" | "nat_san_martin" | "soliverde";
+export type DataSourceId = "rutas_sanas" | "mercado_territorial" | "agroeco" | "eventos" | "el_click" | "el_brote" | "utt_nodos" | "user_points" | "nat_san_martin" | "soliverde" | "spg_inta";
 
 export interface DataSourceSetting {
   source_id: DataSourceId;
