@@ -20,7 +20,7 @@ import { Search, Filter, X, ArrowUp, ArrowDown, Minus, CalendarPlus, Network, Sp
 import { DataSourceToggle } from "@/components/admin/DataSourceToggle";
 import { useDataSources } from "@/hooks/useDataSources";
 import { useLayerActors } from "@/hooks/useLayerActors";
-import { actorGlyphSvg } from "@/lib/mapGlyphs";
+import { actorGlyphSvg, actorGlyph } from "@/lib/mapGlyphs";
 import { useEvents, glowIntensity, eventBucket, proximityColor } from "@/hooks/useEvents";
 import { useActorConnections } from "@/hooks/useActorConnections";
 import { useAuth } from "@/contexts/AuthContext";
@@ -42,6 +42,10 @@ import {
 import { ChevronDown } from "lucide-react";
 import fotoComarcaToolbar from "@/assets/foto-comarca-1.jpg";
 import rutasSanasLogo from "@/assets/rutas-sanas-logo.jpeg.asset.json";
+
+/** Mapa colaborativo original de Rutas Sanas del Alimento (Google My Maps). */
+export const RUTAS_SANAS_MAP_URL =
+  "https://www.google.com/maps/d/viewer?mid=1e4CanhyiwCYZkQdPa9gAr77goJywFFxf&hl=es_419&ll=-34.71330544952425%2C-66.5766887375&z=5";
 
 // ----------------------------------------------------------------------------
 // HTML/URL safety helpers — Leaflet's bindPopup accepts a raw HTML string, so
@@ -349,7 +353,13 @@ const MapPage = () => {
     if (v) url.searchParams.set("capa", MES_LAYER_ID); else url.searchParams.delete("capa");
     window.history.replaceState({}, "", url.toString());
   };
-  const visibleEvents = useMemo(() => applyEventFilters(events, eventFilters), [events, eventFilters]);
+  // Aislar momentáneamente una sola capa (se activa manteniendo apretado su
+  // nombre en el administrador de capas).
+  const [soloSource, setSoloSource] = useState<string | null>(null);
+  const visibleEvents = useMemo(() => {
+    if (soloSource && soloSource !== "eventos") return [];
+    return applyEventFilters(events, eventFilters);
+  }, [events, eventFilters, soloSource]);
   const allTypesCount = Object.keys(actorTypeLabels).length;
   const activeFilterCount =
     (activeTypes.size < allTypesCount ? 1 : 0) +
@@ -526,9 +536,9 @@ const MapPage = () => {
     if (isEnabled("utt_nodos")) out.push(...uttNodesActors);
     if (isEnabled("user_points")) out.push(...userPointActors);
     if (isEnabled("nat_san_martin")) out.push(...natSanMartinActors);
-    out.push(...extraLayerActors.filter(a => isEnabled(a.source as any)));
-    return out;
-  }, [dbActors, isEnabled, rutasSanasActors, userPointActors, natSanMartinActors, elClickActors, elBroteActors, extraLayerActors]);
+    out.push(...extraLayerActors.filter(a => isEnabled(a.source as any) || a.source === soloSource));
+    return soloSource ? out.filter(a => a.source === soloSource) : out;
+  }, [dbActors, isEnabled, rutasSanasActors, userPointActors, natSanMartinActors, elClickActors, elBroteActors, extraLayerActors, soloSource]);
 
   const toggleType = (type: ActorType) => {
     setActiveTypes((prev) => {
@@ -549,14 +559,17 @@ const MapPage = () => {
   };
 
   const filtered = useMemo(() => {
-    if (eventFilters.onlyMes) return [];
+    if (eventFilters.onlyMes && !soloSource) return [];
     return allActors.filter((a) => {
-      if (!activeTypes.has(a.type)) return false;
-      if (!activeCerts.has(a.certification)) return false;
+      // En modo "solo esta capa" se muestran todos sus puntos sin más filtros.
+      if (!soloSource) {
+        if (!activeTypes.has(a.type)) return false;
+        if (!activeCerts.has(a.certification)) return false;
+      }
       if (search && !a.name.toLowerCase().includes(search.toLowerCase()) && !a.products.some((p) => p.toLowerCase().includes(search.toLowerCase()))) return false;
       return true;
     });
-  }, [activeTypes, activeCerts, search, allActors, eventFilters.onlyMes]);
+  }, [activeTypes, activeCerts, search, allActors, eventFilters.onlyMes, soloSource]);
 
   // Recalculate map size when surrounding layout changes
   useEffect(() => {
@@ -654,14 +667,40 @@ const MapPage = () => {
         ? `<div style="transform:rotate(-45deg);display:flex">${glyph}</div>`
         : glyph;
 
-      const icon = L.divIcon({
-        className: "custom-marker",
-        html: `<div style="background:linear-gradient(160deg, ${color}, ${color}cc);width:30px;height:30px;${shape}${borderStyle}box-shadow:0 3px 8px rgba(28,45,20,0.35);display:flex;align-items:center;justify-content:center;">
-          ${inner}
-        </div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 15],
-      });
+      // --- Íconos propios por capa -------------------------------------
+      // SPG (INTA/SENASA/INAFCI): círculo celeste, bien distinguible.
+      // Rutas Sanas: chinche estilo Google My Maps con la paleta del mapa
+      // original (verde oferta, azul demanda, turquesa servicio).
+      const icon = a.source === "spg_inta"
+        ? L.divIcon({
+            className: "custom-marker",
+            html: `<div style="background:radial-gradient(circle at 35% 30%, #7dd3fc, #0ea5e9);width:28px;height:28px;border-radius:50%;border:2.5px solid #ffffff;box-shadow:0 3px 8px rgba(2,132,199,0.45);display:flex;align-items:center;justify-content:center;">${glyph}</div>`,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14],
+          })
+        : a.source === "rutas_sanas"
+        ? (() => {
+            const pinColor = role === "oferta" ? "#188038" : role === "demanda" ? "#1a73e8" : "#12b5cb";
+            return L.divIcon({
+              className: "custom-marker",
+              html: `<div style="filter:drop-shadow(0 2px 3px rgba(15,23,42,0.35))">
+                <svg width="26" height="34" viewBox="0 0 26 34" style="display:block">
+                  <path d="M13 33.5S24.5 20.5 24.5 13A11.5 11.5 0 1 0 1.5 13c0 7.5 11.5 20.5 11.5 20.5Z" fill="${pinColor}" stroke="#ffffff" stroke-width="2"/>
+                  <g transform="translate(5.8,5.8) scale(0.6)">${actorGlyph(a.type)}</g>
+                </svg>
+              </div>`,
+              iconSize: [26, 34],
+              iconAnchor: [13, 34],
+            });
+          })()
+        : L.divIcon({
+            className: "custom-marker",
+            html: `<div style="background:linear-gradient(160deg, ${color}, ${color}cc);width:30px;height:30px;${shape}${borderStyle}box-shadow:0 3px 8px rgba(28,45,20,0.35);display:flex;align-items:center;justify-content:center;">
+              ${inner}
+            </div>`,
+            iconSize: [30, 30],
+            iconAnchor: [15, 15],
+          });
 
       const certColor = a.certification === "green" ? "#2d6a4f" : a.certification === "yellow" ? "#d4a017" : "#dc2626";
       const productLabel = role === "oferta" ? "🟣 Ofrece" : role === "demanda" ? "🔵 Demanda" : "Servicio";
@@ -695,7 +734,7 @@ const MapPage = () => {
       const roleBadgeColor = roleColors[role];
 
       const sourceBadge = a.source === "rutas_sanas"
-        ? `<span style="display:inline-block;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.3px;text-transform:uppercase">Rutas Sanas</span>`
+        ? `<a href="${RUTAS_SANAS_MAP_URL}" target="_blank" rel="noopener noreferrer" title="Ver el mapa original Rutas Sanas del Alimento" style="display:inline-flex;align-items:center;gap:4px;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.3px;text-transform:uppercase;text-decoration:none"><img src="${rutasSanasLogo.url}" alt="Rutas Sanas del Alimento" style="width:14px;height:14px;border-radius:50%;object-fit:cover" />Rutas Sanas ↗</a>`
         : a.source === "mercado_territorial"
         ? `<a href="https://mercadoterritorial.com.ar/buscador-de-nodos/" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#fef3c7;color:#92400e;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dotted #d97706;letter-spacing:0.3px;text-transform:uppercase;text-decoration:none">Mercado Territorial</a>`
         : a.source === "el_click"
@@ -1336,7 +1375,7 @@ const MapPage = () => {
           </div>
         </div>
       </div>
-      <DataSourceToggle position="bottom-6 right-6" />
+      <DataSourceToggle position="bottom-6 right-6" onSolo={setSoloSource} soloSource={soloSource} />
       <EventFormDialog open={eventDialogOpen} onOpenChange={setEventDialogOpen} />
       <AddMapPointDialog open={addPointOpen} onOpenChange={setAddPointOpen} />
       <EndorseDialog
