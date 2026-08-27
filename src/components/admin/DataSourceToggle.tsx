@@ -13,9 +13,13 @@ import { Link } from "react-router-dom";
 interface Props {
   /** floating button position class (e.g. "bottom-6 right-6") */
   position?: string;
+  /** Aislar momentáneamente una capa: se llama con el id al mantener apretado y con null al soltar. */
+  onSolo?: (sourceId: string | null) => void;
+  /** Capa actualmente aislada. */
+  soloSource?: string | null;
 }
 
-export const DataSourceToggle = ({ position = "bottom-6 right-6" }: Props) => {
+export const DataSourceToggle = ({ position = "bottom-6 right-6", onSolo, soloSource = null }: Props) => {
   const { isAdmin, loading: adminLoading } = useIsAdmin();
   const { sources, toggle } = useDataSources();
   const [pending, setPending] = useState<string | null>(null);
@@ -52,10 +56,26 @@ export const DataSourceToggle = ({ position = "bottom-6 right-6" }: Props) => {
             <p className="text-xs text-muted-foreground">
               Activá o desactivá cada fuente. Afecta el mapa y el marketplace para todos los visitantes.
             </p>
+            {onSolo && (
+              <p className="text-[11px] text-primary bg-primary/10 rounded-lg px-2 py-1.5">
+                Mantené apretado el nombre de una capa para ver <strong>sólo</strong> esa capa en el mapa; al soltar vuelven todas.
+              </p>
+            )}
             <div className="space-y-2">
               {sources.map((s) => (
                 <div key={s.source_id} className="flex items-center justify-between gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
-                  <div className="flex items-center gap-2 min-w-0">
+                  <button
+                    type="button"
+                    className={`flex items-center gap-2 min-w-0 text-left flex-1 rounded-md px-1 py-0.5 select-none transition-colors ${soloSource === s.source_id ? "bg-primary/10 ring-1 ring-primary" : ""}`}
+                    title="Mantené apretado para ver sólo esta capa en el mapa"
+                    onMouseDown={() => onSolo?.(s.source_id)}
+                    onMouseUp={() => onSolo?.(null)}
+                    onMouseLeave={() => onSolo?.(null)}
+                    onTouchStart={() => onSolo?.(s.source_id)}
+                    onTouchEnd={() => onSolo?.(null)}
+                    onTouchCancel={() => onSolo?.(null)}
+                    onClick={(e) => e.preventDefault()}
+                  >
                     {s.enabled
                       ? <Eye className="h-4 w-4 text-primary flex-shrink-0" />
                       : <EyeOff className="h-4 w-4 text-muted-foreground flex-shrink-0" />}
@@ -63,7 +83,7 @@ export const DataSourceToggle = ({ position = "bottom-6 right-6" }: Props) => {
                       <p className="text-sm font-medium truncate">{s.label}</p>
                       <p className="text-[10px] text-muted-foreground">{s.source_id}</p>
                     </div>
-                  </div>
+                  </button>
                   {pending === s.source_id
                     ? <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                     : <Switch checked={s.enabled} onCheckedChange={(v) => handleToggle(s.source_id, v)} />}
