@@ -20,7 +20,7 @@ import { Search, Filter, X, ArrowUp, ArrowDown, Minus, CalendarPlus, Network, Sp
 import { DataSourceToggle } from "@/components/admin/DataSourceToggle";
 import { useDataSources } from "@/hooks/useDataSources";
 import { useLayerActors } from "@/hooks/useLayerActors";
-import { actorGlyphSvg } from "@/lib/mapGlyphs";
+import { actorGlyphSvg, actorGlyph } from "@/lib/mapGlyphs";
 import { useEvents, glowIntensity, eventBucket, proximityColor } from "@/hooks/useEvents";
 import { useActorConnections } from "@/hooks/useActorConnections";
 import { useAuth } from "@/contexts/AuthContext";
@@ -682,7 +682,7 @@ const MapPage = () => {
               html: `<div style="filter:drop-shadow(0 2px 3px rgba(15,23,42,0.35))">
                 <svg width="26" height="34" viewBox="0 0 26 34" style="display:block">
                   <path d="M13 33.5S24.5 20.5 24.5 13A11.5 11.5 0 1 0 1.5 13c0 7.5 11.5 20.5 11.5 20.5Z" fill="${pinColor}" stroke="#ffffff" stroke-width="2"/>
-                  <g transform="translate(5.5,5.5) scale(0.63)">${actorGlyphSvg(a.type, 24)}</g>
+                  <g transform="translate(5.8,5.8) scale(0.6)">${actorGlyph(a.type)}</g>
                 </svg>
               </div>`,
               iconSize: [26, 34],
