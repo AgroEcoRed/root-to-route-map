@@ -43,6 +43,10 @@ import { ChevronDown } from "lucide-react";
 import fotoComarcaToolbar from "@/assets/foto-comarca-1.jpg";
 import rutasSanasLogo from "@/assets/rutas-sanas-logo.jpeg.asset.json";
 
+/** Mapa colaborativo original de Rutas Sanas del Alimento (Google My Maps). */
+export const RUTAS_SANAS_MAP_URL =
+  "https://www.google.com/maps/d/viewer?mid=1e4CanhyiwCYZkQdPa9gAr77goJywFFxf&hl=es_419&ll=-34.71330544952425%2C-66.5766887375&z=5";
+
 // ----------------------------------------------------------------------------
 // HTML/URL safety helpers — Leaflet's bindPopup accepts a raw HTML string, so
 // any DB-sourced field interpolated into a popup must be HTML-escaped to avoid
@@ -1371,7 +1375,7 @@ const MapPage = () => {
           </div>
         </div>
       </div>
-      <DataSourceToggle position="bottom-6 right-6" />
+      <DataSourceToggle position="bottom-6 right-6" onSolo={setSoloSource} soloSource={soloSource} />
       <EventFormDialog open={eventDialogOpen} onOpenChange={setEventDialogOpen} />
       <AddMapPointDialog open={addPointOpen} onOpenChange={setAddPointOpen} />
       <EndorseDialog
