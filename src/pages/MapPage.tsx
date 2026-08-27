@@ -555,14 +555,17 @@ const MapPage = () => {
   };
 
   const filtered = useMemo(() => {
-    if (eventFilters.onlyMes) return [];
+    if (eventFilters.onlyMes && !soloSource) return [];
     return allActors.filter((a) => {
-      if (!activeTypes.has(a.type)) return false;
-      if (!activeCerts.has(a.certification)) return false;
+      // En modo "solo esta capa" se muestran todos sus puntos sin más filtros.
+      if (!soloSource) {
+        if (!activeTypes.has(a.type)) return false;
+        if (!activeCerts.has(a.certification)) return false;
+      }
       if (search && !a.name.toLowerCase().includes(search.toLowerCase()) && !a.products.some((p) => p.toLowerCase().includes(search.toLowerCase()))) return false;
       return true;
     });
-  }, [activeTypes, activeCerts, search, allActors, eventFilters.onlyMes]);
+  }, [activeTypes, activeCerts, search, allActors, eventFilters.onlyMes, soloSource]);
 
   // Recalculate map size when surrounding layout changes
   useEffect(() => {
