@@ -532,9 +532,9 @@ const MapPage = () => {
     if (isEnabled("utt_nodos")) out.push(...uttNodesActors);
     if (isEnabled("user_points")) out.push(...userPointActors);
     if (isEnabled("nat_san_martin")) out.push(...natSanMartinActors);
-    out.push(...extraLayerActors.filter(a => isEnabled(a.source as any)));
-    return out;
-  }, [dbActors, isEnabled, rutasSanasActors, userPointActors, natSanMartinActors, elClickActors, elBroteActors, extraLayerActors]);
+    out.push(...extraLayerActors.filter(a => isEnabled(a.source as any) || a.source === soloSource));
+    return soloSource ? out.filter(a => a.source === soloSource) : out;
+  }, [dbActors, isEnabled, rutasSanasActors, userPointActors, natSanMartinActors, elClickActors, elBroteActors, extraLayerActors, soloSource]);
 
   const toggleType = (type: ActorType) => {
     setActiveTypes((prev) => {
