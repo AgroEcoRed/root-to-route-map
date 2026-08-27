@@ -349,7 +349,13 @@ const MapPage = () => {
     if (v) url.searchParams.set("capa", MES_LAYER_ID); else url.searchParams.delete("capa");
     window.history.replaceState({}, "", url.toString());
   };
-  const visibleEvents = useMemo(() => applyEventFilters(events, eventFilters), [events, eventFilters]);
+  // Aislar momentáneamente una sola capa (se activa manteniendo apretado su
+  // nombre en el administrador de capas).
+  const [soloSource, setSoloSource] = useState<string | null>(null);
+  const visibleEvents = useMemo(() => {
+    if (soloSource && soloSource !== "eventos") return [];
+    return applyEventFilters(events, eventFilters);
+  }, [events, eventFilters, soloSource]);
   const allTypesCount = Object.keys(actorTypeLabels).length;
   const activeFilterCount =
     (activeTypes.size < allTypesCount ? 1 : 0) +
