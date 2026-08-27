@@ -663,14 +663,40 @@ const MapPage = () => {
         ? `<div style="transform:rotate(-45deg);display:flex">${glyph}</div>`
         : glyph;
 
-      const icon = L.divIcon({
-        className: "custom-marker",
-        html: `<div style="background:linear-gradient(160deg, ${color}, ${color}cc);width:30px;height:30px;${shape}${borderStyle}box-shadow:0 3px 8px rgba(28,45,20,0.35);display:flex;align-items:center;justify-content:center;">
-          ${inner}
-        </div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 15],
-      });
+      // --- Íconos propios por capa -------------------------------------
+      // SPG (INTA/SENASA/INAFCI): círculo celeste, bien distinguible.
+      // Rutas Sanas: chinche estilo Google My Maps con la paleta del mapa
+      // original (verde oferta, azul demanda, turquesa servicio).
+      const icon = a.source === "spg_inta"
+        ? L.divIcon({
+            className: "custom-marker",
+            html: `<div style="background:radial-gradient(circle at 35% 30%, #7dd3fc, #0ea5e9);width:28px;height:28px;border-radius:50%;border:2.5px solid #ffffff;box-shadow:0 3px 8px rgba(2,132,199,0.45);display:flex;align-items:center;justify-content:center;">${glyph}</div>`,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14],
+          })
+        : a.source === "rutas_sanas"
+        ? (() => {
+            const pinColor = role === "oferta" ? "#188038" : role === "demanda" ? "#1a73e8" : "#12b5cb";
+            return L.divIcon({
+              className: "custom-marker",
+              html: `<div style="filter:drop-shadow(0 2px 3px rgba(15,23,42,0.35))">
+                <svg width="26" height="34" viewBox="0 0 26 34" style="display:block">
+                  <path d="M13 33.5S24.5 20.5 24.5 13A11.5 11.5 0 1 0 1.5 13c0 7.5 11.5 20.5 11.5 20.5Z" fill="${pinColor}" stroke="#ffffff" stroke-width="2"/>
+                  <g transform="translate(5.5,5.5) scale(0.63)">${actorGlyphSvg(a.type, 24)}</g>
+                </svg>
+              </div>`,
+              iconSize: [26, 34],
+              iconAnchor: [13, 34],
+            });
+          })()
+        : L.divIcon({
+            className: "custom-marker",
+            html: `<div style="background:linear-gradient(160deg, ${color}, ${color}cc);width:30px;height:30px;${shape}${borderStyle}box-shadow:0 3px 8px rgba(28,45,20,0.35);display:flex;align-items:center;justify-content:center;">
+              ${inner}
+            </div>`,
+            iconSize: [30, 30],
+            iconAnchor: [15, 15],
+          });
 
       const certColor = a.certification === "green" ? "#2d6a4f" : a.certification === "yellow" ? "#d4a017" : "#dc2626";
       const productLabel = role === "oferta" ? "🟣 Ofrece" : role === "demanda" ? "🔵 Demanda" : "Servicio";
