@@ -730,7 +730,7 @@ const MapPage = () => {
       const roleBadgeColor = roleColors[role];
 
       const sourceBadge = a.source === "rutas_sanas"
-        ? `<span style="display:inline-block;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.3px;text-transform:uppercase">Rutas Sanas</span>`
+        ? `<a href="${RUTAS_SANAS_MAP_URL}" target="_blank" rel="noopener noreferrer" title="Ver el mapa original Rutas Sanas del Alimento" style="display:inline-flex;align-items:center;gap:4px;background:#f3f4f6;color:#6b7280;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dashed #9ca3af;letter-spacing:0.3px;text-transform:uppercase;text-decoration:none"><img src="${rutasSanasLogo.url}" alt="Rutas Sanas del Alimento" style="width:14px;height:14px;border-radius:50%;object-fit:cover" />Rutas Sanas ↗</a>`
         : a.source === "mercado_territorial"
         ? `<a href="https://mercadoterritorial.com.ar/buscador-de-nodos/" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#fef3c7;color:#92400e;font-size:9px;font-weight:600;padding:2px 6px;border-radius:6px;border:1px dotted #d97706;letter-spacing:0.3px;text-transform:uppercase;text-decoration:none">Mercado Territorial</a>`
         : a.source === "el_click"
