@@ -49,6 +49,16 @@ export default function LayerAdminPage() {
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 25;
 
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return actors;
+    return actors.filter(a =>
+      a.name.toLowerCase().includes(q) ||
+      (a.description || "").toLowerCase().includes(q) ||
+      (a.address || "").toLowerCase().includes(q)
+    );
+  }, [actors, search]);
+
   if (authLoading || lmLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -70,16 +80,6 @@ export default function LayerAdminPage() {
     if (error) toast.error("No se pudo cambiar el estado: " + error.message);
     else toast.success(`Capa ${next ? "activada" : "desactivada"}`);
   };
-
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return actors;
-    return actors.filter(a =>
-      a.name.toLowerCase().includes(q) ||
-      (a.description || "").toLowerCase().includes(q) ||
-      (a.address || "").toLowerCase().includes(q)
-    );
-  }, [actors, search]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const pageRows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
