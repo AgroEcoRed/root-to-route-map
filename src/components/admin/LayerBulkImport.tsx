@@ -134,13 +134,13 @@ export default function LayerBulkImport({ layerId, onImported }: Props) {
       for (const r of rows) {
         const name = pick(r, mode === "actores"
           ? ["nombre", "name", "actor", "titulo", "organizacion"]
-          : ["titulo", "title", "nombre", "actividad", "evento"]);
+          : ["titulo_de_la_actividad", "titulo", "title", "nombre", "actividad", "evento"]);
         if (!name) { skipped++; continue; }
 
         let lat = num(pick(r, ["lat", "latitud", "latitude"]));
         let lng = num(pick(r, ["lng", "lon", "long", "longitud", "longitude"]));
-        const address = pick(r, ["direccion", "address", "lugar", "domicilio", "ubicacion"]);
-        const locality = pick(r, ["localidad", "ciudad", "municipio", "partido", "provincia"]);
+        const address = pick(r, ["direccion_de_la_actividad", "direccion", "address", "lugar", "domicilio", "ubicacion"]);
+        const locality = pick(r, ["localidad", "ciudad", "municipio", "partido_departamento", "partido", "provincia"]);
 
         if ((lat == null || lng == null) && (address || locality)) {
           let g = await geocode([address, locality, "Argentina"].filter(Boolean).join(", "));
@@ -175,24 +175,25 @@ export default function LayerBulkImport({ layerId, onImported }: Props) {
           if (error) { skipped++; lines.push(`${name}: ${error.message}`); } else ok++;
         } else {
           const startRaw = pick(r, ["fecha_inicio", "fecha", "inicio", "fecha_de_inicio", "dia", "starts_at", "start"]);
-          const timeRaw = pick(r, ["hora", "hora_inicio", "horario"]);
+          const timeRaw = pick(r, ["hora_de_comienzo", "hora", "hora_inicio", "horario"]);
           const start = parseDate(startRaw, timeRaw);
           if (!start) { skipped++; lines.push(`Fecha inválida ("${startRaw}"): ${name}`); continue; }
           const endRaw = pick(r, ["fecha_fin", "fin", "fecha_de_fin", "ends_at", "end"]);
           const end = endRaw ? parseDate(endRaw, pick(r, ["hora_fin"])) : null;
-          const typeRaw = pick(r, ["tipo", "event_type", "categoria"]);
+          const typeRaw = pick(r, ["tipo_de_actividad", "tipo", "event_type", "categoria"]);
           const { type: eventType, custom } = mapEventType(typeRaw);
           const { error } = await (supabase as any).from("events").insert({
             title: name,
-            description: pick(r, ["descripcion", "description", "detalle"]) || null,
+            description: pick(r, ["descripcion_de_la_actividad", "descripcion", "description", "detalle"]) || null,
             event_type: eventType,
             custom_type: custom,
             starts_at: start.toISOString(),
             ends_at: end ? end.toISOString() : null,
             location_name: [address, locality].filter(Boolean).join(", ") || null,
             lat, lng,
-            link: pick(r, ["enlace", "link", "url"]) || null,
-            contact: pick(r, ["contacto", "contact", "telefono", "whatsapp"]) || null,
+            link: pick(r, ["enlace", "link", "url", "red_social"]) || null,
+            contact: pick(r, ["contacto", "contact", "telefono", "whatsapp", "correo_electronico"]) || null,
+            focal_name: pick(r, ["nombre_y_apellido", "referente"]) || null,
             source: "community",
             approved: true,
             layer_id: layerId,
