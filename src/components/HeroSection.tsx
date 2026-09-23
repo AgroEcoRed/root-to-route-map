@@ -7,6 +7,7 @@ import trigo from "@/assets/foto-trigo-atardecer.jpg";
 import ganaderia from "@/assets/foto-ganaderia.jpg";
 import papas from "@/assets/foto-papas.jpg";
 import rutasSanasLogo from "@/assets/rutas-sanas-logo.jpeg.asset.json";
+import renamaLogo from "@/assets/renama-logo.png.asset.json";
 import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 // Logos institucionales ocultos temporalmente hasta obtener autorización
