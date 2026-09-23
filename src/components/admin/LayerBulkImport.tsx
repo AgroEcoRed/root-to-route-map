@@ -21,10 +21,15 @@ const norm = (s: string) =>
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
 
+// Busca primero el nombre exacto de columna y, si no, una columna que empiece
+// así (útil para encabezados largos de Google Forms, ej. "Título de la actividad").
 const pick = (row: Record<string, unknown>, keys: string[]): string => {
+  const val = (v: unknown) => (v !== undefined && v !== null && String(v).trim() !== "" ? String(v).trim() : "");
+  for (const k of keys) { const v = val(row[k]); if (v) return v; }
+  const cols = Object.keys(row);
   for (const k of keys) {
-    const v = row[k];
-    if (v !== undefined && v !== null && String(v).trim() !== "") return String(v).trim();
+    const c = cols.find((c) => c.startsWith(k + "_") || c === k);
+    if (c) { const v = val(row[c]); if (v) return v; }
   }
   return "";
 };
