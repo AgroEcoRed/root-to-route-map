@@ -98,7 +98,7 @@ function mapEventType(raw: string): { type: string; custom: string | null } {
 
 export default function LayerBulkImport({ layerId, onImported }: Props) {
   const { user } = useAuth();
-  const [mode, setMode] = useState<Mode>("actores");
+  const [mode, setMode] = useState<Mode>(layerId === "mes_agroecologia" ? "actividades" : "actores");
   const [busy, setBusy] = useState(false);
   const [log, setLog] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -225,8 +225,12 @@ export default function LayerBulkImport({ layerId, onImported }: Props) {
         deducir desde la dirección o localidad. Después podés editar cada registro desde la lista.
       </p>
 
+      <p className="mb-3 rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-sm font-medium text-foreground">
+        Vas a importar: <span className="capitalize text-primary">{mode}</span>
+      </p>
+
       <div className="flex flex-wrap items-center gap-2 mb-3">
-        <Label className="text-xs">Contenido:</Label>
+        <Label className="text-xs">Elegí qué contiene la planilla:</Label>
         {(["actores", "actividades"] as Mode[]).map((m) => (
           <Badge
             key={m}
@@ -251,7 +255,7 @@ export default function LayerBulkImport({ layerId, onImported }: Props) {
       />
       <Button size="sm" disabled={busy} onClick={() => inputRef.current?.click()}>
         {busy ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Upload className="h-4 w-4 mr-1" />}
-        {busy ? "Importando…" : "Subir planilla"}
+        {busy ? "Importando…" : `Subir planilla de ${mode}`}
       </Button>
 
       {log.length > 0 && (
