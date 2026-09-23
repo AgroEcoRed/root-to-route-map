@@ -94,8 +94,15 @@ const HeroSection = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.25 }}
           className="absolute top-24 right-4 sm:right-8 flex items-center gap-3 rounded-lg border border-white/30 bg-background/85 p-2.5 pr-4 shadow-lg backdrop-blur-md"
-          aria-label="Red integrada: Rutas Sanas del Alimento"
+          aria-label="Redes integradas: RENAMA y Rutas Sanas del Alimento"
         >
+          <img
+            src={renamaLogo.url}
+            alt="Logo de RENAMA, Red Nacional de Municipios y Comunidades que Agroecologizan"
+            className="h-10 w-auto object-contain sm:h-12"
+            loading="eager"
+          />
+          <div className="h-10 w-px bg-border sm:h-12" aria-hidden="true" />
           <img
             src={rutasSanasLogo.url}
             alt="Logo de la Red Interregional de Nodos de Consumo Agroecológico Las Rutas Sanas del Alimento"
