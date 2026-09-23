@@ -94,6 +94,9 @@ const HeroSection = () => {
             aria-label="Redes integradas: RENAMA y Rutas Sanas del Alimento"
           >
             <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.25 }}
               className="flex items-center justify-center rounded-lg border border-white/30 bg-background/85 p-2 shadow-lg backdrop-blur-md"
               aria-label="RENAMA, Red Nacional de Municipios y Comunidades que Agroecologizan"
             >
@@ -105,13 +108,16 @@ const HeroSection = () => {
               />
             </motion.div>
             <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
               className="flex items-center gap-2.5 rounded-lg border border-white/30 bg-background/85 p-2 pr-3.5 shadow-lg backdrop-blur-md"
               aria-label="Rutas Sanas del Alimento, red integrada al mapa"
             >
               <img
                 src={rutasSanasLogo.url}
                 alt="Logo de la Red Interregional de Nodos de Consumo Agroecológico Las Rutas Sanas del Alimento"
-                className="h-11 w-11 rounded-full object-cover sm:h-13 sm:w-13"
+                className="h-11 w-11 rounded-full object-cover sm:h-12 sm:w-12"
               />
               <div className="hidden max-w-40 sm:block">
                 <p className="text-xs font-semibold leading-tight text-foreground">Rutas Sanas del Alimento</p>
