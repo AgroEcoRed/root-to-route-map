@@ -89,30 +89,36 @@ const HeroSection = () => {
       ))}
 
       <motion.div className="container relative z-10 pt-28 pb-20" style={{ y: textY }}>
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.25 }}
-          className="absolute top-24 right-4 sm:right-8 flex items-center gap-3 rounded-lg border border-white/30 bg-background/85 p-2.5 pr-4 shadow-lg backdrop-blur-md"
-          aria-label="Redes integradas: RENAMA y Rutas Sanas del Alimento"
-        >
-          <img
-            src={renamaLogo.url}
-            alt="Logo de RENAMA, Red Nacional de Municipios y Comunidades que Agroecologizan"
-            className="h-10 w-auto object-contain sm:h-12"
-            loading="eager"
-          />
-          <div className="h-10 w-px bg-border sm:h-12" aria-hidden="true" />
-          <img
-            src={rutasSanasLogo.url}
-            alt="Logo de la Red Interregional de Nodos de Consumo Agroecológico Las Rutas Sanas del Alimento"
-            className="h-14 w-14 rounded-full object-cover sm:h-16 sm:w-16"
-          />
-          <div className="hidden max-w-40 sm:block">
-            <p className="text-xs font-semibold leading-tight text-foreground">Rutas Sanas del Alimento</p>
-            <p className="mt-1 text-[10px] leading-tight text-muted-foreground">Red integrada al mapa</p>
+          <div
+            className="absolute top-24 right-4 sm:right-8 flex items-center gap-3"
+            aria-label="Redes integradas: RENAMA y Rutas Sanas del Alimento"
+          >
+            <motion.div
+              className="flex items-center justify-center rounded-lg border border-white/30 bg-background/85 p-2 shadow-lg backdrop-blur-md"
+              aria-label="RENAMA, Red Nacional de Municipios y Comunidades que Agroecologizan"
+            >
+              <img
+                src={renamaLogo.url}
+                alt="Logo de RENAMA, Red Nacional de Municipios y Comunidades que Agroecologizan"
+                className="h-10 w-auto object-contain sm:h-12"
+                loading="eager"
+              />
+            </motion.div>
+            <motion.div
+              className="flex items-center gap-2.5 rounded-lg border border-white/30 bg-background/85 p-2 pr-3.5 shadow-lg backdrop-blur-md"
+              aria-label="Rutas Sanas del Alimento, red integrada al mapa"
+            >
+              <img
+                src={rutasSanasLogo.url}
+                alt="Logo de la Red Interregional de Nodos de Consumo Agroecológico Las Rutas Sanas del Alimento"
+                className="h-11 w-11 rounded-full object-cover sm:h-13 sm:w-13"
+              />
+              <div className="hidden max-w-40 sm:block">
+                <p className="text-xs font-semibold leading-tight text-foreground">Rutas Sanas del Alimento</p>
+                <p className="mt-1 text-[10px] leading-tight text-muted-foreground">Red integrada al mapa</p>
+              </div>
+            </motion.div>
           </div>
-        </motion.div>
         {/* Logos institucionales ocultos temporalmente hasta obtener autorización
         <motion.div
           initial={{ opacity: 0, y: -10 }}
