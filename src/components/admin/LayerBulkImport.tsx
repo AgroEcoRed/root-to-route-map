@@ -138,7 +138,11 @@ export default function LayerBulkImport({ layerId, onImported }: Props) {
         const locality = pick(r, ["localidad", "ciudad", "municipio", "partido", "provincia"]);
 
         if ((lat == null || lng == null) && (address || locality)) {
-          const g = await geocode([address, locality, "Argentina"].filter(Boolean).join(", "));
+          let g = await geocode([address, locality, "Argentina"].filter(Boolean).join(", "));
+          if (!g && address && locality) {
+            await new Promise((res) => setTimeout(res, 1100));
+            g = await geocode(`${locality}, Argentina`);
+          }
           if (g) { lat = g.lat; lng = g.lng; geocoded++; }
           await new Promise((res) => setTimeout(res, 1100));
         }
