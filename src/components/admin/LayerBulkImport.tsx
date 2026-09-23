@@ -46,6 +46,51 @@ async function geocode(q: string): Promise<{ lat: number; lng: number } | null> 
   return null;
 }
 
+/** Acepta fechas de Excel (número), dd/mm/aaaa, aaaa-mm-dd, con o sin hora. Hora de Argentina. */
+function parseDate(raw: string, timeRaw = ""): Date | null {
+  if (!raw) return null;
+  const s = raw.trim();
+  let y: number, mo: number, d: number, h = 0, mi = 0;
+  const serial = /^\d+(\.\d+)?$/.test(s) ? parseFloat(s) : NaN;
+  if (Number.isFinite(serial) && serial > 20000 && serial < 80000) {
+    const ms = Math.round((serial - 25569) * 86400000);
+    const u = new Date(ms);
+    y = u.getUTCFullYear(); mo = u.getUTCMonth() + 1; d = u.getUTCDate(); h = u.getUTCHours(); mi = u.getUTCMinutes();
+  } else {
+    let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2})[:.hH](\d{2}))?/);
+    if (m) { y = +m[1]; mo = +m[2]; d = +m[3]; h = +(m[4] || 0); mi = +(m[5] || 0); }
+    else {
+      m = s.match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{2,4})(?:[ ,T]+(\d{1,2})[:.hH](\d{2})?)?/);
+      if (!m) return null;
+      d = +m[1]; mo = +m[2]; y = +m[3]; if (y < 100) y += 2000; h = +(m[4] || 0); mi = +(m[5] || 0);
+    }
+  }
+  const t = timeRaw.trim();
+  if (t) {
+    const tn = /^\d*\.\d+$/.test(t) ? parseFloat(t) : NaN; // hora de Excel (fracción del día)
+    if (Number.isFinite(tn)) { const mins = Math.round(tn * 1440); h = Math.floor(mins / 60); mi = mins % 60; }
+    else { const tm = t.match(/(\d{1,2})(?:[:.hH](\d{2}))?/); if (tm) { h = +tm[1]; mi = +(tm[2] || 0); } }
+  }
+  if (!(mo >= 1 && mo <= 12 && d >= 1 && d <= 31 && y > 1900)) return null;
+  const date = new Date(Date.UTC(y, mo - 1, d, h + 3, mi)); // Argentina = UTC-3
+  return isNaN(date.getTime()) ? null : date;
+}
+
+const EVENT_TYPES = ["feria", "intercambio", "formacion", "otro", "conferencia_jornada", "taller", "encuentro", "voluntariado"];
+function mapEventType(raw: string): { type: string; custom: string | null } {
+  if (!raw) return { type: "otro", custom: null };
+  const k = norm(raw);
+  if (EVENT_TYPES.includes(k)) return { type: k, custom: null };
+  if (/feria|mercado/.test(k)) return { type: "feria", custom: raw };
+  if (/taller/.test(k)) return { type: "taller", custom: raw };
+  if (/curso|capacit|formac|charla/.test(k)) return { type: "formacion", custom: raw };
+  if (/jornada|conferen|congreso|semin|panel/.test(k)) return { type: "conferencia_jornada", custom: raw };
+  if (/encuentro|reunion|visita|recorrida/.test(k)) return { type: "encuentro", custom: raw };
+  if (/intercambio|trueque|semilla/.test(k)) return { type: "intercambio", custom: raw };
+  if (/voluntar|minga|plantac/.test(k)) return { type: "voluntariado", custom: raw };
+  return { type: "otro", custom: raw };
+}
+
 export default function LayerBulkImport({ layerId, onImported }: Props) {
   const { user } = useAuth();
   const [mode, setMode] = useState<Mode>("actores");
@@ -120,17 +165,21 @@ export default function LayerBulkImport({ layerId, onImported }: Props) {
           });
           if (error) { skipped++; lines.push(`${name}: ${error.message}`); } else ok++;
         } else {
-          const startRaw = pick(r, ["fecha_inicio", "fecha", "inicio", "starts_at", "start"]);
-          const start = startRaw ? new Date(startRaw.replace(" ", "T")) : null;
-          if (!start || isNaN(start.getTime())) { skipped++; lines.push(`Fecha inválida: ${name}`); continue; }
-          const endRaw = pick(r, ["fecha_fin", "fin", "ends_at", "end"]);
-          const end = endRaw ? new Date(endRaw.replace(" ", "T")) : null;
+          const startRaw = pick(r, ["fecha_inicio", "fecha", "inicio", "fecha_de_inicio", "dia", "starts_at", "start"]);
+          const timeRaw = pick(r, ["hora", "hora_inicio", "horario"]);
+          const start = parseDate(startRaw, timeRaw);
+          if (!start) { skipped++; lines.push(`Fecha inválida ("${startRaw}"): ${name}`); continue; }
+          const endRaw = pick(r, ["fecha_fin", "fin", "fecha_de_fin", "ends_at", "end"]);
+          const end = endRaw ? parseDate(endRaw, pick(r, ["hora_fin"])) : null;
+          const typeRaw = pick(r, ["tipo", "event_type", "categoria"]);
+          const { type: eventType, custom } = mapEventType(typeRaw);
           const { error } = await (supabase as any).from("events").insert({
             title: name,
             description: pick(r, ["descripcion", "description", "detalle"]) || null,
-            event_type: pick(r, ["tipo", "event_type", "categoria"]) || "otro",
+            event_type: eventType,
+            custom_type: custom,
             starts_at: start.toISOString(),
-            ends_at: end && !isNaN(end.getTime()) ? end.toISOString() : null,
+            ends_at: end ? end.toISOString() : null,
             location_name: [address, locality].filter(Boolean).join(", ") || null,
             lat, lng,
             link: pick(r, ["enlace", "link", "url"]) || null,
