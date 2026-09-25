@@ -1,12 +1,23 @@
 import { motion } from "framer-motion";
 import { Plus, Mail } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import renamaLogo from "@/assets/renama-logo.png.asset.json";
+import rutasSanasLogo from "@/assets/rutas-sanas-logo.jpeg.asset.json";
 // Logos institucionales ocultos temporalmente hasta obtener autorización
 // import conicetLogo from "@/assets/logo-conicet.png";
 // import unsamLogo from "@/assets/logo-unsam.png";
 // import ubaLogo from "@/assets/logo-uba.png";
 
 const partners: { name: string; logo?: string; url?: string }[] = [
+  {
+    name: "RENAMA",
+    logo: renamaLogo.url,
+  },
+  {
+    name: "Rutas Sanas del Alimento",
+    logo: rutasSanasLogo.url,
+    url: "https://www.google.com/maps/d/viewer?mid=1e4CanhyiwCYZkQdPa9gAr77goJywFFxf&hl=es_419&ll=-34.71330544952425%2C-66.5766887375&z=5",
+  },
   // { name: "CONICET", logo: conicetLogo, url: "https://www.conicet.gov.ar" },
   // { name: "UNSAM", logo: unsamLogo, url: "https://www.unsam.edu.ar" },
   // { name: "UBA", logo: ubaLogo, url: "https://www.uba.ar" },
@@ -38,11 +49,8 @@ const PartnersSection = () => {
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 items-center justify-items-center mb-12">
           {partners.map((partner, i) => (
-            <motion.a
+            <motion.div
               key={partner.name}
-              href={partner.url}
-              target="_blank"
-              rel="noopener noreferrer"
               className="group flex items-center justify-center w-full h-28 px-6 py-4 rounded-xl bg-card border border-border hover:border-primary/30 hover:shadow-card transition-all duration-300"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -50,13 +58,30 @@ const PartnersSection = () => {
               transition={{ duration: 0.5, delay: i * 0.1 }}
               whileHover={{ y: -4 }}
             >
-              <img
-                src={partner.logo}
-                alt={partner.name}
-                className="max-h-16 w-auto object-contain grayscale group-hover:grayscale-0 transition-all duration-300"
-                loading="lazy"
-              />
-            </motion.a>
+              {partner.url ? (
+                <a
+                  href={partner.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-full w-full items-center justify-center"
+                  aria-label={`Visitar ${partner.name}`}
+                >
+                  <img
+                    src={partner.logo}
+                    alt={partner.name}
+                    className="max-h-16 w-auto object-contain grayscale group-hover:grayscale-0 transition-all duration-300"
+                    loading="lazy"
+                  />
+                </a>
+              ) : (
+                <img
+                  src={partner.logo}
+                  alt={partner.name}
+                  className="max-h-16 w-auto object-contain grayscale group-hover:grayscale-0 transition-all duration-300"
+                  loading="lazy"
+                />
+              )}
+            </motion.div>
           ))}
 
           {/* Placeholder slots for future partners */}

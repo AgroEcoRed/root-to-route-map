@@ -28,6 +28,11 @@ export const useLayerManager = () => {
     }
     let active = true;
     (async () => {
+      // Reclamá cualquier invitación pendiente antes de decidir qué capas puede
+      // administrar esta sesión, incluso si la sesión ya estaba abierta.
+      try {
+        await supabase.functions.invoke("claim-layer-invites");
+      } catch { /* La consulta posterior conserva el acceso ya asignado */ }
       const { data } = await (supabase as any)
         .from("layer_managers")
         .select("layer_id")
