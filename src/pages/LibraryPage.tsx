@@ -23,6 +23,9 @@ import LicenseBadge from "@/components/LicenseBadge";
 import { DEFAULT_LICENSE, LicenseCode } from "@/lib/licenses";
 import { normalizeTitle, normalizePersonName } from "@/lib/titleCase";
 import { CITATION_STYLES, CitationStyle, formatCitation, formatBibliography } from "@/lib/citations";
+import TextReader, { sendToReader, type LangKey } from "@/components/library/TextReader";
+import { extractPdfText } from "@/lib/pdfText";
+import { Headphones } from "lucide-react";
 
 const ITEM_TYPES = ["article", "book", "thesis", "report", "chapter", "web"];
 
@@ -292,6 +295,8 @@ const LibraryPage = () => {
             </div>
           )}
 
+          <TextReader />
+
           {/* List */}
           {loading ? (
             <div className="flex justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
@@ -336,6 +341,28 @@ const ItemCard = ({
       return;
     }
     window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  };
+  const [pdfBusy, setPdfBusy] = useState(false);
+  const readerLang = (): LangKey | undefined =>
+    ({ es: "es-AR", en: "en-US", pt: "pt-BR", fr: "fr-FR" } as Record<string, LangKey>)[(item as any).language?.slice(0, 2)?.toLowerCase()];
+  const listen = () => {
+    const parts = [item.title, item.authors?.length ? item.authors.join(", ") : "", item.year ? String(item.year) : "", item.abstract || ""];
+    sendToReader(parts.filter(Boolean).join(". "), readerLang());
+  };
+  const listenPdf = async () => {
+    if (!item.file_path) return;
+    setPdfBusy(true);
+    try {
+      const { data, error } = await supabase.storage.from("biblioteca").createSignedUrl(item.file_path, 60 * 10);
+      if (error || !data?.signedUrl) { toast.error("Iniciá sesión para acceder al archivo"); return; }
+      const text = await extractPdfText(data.signedUrl);
+      if (!text) { toast.warning("El PDF no tiene texto seleccionable"); return; }
+      sendToReader(text, readerLang());
+    } catch {
+      toast.error("No se pudo leer el PDF");
+    } finally {
+      setPdfBusy(false);
+    }
   };
   const move = async (collection_id: string | null) => {
     const { error } = await supabase.from("library_items").update({ collection_id }).eq("id", item.id);
@@ -394,9 +421,17 @@ const ItemCard = ({
           >
             <Quote className="h-3.5 w-3.5" /> Copiar cita
           </button>
+          <button onClick={listen} className="text-xs flex items-center gap-1 text-primary hover:underline">
+            <Headphones className="h-3.5 w-3.5" /> Escuchar ficha
+          </button>
           {item.file_path && (
             <button onClick={openFile} className="text-xs flex items-center gap-1 text-primary hover:underline">
               <FileText className="h-3.5 w-3.5" /> PDF
+            </button>
+          )}
+          {item.file_path && /\.pdf$/i.test(item.file_path) && (
+            <button onClick={listenPdf} disabled={pdfBusy} className="text-xs flex items-center gap-1 text-primary hover:underline disabled:opacity-50">
+              {pdfBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Headphones className="h-3.5 w-3.5" />} Escuchar PDF
             </button>
           )}
           {item.url && (
