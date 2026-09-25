@@ -29,10 +29,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        setLoading(false);
         // Gate sign-in: only allow users who completed registration.
         // Runs for both email/password and OAuth (Google) sign-ins.
         if (_event === "SIGNED_IN" && session?.user) {
+          setLoading(true);
           setTimeout(async () => {
             try {
               await supabase.functions.invoke("claim-layer-invites");
@@ -68,13 +68,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 { duration: 6000 }
               );
               window.location.href = "/registro";
+              return;
             }
+            setLoading(false);
           }, 0);
+        } else {
+          setLoading(false);
         }
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Al restaurar una sesión existente también reclamamos invitaciones pendientes.
+    // Así una cuenta institucional recibe su capa sin tener que cerrar sesión y volver a entrar.
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        try {
+          await supabase.functions.invoke("claim-layer-invites");
+        } catch { /* No bloquea el ingreso */ }
+      }
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
