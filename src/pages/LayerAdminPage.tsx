@@ -46,6 +46,7 @@ export default function LayerAdminPage() {
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<Partial<LayerActor> | null>(null);
   const [saving, setSaving] = useState(false);
+  const [eventImportVersion, setEventImportVersion] = useState(0);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 25;
 
@@ -353,9 +354,15 @@ export default function LayerAdminPage() {
           )}
         </Card>
 
-        <LayerEventsAdmin layerId={layerId} />
+        <LayerEventsAdmin key={eventImportVersion} layerId={layerId} />
 
-        <LayerBulkImport layerId={layerId} onImported={reload} />
+        <LayerBulkImport
+          layerId={layerId}
+          onImported={() => {
+            reload();
+            setEventImportVersion((version) => version + 1);
+          }}
+        />
 
         <Dialog open={!!editing} onOpenChange={(o) => { if (!o) setEditing(null); }}>
           <DialogContent className="max-w-lg">

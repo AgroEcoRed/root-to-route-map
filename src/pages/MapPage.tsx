@@ -968,7 +968,9 @@ const MapPage = () => {
   useEffect(() => {
     if (!onlyMes) { fittedMesRef.current = false; return; }
     if (fittedMesRef.current || !mapRef.current) return;
-    const pts = visibleEvents
+    const upcomingPoints = visibleEvents.filter((e) => eventBucket(e) === "upcoming");
+    const eventsToFit = upcomingPoints.length > 0 ? upcomingPoints : visibleEvents;
+    const pts = eventsToFit
       .filter((e) => e.lat != null && e.lng != null)
       .map((e) => [e.lat as number, e.lng as number] as [number, number]);
     if (pts.length === 0) return;
