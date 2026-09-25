@@ -207,17 +207,41 @@ export default function LayerBulkImport({ layerId, onImported }: Props) {
             lines.push(`Ya estaba cargada: ${name}`);
             continue;
           }
+          const email = pick(r, ["correo_electronico", "email", "mail", "direccion_de_correo_electronico"]);
+          const phone = pick(r, ["telefono", "whatsapp", "celular"]);
+          const social = pick(r, ["red_social", "redes_sociales", "instagram", "facebook"]);
+          const linkRaw = pick(r, ["enlace", "link", "url"]);
+          const link = linkRaw || (/^https?:\/\//i.test(social) ? social : "");
+          const contactParts = [
+            pick(r, ["contacto", "contact"]),
+            phone && `Tel: ${phone}`,
+            email && `Correo: ${email}`,
+            social && !/^https?:\/\//i.test(social) && `Redes: ${social}`,
+          ].filter(Boolean) as string[];
+          const comments = pick(r, ["comentarios_adicionales", "comentarios", "observaciones"]);
+          const extras = [
+            ["Modalidad", pick(r, ["modalidad"])],
+            ["Duración", pick(r, ["duracion_de_la_actividad", "duracion"])],
+            ["Organizan", pick(r, ["instituciones_entidades_persona", "organizan", "organizador", "organiza"])],
+            ["Tipo de organización", pick(r, ["tipo_de_instituciones", "tipo_de_organizacion"])],
+            ["Comentarios", /^(ninguno|ninguna|no|-)$/i.test(comments) ? "" : comments],
+          ].filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`);
+          const baseDesc = pick(r, ["descripcion_de_la_actividad", "descripcion", "description", "detalle"]);
+          const description = [baseDesc, extras.join("\n")].filter(Boolean).join("\n\n");
           const { error } = await (supabase as any).from("events").insert({
             title: name,
-            description: pick(r, ["descripcion_de_la_actividad", "descripcion", "description", "detalle"]) || null,
+            description: description || null,
             event_type: eventType,
             custom_type: custom,
             starts_at: startsAt,
             ends_at: end ? end.toISOString() : null,
             location_name: [address, locality, district, province].filter(Boolean).join(", ") || null,
             lat, lng,
-            link: pick(r, ["enlace", "link", "url", "red_social"]) || null,
-            contact: pick(r, ["contacto", "contact", "telefono", "whatsapp", "correo_electronico"]) || null,
+            link: link || null,
+            contact: contactParts.join(" · ") || null,
+            contact_email: email || null,
+            contact_phone: phone || null,
+            focal_email: email || null,
             focal_name: pick(r, ["nombre_y_apellido", "referente"]) || null,
             source: "community",
             approved: true,
