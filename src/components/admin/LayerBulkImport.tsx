@@ -129,7 +129,7 @@ export default function LayerBulkImport({ layerId, onImported }: Props) {
         return o;
       });
 
-      let ok = 0, skipped = 0, geocoded = 0;
+      let ok = 0, skipped = 0, duplicated = 0, geocoded = 0;
 
       for (const r of rows) {
         const name = pick(r, mode === "actores"
@@ -140,13 +140,20 @@ export default function LayerBulkImport({ layerId, onImported }: Props) {
         let lat = num(pick(r, ["lat", "latitud", "latitude"]));
         let lng = num(pick(r, ["lng", "lon", "long", "longitud", "longitude"]));
         const address = pick(r, ["direccion_de_la_actividad", "direccion", "address", "lugar", "domicilio", "ubicacion"]);
-        const locality = pick(r, ["localidad", "ciudad", "municipio", "partido_departamento", "partido", "provincia"]);
+        const locality = pick(r, ["localidad", "ciudad", "municipio"]);
+        const district = pick(r, ["partido_departamento", "partido", "departamento"]);
+        const province = pick(r, ["provincia", "province"]);
 
         if ((lat == null || lng == null) && (address || locality)) {
-          let g = await geocode([address, locality, "Argentina"].filter(Boolean).join(", "));
+          // Cuanto más contexto territorial enviamos, menos probable es que una
+          // dirección ambigua termine en otra ciudad o en otro barrio homónimo.
+          let g = await geocode([address, locality, district, province, "Argentina"].filter(Boolean).join(", "));
           if (!g && address && locality) {
             await new Promise((res) => setTimeout(res, 1100));
-            g = await geocode(`${locality}, Argentina`);
+            // Si la dirección no puede resolverse (por ejemplo, el nombre de una
+            // persona o de una casa), ubicamos por localidad. El mapa la mostrará
+            // como una estrella punteada para indicar que es aproximada.
+            g = await geocode([locality, district, province, "Argentina"].filter(Boolean).join(", "));
           }
           if (g) { lat = g.lat; lng = g.lng; geocoded++; }
           await new Promise((res) => setTimeout(res, 1100));
@@ -182,14 +189,32 @@ export default function LayerBulkImport({ layerId, onImported }: Props) {
           const end = endRaw ? parseDate(endRaw, pick(r, ["hora_fin"])) : null;
           const typeRaw = pick(r, ["tipo_de_actividad", "tipo", "event_type", "categoria"]);
           const { type: eventType, custom } = mapEventType(typeRaw);
+          const startsAt = start.toISOString();
+          const { data: existing, error: duplicateCheckError } = await (supabase as any)
+            .from("events")
+            .select("id")
+            .eq("layer_id", layerId)
+            .eq("title", name)
+            .eq("starts_at", startsAt)
+            .limit(1);
+          if (duplicateCheckError) {
+            skipped++;
+            lines.push(`${name}: no se pudo comprobar si ya estaba cargada (${duplicateCheckError.message})`);
+            continue;
+          }
+          if (Array.isArray(existing) && existing.length > 0) {
+            duplicated++;
+            lines.push(`Ya estaba cargada: ${name}`);
+            continue;
+          }
           const { error } = await (supabase as any).from("events").insert({
             title: name,
             description: pick(r, ["descripcion_de_la_actividad", "descripcion", "description", "detalle"]) || null,
             event_type: eventType,
             custom_type: custom,
-            starts_at: start.toISOString(),
+            starts_at: startsAt,
             ends_at: end ? end.toISOString() : null,
-            location_name: [address, locality].filter(Boolean).join(", ") || null,
+            location_name: [address, locality, district, province].filter(Boolean).join(", ") || null,
             lat, lng,
             link: pick(r, ["enlace", "link", "url", "red_social"]) || null,
             contact: pick(r, ["contacto", "contact", "telefono", "whatsapp", "correo_electronico"]) || null,
@@ -203,10 +228,11 @@ export default function LayerBulkImport({ layerId, onImported }: Props) {
         }
       }
 
-      lines.unshift(`Importadas ${ok} filas · ${skipped} omitidas · ${geocoded} geolocalizadas por dirección`);
+      lines.unshift(`Importadas ${ok} filas · ${duplicated} ya existentes · ${skipped} omitidas · ${geocoded} geolocalizadas`);
       setLog(lines.slice(0, 25));
-      toast.success(`Se importaron ${ok} filas`);
-      onImported?.();
+      if (skipped > 0) toast.warning(`Se importaron ${ok} filas y ${skipped} necesitan revisión`);
+      else toast.success(ok > 0 ? `Se importaron ${ok} filas` : "No había actividades nuevas para importar");
+      if (ok > 0) onImported?.();
     } catch (e) {
       toast.error("No se pudo leer el archivo: " + (e as Error).message);
     } finally {
