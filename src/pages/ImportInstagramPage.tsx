@@ -96,7 +96,7 @@ const ImportInstagramPage = () => {
         <div className="container max-w-4xl">
           <div className="mb-8">
             <Badge variant="secondary" className="mb-3">
-              <Sparkles className="h-3 w-3 mr-1" /> Beta · asistido por IA
+              <Sparkles className="h-3 w-3 mr-1" /> Beta
             </Badge>
             <h1 className="font-display text-4xl mb-2 flex items-center gap-3">
               <Instagram className="h-8 w-8 text-primary" />
@@ -144,7 +144,7 @@ const ImportInstagramPage = () => {
               <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
               <span>
                 Por restricciones de Instagram, lo más confiable es pegar el texto
-                de cada slide. La plataforma usa IA para extraer nodos y
+                de cada slide. La plataforma extrae los nodos automáticamente y
                 geocodifica las direcciones con OpenStreetMap. Revisá los
                 resultados antes de crear los perfiles.
               </span>

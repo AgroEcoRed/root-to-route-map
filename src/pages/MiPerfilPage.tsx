@@ -358,7 +358,7 @@ const MiPerfilPage = () => {
           <section className="rounded-2xl border border-border bg-card p-6">
             <h2 className="font-display text-xl mb-2 flex items-center gap-2"><ScanText className="h-5 w-5 text-primary" /> Digitalizar documentos</h2>
             <p className="text-sm text-muted-foreground mb-4">
-              Subí una foto de un documento manuscrito o impreso y la IA transcribirá el texto.
+              Subí una foto de un documento manuscrito o impreso y lo transcribimos a texto para que puedas editar y copiar.
             </p>
             <div className="flex gap-3 mb-4">
               <input

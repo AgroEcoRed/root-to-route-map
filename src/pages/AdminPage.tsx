@@ -16,8 +16,8 @@ const sections = [
   {
     to: "/admin/hints",
     icon: Sparkles,
-    title: "Hints de la IA (Sembra)",
-    desc: "Reglas, terminología, ejemplos y conocimiento curado que la IA usa en el registro y en el chat.",
+    title: "Hints de Sembra",
+    desc: "Reglas, terminología, ejemplos y conocimiento curado que usa el asistente en el registro y en el chat.",
   },
   {
     to: "/admin/usuarios",
@@ -51,7 +51,7 @@ export default function AdminPage() {
         </div>
         <p className="text-muted-foreground mb-8 max-w-2xl">
           Configurá las áreas centrales de AgroEco.Red: las capas del Mapa Vivo,
-          los hints que orientan a la IA Sembra y los permisos de quienes
+          los hints que orientan al asistente Sembra y los permisos de quienes
           administran la plataforma.
         </p>
 

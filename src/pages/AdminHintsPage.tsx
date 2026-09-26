@@ -123,7 +123,7 @@ export default function AdminHintsPage() {
         </Link>
         <div className="flex items-center gap-3 mb-2">
           <Sparkles className="h-6 w-6 text-primary" />
-          <h1 className="font-display text-3xl">Hints de la IA (Sembra)</h1>
+          <h1 className="font-display text-3xl">Hints de Sembra</h1>
         </div>
         <p className="text-muted-foreground mb-6 max-w-2xl">
           Lista de reglas y conocimiento curado que se inyecta como contexto al
@@ -145,7 +145,7 @@ export default function AdminHintsPage() {
             <div>
               <Label htmlFor="h-content" className="text-xs">Contenido / regla</Label>
               <Textarea id="h-content" rows={4} value={content} onChange={(e) => setContent(e.target.value)}
-                placeholder="Escribí la regla, el ejemplo o el dato que la IA debe tener en cuenta." />
+                placeholder="Escribí la regla, el ejemplo o el dato que el asistente debe tener en cuenta." />
             </div>
             <div className="grid sm:grid-cols-3 gap-3">
               <div>
