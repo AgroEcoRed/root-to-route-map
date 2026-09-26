@@ -37,7 +37,7 @@ const pickVoice = (voices: SpeechSynthesisVoice[], key: LangKey) => {
 };
 
 const splitSentences = (text: string) =>
-  (text.replace(/\s+/g, " ").match(/[^.!?;:]{1,200}[.!?;:]*\s*/g) || []).map((s) => s.trim()).filter(Boolean);
+  (text.replace(/\s+/g, " ").match(/[^.!?;:]{1,120}[.!?;:]*\s*/g) || []).map((s) => s.trim()).filter(Boolean);
 
 const TextReader = () => {
   const supported = typeof window !== "undefined" && "speechSynthesis" in window;
@@ -53,6 +53,10 @@ const TextReader = () => {
   const fileRef = useRef<HTMLInputElement>(null);
   const runId = useRef(0);
   const panelRef = useRef<HTMLDivElement>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const currentRef = useRef(-1);
+  const pausedAtRef = useRef(0);
+  const watchdog = useRef<number | undefined>();
 
   const sentences = useMemo(() => splitSentences(text), [text]);
 
@@ -62,8 +66,30 @@ const TextReader = () => {
     load();
     window.speechSynthesis.addEventListener("voiceschanged", load);
     return () => {
+      runId.current++;
+      window.clearTimeout(watchdog.current);
       window.speechSynthesis.removeEventListener("voiceschanged", load);
       window.speechSynthesis.cancel();
+      utteranceRef.current = null;
+    };
+  }, [supported]);
+
+  useEffect(() => {
+    if (!supported) return;
+    const pauseForBackground = () => {
+      if (!document.hidden || currentRef.current < 0) return;
+      pausedAtRef.current = currentRef.current;
+      runId.current++;
+      window.clearTimeout(watchdog.current);
+      window.speechSynthesis.cancel();
+      utteranceRef.current = null;
+      setStatus("paused");
+    };
+    document.addEventListener("visibilitychange", pauseForBackground);
+    window.addEventListener("pagehide", pauseForBackground);
+    return () => {
+      document.removeEventListener("visibilitychange", pauseForBackground);
+      window.removeEventListener("pagehide", pauseForBackground);
     };
   }, [supported]);
 
@@ -75,50 +101,80 @@ const TextReader = () => {
 
   const stop = () => {
     runId.current++;
+    window.clearTimeout(watchdog.current);
     window.speechSynthesis.cancel();
+    utteranceRef.current = null;
+    currentRef.current = -1;
+    pausedAtRef.current = 0;
     setStatus("idle");
     setCurrent(-1);
   };
 
-  const watchdog = useRef<number | undefined>();
-
   const speakFrom = (start: number) => {
     if (!sentences.length) return toast.info("Pegá o cargá un texto primero");
-    window.speechSynthesis.cancel();
     const id = ++runId.current;
+    window.clearTimeout(watchdog.current);
+    window.speechSynthesis.cancel();
     const voice = voices.find((v) => v.name === voiceName);
     const next = (i: number) => {
       window.clearTimeout(watchdog.current);
       if (id !== runId.current) return;
-      if (i >= sentences.length) { setStatus("idle"); setCurrent(-1); return; }
+      if (i >= sentences.length) {
+        utteranceRef.current = null;
+        currentRef.current = -1;
+        pausedAtRef.current = 0;
+        setStatus("idle");
+        setCurrent(-1);
+        return;
+      }
       let done = false;
-      const advance = () => { if (done) return; done = true; next(i + 1); };
+      const advance = () => {
+        if (done || id !== runId.current) return;
+        done = true;
+        window.clearTimeout(watchdog.current);
+        utteranceRef.current = null;
+        window.setTimeout(() => next(i + 1), 80);
+      };
       const u = new SpeechSynthesisUtterance(sentences[i]);
+      utteranceRef.current = u;
       u.lang = voice?.lang || lang;
       if (voice) u.voice = voice;
       u.rate = rate;
-      u.onstart = () => id === runId.current && setCurrent(i);
+      currentRef.current = i;
+      pausedAtRef.current = i;
+      setCurrent(i);
+      u.onstart = () => {
+        if (id !== runId.current) return;
+        currentRef.current = i;
+        setCurrent(i);
+      };
       u.onend = advance;
       u.onerror = advance;
       window.speechSynthesis.speak(u);
-      // Algunos navegadores (sobre todo en celulares) a veces no avisan que terminó una frase
-      // y la lectura se queda colgada: si pasa demasiado tiempo, seguimos con la siguiente.
-      const maxMs = (sentences[i].length * 110) / rate + 6000;
-      const check = () => {
+      // En algunos celulares no llega onend y `speaking` queda trabado en true.
+      // Conservamos el objeto de voz y, pasado un margen amplio, liberamos esa frase
+      // para que la lectura pueda continuar con el resto del documento.
+      const maxMs = Math.min(45000, Math.max(18000, (sentences[i].length * 180) / rate + 8000));
+      watchdog.current = window.setTimeout(() => {
         if (done || id !== runId.current) return;
-        if (window.speechSynthesis.paused) { watchdog.current = window.setTimeout(check, 1000); return; }
-        if (!window.speechSynthesis.speaking) advance();
-        else watchdog.current = window.setTimeout(check, 1500);
-      };
-      watchdog.current = window.setTimeout(check, maxMs);
+        window.speechSynthesis.cancel();
+        advance();
+      }, maxMs);
     };
     setStatus("playing");
     next(start);
   };
 
   const togglePlay = () => {
-    if (status === "playing") { window.speechSynthesis.pause(); setStatus("paused"); }
-    else if (status === "paused") { window.speechSynthesis.resume(); setStatus("playing"); }
+    if (status === "playing") {
+      pausedAtRef.current = Math.max(0, currentRef.current);
+      runId.current++;
+      window.clearTimeout(watchdog.current);
+      window.speechSynthesis.cancel();
+      utteranceRef.current = null;
+      setStatus("paused");
+    }
+    else if (status === "paused") speakFrom(pausedAtRef.current);
     else speakFrom(0);
   };
 
@@ -234,7 +290,11 @@ const TextReader = () => {
             <Button onClick={() => fileRef.current?.click()} size="sm" variant="ghost" disabled={loadingPdf}>
               {loadingPdf ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <FileUp className="h-4 w-4 mr-1" />} Cargar PDF
             </Button>
-            {status !== "idle" && <span className="text-xs text-muted-foreground self-center">Tocá una frase para saltar a ella.</span>}
+          {status !== "idle" && (
+            <span className="text-xs text-muted-foreground self-center">
+              Frase {Math.max(1, current + 1)} de {sentences.length}. Tocá una frase para saltar a ella.
+            </span>
+          )}
           </div>
         </div>
       )}
