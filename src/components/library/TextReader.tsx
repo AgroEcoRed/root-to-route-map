@@ -37,7 +37,7 @@ const pickVoice = (voices: SpeechSynthesisVoice[], key: LangKey) => {
 };
 
 const splitSentences = (text: string) =>
-  (text.replace(/\s+/g, " ").match(/[^.!?¡¿;:\n]{1,260}[.!?;:]*\s*/g) || []).map((s) => s.trim()).filter(Boolean);
+  (text.replace(/\s+/g, " ").match(/[^.!?;:]{1,200}[.!?;:]*\s*/g) || []).map((s) => s.trim()).filter(Boolean);
 
 const TextReader = () => {
   const supported = typeof window !== "undefined" && "speechSynthesis" in window;
@@ -80,22 +80,37 @@ const TextReader = () => {
     setCurrent(-1);
   };
 
+  const watchdog = useRef<number | undefined>();
+
   const speakFrom = (start: number) => {
     if (!sentences.length) return toast.info("Pegá o cargá un texto primero");
     window.speechSynthesis.cancel();
     const id = ++runId.current;
     const voice = voices.find((v) => v.name === voiceName);
     const next = (i: number) => {
+      window.clearTimeout(watchdog.current);
       if (id !== runId.current) return;
       if (i >= sentences.length) { setStatus("idle"); setCurrent(-1); return; }
+      let done = false;
+      const advance = () => { if (done) return; done = true; next(i + 1); };
       const u = new SpeechSynthesisUtterance(sentences[i]);
       u.lang = voice?.lang || lang;
       if (voice) u.voice = voice;
       u.rate = rate;
       u.onstart = () => id === runId.current && setCurrent(i);
-      u.onend = () => next(i + 1);
-      u.onerror = (e) => { if (e.error !== "interrupted" && e.error !== "canceled") next(i + 1); };
+      u.onend = advance;
+      u.onerror = advance;
       window.speechSynthesis.speak(u);
+      // Algunos navegadores (sobre todo en celulares) a veces no avisan que terminó una frase
+      // y la lectura se queda colgada: si pasa demasiado tiempo, seguimos con la siguiente.
+      const maxMs = (sentences[i].length * 110) / rate + 6000;
+      const check = () => {
+        if (done || id !== runId.current) return;
+        if (window.speechSynthesis.paused) { watchdog.current = window.setTimeout(check, 1000); return; }
+        if (!window.speechSynthesis.speaking) advance();
+        else watchdog.current = window.setTimeout(check, 1500);
+      };
+      watchdog.current = window.setTimeout(check, maxMs);
     };
     setStatus("playing");
     next(start);
