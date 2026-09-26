@@ -226,7 +226,7 @@ const Navbar = () => {
                  size="sm"
                  variant="outline"
                  asChild
-                  className={`${isMapPage ? "hidden sm:inline-flex" : "inline-flex"} h-9 px-2.5 sm:px-4 font-semibold ${navbarScrolled
+                  className={`inline-flex h-9 px-2.5 sm:px-4 font-semibold ${navbarScrolled
                    ? "border-primary text-primary hover:bg-primary/10"
                    : "border-white/70 bg-white/10 text-white hover:bg-white/20 hover:text-white"}`}
                >
