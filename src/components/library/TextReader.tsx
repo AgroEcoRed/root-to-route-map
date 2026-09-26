@@ -66,8 +66,30 @@ const TextReader = () => {
     load();
     window.speechSynthesis.addEventListener("voiceschanged", load);
     return () => {
+      runId.current++;
+      window.clearTimeout(watchdog.current);
       window.speechSynthesis.removeEventListener("voiceschanged", load);
       window.speechSynthesis.cancel();
+      utteranceRef.current = null;
+    };
+  }, [supported]);
+
+  useEffect(() => {
+    if (!supported) return;
+    const pauseForBackground = () => {
+      if (!document.hidden || currentRef.current < 0) return;
+      pausedAtRef.current = currentRef.current;
+      runId.current++;
+      window.clearTimeout(watchdog.current);
+      window.speechSynthesis.cancel();
+      utteranceRef.current = null;
+      setStatus("paused");
+    };
+    document.addEventListener("visibilitychange", pauseForBackground);
+    window.addEventListener("pagehide", pauseForBackground);
+    return () => {
+      document.removeEventListener("visibilitychange", pauseForBackground);
+      window.removeEventListener("pagehide", pauseForBackground);
     };
   }, [supported]);
 
