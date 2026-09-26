@@ -140,7 +140,7 @@ const QuickRegistrationPage = () => {
                   </h1>
                   <p className="text-muted-foreground">
                     Pegá un enlace a tu sitio, Instagram, Linktree o documento público.
-                    Nuestra IA arma tu perfil automáticamente; vos sólo confirmás.
+                    La plataforma arma tu perfil automáticamente; vos sólo confirmás.
                   </p>
                 </div>
 
@@ -186,7 +186,7 @@ const QuickRegistrationPage = () => {
 
                   <Button type="submit" disabled={loading} className="w-full" size="lg">
                     <Sparkles className="h-4 w-4 mr-2" />
-                    Analizar enlace con IA
+                    Analizar enlace
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
 

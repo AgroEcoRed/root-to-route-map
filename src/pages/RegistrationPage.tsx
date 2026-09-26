@@ -391,7 +391,7 @@ Gracias.`;
                         ¿Tenés un sitio, Instagram o Linktree?
                       </p>
                       <p className="text-xs sm:text-sm text-muted-foreground">
-                        Registrate en 30 segundos: nuestra IA lee el enlace y arma tu perfil. Vos sólo confirmás.
+                        Registrate en 30 segundos: la plataforma lee el enlace y arma tu perfil. Vos sólo confirmás.
                       </p>
                     </div>
                     <Button
