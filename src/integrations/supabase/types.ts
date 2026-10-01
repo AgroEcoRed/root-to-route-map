@@ -225,6 +225,7 @@ export type Database = {
         Row: {
           enabled: boolean
           label: string
+          privacy: Json
           source_id: string
           updated_at: string
           updated_by: string | null
@@ -232,6 +233,7 @@ export type Database = {
         Insert: {
           enabled?: boolean
           label: string
+          privacy?: Json
           source_id: string
           updated_at?: string
           updated_by?: string | null
@@ -239,6 +241,7 @@ export type Database = {
         Update: {
           enabled?: boolean
           label?: string
+          privacy?: Json
           source_id?: string
           updated_at?: string
           updated_by?: string | null
@@ -391,6 +394,54 @@ export type Database = {
           url?: string
         }
         Relationships: []
+      }
+      layer_actor_private: {
+        Row: {
+          actor_type: string | null
+          contact: string | null
+          family: string | null
+          lat: number | null
+          layer_actor_id: string
+          lng: number | null
+          source_id: string
+          updated_at: string
+        }
+        Insert: {
+          actor_type?: string | null
+          contact?: string | null
+          family?: string | null
+          lat?: number | null
+          layer_actor_id: string
+          lng?: number | null
+          source_id: string
+          updated_at?: string
+        }
+        Update: {
+          actor_type?: string | null
+          contact?: string | null
+          family?: string | null
+          lat?: number | null
+          layer_actor_id?: string
+          lng?: number | null
+          source_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "layer_actor_private_layer_actor_id_fkey"
+            columns: ["layer_actor_id"]
+            isOneToOne: true
+            referencedRelation: "layer_actors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "layer_actor_private_layer_actor_id_fkey"
+            columns: ["layer_actor_id"]
+            isOneToOne: true
+            referencedRelation: "public_layer_actors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       layer_actors: {
         Row: {
@@ -1388,6 +1439,7 @@ export type Database = {
       }
     }
     Functions: {
+      apply_layer_privacy: { Args: { _layer_id: string }; Returns: number }
       can_manage_layer: {
         Args: { _layer_id: string; _user_id: string }
         Returns: boolean
