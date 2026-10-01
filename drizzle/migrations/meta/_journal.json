@@ -8,6 +8,13 @@
       "when": 1790629973189,
       "tag": "0000_fix_biblioteca_file_reading",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790879576114,
+      "tag": "0001_layer_privacy",
+      "breakpoints": true
     }
   ]
 }

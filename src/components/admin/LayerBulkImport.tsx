@@ -40,6 +40,54 @@ const num = (v: string): number | null => {
   return Number.isFinite(n) ? n : null;
 };
 
+/** Lee un .kml o .kmz (Google Earth / My Maps) y devuelve una fila por punto. */
+async function parseKmlFile(file: File): Promise<Record<string, unknown>[]> {
+  let text: string;
+  if (/\.kmz$/i.test(file.name)) {
+    const JSZip = (await import("jszip")).default;
+    const zip = await JSZip.loadAsync(await file.arrayBuffer());
+    const kml = Object.values(zip.files).find((f) => /\.kml$/i.test(f.name));
+    if (!kml) throw new Error("El .kmz no contiene ningún .kml");
+    text = await kml.async("text");
+  } else {
+    text = await file.text();
+  }
+  const doc = new DOMParser().parseFromString(text, "application/xml");
+  const strip = (html: string) => {
+    const d = new DOMParser().parseFromString(html, "text/html");
+    return (d.body.textContent || "").replace(/\s+\n/g, "\n").trim();
+  };
+  const out: Record<string, unknown>[] = [];
+  doc.querySelectorAll("Placemark").forEach((pm) => {
+    const coordsEl = pm.querySelector("Point coordinates") || pm.querySelector("coordinates");
+    const first = coordsEl?.textContent?.trim().split(/\s+/)[0];
+    if (!first) return;
+    const [lng, lat] = first.split(",").map(Number);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+    const folder = pm.parentElement?.tagName === "Folder" ? pm.parentElement.querySelector(":scope > name")?.textContent?.trim() : "";
+    const row: Record<string, unknown> = {
+      nombre: pm.querySelector(":scope > name")?.textContent?.trim() || "Sin nombre",
+      descripcion: strip(pm.querySelector(":scope > description")?.textContent || ""),
+      lat: String(lat),
+      lng: String(lng),
+    };
+    if (folder) row.familia = folder;
+    pm.querySelectorAll("ExtendedData Data").forEach((d) => {
+      const k = d.getAttribute("name");
+      const v = d.querySelector("value")?.textContent?.trim();
+      if (k && v && !(k in row)) row[k] = v;
+    });
+    pm.querySelectorAll("ExtendedData SimpleData").forEach((d) => {
+      const k = d.getAttribute("name");
+      const v = d.textContent?.trim();
+      if (k && v && !(k in row)) row[k] = v;
+    });
+    out.push(row);
+  });
+  if (out.length === 0) throw new Error("No se encontraron puntos en el mapa");
+  return out;
+}
+
 async function geocode(q: string): Promise<{ lat: number; lng: number } | null> {
   try {
     const res = await fetch(
@@ -119,10 +167,20 @@ export default function LayerBulkImport({ layerId, onImported }: Props) {
     setLog([]);
     const lines: string[] = [];
     try {
-      const buf = await file.arrayBuffer();
-      const wb = XLSX.read(buf, { type: "array" });
-      const sheet = wb.Sheets[wb.SheetNames[0]];
-      const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
+      const isMapFile = /\.(kml|kmz)$/i.test(file.name);
+      if (isMapFile && mode !== "actores") {
+        toast.error("Los mapas de Google Earth se importan como experiencias: elegí \"actores\".");
+        return;
+      }
+      let raw: Record<string, unknown>[];
+      if (isMapFile) {
+        raw = await parseKmlFile(file);
+      } else {
+        const buf = await file.arrayBuffer();
+        const wb = XLSX.read(buf, { type: "array" });
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
+      }
       const rows = raw.map((r) => {
         const o: Record<string, unknown> = {};
         Object.entries(r).forEach(([k, v]) => { o[norm(k)] = v; });
@@ -256,6 +314,11 @@ export default function LayerBulkImport({ layerId, onImported }: Props) {
       setLog(lines.slice(0, 25));
       if (skipped > 0) toast.warning(`Se importaron ${ok} filas y ${skipped} necesitan revisión`);
       else toast.success(ok > 0 ? `Se importaron ${ok} filas` : "No había actividades nuevas para importar");
+      if (ok > 0 && mode === "actores") {
+        // Aplica las reglas de privacidad de la capa (contactos, ubicación exacta, tipologías).
+        const { error: privErr } = await (supabase as any).rpc("apply_layer_privacy", { _layer_id: layerId });
+        if (privErr) toast.error("No se pudieron aplicar las reglas de privacidad: " + privErr.message);
+      }
       if (ok > 0) onImported?.();
     } catch (e) {
       toast.error("No se pudo leer el archivo: " + (e as Error).message);
@@ -268,11 +331,12 @@ export default function LayerBulkImport({ layerId, onImported }: Props) {
   return (
     <Card className="p-5 mt-4">
       <h2 className="font-display text-lg flex items-center gap-2 mb-2">
-        <FileSpreadsheet className="h-4 w-4 text-primary" /> Carga masiva por Excel / CSV
+        <FileSpreadsheet className="h-4 w-4 text-primary" /> Carga masiva por Excel / CSV / Google Earth
       </h2>
       <p className="text-xs text-muted-foreground mb-3">
-        Subí una planilla con actores o actividades de tu capa. Si faltan coordenadas, se intentan
-        deducir desde la dirección o localidad. Después podés editar cada registro desde la lista.
+        Subí una planilla con actores o actividades de tu capa, o un mapa previo exportado de
+        Google Earth / Google My Maps (.kml o .kmz). Si faltan coordenadas, se intentan deducir
+        desde la dirección o localidad. Después podés editar cada registro desde la lista.
       </p>
 
       <p className="mb-3 rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-sm font-medium text-foreground">
@@ -299,7 +363,7 @@ export default function LayerBulkImport({ layerId, onImported }: Props) {
       <input
         ref={inputRef}
         type="file"
-        accept=".xlsx,.xls,.csv"
+        accept=".xlsx,.xls,.csv,.kml,.kmz"
         className="hidden"
         onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
       />
