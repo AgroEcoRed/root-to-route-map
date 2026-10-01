@@ -363,7 +363,7 @@ export default function LayerBulkImport({ layerId, onImported }: Props) {
       <input
         ref={inputRef}
         type="file"
-        accept=".xlsx,.xls,.csv"
+        accept=".xlsx,.xls,.csv,.kml,.kmz"
         className="hidden"
         onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
       />
