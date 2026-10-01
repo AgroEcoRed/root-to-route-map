@@ -1,0 +1,1 @@
+- Layer privacy: full actor data lives in layer_actor_private (managers only); apply_layer_privacy rewrites the public layer_actors row per the layer's data_source_settings.privacy flags — why: keeps reserved data out of the public API.
