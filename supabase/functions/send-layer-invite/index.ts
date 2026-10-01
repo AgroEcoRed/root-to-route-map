@@ -46,6 +46,13 @@ Deno.serve(async (req) => {
   if (!EMAIL_RE.test(email)) return json({ error: "Email inválido" }, 400);
   if (!layerId || !/^[a-z0-9_:-]+$/i.test(layerId)) return json({ error: "Capa inválida" }, 400);
 
+  const cc = (Array.isArray(body?.cc) ? body.cc : [])
+    .map((c: unknown) => String(c || "").trim().toLowerCase())
+    .filter((c: string) => EMAIL_RE.test(c) && c !== email)
+    .slice(0, 5);
+  const orgName = String(body?.org_name || "").trim().slice(0, 160);
+  const purpose = String(body?.purpose || "").trim().slice(0, 1500);
+
   const requestedOrigin = String(body?.origin || "").replace(/\/$/, "");
   const origin = ALLOWED_ORIGINS.has(requestedOrigin) ? requestedOrigin : DEFAULT_ORIGIN;
 
@@ -78,8 +85,9 @@ Deno.serve(async (req) => {
     <div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#1f2937;line-height:1.55">
       <h2 style="color:#15803d;margin-bottom:4px">Invitación a gestionar una capa del Mapa Vivo</h2>
       <p style="font-size:13px;color:#6b7280;margin-top:0">AgroEco.Red · sistemas alimentarios agroecológicos</p>
-      <p>Hola,</p>
+      <p>Hola${orgName ? ` equipo de ${escapeHtml(orgName)}` : ""},</p>
       <p>Desde AgroEco.Red queremos invitarles a administrar una capa autónoma del mapeo: <strong>${escapeHtml(source.label)}</strong>.</p>
+      ${purpose ? `<p>${escapeHtml(purpose).replace(/\n/g, "<br/>")}</p>` : ""}
       <p>La idea es que puedan cargar, revisar, actualizar y verificar los puntos vinculados a su trabajo territorial, sin modificar otras capas de la plataforma. Cada registro puede marcarse como público (visible en el mapa general) o interno (visible sólo para quienes administran la capa).</p>
       <div style="background:#f0fdf4;border-left:4px solid #15803d;padding:12px 14px;border-radius:6px;margin:16px 0">
         <p style="margin:0 0 8px"><strong>Para aceptar la invitación:</strong></p>
@@ -107,6 +115,7 @@ Deno.serve(async (req) => {
       from: "AgroEco.Red <info@agroeco.red>",
       reply_to: "info@agroeco.red",
       to: [email],
+      ...(cc.length ? { cc } : {}),
       subject,
       html,
     }),
