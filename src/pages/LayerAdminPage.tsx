@@ -18,6 +18,7 @@ import { useLayerActors, type LayerActor } from "@/hooks/useLayerActors";
 import LayerBulkImport from "@/components/admin/LayerBulkImport";
 import LayerEventsAdmin from "@/components/admin/LayerEventsAdmin";
 import LayerPrivacyPanel from "@/components/admin/LayerPrivacyPanel";
+import LayerReviewPanel from "@/components/admin/LayerReviewPanel";
 import { toast } from "sonner";
 import { Layers, Loader2, ArrowLeft, MapPin, ShoppingBag, Power, Pencil, Plus, Trash2, CheckCircle2, Search, Send, Copy, Eye, EyeOff } from "lucide-react";
 
@@ -357,7 +358,9 @@ export default function LayerAdminPage() {
 
         <LayerEventsAdmin key={eventImportVersion} layerId={layerId} />
 
-        <LayerPrivacyPanel layerId={layerId} onApplied={reload} />
+        <LayerReviewPanel actors={actors} onChanged={reload} />
+
+        <LayerPrivacyPanel layerId={layerId} actors={actors} onApplied={reload} />
 
         <LayerBulkImport
           layerId={layerId}
