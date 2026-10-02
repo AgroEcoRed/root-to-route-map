@@ -1675,6 +1675,42 @@ export type Database = {
         }
         Returns: boolean
       }
+      review_layer_actor: {
+        Args: { _decision: string; _id: string }
+        Returns: {
+          actor_type: string | null
+          address: string | null
+          confirmation_email: string | null
+          confirmation_phone: string | null
+          confirmation_sent_at: string | null
+          confirmation_status: string
+          confirmation_token: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
+          contact: string | null
+          created_at: string
+          created_by: string | null
+          delivery_days: string[] | null
+          description: string | null
+          extra: Json
+          family: string | null
+          id: string
+          lat: number
+          lng: number
+          name: string
+          public_visible: boolean
+          source_id: string
+          updated_at: string
+          verified_at: string | null
+          verified_by_role: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "layer_actors"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       update_event_by_token: {
         Args: {
           _contact?: string
