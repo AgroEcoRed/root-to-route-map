@@ -24,27 +24,25 @@ const Navbar = () => {
   const { t, lang, setLang, langs } = useLanguage();
   const { totalItems, setIsOpen: setCartOpen } = useCart();
 
-  // Esenciales: SIEMPRE visibles (incluso en móvil), nunca colapsan.
+  // Orden pedido: Mapa Vivo - Biblioteca - Garantías - Mercado - Recursos - Comunidad - Observatorio
   const essentialNav = [
-    { to: "/mapa", label: t("nav.map"), icon: MapPin },
-    { to: "/mercado", label: t("nav.market"), icon: ShoppingBasket },
+    { to: "/mapa", label: "Mapa Vivo", icon: MapPin },
   ];
-  // Secundarios: van apareciendo a medida que hay espacio, y al hamburguesa
-  // si no entran. Orden de prioridad: SPG → Comunidad → Recursos → Observatorio.
   const secondaryNav = [
-    { to: "/garantias", label: t("nav.spg"), icon: ShieldCheck, showFrom: "xl" as const },
-    { to: "/comunidad", label: t("nav.community"), icon: BookOpen, showFrom: "xl" as const },
-    { to: "/biblioteca", label: "Biblioteca", icon: BookOpen, showFrom: "2xl" as const },
-    { to: "/recursos", label: t("nav.services"), icon: Sprout, showFrom: "2xl" as const },
-    { to: "/observatorio", label: t("nav.observatory"), icon: BarChart3, showFrom: "2xl" as const },
+    { to: "/biblioteca", label: "Biblioteca", icon: BookOpen, showFrom: "lg" as const },
+    { to: "/garantias", label: "Garantías Participativas", icon: ShieldCheck, showFrom: "xl" as const },
+    { to: "/mercado", label: "Mercado Agroecológico", icon: ShoppingBasket, showFrom: "xl" as const },
+    { to: "/recursos", label: "Recursos compartidos", icon: Sprout, showFrom: "2xl" as const },
+    { to: "/comunidad", label: "Comunidad y Saberes", icon: BookOpen, showFrom: "2xl" as const },
+    { to: "/observatorio", label: "Observatorio", icon: BarChart3, showFrom: "2xl" as const },
   ];
   const allNavItems = [
     { to: "/", label: t("nav.home"), icon: Leaf },
     ...essentialNav,
     ...secondaryNav.map(({ showFrom: _omit, ...rest }) => rest),
   ];
-  const visibilityClass = (showFrom: "xl" | "2xl") =>
-    showFrom === "xl" ? "hidden xl:inline-flex" : "hidden 2xl:inline-flex";
+  const visibilityClass = (showFrom: "lg" | "xl" | "2xl") =>
+    showFrom === "lg" ? "hidden lg:inline-flex" : showFrom === "xl" ? "hidden xl:inline-flex" : "hidden 2xl:inline-flex";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -82,6 +80,15 @@ const Navbar = () => {
       }`}
     >
       <div className="container flex items-center justify-between gap-2 h-16">
+        <div className="flex items-center gap-1 min-w-0 flex-shrink-0">
+          {/* Hamburguesa: SIEMPRE visible — abre el menú con el resto de secciones */}
+          <button
+            className={`p-2 flex-shrink-0 rounded-lg transition-colors ${navbarScrolled ? "text-foreground hover:bg-muted/50" : "text-white hover:bg-white/15"}`}
+            onClick={() => setOpen(!open)}
+            aria-label="Menú"
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         <Link to="/" className="flex items-center gap-2 group min-w-0 flex-shrink-0">
           <div className="transition-transform group-hover:scale-110">
             <AnimatedLogo size={32} />
@@ -90,9 +97,10 @@ const Navbar = () => {
             AgroEco<span className="text-wheat">.Red</span>
           </span>
         </Link>
+        </div>
 
         {/* Esenciales: SIEMPRE visibles (logo, mapa, mercado) */}
-        <div className={`${isMapPage ? "hidden sm:flex" : "flex"} items-center gap-0.5 sm:gap-1 flex-1 justify-center md:justify-start md:ml-2`}>
+        <div className={`${isMapPage ? "hidden sm:flex" : "flex"} items-center gap-0.5 sm:gap-1 flex-1 min-w-0 justify-center md:justify-start md:ml-2`}>
           {essentialNav.map((item) => {
             const active = location.pathname === item.to;
             return (
@@ -100,7 +108,7 @@ const Navbar = () => {
                 key={item.to}
                 to={item.to}
                 title={item.label}
-                className={`relative flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+                className={`relative flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-all ${
                   active
                     ? navbarScrolled ? "text-primary bg-primary/10" : "text-white bg-white/15 font-semibold"
                     : navbarScrolled ? "text-muted-foreground hover:text-foreground hover:bg-muted/50" : "text-white/90 hover:text-white hover:bg-white/10"
@@ -119,7 +127,7 @@ const Navbar = () => {
               <Link
                 key={item.to}
                 to={item.to}
-                className={`${visibilityClass(item.showFrom)} items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`${visibilityClass(item.showFrom)} items-center gap-1.5 px-2.5 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
                   active
                     ? navbarScrolled ? "text-primary bg-primary/10" : "text-white bg-white/15 font-semibold"
                     : navbarScrolled ? "text-muted-foreground hover:text-foreground hover:bg-muted/50" : "text-white/90 hover:text-white hover:bg-white/10"
@@ -242,14 +250,6 @@ const Navbar = () => {
              </>
            )}
 
-          {/* Hamburguesa: SIEMPRE visible — abre el menú con el resto de secciones */}
-          <button
-            className={`p-2 rounded-lg transition-colors ${navbarScrolled ? "text-foreground hover:bg-muted/50" : "text-white hover:bg-white/15"}`}
-            onClick={() => setOpen(!open)}
-            aria-label="Menú"
-          >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
         </div>
       </div>
 
