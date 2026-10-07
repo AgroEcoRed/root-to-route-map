@@ -70,6 +70,8 @@ const TextReader = () => {
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [voiceName, setVoiceName] = useState<string>("");
   const [rate, setRate] = useState(1);
+  const [autoLang, setAutoLang] = useState(true);
+  const [currentLang, setCurrentLang] = useState<LangKey | null>(null);
   const [status, setStatus] = useState<"idle" | "playing" | "paused">("idle");
   const [current, setCurrent] = useState(-1);
   const [loadingPdf, setLoadingPdf] = useState(false);
@@ -139,6 +141,7 @@ const TextReader = () => {
     window.clearTimeout(watchdog.current);
     window.speechSynthesis.cancel();
     const voice = voices.find((v) => v.name === voiceName);
+    let prevLang: LangKey = (autoLang && start > 0 && detectLang(sentences.slice(Math.max(0, start - 3), start).join(" "))) || lang;
     const next = (i: number) => {
       window.clearTimeout(watchdog.current);
       if (id !== runId.current) return;
@@ -160,8 +163,16 @@ const TextReader = () => {
       };
       const u = new SpeechSynthesisUtterance(sentences[i]);
       utteranceRef.current = u;
-      u.lang = voice?.lang || lang;
-      if (voice) u.voice = voice;
+      let useVoice = voice;
+      let useLang: LangKey = lang;
+      if (autoLang) {
+        useLang = detectLang(sentences[i]) || prevLang;
+        prevLang = useLang;
+        useVoice = useLang === lang ? voice : pickVoice(voices, useLang) || voice;
+      }
+      setCurrentLang(autoLang ? useLang : null);
+      u.lang = useVoice?.lang || useLang;
+      if (useVoice) u.voice = useVoice;
       u.rate = rate;
       currentRef.current = i;
       pausedAtRef.current = i;
