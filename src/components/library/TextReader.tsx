@@ -264,6 +264,13 @@ const TextReader = () => {
             (por ejemplo Samantha en Mac/iPhone); si no aparece una voz del idioma, podés instalarla desde la configuración de tu equipo.
           </p>
 
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={autoLang} onChange={(e) => { stop(); setAutoLang(e.target.checked); }} />
+            Reconocer el idioma automáticamente (textos bilingües o en varios idiomas)
+          </label>
+          <p className="text-xs text-muted-foreground -mt-2">
+            {autoLang ? "El idioma elegido abajo se usa como base; cada frase cambia de voz si está en otro idioma." : "Se lee todo con el idioma elegido."}
+          </p>
           <div className="flex flex-wrap gap-2">
             {LANGS.map((l) => (
               <button
@@ -326,7 +333,8 @@ const TextReader = () => {
             </Button>
           {status !== "idle" && (
             <span className="text-xs text-muted-foreground self-center">
-              Frase {Math.max(1, current + 1)} de {sentences.length}. Tocá una frase para saltar a ella.
+              Frase {Math.max(1, current + 1)} de {sentences.length}
+              {currentLang && ` · ${LANGS.find((l) => l.key === currentLang)?.label}`}. Tocá una frase para saltar a ella.
             </span>
           )}
           </div>
