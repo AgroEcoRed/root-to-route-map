@@ -1,6 +1,8 @@
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { CalendarDays, MapPin, Sparkles, ArrowRight } from "lucide-react";
-import { useEvents, eventBucket, glowIntensity, proximityColor } from "@/hooks/useEvents";
+import { CalendarDays, MapPin, Sparkles, ArrowRight, X } from "lucide-react";
+import { useEvents, eventBucket, glowIntensity, proximityColor, AgroEventFull } from "@/hooks/useEvents";
+import { eventProvince } from "@/components/events/EventsFilterBar";
 
 const typeLabels: Record<string, string> = {
   feria: "Feria",
@@ -22,20 +24,104 @@ const Star = ({ color, size = 28 }: { color: string; size?: number }) => (
   </svg>
 );
 
+const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+
+/** Localidad: la parte de la dirección sin números ni nombre de provincia/partido. */
+const eventLocality = (ev: AgroEventFull): string | null => {
+  const parts = (ev.location_name || "").split(",").map((p) => p.trim()).filter(Boolean);
+  const prov = eventProvince(ev);
+  const cands = parts.filter(
+    (p) => !/\d/.test(p) && !/^partido|^argentina$|^provincia/i.test(p) && (!prov || norm(p) !== norm(prov)),
+  );
+  return cands[0] || null;
+};
+
+const eventModality = (ev: AgroEventFull): string => {
+  const t = norm(`${ev.description || ""} ${ev.location_name || ""}`);
+  if (/hibrid/.test(t)) return "Híbrida";
+  if (/virtual|zoom|meet|online|en linea|streaming/.test(t)) return "Virtual";
+  return "Presencial";
+};
+
+const dayKey = (iso: string) =>
+  new Date(iso).toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
+
+const selectCls = "text-sm rounded-lg border border-border bg-background px-3 py-2";
+
 const UpcomingActivitiesSection = () => {
   const { events, loading } = useEvents();
+  const [province, setProvince] = useState("");
+  const [locality, setLocality] = useState("");
+  const [when, setWhen] = useState("");
+  const [day, setDay] = useState("");
+  const [type, setType] = useState("");
+  const [modality, setModality] = useState("");
+  const [onlyMes, setOnlyMes] = useState(false);
+  const [showAll, setShowAll] = useState(false);
 
-  const upcoming = events
-    .filter((e) => eventBucket(e) === "upcoming")
-    .sort((a, b) => +new Date(a.starts_at) - +new Date(b.starts_at))
-    .slice(0, 6);
+  const all = useMemo(
+    () =>
+      events
+        .filter((e) => eventBucket(e) === "upcoming")
+        .sort((a, b) => +new Date(a.starts_at) - +new Date(b.starts_at)),
+    [events],
+  );
 
-  if (loading || upcoming.length === 0) return null;
+  const provinces = useMemo(
+    () => [...new Set(all.map(eventProvince).filter(Boolean) as string[])].sort((a, b) => a.localeCompare(b, "es")),
+    [all],
+  );
+  const localities = useMemo(
+    () =>
+      [
+        ...new Set(
+          all
+            .filter((e) => !province || eventProvince(e) === province)
+            .map(eventLocality)
+            .filter(Boolean) as string[],
+        ),
+      ].sort((a, b) => a.localeCompare(b, "es")),
+    [all, province],
+  );
+  const types = useMemo(() => [...new Set(all.map((e) => e.event_type))], [all]);
+  const hasMes = all.some((e) => e.layer_id === "mes_agroecologia");
+
+  const filtered = useMemo(() => {
+    const today = dayKey(new Date().toISOString());
+    const now = new Date();
+    const in7 = dayKey(new Date(now.getTime() + 7 * 864e5).toISOString());
+    const in30 = dayKey(new Date(now.getTime() + 30 * 864e5).toISOString());
+    return all.filter((e) => {
+      if (province && eventProvince(e) !== province) return false;
+      if (locality && eventLocality(e) !== locality) return false;
+      if (type && e.event_type !== type) return false;
+      if (modality && eventModality(e) !== modality) return false;
+      if (onlyMes && e.layer_id !== "mes_agroecologia") return false;
+      const k = dayKey(e.starts_at);
+      if (day && k !== day) return false;
+      if (when === "hoy" && k !== today) return false;
+      if (when === "semana" && k > in7) return false;
+      if (when === "mes" && k > in30) return false;
+      if (when === "finde") {
+        const wd = new Date(e.starts_at).getDay();
+        if (k > in7 || (wd !== 0 && wd !== 6)) return false;
+      }
+      return true;
+    });
+  }, [all, province, locality, type, modality, onlyMes, day, when]);
+
+  if (loading || all.length === 0) return null;
+
+  const active = province || locality || when || day || type || modality || onlyMes;
+  const clear = () => {
+    setProvince(""); setLocality(""); setWhen(""); setDay(""); setType(""); setModality(""); setOnlyMes(false);
+  };
+  const shown = showAll ? filtered : filtered.slice(0, 6);
 
   return (
     <section className="py-16 md:py-20 bg-gradient-to-b from-background to-muted/30">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
           <div>
             <div className="inline-flex items-center gap-2 text-primary mb-2">
               <Sparkles className="h-4 w-4" />
@@ -55,52 +141,98 @@ const UpcomingActivitiesSection = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {upcoming.map((ev) => {
-            const intensity = glowIntensity(ev.starts_at);
-            const color = proximityColor(intensity);
-            const dt = new Date(ev.starts_at);
-            const dateStr = dt.toLocaleString("es-AR", {
-              weekday: "short",
-              day: "numeric",
-              month: "short",
-              hour: "2-digit",
-              minute: "2-digit",
-            });
-            return (
-              <Link
-                key={ev.id}
-                to={`/mapa?event=${ev.id}`}
-                className="group relative rounded-2xl border border-border bg-card p-4 pl-5 shadow-sm hover:shadow-elevated hover:-translate-y-0.5 transition overflow-hidden"
-                style={{ boxShadow: `inset 5px 0 0 0 ${color}` }}
-              >
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-muted text-foreground/80">
-                    {typeLabels[ev.event_type] || ev.event_type}
-                  </span>
-                  <Star color={color} />
-                </div>
-                <h3 className="font-display text-lg leading-snug mb-1.5 group-hover:text-primary transition">
-                  {ev.title}
-                </h3>
-                <p className="text-xs font-medium text-foreground/80 flex items-center gap-1.5">
-                  <CalendarDays className="h-3.5 w-3.5" /> {dateStr}
-                </p>
-                {ev.location_name && (
-                  <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-1">
-                    <MapPin className="h-3.5 w-3.5" /> {ev.location_name}
-                  </p>
-                )}
-                {ev.description && (
-                  <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{ev.description}</p>
-                )}
-                <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition">
-                  Ver en el mapa <ArrowRight className="h-3 w-3" />
-                </span>
-              </Link>
-            );
-          })}
+        <div className="flex flex-wrap items-center gap-2 mb-6">
+          <select className={selectCls} value={province} onChange={(e) => { setProvince(e.target.value); setLocality(""); }} aria-label="Provincia">
+            <option value="">Todas las provincias</option>
+            {provinces.map((p) => <option key={p} value={p}>{p}</option>)}
+          </select>
+          <select className={selectCls} value={locality} onChange={(e) => setLocality(e.target.value)} aria-label="Localidad">
+            <option value="">Todas las localidades</option>
+            {localities.map((p) => <option key={p} value={p}>{p}</option>)}
+          </select>
+          <select className={selectCls} value={when} onChange={(e) => { setWhen(e.target.value); setDay(""); }} aria-label="Cuándo">
+            <option value="">Cualquier fecha</option>
+            <option value="hoy">Hoy</option>
+            <option value="finde">Este fin de semana</option>
+            <option value="semana">Próximos 7 días</option>
+            <option value="mes">Próximos 30 días</option>
+          </select>
+          <input type="date" className={selectCls} value={day} onChange={(e) => { setDay(e.target.value); setWhen(""); }} aria-label="Día" />
+          <select className={selectCls} value={type} onChange={(e) => setType(e.target.value)} aria-label="Tipo">
+            <option value="">Todos los tipos</option>
+            {types.map((t) => <option key={t} value={t}>{typeLabels[t] || t}</option>)}
+          </select>
+          <select className={selectCls} value={modality} onChange={(e) => setModality(e.target.value)} aria-label="Modalidad">
+            <option value="">Toda modalidad</option>
+            <option>Presencial</option>
+            <option>Virtual</option>
+            <option>Híbrida</option>
+          </select>
+          {hasMes && (
+            <button
+              onClick={() => setOnlyMes((v) => !v)}
+              className={`text-sm px-3 py-2 rounded-lg border transition-colors ${onlyMes ? "bg-primary text-primary-foreground border-primary" : "border-border hover:bg-muted"}`}
+            >
+              Mes de la Agroecología
+            </button>
+          )}
+          {active && (
+            <button onClick={clear} className="text-sm inline-flex items-center gap-1 text-muted-foreground hover:text-foreground">
+              <X className="h-4 w-4" /> Limpiar
+            </button>
+          )}
+          <span className="text-xs text-muted-foreground ml-auto">{filtered.length} actividades</span>
         </div>
+
+        {filtered.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-8 text-center">No hay actividades con esos filtros.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {shown.map((ev) => {
+              const intensity = glowIntensity(ev.starts_at);
+              const color = proximityColor(intensity);
+              const dateStr = new Date(ev.starts_at).toLocaleString("es-AR", {
+                weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
+                timeZone: "America/Argentina/Buenos_Aires",
+              });
+              return (
+                <Link
+                  key={ev.id}
+                  to={`/mapa?event=${ev.id}`}
+                  className="group relative rounded-2xl border border-border bg-card p-4 pl-5 shadow-sm hover:shadow-elevated hover:-translate-y-0.5 transition overflow-hidden"
+                  style={{ boxShadow: `inset 5px 0 0 0 ${color}` }}
+                >
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-muted text-foreground/80">
+                      {typeLabels[ev.event_type] || ev.event_type}
+                    </span>
+                    <Star color={color} />
+                  </div>
+                  <h3 className="font-display text-lg leading-snug mb-1.5 group-hover:text-primary transition">{ev.title}</h3>
+                  <p className="text-xs font-medium text-foreground/80 flex items-center gap-1.5">
+                    <CalendarDays className="h-3.5 w-3.5" /> {dateStr}
+                  </p>
+                  {ev.location_name && (
+                    <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-1">
+                      <MapPin className="h-3.5 w-3.5" /> {ev.location_name}
+                    </p>
+                  )}
+                  {ev.description && <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{ev.description}</p>}
+                  <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition">
+                    Ver en el mapa <ArrowRight className="h-3 w-3" />
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+        {filtered.length > 6 && (
+          <div className="text-center mt-6">
+            <button onClick={() => setShowAll((v) => !v)} className="text-sm font-semibold text-primary hover:underline">
+              {showAll ? "Ver menos" : `Ver las ${filtered.length} actividades`}
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

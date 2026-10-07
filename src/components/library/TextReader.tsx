@@ -39,6 +39,29 @@ const pickVoice = (voices: SpeechSynthesisVoice[], key: LangKey) => {
 const splitSentences = (text: string) =>
   (text.replace(/\s+/g, " ").match(/[^.!?;:]{1,120}[.!?;:]*\s*/g) || []).map((s) => s.trim()).filter(Boolean);
 
+/** Palabras frecuentes por idioma para reconocer el idioma de cada frase. */
+const STOP: Record<LangKey, string[]> = {
+  "en-US": "the of and to in is that for it with as was on are be by this from or have an not which but they their has were been would can will".split(" "),
+  "es-AR": "el la de que y en los del se las por un una para con no es al lo como más pero sus le ya o este sí porque esta entre cuando muy sin sobre también".split(" "),
+  "pt-BR": "o a de que e do da em um para é com não uma os no se na por mais as dos como mas foi ao ele das tem à seu sua ou ser quando muito também são pelo pela".split(" "),
+  "fr-FR": "le la les de des et à un une du en est que qui dans pour pas sur au avec ce il elle sont par plus ne nous vous leur aux mais ou cette être".split(" "),
+};
+const SETS = Object.fromEntries(Object.entries(STOP).map(([k, v]) => [k, new Set(v)])) as Record<LangKey, Set<string>>;
+
+export const detectLang = (s: string): LangKey | null => {
+  const words = s.toLowerCase().match(/[a-zà-ÿ']+/g) || [];
+  if (words.length < 3) return null;
+  const score: Record<LangKey, number> = { "en-US": 0, "es-AR": 0, "pt-BR": 0, "fr-FR": 0 };
+  for (const w of words) for (const k of Object.keys(SETS) as LangKey[]) if (SETS[k].has(w)) score[k]++;
+  if (/[ñ¿¡]/.test(s)) score["es-AR"] += 2;
+  if (/[ãõç]|ção|ões|lh|nh/.test(s.toLowerCase())) score["pt-BR"] += 2;
+  if (/[èêëîïôûœ]|\b(l'|d'|qu')/i.test(s)) score["fr-FR"] += 2;
+  if (/\b(th|wh)\w+|'s\b/i.test(s)) score["en-US"] += 1;
+  const best = (Object.keys(score) as LangKey[]).sort((a, b) => score[b] - score[a]);
+  if (score[best[0]] < 2 || score[best[0]] === score[best[1]]) return null;
+  return best[0];
+};
+
 const TextReader = () => {
   const supported = typeof window !== "undefined" && "speechSynthesis" in window;
   const [open, setOpen] = useState(false);
@@ -47,6 +70,8 @@ const TextReader = () => {
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [voiceName, setVoiceName] = useState<string>("");
   const [rate, setRate] = useState(1);
+  const [autoLang, setAutoLang] = useState(true);
+  const [currentLang, setCurrentLang] = useState<LangKey | null>(null);
   const [status, setStatus] = useState<"idle" | "playing" | "paused">("idle");
   const [current, setCurrent] = useState(-1);
   const [loadingPdf, setLoadingPdf] = useState(false);
@@ -116,6 +141,7 @@ const TextReader = () => {
     window.clearTimeout(watchdog.current);
     window.speechSynthesis.cancel();
     const voice = voices.find((v) => v.name === voiceName);
+    let prevLang: LangKey = (autoLang && start > 0 && detectLang(sentences.slice(Math.max(0, start - 3), start).join(" "))) || lang;
     const next = (i: number) => {
       window.clearTimeout(watchdog.current);
       if (id !== runId.current) return;
@@ -137,8 +163,16 @@ const TextReader = () => {
       };
       const u = new SpeechSynthesisUtterance(sentences[i]);
       utteranceRef.current = u;
-      u.lang = voice?.lang || lang;
-      if (voice) u.voice = voice;
+      let useVoice = voice;
+      let useLang: LangKey = lang;
+      if (autoLang) {
+        useLang = detectLang(sentences[i]) || prevLang;
+        prevLang = useLang;
+        useVoice = useLang === lang ? voice : pickVoice(voices, useLang) || voice;
+      }
+      setCurrentLang(autoLang ? useLang : null);
+      u.lang = useVoice?.lang || useLang;
+      if (useVoice) u.voice = useVoice;
       u.rate = rate;
       currentRef.current = i;
       pausedAtRef.current = i;
@@ -230,6 +264,13 @@ const TextReader = () => {
             (por ejemplo Samantha en Mac/iPhone); si no aparece una voz del idioma, podés instalarla desde la configuración de tu equipo.
           </p>
 
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={autoLang} onChange={(e) => { stop(); setAutoLang(e.target.checked); }} />
+            Reconocer el idioma automáticamente (textos bilingües o en varios idiomas)
+          </label>
+          <p className="text-xs text-muted-foreground -mt-2">
+            {autoLang ? "El idioma elegido abajo se usa como base; cada frase cambia de voz si está en otro idioma." : "Se lee todo con el idioma elegido."}
+          </p>
           <div className="flex flex-wrap gap-2">
             {LANGS.map((l) => (
               <button
@@ -292,7 +333,8 @@ const TextReader = () => {
             </Button>
           {status !== "idle" && (
             <span className="text-xs text-muted-foreground self-center">
-              Frase {Math.max(1, current + 1)} de {sentences.length}. Tocá una frase para saltar a ella.
+              Frase {Math.max(1, current + 1)} de {sentences.length}
+              {currentLang && ` · ${LANGS.find((l) => l.key === currentLang)?.label}`}. Tocá una frase para saltar a ella.
             </span>
           )}
           </div>
