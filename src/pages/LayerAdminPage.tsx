@@ -110,6 +110,15 @@ export default function LayerAdminPage() {
     let error;
     if (editing.id) {
       ({ error } = await (supabase as any).from("layer_actors").update(payload).eq("id", editing.id));
+      // Con datos reservados, la fila pública ya tiene esos campos vacíos y el
+      // trigger no puede distinguir "sin cambios" de "borrado". Escribimos lo que
+      // quedó en el formulario directo en la copia completa del equipo (si existe).
+      if (!error) {
+        ({ error } = await (supabase as any)
+          .from("layer_actor_private")
+          .update({ contact: payload.contact, actor_type: payload.actor_type, family: payload.family })
+          .eq("layer_actor_id", editing.id));
+      }
     } else {
       ({ error } = await (supabase as any).from("layer_actors").insert(payload));
     }
