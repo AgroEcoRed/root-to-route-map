@@ -4,7 +4,9 @@ import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Lock, Globe, MapPin, Sprout, Users, AlertTriangle } from "lucide-react";
+import { Lock, Globe, MapPin, Sprout, Users, AlertTriangle, Mail, Phone } from "lucide-react";
+
+const slug = (n: string) => n.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, ".");
 
 /**
  * PROTOTIPO (datos ficticios, sin guardar nada).
@@ -82,7 +84,11 @@ const PrototipoFacilitadoresPage = () => {
                     <div className="rounded-lg bg-muted/50 p-3"><p className="text-muted-foreground text-xs">Facilita desde</p><p className="font-semibold">{fac.desde}</p></div>
                     <div className="rounded-lg bg-muted/50 p-3"><p className="text-muted-foreground text-xs">Experiencias acompañadas</p><p className="font-semibold">{fac.acomp}</p></div>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-3">El contacto personal no se publica: se escribe a través de la Red.</p>
+                  <div className="mt-4 rounded-lg border p-3 text-sm space-y-1">
+                    <p className="text-xs text-muted-foreground">Contacto</p>
+                    <p><Mail className="inline h-4 w-4 mr-1" /><a className="underline" href={`mailto:${slug(fac.name)}@ejemplo.org`}>{slug(fac.name)}@ejemplo.org</a></p>
+                    <p><Phone className="inline h-4 w-4 mr-1" />+54 9 221 555-{fac.desde}</p>
+                  </div>
                 </div>
               </div>
             </Card>
