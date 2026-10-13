@@ -8,6 +8,7 @@ import ganaderia from "@/assets/foto-ganaderia.jpg";
 import papas from "@/assets/foto-papas.jpg";
 import rutasSanasLogo from "@/assets/rutas-sanas-logo.jpeg.asset.json";
 import renamaLogo from "@/assets/renama-logo.png.asset.json";
+import saaeLogo from "@/assets/saae-logo.png.asset.json";
 import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 // Logos institucionales ocultos temporalmente hasta obtener autorización
@@ -124,6 +125,9 @@ const HeroSection = () => {
                 <p className="mt-1 text-[10px] leading-tight text-muted-foreground">Red integrada al mapa</p>
               </div>
             </motion.div>
+            <div className="flex items-center justify-center rounded-lg border border-white/30 bg-background/85 p-1.5 shadow-lg backdrop-blur-md">
+              <img src={saaeLogo.url} alt="Logo de la Sociedad Argentina de Agroecología (SAAE)" className="h-11 w-auto object-contain sm:h-14" />
+            </div>
           </motion.div>
 
           <motion.div
@@ -157,6 +161,9 @@ const HeroSection = () => {
                 <p className="text-xs font-semibold leading-tight text-foreground">Rutas Sanas del Alimento</p>
                 <p className="mt-1 text-[10px] leading-tight text-muted-foreground">Red integrada al mapa</p>
               </div>
+            </div>
+            <div className="flex items-center justify-center rounded-lg border border-white/30 bg-background/85 p-1.5 shadow-lg backdrop-blur-md">
+              <img src={saaeLogo.url} alt="Logo de la Sociedad Argentina de Agroecología (SAAE)" className="h-10 w-auto object-contain" />
             </div>
           </motion.div>
         {/* Logos institucionales ocultos temporalmente hasta obtener autorización

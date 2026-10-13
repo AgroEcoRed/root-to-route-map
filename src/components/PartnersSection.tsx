@@ -3,6 +3,7 @@ import { Plus, Mail } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import renamaLogo from "@/assets/renama-logo.png.asset.json";
 import rutasSanasLogo from "@/assets/rutas-sanas-logo.jpeg.asset.json";
+import saaeLogo from "@/assets/saae-logo.png.asset.json";
 // Logos institucionales ocultos temporalmente hasta obtener autorización
 // import conicetLogo from "@/assets/logo-conicet.png";
 // import unsamLogo from "@/assets/logo-unsam.png";
@@ -17,6 +18,10 @@ const partners: { name: string; logo?: string; url?: string }[] = [
     name: "Rutas Sanas del Alimento",
     logo: rutasSanasLogo.url,
     url: "https://www.google.com/maps/d/viewer?mid=1e4CanhyiwCYZkQdPa9gAr77goJywFFxf&hl=es_419&ll=-34.71330544952425%2C-66.5766887375&z=5",
+  },
+  {
+    name: "Sociedad Argentina de Agroecología (SAAE)",
+    logo: saaeLogo.url,
   },
   // { name: "CONICET", logo: conicetLogo, url: "https://www.conicet.gov.ar" },
   // { name: "UNSAM", logo: unsamLogo, url: "https://www.unsam.edu.ar" },
