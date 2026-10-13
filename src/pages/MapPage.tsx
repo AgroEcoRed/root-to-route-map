@@ -1170,7 +1170,7 @@ const MapPage = () => {
                   title={onlyMes ? "Volver al mapa general" : "Ver sólo el Mes de la Agroecología"}
                 >
                   <span aria-hidden="true">🌱</span>
-                  <span className="ml-1.5">{onlyMes ? "Volver al mapa general" : "Mapa del Mes"}</span>
+                  <span className="ml-1.5">{onlyMes ? "Volver al mapa general" : "Mapa del Mes de la Agroecología"}</span>
                 </Button>
               )}
               <span className="hidden md:inline text-xs text-muted-foreground shrink-0">

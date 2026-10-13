@@ -26,7 +26,7 @@ const MesAgroecologiaBanner = () => {
         <Button asChild size="lg" className="rounded-full shrink-0">
           <Link to="/mapa?capa=mes_agroecologia">
             <MapPin className="h-4 w-4 mr-2" />
-            Ver el mapa del Mes
+            Ver el mapa del Mes de la Agroecología
           </Link>
         </Button>
       </div>
