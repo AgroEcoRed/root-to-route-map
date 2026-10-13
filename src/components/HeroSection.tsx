@@ -122,7 +122,6 @@ const HeroSection = () => {
               />
               <div className="hidden max-w-40 lg:block">
                 <p className="text-xs font-semibold leading-tight text-foreground">Rutas Sanas del Alimento</p>
-                <p className="mt-1 text-[10px] leading-tight text-muted-foreground">Red integrada al mapa</p>
               </div>
             </motion.div>
             <div className="flex items-center justify-center rounded-lg border border-white/30 bg-background/85 p-1.5 shadow-lg backdrop-blur-md">
@@ -159,7 +158,6 @@ const HeroSection = () => {
               />
               <div className="max-w-36">
                 <p className="text-xs font-semibold leading-tight text-foreground">Rutas Sanas del Alimento</p>
-                <p className="mt-1 text-[10px] leading-tight text-muted-foreground">Red integrada al mapa</p>
               </div>
             </div>
             <div className="flex items-center justify-center rounded-lg border border-white/30 bg-background/85 p-1.5 shadow-lg backdrop-blur-md">
