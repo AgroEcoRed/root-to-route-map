@@ -27,6 +27,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { EventFormDialog } from "@/components/events/EventFormDialog";
 import { EventsSidebar } from "@/components/events/EventsSidebar";
 import EventsFilterBar, { applyEventFilters, EventsFilters, MES_LAYER_ID } from "@/components/events/EventsFilterBar";
+import { readEventVisibility, isEventPubliclyVisible, type EventVisibility } from "@/lib/eventVisibility";
 import { AddMapPointDialog } from "@/components/AddMapPointDialog";
 import { EndorseDialog } from "@/components/actors/EndorseDialog";
 import { DeclareConnectionDialog } from "@/components/actors/DeclareConnectionDialog";
@@ -356,10 +357,23 @@ const MapPage = () => {
   // Aislar momentáneamente una sola capa (se activa manteniendo apretado su
   // nombre en el administrador de capas).
   const [soloSource, setSoloSource] = useState<string | null>(null);
+  // Cada capa decide qué actividades se ven en el mapa público (p. ej. el Mes
+  // oculta las pasadas durante noviembre y las muestra en gris después).
+  const [layerEventVis, setLayerEventVis] = useState<Record<string, EventVisibility>>({});
+  useEffect(() => {
+    (supabase as any).from("data_source_settings").select("source_id,privacy").then(({ data }: any) => {
+      const m: Record<string, EventVisibility> = {};
+      ((data as any[]) || []).forEach((r) => { m[r.source_id] = readEventVisibility(r.privacy); });
+      setLayerEventVis(m);
+    });
+  }, []);
   const visibleEvents = useMemo(() => {
     if (soloSource && soloSource !== "eventos") return [];
-    return applyEventFilters(events, eventFilters);
-  }, [events, eventFilters, soloSource]);
+    return applyEventFilters(events, eventFilters).filter((ev) => {
+      const vis = ev.layer_id ? layerEventVis[ev.layer_id] : undefined;
+      return !vis || isEventPubliclyVisible(ev, vis);
+    });
+  }, [events, eventFilters, soloSource, layerEventVis]);
   const allTypesCount = Object.keys(actorTypeLabels).length;
   const activeFilterCount =
     (activeTypes.size < allTypesCount ? 1 : 0) +

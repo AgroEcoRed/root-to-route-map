@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CalendarDays, Loader2, Search, Trash2, ExternalLink, MapPin, EyeOff, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
+import EventVisibilityPanel from "@/components/admin/EventVisibilityPanel";
 
 interface LayerEvent {
   id: string;
@@ -121,7 +122,11 @@ export default function LayerEventsAdmin({ layerId }: { layerId: string }) {
   const published = events.filter((e) => e.approved).length;
   const located = events.filter((e) => e.lat != null && e.lng != null).length;
 
+  const years = Array.from(new Set(events.map((e) => new Date(e.starts_at).getFullYear()).filter((y) => !isNaN(y)))).sort();
+
   return (
+    <>
+    <EventVisibilityPanel layerId={layerId} years={years} />
     <Card className="p-5 mt-4">
       <div className="flex items-center justify-between gap-3 flex-wrap mb-3">
         <h2 className="font-display text-lg flex items-center gap-2">
@@ -236,5 +241,6 @@ export default function LayerEventsAdmin({ layerId }: { layerId: string }) {
         </div>
       )}
     </Card>
+    </>
   );
 }
