@@ -359,7 +359,11 @@ const MapPage = () => {
   };
   // Aislar momentáneamente una sola capa (se activa manteniendo apretado su
   // nombre en el administrador de capas).
-  const [soloSource, setSoloSource] = useState<string | null>(null);
+  const [soloSource, setSoloSource] = useState<string | null>(() => {
+    // Acceso directo: /mapa?capa=red_facilitadores muestra sólo esa capa (aunque esté apagada para el público).
+    const c = new URLSearchParams(window.location.search).get("capa");
+    return c && c !== MES_LAYER_ID ? c : null;
+  });
   // Cada capa decide qué actividades se ven en el mapa público (p. ej. el Mes
   // oculta las pasadas durante noviembre y las muestra en gris después).
   const [layerEventVis, setLayerEventVis] = useState<Record<string, EventVisibility>>({});

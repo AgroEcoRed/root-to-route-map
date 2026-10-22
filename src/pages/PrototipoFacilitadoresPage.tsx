@@ -53,6 +53,11 @@ const PrototipoFacilitadoresPage = () => {
           <p className="text-muted-foreground mt-2">Ficha pública de cada facilitador/a y red de vínculos reservada al equipo que administra la capa.</p>
         </header>
 
+        <Card className="p-4 flex flex-wrap items-center gap-3">
+          <p className="text-sm flex-1">Ya existe la capa real <strong>Red de Facilitadorxs</strong>, apagada para el público. Se puede mostrar en reunión con el acceso directo.</p>
+          <Button asChild><a href="/mapa?capa=red_facilitadores"><MapPin className="h-4 w-4 mr-1" />Mapa de Facilitadorxs</a></Button>
+          <Button asChild variant="outline"><a href="/admin/capas/red_facilitadores"><Lock className="h-4 w-4 mr-1" />Panel de la capa</a></Button>
+        </Card>
         <div className="flex flex-wrap gap-2">
           <Button variant={!team ? "default" : "outline"} onClick={() => setTeam(false)}><Globe className="h-4 w-4 mr-1" /> Vista pública</Button>
           <Button variant={team ? "default" : "outline"} onClick={() => setTeam(true)}><Lock className="h-4 w-4 mr-1" /> Vista equipo de la capa</Button>
