@@ -50,6 +50,8 @@ const glyphs: Record<string, string> = {
 
   // ---- Servicio ----
   logistics: `<path ${S} d="M2.5 7.5h11v9h-11z"/><path ${S} d="M13.5 11h4l3 3v2.5h-7z"/><circle ${S} cx="7" cy="18" r="1.8"/><circle ${S} cx="17.5" cy="18" r="1.8"/>`,
+  // Facilitador/a: letra F
+  facilitator: `<path fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" d="M8 20V4h9M8 12h7"/>`,
 };
 
 const fallbackGlyph = `<circle ${F} cx="12" cy="12" r="3.4"/>`;
