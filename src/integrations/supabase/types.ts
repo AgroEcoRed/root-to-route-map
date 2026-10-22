@@ -395,6 +395,68 @@ export type Database = {
         }
         Relationships: []
       }
+      layer_actor_links: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          layer_id: string
+          link_type: string
+          note: string | null
+          source_actor_id: string
+          target_actor_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          layer_id: string
+          link_type?: string
+          note?: string | null
+          source_actor_id: string
+          target_actor_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          layer_id?: string
+          link_type?: string
+          note?: string | null
+          source_actor_id?: string
+          target_actor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "layer_actor_links_source_actor_id_fkey"
+            columns: ["source_actor_id"]
+            isOneToOne: false
+            referencedRelation: "layer_actors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "layer_actor_links_source_actor_id_fkey"
+            columns: ["source_actor_id"]
+            isOneToOne: false
+            referencedRelation: "public_layer_actors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "layer_actor_links_target_actor_id_fkey"
+            columns: ["target_actor_id"]
+            isOneToOne: false
+            referencedRelation: "layer_actors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "layer_actor_links_target_actor_id_fkey"
+            columns: ["target_actor_id"]
+            isOneToOne: false
+            referencedRelation: "public_layer_actors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       layer_actor_private: {
         Row: {
           actor_type: string | null
