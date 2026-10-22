@@ -92,7 +92,8 @@ type ActorType =
   | "agroecological_fair"
   | "agroecological_market"
   | "bio_input_supplier"
-  | "network";
+  | "network"
+  | "facilitator";
 
 type ActorRole = "oferta" | "demanda" | "servicio";
 
@@ -175,6 +176,7 @@ const actorTypeLabels: Record<ActorType, string> = {
   agroecological_market: "Mercado Agroecológico",
   bio_input_supplier: "Proveedor/a de Bio-insumos",
   network: "Red / Articulación",
+  facilitator: "Facilitador/a Agroecológico/a",
 };
 
 const actorRole: Record<ActorType, ActorRole> = {
@@ -203,6 +205,7 @@ const actorRole: Record<ActorType, ActorRole> = {
   logistics: "servicio",
   bio_input_supplier: "oferta",
   network: "servicio",
+  facilitator: "servicio",
 };
 
 const roleLabels: Record<ActorRole, string> = {
@@ -356,7 +359,11 @@ const MapPage = () => {
   };
   // Aislar momentáneamente una sola capa (se activa manteniendo apretado su
   // nombre en el administrador de capas).
-  const [soloSource, setSoloSource] = useState<string | null>(null);
+  const [soloSource, setSoloSource] = useState<string | null>(() => {
+    // Acceso directo: /mapa?capa=red_facilitadores muestra sólo esa capa (aunque esté apagada para el público).
+    const c = new URLSearchParams(window.location.search).get("capa");
+    return c && c !== MES_LAYER_ID ? c : null;
+  });
   // Cada capa decide qué actividades se ven en el mapa público (p. ej. el Mes
   // oculta las pasadas durante noviembre y las muestra en gris después).
   const [layerEventVis, setLayerEventVis] = useState<Record<string, EventVisibility>>({});
@@ -1120,7 +1127,7 @@ const MapPage = () => {
   // Group actor types by role for filter display
   const ofertaTypes: ActorType[] = ["producer", "cooperative", "processing", "agroecological_node", "seed_bank", "composting_center", "research_center", "solidarity_intermediary", "community_garden", "bio_input_supplier"];
   const demandaTypes: ActorType[] = ["restaurant", "social_kitchen", "institution", "retail", "consumer_node", "individual_consumer", "food_bank", "consumer_cooperative", "community_org", "health_food_store", "agroecological_store", "agroecological_fair", "agroecological_market"];
-  const servicioTypes: ActorType[] = ["logistics", "network"];
+  const servicioTypes: ActorType[] = ["logistics", "network", "facilitator"];
 
   return (
     <div className="h-screen min-h-[100dvh] overflow-hidden bg-background flex flex-col">
