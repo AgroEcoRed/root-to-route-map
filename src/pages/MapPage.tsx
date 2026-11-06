@@ -950,7 +950,14 @@ const MapPage = () => {
       }
       if (ev.contact && !contactBits.length) contactBits.push(`📞 ${escHtml(ev.contact)}`);
       const contactHtml = contactBits.length ? `<p style="font-size:11px;color:#444;margin:6px 0 0">Confirmar info: ${contactBits.join(" · ")}</p>` : "";
-      const descHtml = ev.description ? `<p style="font-size:12px;color:#444;margin:6px 0">${escHtml(ev.description)}</p>` : "";
+      const formatDesc = (raw: string) => {
+        const labels = ["Modalidad", "Duración", "Duracion", "Horario", "Organizan", "Organiza", "Co-organizan", "Tipo de organización", "Tipo de actividad", "Comentarios", "Contacto", "Inscripción", "Inscripcion", "Destinatarios", "Público", "Lugar", "Referente", "Requisitos", "Costo", "Cupo", "Más info", "Observaciones"];
+        const re = new RegExp(`\\s*(?:\\.|·)?\\s*\\b(${labels.join("|")}):\\s*`, "g");
+        return escHtml(raw)
+          .replace(re, (_m, l) => `<br/><b>${l}:</b> `)
+          .replace(/^<br\/>/, "");
+      };
+      const descHtml = ev.description ? `<p style="font-size:12px;color:#444;margin:6px 0;line-height:1.5">${formatDesc(ev.description)}</p>` : "";
       const locHtml = ev.location_name ? `<p style="font-size:11px;color:#666;margin:4px 0">📍 ${escHtml(ev.location_name)}</p>` : "";
       // Flyer NO se muestra en el popup del mapa — vive solo en la barra de la derecha.
       const flyerHtml = "";
@@ -969,7 +976,11 @@ const MapPage = () => {
             <p style="font-size:12px;color:#444;margin:0;font-weight:600">🗓️ ${escHtml(dateStr)}</p>
             ${locHtml}${descHtml}${flyerHtml}${orgsHtml}${contactHtml}${linkHtml}${shareHtml}${eventLicenseHtml}
           </div>
-        `)
+        `, {
+          maxWidth: Math.min(340, window.innerWidth - 48),
+          autoPanPaddingTopLeft: L.point(16, 80),
+          autoPanPaddingBottomRight: L.point(16, 140),
+        })
         .addTo(eventsLayerRef.current!);
       marker.on("contextmenu", (e: any) => {
         e.originalEvent?.preventDefault?.();
