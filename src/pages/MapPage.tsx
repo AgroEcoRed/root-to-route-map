@@ -952,7 +952,7 @@ const MapPage = () => {
       const contactHtml = contactBits.length ? `<p style="font-size:11px;color:#444;margin:6px 0 0">Confirmar info: ${contactBits.join(" · ")}</p>` : "";
       const formatDesc = (raw: string) => {
         const labels = ["Modalidad", "Duración", "Duracion", "Horario", "Organizan", "Organiza", "Co-organizan", "Tipo de organización", "Tipo de actividad", "Comentarios", "Contacto", "Inscripción", "Inscripcion", "Destinatarios", "Público", "Lugar", "Referente", "Requisitos", "Costo", "Cupo", "Más info", "Observaciones"];
-        const re = new RegExp(`\\s*(?:\\.|·)?\\s*\\b(${labels.join("|")}):\\s*`, "g");
+        const re = new RegExp(`\\s*\\b(${labels.join("|")}):\\s*`, "g");
         return escHtml(raw)
           .replace(re, (_m, l) => `<br/><b>${l}:</b> `)
           .replace(/^<br\/>/, "");
