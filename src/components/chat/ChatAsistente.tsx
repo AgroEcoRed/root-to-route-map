@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Send, Sprout, RotateCcw, MessageCircle } from "lucide-react";
+import { X, Send, Sprout, RotateCcw, MessageCircle, Minus } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,6 +20,8 @@ const MODES: { key: Mode; labelKey: string; emptyKey: string }[] = [
 const ChatAsistente = () => {
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
+  const [mini, setMiniState] = useState(() => localStorage.getItem("sembra-mini") === "1");
+  const setMini = (v: boolean) => { setMiniState(v); localStorage.setItem("sembra-mini", v ? "1" : "0"); };
   const [mode, setMode] = useState<Mode>("general");
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -99,23 +101,35 @@ const ChatAsistente = () => {
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => { setOpen((v) => !v); }}
         aria-label={t("chat.title")}
-        className="fixed bottom-5 right-5 z-[60] flex items-center gap-2 pl-2 pr-4 py-2 rounded-full bg-gradient-hero text-primary-foreground shadow-elevated hover:scale-105 transition-transform"
+        className={`fixed z-[60] flex items-center gap-2 rounded-full bg-gradient-hero text-primary-foreground shadow-elevated hover:scale-105 transition-all ${
+          mini && !open ? "bottom-3 right-3 p-1 opacity-80 hover:opacity-100" : "bottom-5 right-5 pl-2 pr-4 py-2"
+        }`}
       >
-        <span className="relative flex items-center justify-center h-10 w-10 rounded-full bg-white/95 text-primary shadow-inner">
-          {open ? <X className="h-5 w-5" /> : <Sprout className="h-5 w-5" />}
-          {!open && (
+        <span className={`relative flex items-center justify-center rounded-full bg-white/95 text-primary shadow-inner ${mini && !open ? "h-8 w-8" : "h-10 w-10"}`}>
+          {open ? <X className="h-5 w-5" /> : <Sprout className={mini ? "h-4 w-4" : "h-5 w-5"} />}
+          {!open && !mini && (
             <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 border-2 border-white" />
           )}
         </span>
-        {!open && (
+        {!open && !mini && (
           <span className="flex flex-col items-start leading-tight">
             <span className="text-[10px] uppercase tracking-wider opacity-80">Asistente</span>
             <span className="text-sm font-display font-semibold">Sembra</span>
           </span>
         )}
       </motion.button>
+      {!open && !mini && (
+        <button
+          onClick={() => setMini(true)}
+          aria-label="Achicar Sembra"
+          title="Achicar Sembra"
+          className="fixed bottom-[3.75rem] right-4 z-[61] h-6 w-6 rounded-full bg-card border border-border text-muted-foreground hover:text-foreground shadow flex items-center justify-center"
+        >
+          <Minus className="h-3.5 w-3.5" />
+        </button>
+      )}
 
       <AnimatePresence>
         {open && (
@@ -138,6 +152,15 @@ const ChatAsistente = () => {
                   <p className="text-[11px] text-muted-foreground">{t("chat.subtitle")}</p>
                 </div>
               </div>
+              <div className="flex items-center gap-1">
+              <button
+                onClick={() => { setOpen(false); setMini(true); }}
+                title="Achicar Sembra"
+                aria-label="Achicar Sembra"
+                className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Minus className="h-4 w-4" />
+              </button>
               <button
                 onClick={reset}
                 title={t("chat.new")}
@@ -145,6 +168,7 @@ const ChatAsistente = () => {
               >
                 <RotateCcw className="h-4 w-4" />
               </button>
+              </div>
             </div>
 
             {/* Mode tabs */}
