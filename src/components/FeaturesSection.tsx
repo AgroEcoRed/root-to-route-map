@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { MapPin, ShoppingBasket, ShieldCheck, Truck, MessageCircle, BarChart3, Leaf, Sprout } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import fotoComarca1 from "@/assets/foto-comarca-1.jpg";
 import fotoVerduras from "@/assets/foto-verduras.jpg";
 import fotoProductor from "@/assets/foto-productor.jpg";

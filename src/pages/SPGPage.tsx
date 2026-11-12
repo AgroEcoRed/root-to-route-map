@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { motion } from "framer-motion";
 import { ShieldCheck, BookOpen, Users, Sprout, ArrowRight, CircleCheck, CircleDot, Circle } from "lucide-react";
 import Navbar from "@/components/Navbar";
