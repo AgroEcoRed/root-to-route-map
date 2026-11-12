@@ -37,7 +37,8 @@ Deno.serve(async (req) => {
   const { data: invites, error: inviteErr } = await sb
     .from("layer_manager_invites")
     .select("id, layer_id, invited_by")
-    .eq("email", email);
+    .eq("email", email)
+    .is("accepted_at", null);
   if (inviteErr) return json({ error: inviteErr.message }, 500);
 
   const claimed: string[] = [];
