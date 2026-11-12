@@ -337,7 +337,7 @@ const ItemCard = ({
       .from("biblioteca")
       .createSignedUrl(item.file_path, 60 * 10);
     if (error || !data?.signedUrl) {
-      toast.error("No se pudo abrir el archivo");
+      toast.error("Este archivo solo lo puede abrir quien lo subió");
       return;
     }
     window.open(data.signedUrl, "_blank", "noopener,noreferrer");
@@ -354,7 +354,7 @@ const ItemCard = ({
     setPdfBusy(true);
     try {
       const { data, error } = await supabase.storage.from("biblioteca").createSignedUrl(item.file_path, 60 * 10);
-      if (error || !data?.signedUrl) { toast.error("No se pudo abrir el archivo"); return; }
+      if (error || !data?.signedUrl) { toast.error("Este archivo solo lo puede abrir quien lo subió"); return; }
       const text = await extractPdfText(data.signedUrl);
       if (!text) { toast.warning("El PDF no tiene texto seleccionable"); return; }
       sendToReader(text, readerLang());

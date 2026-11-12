@@ -64,6 +64,13 @@
       "when": 1794524264281,
       "tag": "0008_tighten_public_reads",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794526367936,
+      "tag": "0009_biblioteca_owner_reads",
+      "breakpoints": true
     }
   ]
 }
