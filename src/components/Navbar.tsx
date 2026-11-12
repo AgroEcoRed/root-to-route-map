@@ -32,17 +32,17 @@ const Navbar = () => {
     { to: "/biblioteca", label: "Biblioteca", icon: BookOpen, showFrom: "lg" as const },
     { to: "/garantias", label: "Garantías Participativas", icon: ShieldCheck, showFrom: "xl" as const },
     { to: "/mercado", label: "Mercado Agroecológico", icon: ShoppingBasket, showFrom: "xl" as const },
-    { to: "/recursos", label: "Recursos compartidos", icon: Sprout, showFrom: "2xl" as const },
-    { to: "/comunidad", label: "Comunidad y Saberes", icon: BookOpen, showFrom: "2xl" as const },
-    { to: "/observatorio", label: "Observatorio", icon: BarChart3, showFrom: "2xl" as const },
+    { to: "/recursos", label: "Recursos compartidos", icon: Sprout, showFrom: "3xl" as const },
+    { to: "/comunidad", label: "Comunidad y Saberes", icon: BookOpen, showFrom: "3xl" as const },
+    { to: "/observatorio", label: "Observatorio", icon: BarChart3, showFrom: "3xl" as const },
   ];
   const allNavItems = [
     { to: "/", label: t("nav.home"), icon: Leaf },
     ...essentialNav,
     ...secondaryNav.map(({ showFrom: _omit, ...rest }) => rest),
   ];
-  const visibilityClass = (showFrom: "lg" | "xl" | "2xl") =>
-    showFrom === "lg" ? "hidden lg:inline-flex" : showFrom === "xl" ? "hidden xl:inline-flex" : "hidden 2xl:inline-flex";
+  const visibilityClass = (showFrom: "lg" | "xl" | "3xl") =>
+    showFrom === "lg" ? "hidden lg:inline-flex" : showFrom === "xl" ? "hidden xl:inline-flex" : "hidden min-[1920px]:inline-flex";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -100,7 +100,7 @@ const Navbar = () => {
         </div>
 
         {/* Esenciales: SIEMPRE visibles (logo, mapa, mercado) */}
-        <div className={`${isMapPage ? "hidden sm:flex" : "flex"} items-center gap-0.5 sm:gap-1 flex-1 min-w-0 justify-center md:justify-start md:ml-2`}>
+        <div className={`${isMapPage ? "hidden sm:flex" : "flex"} items-center gap-0.5 sm:gap-1 flex-1 min-w-0 overflow-hidden justify-center md:justify-start md:ml-2`}>
           {essentialNav.map((item) => {
             const active = location.pathname === item.to;
             return (
