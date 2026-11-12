@@ -31,7 +31,7 @@ const Footer = () => {
                 },
                 { Icon: Github, href: "#", label: "GitHub", external: false },
                 { Icon: Twitter, href: "#", label: "X (Twitter)", external: false },
-                { Icon: Mail, href: "#", label: "Email", external: false },
+                { Icon: Mail, href: "mailto:info@agroeco.red", label: "Email info@agroeco.red", external: false },
               ].map(({ Icon, href, label, external }) => (
                 <motion.a key={label} href={href} aria-label={label}
                   {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
@@ -71,8 +71,13 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <a href="mailto:info@agroeco.red" className="hover:text-wheat transition-colors hover:translate-x-1 inline-block">
+                  info@agroeco.red
+                </a>
+              </li>
+              <li>
                 <a href="mailto:apsosa@unsam.edu.ar" className="hover:text-wheat transition-colors hover:translate-x-1 inline-block">
-                  {t("footer.contact")}
+                  {t("footer.contact_institucional")}
                 </a>
               </li>
             </ul>
