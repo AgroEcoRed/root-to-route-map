@@ -42,6 +42,11 @@ const ChatAsistente = () => {
   const send = async () => {
     const text = input.trim();
     if (!text || loading) return;
+    const { data: sess } = await supabase.auth.getSession();
+    if (!sess.session) {
+      append({ role: "assistant", content: "Para conversar con Sembra, ingresá a tu cuenta o registrate. [Ingresar](/auth)" });
+      return;
+    }
     setInput("");
     append({ role: "user", content: text });
     setLoading(true);

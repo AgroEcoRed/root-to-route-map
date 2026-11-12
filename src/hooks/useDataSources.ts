@@ -34,7 +34,8 @@ export const useDataSources = () => {
     if (data && data.length > 0) {
       // Preserve canonical order
       const map = new Map(data.map((d: any) => [d.source_id, d]));
-      const defaults = DEFAULTS.map(d => (map.get(d.source_id) as DataSourceSetting) || d);
+      // Rows not returned are disabled (hidden layers aren't readable publicly)
+      const defaults = DEFAULTS.map(d => (map.get(d.source_id) as DataSourceSetting) || { ...d, enabled: false });
       const defaultIds = new Set(DEFAULTS.map(d => d.source_id));
       const extras = (data as DataSourceSetting[]).filter(d => !defaultIds.has(d.source_id));
       setSources([...defaults, ...extras]);
