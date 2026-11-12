@@ -21,18 +21,24 @@ const OpenKnowledgeSection = () => {
   const cards = [
     {
       code: "CC-BY-SA-4.0",
+      short: licenseCode("CC-BY-SA-4.0")?.short ?? "CC BY-SA 4.0",
+      url: licenseCode("CC-BY-SA-4.0")?.url,
       icon: CreativeCommons,
       titleKey: "open.card_contents_title",
       textKey: "open.card_contents_text",
     },
     {
       code: "ODbL-1.0",
+      short: licenseCode("ODbL-1.0")?.short ?? "ODbL 1.0",
+      url: licenseCode("ODbL-1.0")?.url,
       icon: Database,
       titleKey: "open.card_data_title",
       textKey: "open.card_data_text",
     },
     {
-      code: "AGPL",
+      code: "AGPL-3.0",
+      short: "AGPL-3.0",
+      url: "https://www.gnu.org/licenses/agpl-3.0.es.html",
       icon: Code2,
       titleKey: "open.card_code_title",
       textKey: "open.card_code_text",
@@ -74,7 +80,6 @@ const OpenKnowledgeSection = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
           {cards.map((card, i) => {
-            const lic = licenseCode(card.code);
             const Icon = card.icon;
             return (
               <motion.div
@@ -90,7 +95,7 @@ const OpenKnowledgeSection = () => {
                     <Icon className="h-5 w-5" />
                   </div>
                   <span className="text-xs font-semibold tracking-wider uppercase text-muted-foreground">
-                    {lic?.short ?? card.code}
+                    {card.short}
                   </span>
                 </div>
                 <h3 className="font-display text-lg text-foreground mb-2">
@@ -99,9 +104,9 @@ const OpenKnowledgeSection = () => {
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   {t(card.textKey)}
                 </p>
-                {lic?.url && (
+                {card.url && (
                   <a
-                    href={lic.url}
+                    href={card.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-primary hover:underline mt-3 inline-block"
