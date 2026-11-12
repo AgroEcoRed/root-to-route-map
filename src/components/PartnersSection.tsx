@@ -89,20 +89,6 @@ const PartnersSection = () => {
             </motion.div>
           ))}
 
-          {/* Placeholder slots for future partners */}
-          {[0, 1, 2].map((slot) => (
-            <motion.div
-              key={`placeholder-${slot}`}
-              className="flex flex-col items-center justify-center w-full h-28 px-4 py-4 rounded-xl border-2 border-dashed border-border/60 bg-muted/20 text-muted-foreground/50 hover:border-primary/30 hover:text-primary/60 transition-all duration-300 cursor-default"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: (partners.length + slot) * 0.1 }}
-            >
-              <Plus className="h-6 w-6 mb-1" />
-              <span className="text-xs text-center leading-tight">{t("partners.placeholder")}</span>
-            </motion.div>
-          ))}
         </div>
 
         <motion.div
