@@ -423,11 +423,6 @@ Deno.serve(async (req) => {
         } catch { authed = false; }
       }
     }
-    if (!authed) {
-      return new Response(JSON.stringify({ error: "Necesitás iniciar sesión" }), {
-        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
     const rl = rateLimit(ip, authed);
     if (!rl.ok) {
       return new Response(
