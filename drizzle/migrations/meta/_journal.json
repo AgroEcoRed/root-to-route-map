@@ -43,6 +43,13 @@
       "when": 1792702980800,
       "tag": "0005_facilitadores_layer_links",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794522309780,
+      "tag": "0006_tighten_flyers_and_connections",
+      "breakpoints": true
     }
   ]
 }
