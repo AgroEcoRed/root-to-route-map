@@ -229,7 +229,7 @@ async function toolBuscarActores(args: Record<string, unknown>) {
 
   // Pull layer_actors + profiles (both have lat/lng)
   const [{ data: actors }, { data: profiles }] = await Promise.all([
-    sb.from("layer_actors").select("id,name,actor_type,description,address,contact,lat,lng,source_id").limit(500),
+    sb.from("layer_actors").select("id,name,actor_type,description,address,contact,lat,lng,source_id").eq("public_visible", true).limit(500),
     sb.from("profiles").select("user_id,display_name,actor_type,location,description,products,lat,lng").not("lat", "is", null).limit(500),
   ]);
 
@@ -412,7 +412,16 @@ Deno.serve(async (req) => {
       // We don't fully verify here (avoids extra latency on a public endpoint),
       // but a non-empty token from the legit client bumps the IP into the
       // higher tier. Anonymous abuse is bounded by the strict anon tier below.
-      if (tok && tok.length > 20) authed = true;
+      if (tok && tok.length > 20) {
+        try {
+          const vc = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, {
+            global: { headers: { Authorization: `Bearer ${tok}` } },
+            auth: { persistSession: false },
+          });
+          const { data } = await vc.auth.getUser(tok);
+          authed = !!data?.user;
+        } catch { authed = false; }
+      }
     }
     const rl = rateLimit(ip, authed);
     if (!rl.ok) {

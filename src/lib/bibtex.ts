@@ -26,7 +26,11 @@ export const toBibtex = (items: LibraryItem[]): string => {
 
 export const toCsv = (items: LibraryItem[]): string => {
   const header = ["title", "authors", "year", "type", "doi", "url", "journal", "publisher", "tags"];
-  const escapeCsv = (s: string) => `"${(s ?? "").replace(/"/g, '""')}"`;
+  const escapeCsv = (s: string) => {
+    let v = s ?? "";
+    if (/^[=+\-@\t\r]/.test(v)) v = "'" + v;
+    return `"${v.replace(/"/g, '""')}"`;
+  };
   const rows = items.map((it) =>
     [
       it.title,

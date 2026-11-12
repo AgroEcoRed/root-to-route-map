@@ -86,6 +86,18 @@ Deno.serve(async (req) => {
     if (normalizedUrl && !/^https?:\/\//i.test(normalizedUrl)) {
       normalizedUrl = "https://" + normalizedUrl;
     }
+    if (normalizedUrl) {
+      let okHost = false;
+      try {
+        const h = new URL(normalizedUrl).hostname.toLowerCase();
+        okHost = h === "instagram.com" || h.endsWith(".instagram.com");
+      } catch { okHost = false; }
+      if (!okHost) {
+        return new Response(JSON.stringify({ error: "Solo se aceptan enlaces de Instagram" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
 
     let source = "";
     let title = "";
