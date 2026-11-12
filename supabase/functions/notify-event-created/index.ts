@@ -158,7 +158,7 @@ Deno.serve(async (req) => {
 
   const RESEND_KEY = Deno.env.get("RESEND_API_KEY");
   if (!RESEND_KEY || targets.length === 0) {
-    console.log("notify-event-created: skipped (no key or no targets)", { eventId, targets });
+    console.log("notify-event-created: skipped (no key or no targets)", { eventId, targetCount: targets.length });
     return new Response(JSON.stringify({ ok: true, sent: false, editLink }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
