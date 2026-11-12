@@ -1,7 +1,7 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, MapPin, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import comarca1 from "@/assets/foto-comarca-1.jpg";
 import trigo from "@/assets/foto-trigo-atardecer.jpg";
 import ganaderia from "@/assets/foto-ganaderia.jpg";

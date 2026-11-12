@@ -8,7 +8,7 @@ import {
 import { useDataSources } from "@/hooks/useDataSources";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 interface Props {
   /** floating button position class (e.g. "bottom-6 right-6") */

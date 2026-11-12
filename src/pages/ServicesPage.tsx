@@ -7,7 +7,7 @@ import {
   ShoppingBasket, ExternalLink, BookOpen, Shield, CreditCard,
   Truck, ArrowRight
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { useState, useEffect } from "react";
 import { getWeather, type WeatherData } from "@/lib/weather/officialWeather";
 

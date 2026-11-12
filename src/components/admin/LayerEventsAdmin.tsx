@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CalendarDays, Loader2, Search, Trash2, ExternalLink, MapPin, EyeOff, Eye } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import EventVisibilityPanel from "@/components/admin/EventVisibilityPanel";
 
 interface LayerEvent {

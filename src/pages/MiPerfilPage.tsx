@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate } from "react-router";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,7 @@ import AddMapPointDialog from "@/components/AddMapPointDialog";
 import MyMapContributions from "@/components/MyMapContributions";
 import InviteOthersSection from "@/components/InviteOthersSection";
 import LayerManagerPanelCard from "@/components/LayerManagerPanelCard";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { MapPin, Plus, Sparkles } from "lucide-react";
 
 /** Visible CTAs to add map points and activities, plus preliminary upload. */

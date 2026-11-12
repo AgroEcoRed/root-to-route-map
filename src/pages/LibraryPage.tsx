@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router";
 import { motion } from "framer-motion";
 import { BookOpen, Upload, Download, Search, Tag, FileText, ExternalLink, Loader2, Plus, FolderPlus, Folder, Sparkles, Library, Quote, Copy, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
