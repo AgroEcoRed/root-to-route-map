@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { Github, Twitter, Mail } from "lucide-react";
+import { Github, Twitter, Mail, Instagram } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import AnimatedLogo from "@/components/AnimatedLogo";
@@ -22,8 +22,20 @@ const Footer = () => {
             </Link>
             <p className="text-forest-foreground/70 text-sm max-w-sm leading-relaxed mb-6">{t("footer.description")}</p>
             <div className="flex gap-3">
-              {[Github, Twitter, Mail].map((Icon, i) => (
-                <motion.a key={i} href="#" whileHover={{ y: -3, scale: 1.1 }}
+              {[
+                {
+                  Icon: Instagram,
+                  href: "https://www.instagram.com/agroeco.red/",
+                  label: "Instagram @agroeco.red",
+                  external: true,
+                },
+                { Icon: Github, href: "#", label: "GitHub", external: false },
+                { Icon: Twitter, href: "#", label: "X (Twitter)", external: false },
+                { Icon: Mail, href: "#", label: "Email", external: false },
+              ].map(({ Icon, href, label, external }) => (
+                <motion.a key={label} href={href} aria-label={label}
+                  {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  whileHover={{ y: -3, scale: 1.1 }}
                   className="w-9 h-9 rounded-lg bg-forest-foreground/10 flex items-center justify-center hover:bg-wheat/20 hover:text-wheat transition-colors">
                   <Icon className="h-4 w-4" />
                 </motion.a>
