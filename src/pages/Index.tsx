@@ -7,6 +7,7 @@ import ActorTypesSection from "@/components/ActorTypesSection";
 import TerritoriesGallery from "@/components/TerritoriesGallery";
 import PartnersSection from "@/components/PartnersSection";
 import CTASection from "@/components/CTASection";
+import OpenKnowledgeSection from "@/components/OpenKnowledgeSection";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -21,6 +22,7 @@ const Index = () => {
       <TerritoriesGallery />
       <PartnersSection />
       <CTASection />
+      <OpenKnowledgeSection />
       <Footer />
     </div>
   );
