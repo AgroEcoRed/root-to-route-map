@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, Sprout, RotateCcw, MessageCircle, Minus } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -20,7 +21,10 @@ const MODES: { key: Mode; labelKey: string; emptyKey: string }[] = [
 const ChatAsistente = () => {
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
-  const [mini, setMiniState] = useState(() => localStorage.getItem("sembra-mini") === "1");
+  const [miniPref, setMiniState] = useState(() => localStorage.getItem("sembra-mini") === "1");
+  const { pathname } = useLocation();
+  const onMap = pathname.startsWith("/mapa");
+  const mini = miniPref || onMap;
   const setMini = (v: boolean) => { setMiniState(v); localStorage.setItem("sembra-mini", v ? "1" : "0"); };
   const [mode, setMode] = useState<Mode>("general");
   const [input, setInput] = useState("");
@@ -104,7 +108,7 @@ const ChatAsistente = () => {
         onClick={() => { setOpen((v) => !v); }}
         aria-label={t("chat.title")}
         className={`fixed z-[60] flex items-center gap-2 rounded-full bg-gradient-hero text-primary-foreground shadow-elevated hover:scale-105 transition-all ${
-          mini && !open ? "bottom-3 right-3 p-1 opacity-80 hover:opacity-100" : "bottom-5 right-5 pl-2 pr-4 py-2"
+          mini && !open ? `${onMap ? "bottom-8" : "bottom-3"} right-3 p-1 opacity-80 hover:opacity-100` : "bottom-5 right-5 pl-2 pr-4 py-2"
         }`}
       >
         <span className={`relative flex items-center justify-center rounded-full bg-white/95 text-primary shadow-inner ${mini && !open ? "h-8 w-8" : "h-10 w-10"}`}>
@@ -125,9 +129,9 @@ const ChatAsistente = () => {
           onClick={() => setMini(true)}
           aria-label="Achicar Sembra"
           title="Achicar Sembra"
-          className="fixed bottom-[3.75rem] right-4 z-[61] h-6 w-6 rounded-full bg-card border border-border text-muted-foreground hover:text-foreground shadow flex items-center justify-center"
+          className="fixed bottom-[3.5rem] right-3 z-[61] h-8 w-8 rounded-full bg-card border border-border text-muted-foreground hover:text-foreground shadow flex items-center justify-center"
         >
-          <Minus className="h-3.5 w-3.5" />
+          <Minus className="h-4 w-4" />
         </button>
       )}
 
