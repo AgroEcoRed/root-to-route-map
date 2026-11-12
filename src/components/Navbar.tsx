@@ -42,7 +42,7 @@ const Navbar = () => {
     ...secondaryNav.map(({ showFrom: _omit, ...rest }) => rest),
   ];
   const visibilityClass = (showFrom: "lg" | "xl" | "3xl") =>
-    showFrom === "lg" ? "hidden lg:inline-flex" : showFrom === "xl" ? "hidden xl:inline-flex" : "hidden min-[1920px]:inline-flex";
+    showFrom === "lg" ? "hidden lg:inline-flex" : showFrom === "xl" ? "hidden xl:inline-flex" : "hidden";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
