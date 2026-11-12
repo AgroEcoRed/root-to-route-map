@@ -50,6 +50,13 @@
       "when": 1794522309780,
       "tag": "0006_tighten_flyers_and_connections",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794523820323,
+      "tag": "0007_guard_approval_and_verification",
+      "breakpoints": true
     }
   ]
 }
