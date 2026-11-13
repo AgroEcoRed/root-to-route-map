@@ -102,8 +102,8 @@ const ChatAsistente = () => {
         transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
         onClick={() => { setOpen((v) => !v); }}
         aria-label={t("chat.title")}
-        className={`fixed z-[60] flex items-center gap-2 rounded-full bg-gradient-hero text-primary-foreground shadow-elevated hover:scale-105 transition-all ${
-          mini && !open ? `${onMap ? "bottom-8" : "bottom-3"} right-3 p-1 opacity-80 hover:opacity-100` : "bottom-5 right-5 pl-2 pr-4 py-2"
+        className={`fixed z-[1200] flex items-center gap-2 rounded-full bg-gradient-hero text-primary-foreground shadow-elevated hover:scale-105 transition-all ${
+          mini && !open ? `${onMap ? "top-1/2 -translate-y-1/2 right-2" : "bottom-3 right-3"} p-1 opacity-80 hover:opacity-100` : "bottom-5 right-5 pl-2 pr-4 py-2"
         }`}
       >
         <span className={`relative flex items-center justify-center rounded-full bg-white/95 text-primary shadow-inner ${mini && !open ? "h-8 w-8" : "h-10 w-10"}`}>
