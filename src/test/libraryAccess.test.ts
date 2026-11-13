@@ -1,4 +1,3 @@
-// @vitest-environment node
 import { describe, expect, it } from "vitest";
 import { loadEnv } from "vite";
 import { createClient } from "@supabase/supabase-js";
