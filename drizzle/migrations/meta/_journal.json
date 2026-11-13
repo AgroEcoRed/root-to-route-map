@@ -85,6 +85,13 @@
       "when": 1794531264484,
       "tag": "0011_bind_flyers_biblioteca_reads_to_owner",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1794612083576,
+      "tag": "0012_restore_published_library_document_reads",
+      "breakpoints": true
     }
   ]
 }
