@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { loadEnv } from "vite";
+import { readFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
 
-const env = loadEnv("development", process.cwd(), "VITE_");
+const env = Object.fromEntries(readFileSync(".env", "utf8").split("\n")
+  .filter((line) => /^VITE_SUPABASE_(URL|PUBLISHABLE_KEY)=/.test(line))
+  .map((line) => {
+    const index = line.indexOf("=");
+    return [line.slice(0, index), line.slice(index + 1).trim().replace(/^["']|["']$/g, "")];
+  }));
 const visitor = createClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_PUBLISHABLE_KEY, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
