@@ -383,6 +383,7 @@ const MapPage = ({ embedded = false }: { embedded?: boolean }) => {
     if (soloSource && soloSource !== "eventos") return [];
     return applyEventFilters(events, eventFilters).filter((ev) => {
       if (embedded && (sourcesLoading || (ev.layer_id && !publiclyEnabled(ev.layer_id)))) return false;
+      if (embedded && ev.layer_id && !layerEventVis[ev.layer_id]) return false;
       const vis = ev.layer_id ? layerEventVis[ev.layer_id] : undefined;
       return !vis || isEventPubliclyVisible(ev, vis);
     });
@@ -495,6 +496,7 @@ const MapPage = ({ embedded = false }: { embedded?: boolean }) => {
       const { data } = await (supabase as any)
         .from("layer_actors")
         .select("id,source_id,name,lat,lng,actor_type,family,description,address,delivery_days,verified_at,verified_by_role,updated_at")
+        .eq("public_visible", true)
         .not("source_id", "in", `(${known.join(",")})`);
       const rows = (data as any[]) || [];
       setExtraLayerActors(rows.map((p, i) => ({
