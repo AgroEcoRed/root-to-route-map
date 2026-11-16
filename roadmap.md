@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Compartir mapa y solicitar exportaciones GeoJSON/CSV por capa; aprobación, rechazo y revocación por administradores; comprobar permisos.
+- [x] Compartir mapa y solicitar exportaciones GeoJSON/CSV por capa; aprobación, rechazo y revocación por administradores; comprobar permisos.
 
 - [x] Canal RSS público de actividades con enlace para compartir y verificación sin cuenta.
 
