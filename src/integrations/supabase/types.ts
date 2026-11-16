@@ -589,6 +589,50 @@ export type Database = {
         }
         Relationships: []
       }
+      layer_export_requests: {
+        Row: {
+          created_at: string
+          id: string
+          layer_id: string
+          purpose: string
+          requester_id: string
+          requester_name: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          layer_id: string
+          purpose: string
+          requester_id: string
+          requester_name: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          layer_id?: string
+          purpose?: string
+          requester_id?: string
+          requester_name?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "layer_export_requests_layer_id_fkey"
+            columns: ["layer_id"]
+            isOneToOne: false
+            referencedRelation: "data_source_settings"
+            referencedColumns: ["source_id"]
+          },
+        ]
+      }
       layer_manager_invites: {
         Row: {
           accepted_at: string | null
