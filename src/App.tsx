@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { CartProvider } from "@/contexts/CartContext";
@@ -38,6 +38,11 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const PlatformChat = () => {
+  const { pathname } = useLocation();
+  return pathname === '/mapa/incrustar' ? null : <ChatAsistente />;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -51,6 +56,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/mapa" element={<MapPage />} />
+              <Route path="/mapa/incrustar" element={<MapPage embedded />} />
               <Route path="/mercado" element={<MarketplacePage />} />
               {/* Alias: Marketplace -> Mercado Agroecológico */}
               <Route path="/marketplace" element={<Navigate to="/mercado" replace />} />
@@ -84,7 +90,7 @@ const App = () => (
               <Route path="/prototipo/facilitadores" element={<PrototipoFacilitadoresPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-            <ChatAsistente />
+            <PlatformChat />
           </AuthProvider>
           </CartProvider>
         </LanguageProvider>
