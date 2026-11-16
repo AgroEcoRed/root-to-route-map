@@ -1,2 +1,3 @@
 - Layer privacy: full actor data lives in layer_actor_private (managers only); apply_layer_privacy rewrites the public layer_actors row per the layer's data_source_settings.privacy flags — why: keeps reserved data out of the public API.
 - Biblioteca public reads must match a catalogue entry and its uploader's object owner/folder, or the ownerless curated SPG seed folder; keep the bucket private and retain owner/admin access — why: allows shared reading without exposing internal imports through arbitrary catalogue paths.
+- Activity RSS uses an anonymous client, explicit public fields, and enabled-layer/year/past filtering before selecting the latest 100 publications — why: syndication must never reveal private records or bypass layer visibility.

@@ -1,0 +1,1 @@
+export const ACTIVITIES_RSS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/activities-rss`;
