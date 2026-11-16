@@ -20,9 +20,9 @@ const OpenKnowledgeSection = () => {
 
   const cards = [
     {
-      code: "CC-BY-SA-4.0",
-      short: licenseCode("CC-BY-SA-4.0")?.short ?? "CC BY-SA 4.0",
-      url: licenseCode("CC-BY-SA-4.0")?.url,
+      code: "CC-BY-NC-SA-4.0",
+      short: licenseCode("CC-BY-NC-SA-4.0")?.short ?? "CC BY-NC-SA 4.0",
+      url: licenseCode("CC-BY-NC-SA-4.0")?.url,
       icon: CreativeCommons,
       titleKey: "open.card_contents_title",
       textKey: "open.card_contents_text",

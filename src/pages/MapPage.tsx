@@ -965,7 +965,7 @@ const MapPage = () => {
       const orgs = ((ev as any).extra_organizer_names || []) as string[];
       const orgsHtml = orgs.length ? `<p style="font-size:11px;color:#444;margin:6px 0 0"><b>Co-organizan:</b> ${escHtml(orgs.join(", "))}</p>` : "";
       const shareHtml = `<p style="margin:8px 0 0;font-size:11px;color:#6b7280">💡 Click derecho sobre la estrella para copiar un link directo a esta actividad.</p>`;
-      const eventLicenseHtml = `<p style="margin:6px 0 0;font-size:10px;color:#94a3b8">📄 Datos: <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener noreferrer" style="color:#64748b;text-decoration:underline">ODbL 1.0</a> · Textos: <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es" target="_blank" rel="noopener noreferrer" style="color:#64748b;text-decoration:underline">CC BY-SA 4.0</a></p>`;
+      const eventLicenseHtml = `<p style="margin:6px 0 0;font-size:10px;color:#94a3b8">📄 Datos: <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener noreferrer" style="color:#64748b;text-decoration:underline">ODbL 1.0</a> · Textos: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" target="_blank" rel="noopener noreferrer" style="color:#64748b;text-decoration:underline">CC BY-NC-SA 4.0</a></p>`;
       const marker = L.marker([ev.lat, ev.lng], { icon, zIndexOffset: isPast ? 400 : 1000, opacity: 1 })
         .bindPopup(`
           <div style="min-width:240px;font-family:DM Sans,sans-serif;padding:4px">
