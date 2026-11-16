@@ -70,10 +70,16 @@ Deno.serve(async req => {
       for (const actor of data || []) features.push({ type: "Feature", geometry: { type: "Point", coordinates: [actor.lng, actor.lat] }, properties: { id: actor.id, name: actor.name, type: actor.actor_type, description: actor.description, location: actor.address, layer: layerId, source: "https://agroeco.red", license: "ODbL-1.0" } });
       if (!data || data.length < 500) break;
     }
-    const { data: events, error: eventError } = await db.from("public_events").select("id,title,description,starts_at,ends_at,location_name,created_at,approved,layer_id,lat,lng").eq("layer_id", layerId).eq("approved", true).order("created_at", { ascending: false }).limit(100);
-    if (eventError) throw eventError;
-    for (const event of selectPublicActivities(events || [], [layer])) {
-      const point = (events || []).find(e => e.id === event.id);
+    const events: Array<{ id: string; title: string; description: string | null; starts_at: string; ends_at: string | null; location_name: string | null; created_at: string; approved: boolean; layer_id: string | null; lat: number | null; lng: number | null }> = [];
+    for (let offset = 0; ; offset += 500) {
+      if (offset >= 20000) return json({ error: "Esta capa es demasiado grande para descargarla de una vez" }, 413);
+      const { data, error } = await db.from("public_events").select("id,title,description,starts_at,ends_at,location_name,created_at,approved,layer_id,lat,lng").eq("layer_id", layerId).eq("approved", true).order("id").range(offset, offset + 499);
+      if (error) throw error;
+      events.push(...(data || []));
+      if (!data || data.length < 500) break;
+    }
+    for (const event of selectPublicActivities(events, [layer], Date.now(), events.length)) {
+      const point = events.find(e => e.id === event.id);
       features.push({ type: "Feature", geometry: point?.lat != null && point?.lng != null ? { type: "Point", coordinates: [point.lng, point.lat] } : null, properties: { id: event.id, name: event.title, type: "actividad", description: event.description, location: event.location_name, starts_at: event.starts_at, ends_at: event.ends_at, layer: layerId, source: "https://agroeco.red", license: "ODbL-1.0" } });
     }
     const columns = ["id", "name", "type", "description", "location", "starts_at", "ends_at", "layer", "source", "license", "longitude", "latitude"];

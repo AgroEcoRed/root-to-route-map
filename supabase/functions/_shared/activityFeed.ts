@@ -16,7 +16,7 @@ export interface FeedLayer {
   privacy: unknown;
 }
 
-export function selectPublicActivities(events: FeedEvent[], layers: FeedLayer[], now = Date.now()) {
+export function selectPublicActivities(events: FeedEvent[], layers: FeedLayer[], now = Date.now(), limit = 100) {
   const settings = new Map(layers.map(layer => [layer.source_id, layer]));
   return events.filter(event => {
     if (!event.approved) return false;
@@ -31,7 +31,7 @@ export function selectPublicActivities(events: FeedEvent[], layers: FeedLayer[],
     const year = Number(date.toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires", year: "numeric" }));
     if (visibility?.hidden_years?.map(Number).includes(year)) return false;
     return visibility?.past !== "hide" || date.getTime() >= now;
-  }).sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at)).slice(0, 100);
+  }).sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at)).slice(0, limit);
 }
 
 export const escapeXml = (value: string) => value
