@@ -18,7 +18,17 @@ Deno.serve(async req => {
     if (body.action === "layers") {
       const { data, error } = await db.from("data_source_settings").select("source_id,label").eq("enabled", true).order("label");
       if (error) throw error;
-      return json({ layers: data });
+      // Do not offer empty exports for legacy layers drawn from bundled files.
+      const available = [];
+      for (const layer of data || []) {
+        const [actors, events] = await Promise.all([
+          db.from("layer_actors").select("id", { count: "exact", head: true }).eq("source_id", layer.source_id).eq("public_visible", true),
+          db.from("public_events").select("id", { count: "exact", head: true }).eq("layer_id", layer.source_id).eq("approved", true),
+        ]);
+        if (actors.error || events.error) throw actors.error || events.error;
+        if ((actors.count || 0) + (events.count || 0) > 0) available.push(layer);
+      }
+      return json({ layers: available });
     }
     const header = req.headers.get("Authorization") || "";
     if (!header.startsWith("Bearer ")) return json({ error: "Ingresá para solicitar o descargar una exportación" }, 401);
