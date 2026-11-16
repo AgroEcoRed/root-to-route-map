@@ -37,3 +37,6 @@ verify_jwt = false
 
 [functions.zotero-sync]
 verify_jwt = false
+
+[functions.library-file]
+verify_jwt = false

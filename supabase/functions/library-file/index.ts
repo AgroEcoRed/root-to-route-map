@@ -17,17 +17,8 @@ Deno.serve(async (req) => {
   if (typeof itemId !== "string" || !/^[0-9a-f-]{36}$/i.test(itemId)) return json({ error: "bad request" }, 400);
 
   const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-  const { data: item } = await admin.from("library_items").select("file_path, uploaded_by").eq("id", itemId).maybeSingle();
-  if (!item?.file_path) return json({ error: "not found" }, 404);
-
-  const path = item.file_path as string;
-  const folder = path.split("/")[0];
-  const { data: obj } = await admin.schema("storage").from("objects")
-    .select("owner_id").eq("bucket_id", "biblioteca").eq("name", path).maybeSingle();
-  if (!obj) return json({ error: "not found" }, 404);
-  const owner = (obj as { owner_id: string | null }).owner_id;
-  const bound = owner === item.uploaded_by || folder === item.uploaded_by || (owner === null && folder === "spg-seed");
-  if (!bound) return json({ error: "not found" }, 404);
+  const { data: path } = await admin.rpc("published_library_file_path", { _item_id: itemId });
+  if (typeof path !== "string" || !path) return json({ error: "not found" }, 404);
 
   const { data, error } = await admin.storage.from("biblioteca").createSignedUrl(path, 600);
   if (error || !data?.signedUrl) return json({ error: "unavailable" }, 500);
