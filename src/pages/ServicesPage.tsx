@@ -127,9 +127,9 @@ const ServicesPage = () => {
       ],
       programs: [
         { name: "SENASA - Registro de Operadores", url: "https://www.argentina.gob.ar/senasa", desc: t("services.prog_senasa") },
-        { name: "RENAF - Registro de Agricultura Familiar", url: "https://www.argentina.gob.ar/servicio/inscribirse-en-el-registro-nacional-de-agricultura-familiar-renaf", desc: t("services.prog_saf") },
+        { name: "RENAF - Registro de Agricultura Familiar", url: "https://www.argentina.gob.ar/agricultura/agricultura-familiar", desc: t("services.prog_saf") },
         { name: "INAES - Cooperativas y Mutuales", url: "https://www.argentina.gob.ar/inaes", desc: t("services.prog_prohuerta") },
-        { name: "Monotributo Social", url: "https://www.argentina.gob.ar/servicio/inscribirse-al-monotributo-social", desc: t("services.prog_monotributo") },
+        { name: "Monotributo Social", url: "https://www.afip.gob.ar/monotributo/monotributo-social/", desc: t("services.prog_monotributo") },
       ],
     },
     {
