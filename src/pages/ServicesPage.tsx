@@ -126,10 +126,10 @@ const ServicesPage = () => {
         { label: t("services.gov_programs"), desc: t("services.gov_programs_desc"), icon: Landmark },
       ],
       programs: [
-        { name: "INTA - ProHuerta", url: "https://www.argentina.gob.ar/inta/prohuerta", desc: t("services.prog_prohuerta") },
         { name: "SENASA - Registro de Operadores", url: "https://www.argentina.gob.ar/senasa", desc: t("services.prog_senasa") },
-        { name: "Secretaría de Agricultura Familiar", url: "https://www.argentina.gob.ar/agricultura/agricultura-familiar", desc: t("services.prog_saf") },
-        { name: "Monotributo Social", url: "https://www.argentina.gob.ar/desarrollosocial/monotributosocial", desc: t("services.prog_monotributo") },
+        { name: "RENAF - Registro de Agricultura Familiar", url: "https://www.argentina.gob.ar/servicio/inscribirse-en-el-registro-nacional-de-agricultura-familiar-renaf", desc: t("services.prog_saf") },
+        { name: "INAES - Cooperativas y Mutuales", url: "https://www.argentina.gob.ar/inaes", desc: t("services.prog_prohuerta") },
+        { name: "Monotributo Social", url: "https://www.argentina.gob.ar/servicio/inscribirse-al-monotributo-social", desc: t("services.prog_monotributo") },
       ],
     },
     {
