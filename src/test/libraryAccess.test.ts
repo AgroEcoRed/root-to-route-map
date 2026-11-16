@@ -15,15 +15,17 @@ const visitor = createClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_PUBLISHABL
 describe("Biblioteca anonymous document access", () => {
   it("allows visitors to sign and download a published PDF", async () => {
     const { data: items, error } = await visitor.from("library_items")
-      .select("file_path").not("file_path", "is", null).limit(1);
+      .select("id, file_path").not("file_path", "is", null).limit(1);
     expect(error).toBeNull();
     const path = items?.[0]?.file_path;
     expect(path).toBeTruthy();
     if (!path) throw new Error("Expected a published library document");
-    const signed = await visitor.storage.from("biblioteca").createSignedUrl(path, 60);
+    const direct = await visitor.storage.from("biblioteca").createSignedUrl(path, 60);
+    expect(direct.data?.signedUrl).toBeFalsy();
+    const signed = await visitor.functions.invoke("library-file", { body: { item_id: items![0].id } });
     expect(signed.error).toBeNull();
-    if (!signed.data?.signedUrl) throw new Error("Expected a signed document URL");
-    const response = await fetch(signed.data.signedUrl);
+    if (!signed.data?.url) throw new Error("Expected a signed document URL");
+    const response = await fetch(signed.data.url);
     expect(response.status).toBe(200);
     expect((await response.arrayBuffer()).byteLength).toBeGreaterThan(0);
   }, 30000);
