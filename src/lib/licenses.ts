@@ -18,11 +18,20 @@ export interface LicenseInfo {
 
 export const LICENSES: LicenseInfo[] = [
   {
+    code: "CC-BY-NC-SA-4.0",
+    short: "CC BY-NC-SA 4.0",
+    name: "Atribución – No Comercial – Compartir Igual",
+    description:
+      "Otros pueden compartir y adaptar sin fines comerciales, dando crédito y manteniendo la misma licencia. (Recomendada por defecto)",
+    url: "https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es",
+    open: true,
+  },
+  {
     code: "CC-BY-SA-4.0",
     short: "CC BY-SA 4.0",
     name: "Atribución – Compartir Igual",
     description:
-      "Otros pueden compartir y adaptar el contenido, incluso comercialmente, siempre que den crédito y usen la misma licencia. (Recomendada por defecto)",
+      "Otros pueden compartir y adaptar el contenido, incluso comercialmente, siempre que den crédito y usen la misma licencia.",
     url: "https://creativecommons.org/licenses/by-sa/4.0/deed.es",
     open: true,
   },
@@ -33,15 +42,6 @@ export const LICENSES: LicenseInfo[] = [
     description:
       "Otros pueden compartir y adaptar el contenido, incluso comercialmente, dando crédito al autor.",
     url: "https://creativecommons.org/licenses/by/4.0/deed.es",
-    open: true,
-  },
-  {
-    code: "CC-BY-NC-SA-4.0",
-    short: "CC BY-NC-SA 4.0",
-    name: "Atribución – No Comercial – Compartir Igual",
-    description:
-      "Otros pueden compartir y adaptar sin fines comerciales, dando crédito y manteniendo la misma licencia.",
-    url: "https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es",
     open: true,
   },
   {
@@ -82,7 +82,7 @@ export const LICENSES: LicenseInfo[] = [
   },
 ];
 
-export const DEFAULT_LICENSE: LicenseCode = "CC-BY-SA-4.0";
+export const DEFAULT_LICENSE: LicenseCode = "CC-BY-NC-SA-4.0";
 
 export const getLicense = (code?: string | null): LicenseInfo => {
   return (

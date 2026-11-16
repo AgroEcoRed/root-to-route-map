@@ -109,7 +109,7 @@ const Footer = () => {
             <span>{t("footer.copyright")}</span>
             <div className="flex items-center gap-4">
               <Link to="/licencias" className="hover:text-wheat transition-colors">
-                Licencias · CC BY-SA 4.0
+                Licencias · CC BY-NC-SA 4.0
               </Link>
               <span>{t("footer.tagline")}</span>
             </div>

@@ -30,8 +30,8 @@ const LicensesPage = () => {
                 <strong>Vos elegís la licencia.</strong> Al subir contenido,
                 podés indicar bajo qué condiciones autorizás que otras personas
                 lo reutilicen. Por defecto sugerimos{" "}
-                <strong>CC BY-SA 4.0</strong>, una licencia abierta con
-                atribución y compartir igual.
+                <strong>CC BY-NC-SA 4.0</strong>, una licencia abierta con
+                atribución, sin usos comerciales y compartir igual.
               </li>
               <li>
                 <strong>Podés cambiarla.</strong> Podés actualizar la licencia
@@ -117,7 +117,7 @@ const LicensesPage = () => {
               publican bajo <strong>Open Database License (ODbL 1.0)</strong>.
               Los <strong>contenidos colaborativos</strong> (textos, fotos,
               documentos) se comparten por defecto bajo{" "}
-              <strong>Creative Commons BY-SA 4.0</strong>, salvo que quien los
+              <strong>Creative Commons BY-NC-SA 4.0</strong>, salvo que quien los
               aportó haya elegido otra licencia.
             </p>
             <p className="text-sm text-muted-foreground leading-relaxed">
