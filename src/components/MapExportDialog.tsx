@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router";
-import { Share2, Download, Send, RefreshCw } from "lucide-react";
+import { Share2, Download, Send, RefreshCw, Code, Eye } from "lucide-react";
+import { mapEmbedCode, mapShareUrl } from "@/lib/mapSharing";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLayerManager } from "@/hooks/useLayerManager";
@@ -26,6 +27,7 @@ export default function MapExportDialog() {
   const [purpose, setPurpose] = useState("");
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [preview, setPreview] = useState(false);
   const loadStatus = useCallback(async () => {
     setLoaded(false);
     setStatus(null);
@@ -43,7 +45,7 @@ export default function MapExportDialog() {
       if (!active) return;
       if (error) { toast.error(t("export.error")); return; }
       setLayers(data.layers || []);
-      setLayer(current => current || data.layers?.[0]?.source_id || "");
+      setLayer(current => current || data.layers?.find((l: { source_id: string }) => l.source_id === new URLSearchParams(window.location.search).get('capa'))?.source_id || data.layers?.[0]?.source_id || "");
     });
     return () => { active = false; };
   }, [open, t]);
@@ -65,9 +67,12 @@ export default function MapExportDialog() {
     finally { setBusy(false); }
   };
   const share = async () => {
-    const url = new URL(window.location.href); url.host = "agroeco.red"; url.protocol = "https:";
-    try { await navigator.clipboard.writeText(url.toString()); toast.success(t("export.copied")); }
+    try { await navigator.clipboard.writeText(mapShareUrl(window.location.search)); toast.success(t("export.copied")); }
     catch { toast.error(t("export.error")); }
+  };
+  const copyEmbed = async () => {
+    try { await navigator.clipboard.writeText(mapEmbedCode(window.location.search, layer)); toast.success(t('export.embedCopied')); }
+    catch { toast.error(t('export.error')); }
   };
   return <Dialog open={open} onOpenChange={setOpen}>
     <DialogTrigger asChild><Button size="sm" variant="outline" className="rounded-full h-10 shrink-0 px-3" aria-label={t("export.title")} title={t("export.title")}><Share2 className="h-4 w-4" /><span className="hidden lg:inline">{t("export.title")}</span></Button></DialogTrigger>
@@ -77,6 +82,11 @@ export default function MapExportDialog() {
       <div className="border-t border-border pt-4 space-y-4">
         <Label htmlFor="export-layer">{t("export.layer")}</Label>
         <Select value={layer} onValueChange={setLayer}><SelectTrigger id="export-layer"><SelectValue placeholder={t("export.layer")} /></SelectTrigger><SelectContent className="z-[2100]">{layers.map(l => <SelectItem key={l.source_id} value={l.source_id}>{l.label}</SelectItem>)}</SelectContent></Select>
+        <div className="flex gap-2 flex-wrap">
+          <Button variant="outline" disabled={!layer} onClick={copyEmbed}><Code className="h-4 w-4" />{t('export.embed')}</Button>
+          <Button variant="ghost" disabled={!layer} onClick={() => setPreview(value => !value)} aria-expanded={preview}><Eye className="h-4 w-4" />{t('export.preview')}</Button>
+        </div>
+        {preview && layer && <iframe title="AgroEco.Red · Mapa Vivo" className="w-full h-80 border border-border rounded-lg" src={`${new URL(mapShareUrl(window.location.search, layer, true)).pathname}${new URL(mapShareUrl(window.location.search, layer, true)).search}`} />}
         {!user ? <Button asChild><Link to="/ingresar">{t("export.login")}</Link></Button> : !loaded ? <p className="text-sm text-muted-foreground">{t("export.loading")}</p> : authorized ? <div className="space-y-3"><p className="text-sm text-primary">{t("export.approved")}</p><div className="flex gap-2 flex-wrap">{(["geojson", "csv"] as const).map(format => <Button key={format} disabled={busy || !layer} onClick={() => execute("download", format)}><Download className="h-4 w-4" />{format.toUpperCase()}</Button>)}</div><p className="text-xs text-muted-foreground">ODbL 1.0 · AgroEco.Red</p></div> : status === "pending" ? <div className="flex gap-2 items-center"><p className="text-sm">{t("export.pending")}</p><Button size="icon" variant="ghost" onClick={loadStatus} title={t("export.refresh")} aria-label={t("export.refresh")}><RefreshCw className="h-4 w-4" /></Button></div> : <div className="space-y-3">
           {status && <p className="text-sm text-muted-foreground">{t(`export.${status}`)}</p>}
           <Label htmlFor="export-name">{t("export.name")}</Label><Input id="export-name" value={name} maxLength={120} onChange={e => setName(e.target.value)} />

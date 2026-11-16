@@ -28,9 +28,14 @@ export const useDataSources = () => {
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    const { data } = await (supabase as any)
+    const result = await (supabase as any)
       .from("data_source_settings")
       .select("source_id, label, enabled");
+    let data = result.data;
+    if (result.error) {
+      const publicResult = await supabase.functions.invoke('public-map-settings');
+      data = publicResult.data?.layers || [];
+    }
     if (data && data.length > 0) {
       // Preserve canonical order
       const map = new Map(data.map((d: any) => [d.source_id, d]));
@@ -39,6 +44,8 @@ export const useDataSources = () => {
       const defaultIds = new Set(DEFAULTS.map(d => d.source_id));
       const extras = (data as DataSourceSetting[]).filter(d => !defaultIds.has(d.source_id));
       setSources([...defaults, ...extras]);
+    } else {
+      setSources(DEFAULTS.map(d => ({ ...d, enabled: false })));
     }
     setLoading(false);
   }, []);

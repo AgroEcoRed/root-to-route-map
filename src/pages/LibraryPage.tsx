@@ -26,6 +26,8 @@ import { CITATION_STYLES, CitationStyle, formatCitation, formatBibliography } fr
 import TextReader, { sendToReader, type LangKey } from "@/components/library/TextReader";
 import { extractPdfText } from "@/lib/pdfText";
 import { Headphones } from "lucide-react";
+import StructuredData from '@/components/StructuredData';
+import { documentSchema } from '@/lib/structuredData';
 
 const ITEM_TYPES = ["article", "book", "thesis", "report", "chapter", "web"];
 
@@ -150,6 +152,7 @@ const LibraryPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <StructuredData nodes={filtered.map(documentSchema)} />
       <Navbar />
 
       <section className="pt-24 pb-8 bg-gradient-to-b from-primary/5 to-background">

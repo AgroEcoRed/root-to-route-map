@@ -8,6 +8,10 @@ const langFlags: Record<Lang, string> = { es: "🇦🇷", en: "🇬🇧", fr: "�
 // ─── Translation keys ───
 const translations: Record<Lang, Record<string, string>> = {
   es: {
+    "export.embed": "Copiar código para incrustar",
+    "export.embedCopied": "Código copiado",
+    "export.preview": "Vista previa",
+    "export.openMap": "Abrir mapa",
     "export.title": "Compartir / Exportar",
     "export.permission": "La exportación requiere permiso de quienes administran la capa. Solo se descargan datos públicos.",
     "export.share": "Copiar enlace del mapa",
@@ -341,6 +345,10 @@ const translations: Record<Lang, Record<string, string>> = {
     "open.cta": "Ver todas las licencias",
   },
   en: {
+    "export.embed": "Copy embed code",
+    "export.embedCopied": "Code copied",
+    "export.preview": "Preview",
+    "export.openMap": "Open map",
     "export.title": "Share / Export",
     "export.permission": "Exporting requires permission from the layer team. Only public data can be downloaded.",
     "export.share": "Copy map link",
@@ -638,6 +646,10 @@ const translations: Record<Lang, Record<string, string>> = {
     "open.cta": "See all licenses",
   },
   fr: {
+    "export.embed": "Copier le code d’intégration",
+    "export.embedCopied": "Code copié",
+    "export.preview": "Aperçu",
+    "export.openMap": "Ouvrir la carte",
     "export.title": "Partager / Exporter",
     "export.permission": "L’exportation nécessite l’accord de l’équipe de la couche. Seules les données publiques sont téléchargeables.",
     "export.share": "Copier le lien de la carte",
@@ -935,6 +947,10 @@ const translations: Record<Lang, Record<string, string>> = {
     "open.cta": "Voir toutes les licences",
   },
   pt: {
+    "export.embed": "Copiar código de incorporação",
+    "export.embedCopied": "Código copiado",
+    "export.preview": "Prévia",
+    "export.openMap": "Abrir mapa",
     "export.title": "Compartilhar / Exportar",
     "export.permission": "A exportação exige autorização de quem administra a camada. Apenas dados públicos podem ser baixados.",
     "export.share": "Copiar link do mapa",

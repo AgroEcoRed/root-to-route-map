@@ -33,6 +33,9 @@ import { EndorseDialog } from "@/components/actors/EndorseDialog";
 import { DeclareConnectionDialog } from "@/components/actors/DeclareConnectionDialog";
 import { toast } from "sonner";
 import MapExportDialog from "@/components/MapExportDialog";
+import EmbeddedMapHeader from "@/components/EmbeddedMapHeader";
+import StructuredData from "@/components/StructuredData";
+import { actorSchema, eventSchema } from "@/lib/structuredData";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -322,7 +325,7 @@ const uttNodesActors: MapActor[] = (uttNodesData.nodes as any[]).map((n, i) => {
 
 type CertFilter = "green" | "yellow" | "red";
 
-const MapPage = () => {
+const MapPage = ({ embedded = false }: { embedded?: boolean }) => {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const [activeTypes, setActiveTypes] = useState<Set<ActorType>>(new Set(Object.keys(actorTypeLabels) as ActorType[]));
@@ -342,7 +345,8 @@ const MapPage = () => {
   const profileIdByCoordsRef = useRef<Map<string, { id: string; lat: number; lng: number; name: string }>>(new Map());
   const [dbActors, setDbActors] = useState<MapActor[]>([]);
   const [dbProfilesById, setDbProfilesById] = useState<Map<string, { id: string; lat: number; lng: number; name: string }>>(new Map());
-  const { isEnabled, loading: sourcesLoading } = useDataSources();
+  const { sources, isEnabled, loading: sourcesLoading } = useDataSources();
+  const publiclyEnabled = useCallback((source: string) => !sourcesLoading && sources.some(s => s.source_id === source && s.enabled), [sources, sourcesLoading]);
   const { user } = useAuth();
   const { events } = useEvents();
   const [eventFilters, setEventFilters] = useState<EventsFilters>(() => ({
@@ -369,19 +373,21 @@ const MapPage = () => {
   // oculta las pasadas durante noviembre y las muestra en gris después).
   const [layerEventVis, setLayerEventVis] = useState<Record<string, EventVisibility>>({});
   useEffect(() => {
-    (supabase as any).from("data_source_settings").select("source_id,privacy").then(({ data }: any) => {
+    supabase.functions.invoke('public-map-settings').then(({ data }) => {
       const m: Record<string, EventVisibility> = {};
-      ((data as any[]) || []).forEach((r) => { m[r.source_id] = readEventVisibility(r.privacy); });
+      ((data?.layers as any[]) || []).forEach((r) => { m[r.source_id] = readEventVisibility(r.privacy); });
       setLayerEventVis(m);
     });
   }, []);
   const visibleEvents = useMemo(() => {
     if (soloSource && soloSource !== "eventos") return [];
     return applyEventFilters(events, eventFilters).filter((ev) => {
+      if (embedded && (sourcesLoading || (ev.layer_id && !publiclyEnabled(ev.layer_id)))) return false;
+      if (embedded && ev.layer_id && !layerEventVis[ev.layer_id]) return false;
       const vis = ev.layer_id ? layerEventVis[ev.layer_id] : undefined;
       return !vis || isEventPubliclyVisible(ev, vis);
     });
-  }, [events, eventFilters, soloSource, layerEventVis]);
+  }, [events, eventFilters, soloSource, layerEventVis, embedded, sourcesLoading, publiclyEnabled]);
   const allTypesCount = Object.keys(actorTypeLabels).length;
   const activeFilterCount =
     (activeTypes.size < allTypesCount ? 1 : 0) +
@@ -419,9 +425,9 @@ const MapPage = () => {
   }, [endorsementsTick]);
 
   // Rutas Sanas is now served from the layer_actors DB table (editable by layer managers).
-  const { actors: rutasSanasDb } = useLayerActors("rutas_sanas");
-  const { actors: userPointsDb } = useLayerActors("user_points");
-  const { actors: natSanMartinDb } = useLayerActors("nat_san_martin");
+  const { actors: rutasSanasDb } = useLayerActors("rutas_sanas", true);
+  const { actors: userPointsDb } = useLayerActors("user_points", true);
+  const { actors: natSanMartinDb } = useLayerActors("nat_san_martin", true);
   const rutasSanasActors = useMemo<MapActor[]>(() => {
     if (!rutasSanasDb || rutasSanasDb.length === 0) return fallbackRutasSanasActors;
     return rutasSanasDb.map((p, i) => ({
@@ -490,6 +496,7 @@ const MapPage = () => {
       const { data } = await (supabase as any)
         .from("layer_actors")
         .select("id,source_id,name,lat,lng,actor_type,family,description,address,delivery_days,verified_at,verified_by_role,updated_at")
+        .eq("public_visible", true)
         .not("source_id", "in", `(${known.join(",")})`);
       const rows = (data as any[]) || [];
       setExtraLayerActors(rows.map((p, i) => ({
@@ -558,9 +565,9 @@ const MapPage = () => {
     if (isEnabled("utt_nodos")) out.push(...uttNodesActors);
     if (isEnabled("user_points")) out.push(...userPointActors);
     if (isEnabled("nat_san_martin")) out.push(...natSanMartinActors);
-    out.push(...extraLayerActors.filter(a => isEnabled(a.source as any) || a.source === soloSource));
+    out.push(...extraLayerActors.filter(a => isEnabled(a.source as any) || (!embedded && a.source === soloSource)));
     return soloSource ? out.filter(a => a.source === soloSource) : out;
-  }, [dbActors, isEnabled, rutasSanasActors, userPointActors, natSanMartinActors, elClickActors, elBroteActors, extraLayerActors, soloSource]);
+  }, [dbActors, isEnabled, rutasSanasActors, userPointActors, natSanMartinActors, elClickActors, elBroteActors, extraLayerActors, soloSource, embedded]);
 
   const toggleType = (type: ActorType) => {
     setActiveTypes((prev) => {
@@ -583,6 +590,7 @@ const MapPage = () => {
   const filtered = useMemo(() => {
     if (eventFilters.onlyMes && !soloSource) return [];
     return allActors.filter((a) => {
+      if (embedded && !publiclyEnabled(a.source)) return false;
       // En modo "solo esta capa" se muestran todos sus puntos sin más filtros.
       if (!soloSource) {
         if (!activeTypes.has(a.type)) return false;
@@ -591,7 +599,7 @@ const MapPage = () => {
       if (search && !a.name.toLowerCase().includes(search.toLowerCase()) && !a.products.some((p) => p.toLowerCase().includes(search.toLowerCase()))) return false;
       return true;
     });
-  }, [activeTypes, activeCerts, search, allActors, eventFilters.onlyMes, soloSource]);
+  }, [activeTypes, activeCerts, search, allActors, eventFilters.onlyMes, soloSource, embedded, publiclyEnabled]);
 
   // Recalculate map size when surrounding layout changes
   useEffect(() => {
@@ -1143,11 +1151,15 @@ const MapPage = () => {
 
   return (
     <div className="h-screen min-h-[100dvh] overflow-hidden bg-background flex flex-col">
-      <Navbar />
-      <div className="flex-1 min-h-0 pt-16 flex flex-col">
+      <StructuredData nodes={[
+        ...filtered.filter(a => publiclyEnabled(a.source)).map(actorSchema),
+        ...visibleEvents.filter(e => !sourcesLoading && (!e.layer_id || publiclyEnabled(e.layer_id))).map(eventSchema),
+      ]} />
+      {embedded ? <EmbeddedMapHeader /> : <Navbar />}
+      <div className={`flex-1 min-h-0 flex flex-col ${embedded ? '' : 'pt-16'}`}>
         {/* Top toolbar: search + filters toggle */}
         {/* Top toolbar: compact search + collapsible filters */}
-        <div className="relative px-3 sm:px-6 py-2 border-b border-border shrink-0 z-[1200]">
+        {!embedded && <div className="relative px-3 sm:px-6 py-2 border-b border-border shrink-0 z-[1200]">
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <img
               src={fotoComarcaToolbar}
@@ -1338,14 +1350,14 @@ const MapPage = () => {
               </div>
             )}
           </div>
-        </div>
+        </div>}
 
         {/* Map area */}
         <div className="flex-1 min-h-0 relative flex flex-col">
           <div ref={mapContainerRef} className="w-full z-0 flex-1 min-h-[300px]" />
 
           {/* Events sidebar (desktop inline + mobile drawer) */}
-          <EventsSidebar
+          {!embedded && <EventsSidebar
             events={showEventsLayer ? visibleEvents : []}
             onFlyTo={(la, ln) => mapRef.current?.flyTo([la, ln], 14, { duration: 0.8 })}
             highlightedEventId={focusedEventId}
@@ -1365,10 +1377,10 @@ const MapPage = () => {
                 () => toast.error("No se pudo copiar")
               );
             }}
-          />
+          />}
 
           {/* Floating action buttons */}
-          <div className="absolute bottom-6 left-6 z-[1000] flex flex-col gap-2">
+          {!embedded && <div className="absolute bottom-6 left-6 z-[1000] flex flex-col gap-2">
             <Button
               size="sm"
               onClick={() => setShowNetwork(s => !s)}
@@ -1408,10 +1420,10 @@ const MapPage = () => {
               <Sparkles className="h-4 w-4" />
               + Actividad futura
             </Button>
-          </div>
+          </div>}
         </div>
       </div>
-      <DataSourceToggle position="bottom-6 right-6" onSolo={setSoloSource} soloSource={soloSource} />
+      {!embedded && <DataSourceToggle position="bottom-6 right-6" onSolo={setSoloSource} soloSource={soloSource} />}
       <EventFormDialog open={eventDialogOpen} onOpenChange={setEventDialogOpen} />
       <AddMapPointDialog open={addPointOpen} onOpenChange={setAddPointOpen} />
       <EndorseDialog

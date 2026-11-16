@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Mapa público para incrustar por capa, con código para copiar; conservar aprobación GeoJSON/CSV.
+- [x] Datos schema.org de actores, actividades visibles y documentos, sin campos reservados.
+
 - [x] Compartir mapa y solicitar exportaciones GeoJSON/CSV por capa; aprobación, rechazo y revocación por administradores; comprobar permisos.
 
 - [x] Canal RSS público de actividades con enlace para compartir y verificación sin cuenta.
