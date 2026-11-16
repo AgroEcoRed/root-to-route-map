@@ -10,10 +10,14 @@ Deno.serve(async (req) => {
   try {
     const url = Deno.env.get("SUPABASE_URL");
     const key = Deno.env.get("SUPABASE_ANON_KEY");
-    if (!url || !key) throw new Error("Missing public connection");
+    const settingsKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!url || !key || !settingsKey) throw new Error("Missing connection");
     // Always anonymous, even for signed-in requests: never expose an owner's private records.
     const client = createClient(url, key, { auth: { persistSession: false } });
-    const { data: layers, error: layerError } = await client.from("data_source_settings")
+    // Settings policies call a manager-only function that anon cannot execute.
+    // Read enabled settings server-side solely to filter; never return their contents.
+    const settingsClient = createClient(url, settingsKey, { auth: { persistSession: false } });
+    const { data: layers, error: layerError } = await settingsClient.from("data_source_settings")
       .select("source_id,enabled,privacy").eq("enabled", true);
     if (layerError) throw layerError;
     const events: FeedEvent[] = [];
