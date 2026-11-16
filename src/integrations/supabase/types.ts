@@ -1781,6 +1781,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      published_library_file_path: {
+        Args: { _item_id: string }
+        Returns: string
+      }
       review_layer_actor: {
         Args: { _decision: string; _id: string }
         Returns: {
