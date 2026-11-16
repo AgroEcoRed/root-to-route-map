@@ -147,6 +147,7 @@ export const EventsSidebarContent = ({
   onOpenEvent?: (id: string) => void;
   highlightedEventId?: string | null;
 }) => {
+  const [activeTab, setActiveTab] = useState("upcoming");
   const grouped = useMemo(() => {
     const upcoming: AgroEventFull[] = [];
     const undated: AgroEventFull[] = [];
@@ -162,6 +163,13 @@ export const EventsSidebarContent = ({
     return { upcoming, undated, past };
   }, [events]);
 
+  useEffect(() => {
+    const highlighted = events.find(event => event.id === highlightedEventId);
+    if (!highlighted) return;
+    const bucket = eventBucket(highlighted);
+    setActiveTab(bucket === "undated_or_unplaced" ? "undated" : bucket);
+  }, [highlightedEventId, events]);
+
   // Auto-scroll the highlighted card into view when it appears.
   useEffect(() => {
     if (!highlightedEventId) return;
@@ -170,7 +178,7 @@ export const EventsSidebarContent = ({
       el?.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 200);
     return () => clearTimeout(t);
-  }, [highlightedEventId, events]);
+  }, [highlightedEventId, events, activeTab]);
 
   const renderCard = (e: AgroEventFull) => (
     <Card
@@ -184,7 +192,7 @@ export const EventsSidebarContent = ({
   );
 
   return (
-    <Tabs defaultValue="upcoming" className="w-full">
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
       <TabsList className="grid grid-cols-3 w-full">
         <TabsTrigger value="upcoming" className="text-xs">Próximas ({grouped.upcoming.length})</TabsTrigger>
         <TabsTrigger value="undated" className="text-xs">Sin fecha/lugar ({grouped.undated.length})</TabsTrigger>

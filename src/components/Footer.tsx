@@ -1,11 +1,23 @@
 import { Link } from "react-router";
-import { Github, Twitter, Mail, Instagram } from "lucide-react";
+import { Github, Twitter, Mail, Instagram, Rss, Copy } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import AnimatedLogo from "@/components/AnimatedLogo";
+import { Button } from "@/components/ui/button";
+import { ACTIVITIES_RSS_URL } from "@/lib/activityFeed";
+import { toast } from "sonner";
 
 const Footer = () => {
   const { t } = useLanguage();
+
+  const copyFeed = async () => {
+    try {
+      await navigator.clipboard.writeText(ACTIVITIES_RSS_URL);
+      toast.success(t("footer.rss_copied"));
+    } catch {
+      toast.error(t("footer.rss_copy_error"));
+    }
+  };
 
   return (
     <footer className="border-t border-border bg-forest text-forest-foreground py-16 relative overflow-hidden">
@@ -64,6 +76,15 @@ const Footer = () => {
                 <Link to="/biblioteca" className="hover:text-wheat transition-colors hover:translate-x-1 inline-block">
                   {t("footer.api_docs")}
                 </Link>
+              </li>
+              <li className="flex items-center gap-2">
+                <a href={ACTIVITIES_RSS_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-wheat transition-colors">
+                  <Rss className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  {t("footer.rss")}
+                </a>
+                <Button variant="ghost" size="icon" onClick={copyFeed} aria-label={t("footer.rss_copy")} title={t("footer.rss_copy")} className="shrink-0 h-8 w-8 text-forest-foreground/60 hover:bg-forest-foreground/10 hover:text-wheat">
+                  <Copy className="h-4 w-4" />
+                </Button>
               </li>
               <li>
                 <Link to="/actores?tab=spg" className="hover:text-wheat transition-colors hover:translate-x-1 inline-block">
