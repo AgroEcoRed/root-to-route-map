@@ -32,6 +32,7 @@ import { AddMapPointDialog } from "@/components/AddMapPointDialog";
 import { EndorseDialog } from "@/components/actors/EndorseDialog";
 import { DeclareConnectionDialog } from "@/components/actors/DeclareConnectionDialog";
 import { toast } from "sonner";
+import MapExportDialog from "@/components/MapExportDialog";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -1159,6 +1160,7 @@ const MapPage = () => {
           <div className="relative max-w-5xl mx-auto">
             {/* En móvil priorizamos el mapa y sus capas; la búsqueda queda disponible en pantallas amplias. */}
             <div className="flex items-center gap-2">
+              <MapExportDialog />
               <div className="relative group hidden sm:block flex-1 min-w-0">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/70 group-focus-within:text-primary transition-colors" />
                 <Input

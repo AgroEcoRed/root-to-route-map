@@ -20,6 +20,7 @@ import LayerEventsAdmin from "@/components/admin/LayerEventsAdmin";
 import LayerPrivacyPanel from "@/components/admin/LayerPrivacyPanel";
 import LayerReviewPanel from "@/components/admin/LayerReviewPanel";
 import LayerLinksPanel from "@/components/admin/LayerLinksPanel";
+import LayerExportsPanel from "@/components/admin/LayerExportsPanel";
 import { toast } from "sonner";
 import { Layers, Loader2, ArrowLeft, MapPin, ShoppingBag, Power, Pencil, Plus, Trash2, CheckCircle2, Search, Send, Copy, Eye, EyeOff } from "lucide-react";
 
@@ -367,6 +368,7 @@ export default function LayerAdminPage() {
         </Card>
 
         <LayerEventsAdmin key={eventImportVersion} layerId={layerId} />
+        <LayerExportsPanel layerId={layerId} />
 
         {layerId === "red_facilitadores" && <LayerLinksPanel layerId={layerId} actors={actors} />}
 
