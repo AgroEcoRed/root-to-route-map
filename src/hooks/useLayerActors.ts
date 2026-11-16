@@ -21,7 +21,7 @@ export interface LayerActor {
   updated_at: string;
 }
 
-export const useLayerActors = (sourceId: string | undefined) => {
+export const useLayerActors = (sourceId: string | undefined, publicOnly = false) => {
   const [actors, setActors] = useState<LayerActor[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -41,7 +41,7 @@ export const useLayerActors = (sourceId: string | undefined) => {
     let rows = (data as LayerActor[]) || [];
     // Quienes gestionan la capa ven los datos completos reservados (RLS devuelve
     // filas sólo a managers/admins; para el público esta consulta viene vacía).
-    const { data: priv } = await (supabase as any)
+    const { data: priv } = publicOnly ? { data: null } : await (supabase as any)
       .from("layer_actor_private")
       .select("layer_actor_id,lat,lng,contact,actor_type,family")
       .eq("source_id", sourceId);
@@ -52,9 +52,9 @@ export const useLayerActors = (sourceId: string | undefined) => {
         return p ? { ...r, lat: p.lat ?? r.lat, lng: p.lng ?? r.lng, contact: p.contact, actor_type: p.actor_type, family: p.family } : r;
       });
     }
-    setActors(rows);
+    setActors(publicOnly ? rows.filter(r => r.public_visible !== false) : rows);
     setLoading(false);
-  }, [sourceId]);
+  }, [sourceId, publicOnly]);
 
   useEffect(() => { load(); }, [load]);
 

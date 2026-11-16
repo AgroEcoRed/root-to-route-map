@@ -373,9 +373,9 @@ const MapPage = ({ embedded = false }: { embedded?: boolean }) => {
   // oculta las pasadas durante noviembre y las muestra en gris después).
   const [layerEventVis, setLayerEventVis] = useState<Record<string, EventVisibility>>({});
   useEffect(() => {
-    (supabase as any).from("data_source_settings").select("source_id,privacy").then(({ data }: any) => {
+    supabase.functions.invoke('public-map-settings').then(({ data }) => {
       const m: Record<string, EventVisibility> = {};
-      ((data as any[]) || []).forEach((r) => { m[r.source_id] = readEventVisibility(r.privacy); });
+      ((data?.layers as any[]) || []).forEach((r) => { m[r.source_id] = readEventVisibility(r.privacy); });
       setLayerEventVis(m);
     });
   }, []);
@@ -424,9 +424,9 @@ const MapPage = ({ embedded = false }: { embedded?: boolean }) => {
   }, [endorsementsTick]);
 
   // Rutas Sanas is now served from the layer_actors DB table (editable by layer managers).
-  const { actors: rutasSanasDb } = useLayerActors("rutas_sanas");
-  const { actors: userPointsDb } = useLayerActors("user_points");
-  const { actors: natSanMartinDb } = useLayerActors("nat_san_martin");
+  const { actors: rutasSanasDb } = useLayerActors("rutas_sanas", true);
+  const { actors: userPointsDb } = useLayerActors("user_points", true);
+  const { actors: natSanMartinDb } = useLayerActors("nat_san_martin", true);
   const rutasSanasActors = useMemo<MapActor[]>(() => {
     if (!rutasSanasDb || rutasSanasDb.length === 0) return fallbackRutasSanasActors;
     return rutasSanasDb.map((p, i) => ({

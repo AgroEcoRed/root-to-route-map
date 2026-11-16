@@ -5,3 +5,4 @@
 - RSS and map exports share activity visibility code under the edge-functions shared directory — why: deployed functions cannot import sibling function directories and must agree on hidden activities.
 - Embedded maps reuse MapPage in read-only presentation mode, omit platform chat and editing controls, and only render enabled public layers — why: embedding must not expose manager previews or bypass export approvals.
 - Schema.org JSON-LD uses explicit public-field builders for visible map actors/events and library documents, with script-safe serialization and original document licenses — why: interoperability must not expose credentials, storage paths or private contacts.
+- Public map settings are served through public-map-settings with enabled layer labels and activity visibility only; map actor hooks never merge private manager data — why: public sharing must work anonymously without opening configuration tables or publishing reserved coordinates.
