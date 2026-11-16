@@ -333,14 +333,12 @@ const ItemCard = ({
   const { lang } = useLanguage();
   const openFile = async () => {
     if (!item.file_path) return;
-    const { data, error } = await supabase.storage
-      .from("biblioteca")
-      .createSignedUrl(item.file_path, 60 * 10);
-    if (error || !data?.signedUrl) {
+    const { data, error } = await supabase.functions.invoke("library-file", { body: { item_id: item.id } });
+    if (error || !data?.url) {
       toast.error("No se pudo abrir el archivo");
       return;
     }
-    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+    window.open(data.url, "_blank", "noopener,noreferrer");
   };
   const [pdfBusy, setPdfBusy] = useState(false);
   const readerLang = (): LangKey | undefined =>
@@ -353,9 +351,9 @@ const ItemCard = ({
     if (!item.file_path) return;
     setPdfBusy(true);
     try {
-      const { data, error } = await supabase.storage.from("biblioteca").createSignedUrl(item.file_path, 60 * 10);
-      if (error || !data?.signedUrl) { toast.error("No se pudo abrir el archivo"); return; }
-      const text = await extractPdfText(data.signedUrl);
+      const { data, error } = await supabase.functions.invoke("library-file", { body: { item_id: item.id } });
+      if (error || !data?.url) { toast.error("No se pudo abrir el archivo"); return; }
+      const text = await extractPdfText(data.url);
       if (!text) { toast.warning("El PDF no tiene texto seleccionable"); return; }
       sendToReader(text, readerLang());
     } catch {
