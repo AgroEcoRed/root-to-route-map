@@ -34,7 +34,6 @@ import ConfirmActorPage from "./pages/ConfirmActorPage";
 import EditEventPage from "./pages/EditEventPage";
 import PrototipoFacilitadoresPage from "./pages/PrototipoFacilitadoresPage";
 import PassifloraOrderPage from "./pages/PassifloraOrderPage";
-import PassifloraProductPage from "./pages/PassifloraProductPage";
 import ChatAsistente from "./components/chat/ChatAsistente";
 import NotFound from "./pages/NotFound";
 
@@ -91,7 +90,6 @@ const App = () => (
               <Route path="/eventos/editar/:token" element={<EditEventPage />} />
               <Route path="/prototipo/facilitadores" element={<PrototipoFacilitadoresPage />} />
               <Route path="/pedidos/red-passiflora/ronda-11/23" element={<PassifloraOrderPage />} />
-              <Route path="/productos/:slug" element={<PassifloraProductPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <PlatformChat />

@@ -930,6 +930,36 @@ export type Database = {
         }
         Relationships: []
       }
+      private_order_links: {
+        Row: {
+          access_key_hash: string
+          created_at: string
+          id: string
+          order_slug: string
+          payload: Json
+          revoked_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_key_hash: string
+          created_at?: string
+          id?: string
+          order_slug: string
+          payload: Json
+          revoked_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_key_hash?: string
+          created_at?: string
+          id?: string
+          order_slug?: string
+          payload?: Json
+          revoked_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       producer_media: {
         Row: {
           attribution: string | null
