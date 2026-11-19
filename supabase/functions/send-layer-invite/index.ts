@@ -52,6 +52,11 @@ Deno.serve(async (req) => {
     .slice(0, 5);
   const orgName = String(body?.org_name || "").trim().slice(0, 160);
   const purpose = String(body?.purpose || "").trim().slice(0, 1500);
+  // Demo opcional (p. ej. pedido privado): sólo enlaces de agroeco.red.
+  const demoUrlRaw = String(body?.demo_url || "").trim();
+  const demoUrl = /^https:\/\/(www\.)?agroeco\.red\/[A-Za-z0-9\/_\-.]*$/.test(demoUrlRaw) ? demoUrlRaw : "";
+  const demoKey = demoUrl ? String(body?.demo_key || "").trim().slice(0, 80) : "";
+  const demoLabel = String(body?.demo_label || "Ver demo").trim().slice(0, 120);
 
   const requestedOrigin = String(body?.origin || "").replace(/\/$/, "");
   const origin = ALLOWED_ORIGINS.has(requestedOrigin) ? requestedOrigin : DEFAULT_ORIGIN;
@@ -99,6 +104,11 @@ Deno.serve(async (req) => {
       </div>
       <p style="margin:18px 0 8px"><a href="${inviteLink}" style="background:#15803d;color:#fff;padding:11px 16px;border-radius:6px;text-decoration:none;display:inline-block;font-weight:700">Registrarse y gestionar la capa</a></p>
       <p style="font-size:12px;color:#6b7280;margin:0 0 16px">Si ya tienen cuenta, pueden ingresar desde este enlace: <a href="${loginLink}">${loginLink}</a></p>
+      ${demoUrl ? `<div style="background:#fef9c3;border-left:4px solid #ca8a04;padding:12px 14px;border-radius:6px;margin:16px 0">
+        <p style="margin:0 0 8px"><strong>${escapeHtml(demoLabel)}</strong></p>
+        <p style="margin:0 0 6px"><a href="${demoUrl}">${demoUrl}</a></p>
+        ${demoKey ? `<p style="margin:0">Clave de acceso: <code>${escapeHtml(demoKey)}</code></p>` : ""}
+      </div>` : ""}
       <p>Al ingresar con ese correo, AgroEco.Red les asignará automáticamente el permiso para administrar únicamente esa capa.</p>
       <hr style="border:none;border-top:1px solid #e5e7eb;margin:22px 0"/>
       <p style="font-size:12px;color:#9ca3af">Si el enlace no abre, copien y peguen esta dirección en el navegador: ${inviteLink}</p>
