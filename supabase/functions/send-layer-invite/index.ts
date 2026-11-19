@@ -123,7 +123,9 @@ Deno.serve(async (req) => {
     body: JSON.stringify({
       // Los correos institucionales de AgroEco.Red siempre salen desde info@agroeco.red.
       from: "AgroEco.Red <info@agroeco.red>",
-      reply_to: "info@agroeco.red",
+      // Mientras no exista una casilla/reenvío para info@agroeco.red, las respuestas
+      // deben llegar directamente a la coordinación para no perderlas.
+      reply_to: "apsosa@unsam.edu.ar",
       to: [email],
       ...(cc.length ? { cc } : {}),
       subject,
