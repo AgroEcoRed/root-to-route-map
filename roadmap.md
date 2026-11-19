@@ -1,5 +1,6 @@
 # Roadmap
 
+- [x] Pedido público de ejemplo de Red Passiflora con enlace para Emilio, productos enlazados y texto para compartir.
 - [x] Mapa público para incrustar por capa, con código para copiar; conservar aprobación GeoJSON/CSV.
 - [x] Datos schema.org de actores, actividades visibles y documentos, sin campos reservados.
 
